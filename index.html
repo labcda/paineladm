@@ -593,7 +593,7 @@
     const senha = document.getElementById('login-senha').value.trim();
     const errorEl = document.getElementById('login-error');
 
-    // Demo credentials: admin@cda.com / cda2024
+    // Demo credentials: admin / cda2024
     if (usuario === 'admin' && senha === 'cda2024') {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('splashScreen').style.display = 'flex';
@@ -636,7 +636,7 @@
   }
 
   // Enter key handlers
-  document.getElementById('login-password').addEventListener('keypress', function(e) {
+  document.getElementById('login-senha').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') fazerLogin();
   });
   document.getElementById('signup-password').addEventListener('keypress', function(e) {
