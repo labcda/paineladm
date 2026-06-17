@@ -4,12 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Lab CDA - Painel Administrativo</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Montserrat:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -22,7 +24,9 @@
       }
     }
   </script>
+
   <style>
+    /* ========== RESET & BASE ========== */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --cda-primary: #49BCBE; --cda-primary-dark: #37A7AA; --cda-primary-light: #E8F8F8;
@@ -33,24 +37,114 @@
     }
     body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; background: var(--neumorphic-bg); }
 
-    /* LOGIN */
-    #loginScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); z-index: 10000; display: flex; align-items: center; justify-content: center; }
-    .login-card { background: rgba(255,255,255,0.95); border-radius: 24px; padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); backdrop-filter: blur(10px); }
-    .login-logo { text-align: center; margin-bottom: 30px; }
-    .login-logo svg { width: 80px; height: 80px; margin: 0 auto 15px; }
-    .login-logo h2 { font-size: 1.5rem; font-weight: 800; color: #0F4C5C; }
-    .login-logo p { font-size: 0.85rem; color: #8c939e; }
-    .login-input-group { margin-bottom: 20px; }
-    .login-input-group label { display: block; font-size: 0.8rem; font-weight: 700; color: #101620; margin-bottom: 6px; }
-    .login-input-group input { width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 0.9rem; font-family: inherit; transition: all 0.2s; background: white; }
-    .login-input-group input:focus { outline: none; border-color: #37A7AA; box-shadow: 0 0 0 3px rgba(55,167,170,0.15); }
-    .login-btn { width: 100%; padding: 14px; border: none; border-radius: 12px; background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); color: white; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-top: 10px; }
-    .login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(15,76,92,0.3); }
-    .login-btn:active { transform: translateY(0); }
-    .login-error { color: #ef4444; font-size: 0.8rem; margin-top: 10px; text-align: center; display: none; }
+    /* ========== LOGIN NEUMORFICO ========== */
+    #loginScreen {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%);
+      z-index: 10000; display: flex; justify-content: center; align-items: center;
+      font-family: 'Montserrat', sans-serif; font-size: 12px;
+    }
+    .login-main {
+      position: relative; width: 1000px; min-width: 1000px; min-height: 600px;
+      height: 600px; padding: 25px; background-color: #ecf0f3;
+      box-shadow: 10px 10px 10px #d1d9e6, -10px -10px 10px #f9f9f9;
+      border-radius: 12px; overflow: hidden;
+    }
+    @media(max-width: 1200px) { .login-main { transform: scale(.7); } }
+    @media(max-width: 1000px) { .login-main { transform: scale(.6); } }
+    @media(max-width: 800px) { .login-main { transform: scale(.5); } }
+    @media(max-width: 600px) { .login-main { transform: scale(.4); } }
 
-    /* SPLASH */
-    #splashScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 1; transition: opacity 0.6s ease; }
+    .login-container {
+      display: flex; justify-content: center; align-items: center; position: absolute;
+      top: 0; width: 600px; height: 100%; padding: 25px; background-color: #ecf0f3;
+      transition: 1.25s;
+    }
+    .login-form {
+      display: flex; justify-content: center; align-items: center; flex-direction: column;
+      width: 100%; height: 100%;
+    }
+    .login-form__icon {
+      object-fit: contain; width: 30px; margin: 0 5px; opacity: .5; transition: .15s; cursor: pointer;
+    }
+    .login-form__icon:hover { opacity: 1; }
+    .login-form__input {
+      width: 350px; height: 40px; margin: 4px 0; padding-left: 25px; font-size: 13px;
+      letter-spacing: .15px; border: none; outline: none; font-family: 'Montserrat', sans-serif;
+      background-color: #ecf0f3; transition: .25s ease; border-radius: 8px;
+      box-shadow: inset 2px 2px 4px #d1d9e6, inset -2px -2px 4px #f9f9f9;
+      color: #181818;
+    }
+    .login-form__input::placeholder { color: #a0a5a8; }
+    .login-form__input:focus {
+      box-shadow: inset 4px 4px 4px #d1d9e6, inset -4px -4px 4px #f9f9f9;
+    }
+    .login-form__span { margin-top: 30px; margin-bottom: 12px; color: #a0a5a8; font-size: 12px; }
+    .login-form__link {
+      color: #181818; font-size: 15px; margin-top: 25px; border-bottom: 1px solid #a0a5a8;
+      line-height: 2; text-decoration: none; cursor: pointer; transition: all 0.2s;
+    }
+    .login-form__link:hover { color: #0F4C5C; border-bottom-color: #0F4C5C; }
+    .login-title { font-size: 34px; font-weight: 700; line-height: 3; color: #181818; }
+    .login-description { font-size: 14px; letter-spacing: .25px; text-align: center; line-height: 1.6; color: #a0a5a8; margin-bottom: 20px; }
+    .login-button {
+      width: 180px; height: 50px; border-radius: 25px; margin-top: 50px; font-weight: 700;
+      font-size: 14px; letter-spacing: 1.15px;
+      background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%);
+      color: #f9f9f9; box-shadow: 8px 8px 16px #d1d9e6, -8px -8px 16px #f9f9f9;
+      border: none; outline: none; cursor: pointer; transition: all 0.25s;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .login-button:hover { box-shadow: 6px 6px 10px #d1d9e6, -6px -6px 10px #f9f9f9; transform: scale(.985); }
+    .login-button:active, .login-button:focus { box-shadow: 2px 2px 6px #d1d9e6, -2px -2px 6px #f9f9f9; transform: scale(.97); }
+
+    .login-switch {
+      display: flex; justify-content: center; align-items: center; position: absolute;
+      top: 0; left: 0; height: 100%; width: 400px; padding: 50px; z-index: 200;
+      transition: 1.25s; background-color: #ecf0f3; overflow: hidden;
+      box-shadow: 4px 4px 10px #d1d9e6, -4px -4px 10px #f9f9f9;
+    }
+    .login-switch__circle {
+      position: absolute; width: 500px; height: 500px; border-radius: 50%;
+      background-color: #ecf0f3; box-shadow: inset 8px 8px 12px #d1d9e6, inset -8px -8px 12px #f9f9f9;
+      bottom: -60%; left: -60%; transition: 1.25s;
+    }
+    .login-switch__circle--t { top: -30%; left: 60%; width: 300px; height: 300px; }
+    .login-switch__container {
+      display: flex; justify-content: center; align-items: center; flex-direction: column;
+      position: absolute; width: 400px; padding: 50px 55px; transition: 1.25s;
+    }
+    .login-switch__button {
+      cursor: pointer; width: 180px; height: 50px; border-radius: 25px; margin-top: 50px;
+      font-weight: 700; font-size: 14px; letter-spacing: 1.15px;
+      background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%);
+      color: #f9f9f9; box-shadow: 8px 8px 16px #d1d9e6, -8px -8px 16px #f9f9f9;
+      border: none; outline: none; font-family: 'Montserrat', sans-serif; transition: all 0.25s;
+    }
+    .login-switch__button:hover { box-shadow: 6px 6px 10px #d1d9e6, -6px -6px 10px #f9f9f9; transform: scale(.985); }
+    .login-switch__button:active, .login-switch__button:focus { box-shadow: 2px 2px 6px #d1d9e6, -2px -2px 6px #f9f9f9; transform: scale(.97); }
+
+    .login-a-container { z-index: 100; left: calc(100% - 600px); }
+    .login-b-container { left: calc(100% - 600px); z-index: 0; }
+
+    .is-txr { left: calc(100% - 400px); transition: 1.25s; transform-origin: left; }
+    .is-txl { left: 0; transition: 1.25s; transform-origin: right; }
+    .is-z200 { z-index: 200; transition: 1.25s; }
+    .is-hidden { visibility: hidden; opacity: 0; position: absolute; transition: 1.25s; }
+    .is-gx { animation: is-gx 1.25s; }
+    @keyframes is-gx { 0%, 10%, 100% { width: 400px; } 30%, 50% { width: 500px; } }
+
+    .login-error-msg {
+      color: #ef4444; font-size: 0.8rem; margin-top: 10px; text-align: center;
+      display: none; font-family: 'Montserrat', sans-serif;
+    }
+
+    /* ========== SPLASH SCREEN ========== */
+    #splashScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%);
+      z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center;
+      opacity: 1; transition: opacity 0.6s ease;
+    }
     #splashScreen.fade-out { opacity: 0; pointer-events: none; }
     .splash-content { text-align: center; color: white; animation: fadeInDown 0.8s ease; }
     .splash-logo { width: 120px; height: 120px; margin-bottom: 30px; animation: float 3s ease-in-out infinite; }
@@ -63,7 +157,7 @@
     @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes progress { 0% { width: 0%; } 100% { width: 100%; } }
 
-    /* LAYOUT */
+    /* ========== LAYOUT APP ========== */
     body.app-loaded { overflow: hidden; height: 100vh; padding: 3rem 0 0 3rem; }
     a { text-decoration: none; color: inherit; }
     ul { list-style: none; }
@@ -184,34 +278,68 @@
 </head>
 <body>
 
-<!-- LOGIN -->
+<!-- ==================== LOGIN NEUMORFICO ==================== -->
 <div id="loginScreen">
-  <div class="login-card">
-    <div class="login-logo">
-      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <defs><linearGradient id="loginLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0F4C5C"/><stop offset="100%" style="stop-color:#49BCBE"/></linearGradient></defs>
-        <circle cx="50" cy="50" r="45" fill="none" stroke="url(#loginLogoGrad)" stroke-width="3"/>
-        <text x="50" y="60" font-size="32" font-weight="bold" fill="url(#loginLogoGrad)" text-anchor="middle" dominant-baseline="middle">CDA</text>
-      </svg>
-      <h2>Laboratório CDA</h2>
-      <p>Painel Administrativo</p>
+  <div class="login-main">
+
+    <!-- CREATE ACCOUNT (Sign Up) -->
+    <div class="login-container login-a-container" id="login-a-container">
+      <form class="login-form" id="login-a-form" onsubmit="return false;">
+        <h2 class="login-title">Create Account</h2>
+        <div class="form__icons">
+          <svg class="login-form__icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg"><circle cx="25" cy="25" r="22" fill="none" stroke="#181818" stroke-width="2"/><text x="25" y="30" font-size="18" font-weight="bold" fill="#181818" text-anchor="middle">f</text></svg>
+          <svg class="login-form__icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg"><circle cx="25" cy="25" r="22" fill="none" stroke="#181818" stroke-width="2"/><text x="25" y="32" font-size="16" font-weight="bold" fill="#181818" text-anchor="middle">in</text></svg>
+          <svg class="login-form__icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg"><circle cx="25" cy="25" r="22" fill="none" stroke="#181818" stroke-width="2"/><text x="25" y="32" font-size="16" font-weight="bold" fill="#181818" text-anchor="middle">X</text></svg>
+        </div>
+        <span class="login-form__span">or use email for registration</span>
+        <input type="text" class="login-form__input" id="signup-name" placeholder="Name" autocomplete="name">
+        <input type="email" class="login-form__input" id="signup-email" placeholder="Email" autocomplete="email">
+        <input type="password" class="login-form__input" id="signup-password" placeholder="Password" autocomplete="new-password">
+        <button class="login-button" onclick="fazerCadastro()">SIGN UP</button>
+        <div class="login-error-msg" id="signup-error">Preencha todos os campos</div>
+      </form>
     </div>
-    <div class="login-input-group">
-      <label><i class="fa-solid fa-user mr-1"></i> Usuário</label>
-      <input type="text" id="login-usuario" placeholder="Digite seu usuário" autocomplete="username">
+
+    <!-- SIGN IN (Login) -->
+    <div class="login-container login-b-container" id="login-b-container">
+      <form class="login-form" id="login-b-form" onsubmit="return false;">
+        <h2 class="login-title">Sign in to Website</h2>
+        <div class="form__icons">
+          <svg class="login-form__icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg"><circle cx="25" cy="25" r="22" fill="none" stroke="#181818" stroke-width="2"/><text x="25" y="30" font-size="18" font-weight="bold" fill="#181818" text-anchor="middle">f</text></svg>
+          <svg class="login-form__icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg"><circle cx="25" cy="25" r="22" fill="none" stroke="#181818" stroke-width="2"/><text x="25" y="32" font-size="16" font-weight="bold" fill="#181818" text-anchor="middle">in</text></svg>
+          <svg class="login-form__icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg"><circle cx="25" cy="25" r="22" fill="none" stroke="#181818" stroke-width="2"/><text x="25" y="32" font-size="16" font-weight="bold" fill="#181818" text-anchor="middle">X</text></svg>
+        </div>
+        <span class="login-form__span">or use your email account</span>
+        <input type="email" class="login-form__input" id="login-email" placeholder="Email" autocomplete="email">
+        <input type="password" class="login-form__input" id="login-password" placeholder="Password" autocomplete="current-password">
+        <a class="login-form__link">Forgot your password?</a>
+        <button class="login-button" onclick="fazerLogin()">SIGN IN</button>
+        <div class="login-error-msg" id="login-error">Email ou senha incorretos</div>
+      </form>
     </div>
-    <div class="login-input-group">
-      <label><i class="fa-solid fa-lock mr-1"></i> Senha</label>
-      <input type="password" id="login-senha" placeholder="Digite sua senha" autocomplete="current-password">
+
+    <!-- SWITCH PANEL -->
+    <div class="login-switch" id="login-switch-cnt">
+      <div class="login-switch__circle"></div>
+      <div class="login-switch__circle login-switch__circle--t"></div>
+
+      <div class="login-switch__container" id="login-switch-c1">
+        <h2 class="login-title">Welcome Back!</h2>
+        <p class="login-description">To keep connected with us please login with your personal info</p>
+        <button class="login-switch__button" onclick="toggleLogin()">SIGN IN</button>
+      </div>
+
+      <div class="login-switch__container is-hidden" id="login-switch-c2">
+        <h2 class="login-title">Hello Friend!</h2>
+        <p class="login-description">Enter your personal details and start journey with us</p>
+        <button class="login-switch__button" onclick="toggleLogin()">SIGN UP</button>
+      </div>
     </div>
-    <button class="login-btn" onclick="fazerLogin()">
-      <i class="fa-solid fa-right-to-bracket mr-2"></i> Entrar
-    </button>
-    <div class="login-error" id="login-error">Usuário ou senha incorretos</div>
+
   </div>
 </div>
 
-<!-- SPLASH -->
+<!-- ==================== SPLASH SCREEN ==================== -->
 <div id="splashScreen">
   <div class="splash-content">
     <div class="splash-logo">
@@ -229,7 +357,7 @@
   </div>
 </div>
 
-<!-- APP -->
+<!-- ==================== APP CONTAINER ==================== -->
 <div class="site-wrap" style="display: none;" id="appContainer">
   <nav class="site-nav">
     <div class="brand">
@@ -441,13 +569,40 @@
 
 <script>
 
+  // ==================== LOGIN TOGGLE ANIMATION ====================
+  let switchCtn = document.getElementById('login-switch-cnt');
+  let switchC1 = document.getElementById('login-switch-c1');
+  let switchC2 = document.getElementById('login-switch-c2');
+  let switchCircle = document.querySelectorAll('.login-switch__circle');
+  let aContainer = document.getElementById('login-a-container');
+  let bContainer = document.getElementById('login-b-container');
+  let allButtons = document.querySelectorAll('.login-button');
+
+  function toggleLogin() {
+    switchCtn.classList.add('is-gx');
+    setTimeout(function() {
+      switchCtn.classList.remove('is-gx');
+    }, 1500);
+
+    switchCtn.classList.toggle('is-txr');
+    switchCircle[0].classList.toggle('is-txr');
+    switchCircle[1].classList.toggle('is-txr');
+
+    switchC1.classList.toggle('is-hidden');
+    switchC2.classList.toggle('is-hidden');
+    aContainer.classList.toggle('is-txl');
+    bContainer.classList.toggle('is-txl');
+    bContainer.classList.toggle('is-z200');
+  }
+
   // ==================== LOGIN ====================
   function fazerLogin() {
-    const usuario = document.getElementById('login-usuario').value.trim();
-    const senha = document.getElementById('login-senha').value.trim();
+    const email = document.getElementById('login-email').value.trim();
+    const senha = document.getElementById('login-password').value.trim();
     const errorEl = document.getElementById('login-error');
 
-    if (usuario === 'admin' && senha === 'cda2024') {
+    // Demo credentials: admin@cda.com / cda2024
+    if (email === 'admin@cda.com' && senha === 'cda2024') {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('splashScreen').style.display = 'flex';
 
@@ -470,11 +625,30 @@
     }
   }
 
-  document.getElementById('login-senha').addEventListener('keypress', function(e) {
+  function fazerCadastro() {
+    const nome = document.getElementById('signup-name').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
+    const senha = document.getElementById('signup-password').value.trim();
+    const errorEl = document.getElementById('signup-error');
+
+    if (!nome || !email || !senha) {
+      errorEl.innerText = 'Preencha todos os campos';
+      errorEl.style.display = 'block';
+      setTimeout(() => errorEl.style.display = 'none', 3000);
+      return;
+    }
+
+    // Simula cadastro e vai para login
+    showToast('Cadastro realizado! Faça login.');
+    toggleLogin();
+  }
+
+  // Enter key handlers
+  document.getElementById('login-password').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') fazerLogin();
   });
-  document.getElementById('login-usuario').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') document.getElementById('login-senha').focus();
+  document.getElementById('signup-password').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') fazerCadastro();
   });
 
   // ==================== DADOS MENSAIS ====================
