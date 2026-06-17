@@ -4,631 +4,219 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Lab CDA - Painel Administrativo</title>
-
-  <!-- Estilos e Bibliotecas -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Montserrat:wght@500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-
-  <!-- jsPDF para gerar PDFs -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            cda: {
-              primary: '#49BCBE',
-              dark: '#37A7AA',
-              light: '#E8F8F8',
-              bg: '#F0F6F7',
-              text: '#1E293B'
-            }
+            cda: { primary: '#49BCBE', dark: '#37A7AA', light: '#E8F8F8', bg: '#F0F6F7', text: '#1E293B' }
           }
         }
       }
     }
   </script>
-
   <style>
-    /* Estilos Base */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --cda-primary: #49BCBE;
-      --cda-primary-dark: #37A7AA;
-      --cda-primary-light: #E8F8F8;
-      --cda-text: #1E293B;
-      --cda-text-light: #64748B;
-      --cda-white: #FFFFFF;
-      --cda-background: #F0F6F7;
-      --neumorphic-bg: #EBECF0;
-      --neumorphic-shadow-dark: #484f60;
-      --neumorphic-shadow-light: #FFFFFF;
-      --accent-green: #0F4C5C;
-      --bright-green: #49BCBE;
+      --cda-primary: #49BCBE; --cda-primary-dark: #37A7AA; --cda-primary-light: #E8F8F8;
+      --cda-text: #1E293B; --cda-text-light: #64748B; --cda-white: #FFFFFF;
+      --cda-background: #F0F6F7; --neumorphic-bg: #EBECF0;
+      --neumorphic-shadow-dark: #484f60; --neumorphic-shadow-light: #FFFFFF;
+      --accent-green: #0F4C5C; --bright-green: #49BCBE;
     }
+    body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; background: var(--neumorphic-bg); }
 
-    body {
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      font-size: 12px;
-      background: var(--neumorphic-bg);
-    }
+    /* LOGIN */
+    #loginScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); z-index: 10000; display: flex; align-items: center; justify-content: center; }
+    .login-card { background: rgba(255,255,255,0.95); border-radius: 24px; padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); backdrop-filter: blur(10px); }
+    .login-logo { text-align: center; margin-bottom: 30px; }
+    .login-logo svg { width: 80px; height: 80px; margin: 0 auto 15px; }
+    .login-logo h2 { font-size: 1.5rem; font-weight: 800; color: #0F4C5C; }
+    .login-logo p { font-size: 0.85rem; color: #8c939e; }
+    .login-input-group { margin-bottom: 20px; }
+    .login-input-group label { display: block; font-size: 0.8rem; font-weight: 700; color: #101620; margin-bottom: 6px; }
+    .login-input-group input { width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 0.9rem; font-family: inherit; transition: all 0.2s; background: white; }
+    .login-input-group input:focus { outline: none; border-color: #37A7AA; box-shadow: 0 0 0 3px rgba(55,167,170,0.15); }
+    .login-btn { width: 100%; padding: 14px; border: none; border-radius: 12px; background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); color: white; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-top: 10px; }
+    .login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(15,76,92,0.3); }
+    .login-btn:active { transform: translateY(0); }
+    .login-error { color: #ef4444; font-size: 0.8rem; margin-top: 10px; text-align: center; display: none; }
 
-    /* SPLASH SCREEN */
-    #splashScreen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%);
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      opacity: 1;
-      transition: opacity 0.6s ease;
-    }
+    /* SPLASH */
+    #splashScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 1; transition: opacity 0.6s ease; }
+    #splashScreen.fade-out { opacity: 0; pointer-events: none; }
+    .splash-content { text-align: center; color: white; animation: fadeInDown 0.8s ease; }
+    .splash-logo { width: 120px; height: 120px; margin-bottom: 30px; animation: float 3s ease-in-out infinite; }
+    .splash-title { font-size: 2.5rem; font-weight: 800; margin-bottom: 10px; letter-spacing: 1px; }
+    .splash-subtitle { font-size: 1rem; opacity: 0.9; margin-bottom: 40px; font-weight: 500; }
+    .splash-progress { width: 200px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+    .splash-progress-bar { height: 100%; background: linear-gradient(90deg, #FFFFFF, #7EFDE0); width: 0%; animation: progress 2.5s ease-in-out forwards; border-radius: 10px; }
+    .splash-text { font-size: 0.85rem; opacity: 0.8; margin-top: 20px; }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes progress { 0% { width: 0%; } 100% { width: 100%; } }
 
-    #splashScreen.fade-out {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .splash-content {
-      text-align: center;
-      color: white;
-      animation: fadeInDown 0.8s ease;
-    }
-
-    .splash-logo {
-      width: 120px;
-      height: 120px;
-      margin-bottom: 30px;
-      animation: float 3s ease-in-out infinite;
-    }
-
-    .splash-title {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 10px;
-      letter-spacing: 1px;
-    }
-
-    .splash-subtitle {
-      font-size: 1rem;
-      opacity: 0.9;
-      margin-bottom: 40px;
-      font-weight: 500;
-    }
-
-    .splash-progress {
-      width: 200px;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
-      overflow: hidden;
-      margin-bottom: 20px;
-    }
-
-    .splash-progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, #FFFFFF, #7EFDE0);
-      width: 0%;
-      animation: progress 2.5s ease-in-out forwards;
-      border-radius: 10px;
-    }
-
-    .splash-text {
-      font-size: 0.85rem;
-      opacity: 0.8;
-      margin-top: 20px;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-20px); }
-    }
-
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes progress {
-      0% { width: 0%; }
-      100% { width: 100%; }
-    }
-
-    /* LAYOUT PRINCIPAL */
-    body.app-loaded {
-      overflow: hidden;
-      height: 100vh;
-      padding: 3rem 0 0 3rem;
-    }
-
+    /* LAYOUT */
+    body.app-loaded { overflow: hidden; height: 100vh; padding: 3rem 0 0 3rem; }
     a { text-decoration: none; color: inherit; }
     ul { list-style: none; }
-
-    .site-wrap {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      height: calc(100vh - 3rem);
-      border-radius: 1.5rem 1.5rem 0 0;
-      overflow: hidden;
-    }
+    .site-wrap { display: grid; grid-template-columns: 280px 1fr; height: calc(100vh - 3rem); border-radius: 1.5rem 1.5rem 0 0; overflow: hidden; }
 
     /* SIDEBAR */
-    .site-nav {
-      background: #0b121b;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      border-radius: 1.5rem 0 0 0;
-      overflow-y: auto;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 1.3rem;
-      padding: 1.75rem 2rem 1.25rem;
-      border-bottom: 0.5px solid rgba(255,255,255,0.07);
-      position: relative;
-    }
+    .site-nav { background: #0b121b; color: white; display: flex; flex-direction: column; border-radius: 1.5rem 0 0 0; overflow-y: auto; }
+    .brand { display: flex; align-items: center; justify-content: space-between; font-size: 1.3rem; padding: 1.75rem 2rem 1.25rem; border-bottom: 0.5px solid rgba(255,255,255,0.07); position: relative; }
     .brand svg { fill: white; width: 16px; height: 16px; }
-    .brand::after {
-      content: ""; width: 8px; height: 8px; background: #4777ce; border-radius: 50%;
-      position: absolute; right: 1.85rem; top: 1.85rem;
-    }
-
+    .brand::after { content: ""; width: 8px; height: 8px; background: #4777ce; border-radius: 50%; position: absolute; right: 1.85rem; top: 1.85rem; }
     .site-nav > ul { flex: 1; padding: 0.5rem 0; margin-bottom: auto; }
-    .site-nav > ul > li > a {
-      display: block; padding: 0.7rem 0.5rem 0.7rem 2rem; font-size: 0.85rem;
-      color: rgba(255,255,255,0.7); position: relative; transition: all 0.2s;
-    }
-    .site-nav > ul > li > a:hover,
-    .site-nav > ul > li > a:focus { color: #49BCBE; }
-    .site-nav > ul > li.active > a {
-      background: linear-gradient(to right, #101b2d, transparent); color: white;
-    }
-    .site-nav > ul > li.active > a::before {
-      content: ""; position: absolute; left: 0; top: 0; height: 100%;
-      background: #49BCBE; width: 5px; border-radius: 0 4px 4px 0;
-    }
-
+    .site-nav > ul > li > a { display: block; padding: 0.7rem 0.5rem 0.7rem 2rem; font-size: 0.85rem; color: rgba(255,255,255,0.7); position: relative; transition: all 0.2s; }
+    .site-nav > ul > li > a:hover, .site-nav > ul > li > a:focus { color: #49BCBE; }
+    .site-nav > ul > li.active > a { background: linear-gradient(to right, #101b2d, transparent); color: white; }
+    .site-nav > ul > li.active > a::before { content: ""; position: absolute; left: 0; top: 0; height: 100%; background: #49BCBE; width: 5px; border-radius: 0 4px 4px 0; }
     .note { margin: 1.5rem; background: #171c26; border-radius: 10px; padding: 1rem; width: calc(100% - 3rem); }
     .note h3 { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; }
     .note p { color: #717783; font-size: 0.78rem; line-height: 1.55; }
 
     /* MAIN */
-    main {
-      background: #ebecee;
-      border-radius: 1.5rem 0 0 0;
-      margin-left: -1.5rem;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      position: relative;
-    }
-
-    main > header { 
-      padding: 2.5rem 3rem 1.5rem; 
-      background: #ebecee; 
-      border-bottom: 1px solid #d5d6d9; 
-    }
-
+    main { background: #ebecee; border-radius: 1.5rem 0 0 0; margin-left: -1.5rem; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+    main > header { padding: 2.5rem 3rem 1.5rem; background: #ebecee; border-bottom: 1px solid #d5d6d9; }
     .breadcrumbs { font-size: 0.75rem; color: #8c939e; margin-bottom: 0.4rem; }
     h1.title { font-size: 1.6rem; font-weight: 700; color: #101620; margin-bottom: 0; }
+    .content-area { flex: 1; padding: 2rem 3rem; overflow-y: auto; background: #f8fafc; }
 
-    .content-area {
-      flex: 1;
-      padding: 2rem 3rem;
-      overflow-y: auto;
-      background: #f8fafc;
-    }
+    /* BUTTONS */
+    .neumorphic-btn { font-family: 'Montserrat', sans-serif; font-size: 18px; color: #6C7587; background-color: var(--neumorphic-bg); border: 3px solid rgba(255,255,255,0); border-radius: 40px; padding: 0 28px; height: 54px; cursor: pointer; transition: all 250ms ease-in-out; box-shadow: 8px 8px 12px -2px rgba(72,79,96,0.4), -6px -6px 12px -1px rgba(255,255,255,1); display: inline-flex; align-items: center; justify-content: center; gap: 8px; outline: none; position: relative; }
+    .neumorphic-btn:hover { box-shadow: none; border-color: rgba(255,255,255,0.5); }
+    .neumorphic-btn:active { box-shadow: inset -4px -4px 6px -1px rgba(255,255,255,1), inset 2px 2px 8px -1px rgba(72,79,96,0.5); border-color: rgba(255,255,255,0); }
+    .neumorphic-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .neumorphic-btn.primary { background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); color: white; box-shadow: 8px 8px 12px -2px rgba(15,76,92,0.3), -6px -6px 12px -1px rgba(255,255,255,0.5); }
+    .neumorphic-btn.primary:hover { box-shadow: 12px 12px 16px -2px rgba(15,76,92,0.4), -8px -8px 16px -1px rgba(255,255,255,0.6); }
+    .neumorphic-btn.primary:active { box-shadow: inset 4px 4px 8px rgba(15,76,92,0.3), inset -2px -2px 6px rgba(255,255,255,0.5); }
+    .neumorphic-btn-lg { padding: 0 40px; height: 60px; font-size: 16px; border-radius: 50px; }
 
-    /* NEUMORPHIC BUTTONS - COR VERDE */
-    .neumorphic-btn {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 18px;
-      color: #6C7587;
-      background-color: var(--neumorphic-bg);
-      border: 3px solid rgba(255, 255, 255, 0);
-      border-radius: 40px;
-      padding: 0 28px;
-      height: 54px;
-      cursor: pointer;
-      transition: all 250ms ease-in-out;
-      box-shadow: 8px 8px 12px -2px rgba(72, 79, 96, 0.4), -6px -6px 12px -1px rgba(255, 255, 255, 1);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      outline: none;
-      position: relative;
-    }
+    /* CARDS */
+    .neumorphic-card { background-color: var(--neumorphic-bg); border-radius: 24px; padding: 24px; box-shadow: 8px 8px 12px -2px rgba(72,79,96,0.4), -6px -6px 12px -1px rgba(255,255,255,1); margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.3); }
 
-    .neumorphic-btn:hover {
-      box-shadow: none;
-      border-color: rgba(255, 255, 255, 0.5);
-    }
+    /* HOME */
+    .home-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px; }
+    .stat-card { background-color: var(--neumorphic-bg); border-radius: 20px; padding: 24px; box-shadow: 8px 8px 12px -2px rgba(72,79,96,0.4), -6px -6px 12px -1px rgba(255,255,255,1); text-align: center; transition: all 300ms ease-in-out; }
+    .stat-card:hover { transform: translateY(-5px); box-shadow: 12px 12px 16px -2px rgba(72,79,96,0.3), -8px -8px 16px -1px rgba(255,255,255,1); }
+    .stat-icon { font-size: 2.5rem; margin-bottom: 12px; color: var(--accent-green); }
+    .stat-value { font-size: 2rem; font-weight: 800; color: #101620; margin-bottom: 8px; }
+    .stat-label { font-size: 0.9rem; color: #8c939e; font-weight: 500; }
+    .stat-mes { font-size: 0.7rem; color: #0F4C5C; font-weight: 700; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
 
-    .neumorphic-btn:active {
-      box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);
-      border-color: rgba(255, 255, 255, 0);
-    }
+    /* ATIVIDADES */
+    .atividade-item { display: flex; align-items: center; padding: 12px; border-radius: 12px; margin-bottom: 10px; transition: all 0.2s; }
+    .atividade-item:hover { transform: translateX(4px); }
+    .atividade-icon { margin-right: 12px; font-size: 1.1rem; }
+    .atividade-info { flex: 1; }
+    .atividade-titulo { font-weight: 600; color: #101620; font-size: 0.85rem; }
+    .atividade-tempo { font-size: 0.75rem; color: #8c939e; }
 
-    .neumorphic-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    /* BOTÃO PRIMARY - COR VERDE DO TÍTULO ORÇAMENTO */
-    .neumorphic-btn.primary {
-      background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%);
-      color: white;
-      box-shadow: 8px 8px 12px -2px rgba(15, 76, 92, 0.3), -6px -6px 12px -1px rgba(255, 255, 255, 0.5);
-    }
-
-    .neumorphic-btn.primary:hover {
-      box-shadow: 12px 12px 16px -2px rgba(15, 76, 92, 0.4), -8px -8px 16px -1px rgba(255, 255, 255, 0.6);
-    }
-
-    .neumorphic-btn.primary:active {
-      box-shadow: inset 4px 4px 8px rgba(15, 76, 92, 0.3), inset -2px -2px 6px rgba(255, 255, 255, 0.5);
-    }
-
-    .neumorphic-btn-sm {
-      padding: 0 20px;
-      height: 48px;
-      font-size: 14px;
-      border-radius: 32px;
-    }
-
-    .neumorphic-btn-lg {
-      padding: 0 40px;
-      height: 60px;
-      font-size: 16px;
-      border-radius: 50px;
-    }
-
-    .neumorphic-icon {
-      width: 24px;
-      height: 24px;
-      fill: #6C7587;
-    }
-
-    /* CARD NEUMORPHIC */
-    .neumorphic-card {
-      background-color: var(--neumorphic-bg);
-      border-radius: 24px;
-      padding: 24px;
-      box-shadow: 8px 8px 12px -2px rgba(72, 79, 96, 0.4), -6px -6px 12px -1px rgba(255, 255, 255, 1);
-      margin-bottom: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    /* HOME PAGE STYLES */
-    .home-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-      margin-bottom: 32px;
-    }
-
-    .stat-card {
-      background-color: var(--neumorphic-bg);
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 8px 8px 12px -2px rgba(72, 79, 96, 0.4), -6px -6px 12px -1px rgba(255, 255, 255, 1);
-      text-align: center;
-      transition: all 300ms ease-in-out;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 12px 12px 16px -2px rgba(72, 79, 96, 0.3), -8px -8px 16px -1px rgba(255, 255, 255, 1);
-    }
-
-    .stat-icon {
-      font-size: 2.5rem;
-      margin-bottom: 12px;
-      color: var(--accent-green);
-    }
-
-    .stat-value {
-      font-size: 2rem;
-      font-weight: 800;
-      color: #101620;
-      margin-bottom: 8px;
-    }
-
-    .stat-label {
-      font-size: 0.9rem;
-      color: #8c939e;
-      font-weight: 500;
-    }
-
-    .action-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-top: 24px;
-    }
-
-    /* Page Visibility */
+    /* PAGES */
     .page { display: none; }
     .page.active { display: block; animation: fadeIn 0.4s ease-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     /* TOAST */
-    #cda-toast {
-      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
-      background: #0F4C5C; color: white; padding: 12px 22px; border-radius: 100px;
-      font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px;
-      box-shadow: 8px 8px 12px -2px rgba(15, 76, 92, 0.4); z-index: 99999; opacity: 0;
-      pointer-events: none; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
+    #cda-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: #0F4C5C; color: white; padding: 12px 22px; border-radius: 100px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; box-shadow: 8px 8px 12px -2px rgba(15,76,92,0.4); z-index: 99999; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
     #cda-toast.toast-show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     /* AUTOCOMPLETE */
-    .autocomplete-container {
-      position: relative;
-    }
+    .autocomplete-container { position: relative; }
+    .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-height: 300px; overflow-y: auto; z-index: 1000; margin-top: 8px; display: none; }
+    .autocomplete-list.show { display: block; }
+    .autocomplete-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: all 0.2s; }
+    .autocomplete-item:hover { background: #E8F8F8; }
+    .autocomplete-item:last-child { border-bottom: none; }
+    .autocomplete-item-nome { font-weight: 600; color: #101620; font-size: 0.9rem; }
+    .autocomplete-item-codigo { font-size: 0.75rem; color: #8c939e; margin-top: 2px; }
+    .autocomplete-item-preco { font-size: 0.85rem; color: #0F4C5C; font-weight: 700; margin-top: 2px; }
 
-    .autocomplete-list {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-      max-height: 300px;
-      overflow-y: auto;
-      z-index: 1000;
-      margin-top: 8px;
-      display: none;
-    }
+    /* EXAMES */
+    .exame-selecionado-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: white; border-radius: 10px; margin-bottom: 6px; box-shadow: 1px 1px 4px rgba(0,0,0,0.05); transition: all 0.2s; }
+    .exame-selecionado-item:hover { transform: translateX(3px); }
+    .exame-info { flex: 1; min-width: 0; }
+    .exame-nome { font-weight: 600; color: #101620; font-size: 0.78rem; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .exame-codigo { font-size: 0.65rem; color: #8c939e; margin-top: 1px; }
+    .exame-preco { font-weight: 700; color: #0F4C5C; font-size: 0.85rem; margin-right: 8px; white-space: nowrap; }
+    .btn-remover-exame { background: #fee2e2; color: #ef4444; border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 0.7rem; flex-shrink: 0; }
+    .btn-remover-exame:hover { background: #ef4444; color: white; }
+    .btn-limpar { background: transparent; color: #8c939e; border: 1px solid #d5d6d9; border-radius: 20px; padding: 6px 14px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; }
+    .btn-limpar:hover { background: #fee2e2; color: #ef4444; border-color: #ef4444; }
 
-    .autocomplete-list.show {
-      display: block;
-    }
+    /* DESCONTOS */
+    .desconto-card { background: #E8F8F8; border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s; }
+    .desconto-card:hover { transform: translateX(3px); box-shadow: 2px 2px 8px rgba(0,0,0,0.08); }
+    .desconto-info { display: flex; align-items: center; gap: 10px; }
+    .desconto-icone { font-size: 1.3rem; }
+    .desconto-titulo { font-weight: 700; color: #101620; font-size: 0.85rem; }
+    .desconto-subtitulo { color: #8c939e; font-size: 0.75rem; }
+    .desconto-valores { text-align: right; }
+    .desconto-off { color: #0F4C5C; font-weight: 800; font-size: 0.9rem; }
+    .desconto-preco { color: #101620; font-weight: 700; font-size: 1rem; }
+    .desconto-parcela { color: #8c939e; font-size: 0.75rem; }
 
-    .autocomplete-item {
-      padding: 12px 16px;
-      cursor: pointer;
-      border-bottom: 1px solid #f0f0f0;
-      transition: all 0.2s;
-    }
+    /* IA AREA */
+    .ia-area { background: linear-gradient(135deg, rgba(15,76,92,0.05) 0%, rgba(73,188,190,0.05) 100%); border: 2px dashed #37A7AA; border-radius: 16px; padding: 20px; text-align: center; margin-top: 16px; transition: all 0.3s; }
+    .ia-area:hover { border-color: #0F4C5C; background: linear-gradient(135deg, rgba(15,76,92,0.08) 0%, rgba(73,188,190,0.08) 100%); }
+    .ia-area i { font-size: 2rem; color: #37A7AA; margin-bottom: 8px; }
+    .ia-area h4 { font-size: 0.9rem; font-weight: 700; color: #0F4C5C; margin-bottom: 4px; }
+    .ia-area p { font-size: 0.75rem; color: #8c939e; }
 
-    .autocomplete-item:hover {
-      background: #E8F8F8;
-    }
+    /* HORARIOS */
+    .horario-btn { padding: 10px 8px; border-radius: 12px; border: none; background: white; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; box-shadow: 2px 2px 8px rgba(0,0,0,0.08); }
+    .horario-btn:hover { background: #E8F8F8; color: #0F4C5C; }
+    .horario-btn.selected { background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); color: white; }
+    .horario-btn.ocupado { background: #fee2e2; color: #ef4444; cursor: not-allowed; opacity: 0.6; }
 
-    .autocomplete-item:last-child {
-      border-bottom: none;
-    }
-
-    .autocomplete-item-nome {
-      font-weight: 600;
-      color: #101620;
-      font-size: 0.9rem;
-    }
-
-    .autocomplete-item-codigo {
-      font-size: 0.75rem;
-      color: #8c939e;
-      margin-top: 2px;
-    }
-
-    .autocomplete-item-preco {
-      font-size: 0.85rem;
-      color: #0F4C5C;
-      font-weight: 700;
-      margin-top: 2px;
-    }
-
-    /* EXAME SELECIONADO ITEM - FONTE MENOR */
-    .exame-selecionado-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 12px;
-      background: white;
-      border-radius: 10px;
-      margin-bottom: 6px;
-      box-shadow: 1px 1px 4px rgba(0,0,0,0.05);
-      transition: all 0.2s;
-    }
-
-    .exame-selecionado-item:hover {
-      transform: translateX(3px);
-    }
-
-    .exame-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .exame-nome {
-      font-weight: 600;
-      color: #101620;
-      font-size: 0.78rem;
-      line-height: 1.3;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .exame-codigo {
-      font-size: 0.65rem;
-      color: #8c939e;
-      margin-top: 1px;
-    }
-
-    .exame-preco {
-      font-weight: 700;
-      color: #0F4C5C;
-      font-size: 0.85rem;
-      margin-right: 8px;
-      white-space: nowrap;
-    }
-
-    .btn-remover-exame {
-      background: #fee2e2;
-      color: #ef4444;
-      border: none;
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      font-size: 0.7rem;
-      flex-shrink: 0;
-    }
-
-    .btn-remover-exame:hover {
-      background: #ef4444;
-      color: white;
-    }
-
-    /* BOTÃO LIMPAR */
-    .btn-limpar {
-      background: transparent;
-      color: #8c939e;
-      border: 1px solid #d5d6d9;
-      border-radius: 20px;
-      padding: 6px 14px;
-      font-size: 0.75rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      margin-top: 8px;
-    }
-
-    .btn-limpar:hover {
-      background: #fee2e2;
-      color: #ef4444;
-      border-color: #ef4444;
-    }
-
-    /* DESCONTOS DE PAGAMENTO */
-    .desconto-card {
-      background: #E8F8F8;
-      border-radius: 14px;
-      padding: 14px 16px;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: all 0.2s;
-    }
-
-    .desconto-card:hover {
-      transform: translateX(3px);
-      box-shadow: 2px 2px 8px rgba(0,0,0,0.08);
-    }
-
-    .desconto-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .desconto-icone {
-      font-size: 1.3rem;
-    }
-
-    .desconto-titulo {
-      font-weight: 700;
-      color: #101620;
-      font-size: 0.85rem;
-    }
-
-    .desconto-subtitulo {
-      color: #8c939e;
-      font-size: 0.75rem;
-    }
-
-    .desconto-valores {
-      text-align: right;
-    }
-
-    .desconto-off {
-      color: #0F4C5C;
-      font-weight: 800;
-      font-size: 0.9rem;
-    }
-
-    .desconto-preco {
-      color: #101620;
-      font-weight: 700;
-      font-size: 1rem;
-    }
-
-    .desconto-parcela {
-      color: #8c939e;
-      font-size: 0.75rem;
-    }
-
-    /* HORÁRIOS */
-    .horario-btn {
-      padding: 10px 8px;
-      border-radius: 12px;
-      border: none;
-      background: white;
-      cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 600;
-      transition: all 0.2s;
-      box-shadow: 2px 2px 8px rgba(0,0,0,0.08);
-    }
-
-    .horario-btn:hover {
-      background: #E8F8F8;
-      color: #0F4C5C;
-    }
-
-    .horario-btn.selected {
-      background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%);
-      color: white;
-    }
-
-    .horario-btn.ocupado {
-      background: #fee2e2;
-      color: #ef4444;
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
+    @media (max-width: 1024px) { .home-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) { .home-grid { grid-template-columns: 1fr; } body.app-loaded { padding: 1rem 0 0 1rem; } .site-wrap { grid-template-columns: 1fr; } .site-nav { display: none; } }
   </style>
 <base target="_blank">
 </head>
 <body>
 
-<!-- SPLASH SCREEN -->
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="loginLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0F4C5C"/><stop offset="100%" style="stop-color:#49BCBE"/></linearGradient></defs>
+        <circle cx="50" cy="50" r="45" fill="none" stroke="url(#loginLogoGrad)" stroke-width="3"/>
+        <text x="50" y="60" font-size="32" font-weight="bold" fill="url(#loginLogoGrad)" text-anchor="middle" dominant-baseline="middle">CDA</text>
+      </svg>
+      <h2>Laboratório CDA</h2>
+      <p>Painel Administrativo</p>
+    </div>
+    <div class="login-input-group">
+      <label><i class="fa-solid fa-user mr-1"></i> Usuário</label>
+      <input type="text" id="login-usuario" placeholder="Digite seu usuário" autocomplete="username">
+    </div>
+    <div class="login-input-group">
+      <label><i class="fa-solid fa-lock mr-1"></i> Senha</label>
+      <input type="password" id="login-senha" placeholder="Digite sua senha" autocomplete="current-password">
+    </div>
+    <button class="login-btn" onclick="fazerLogin()">
+      <i class="fa-solid fa-right-to-bracket mr-2"></i> Entrar
+    </button>
+    <div class="login-error" id="login-error">Usuário ou senha incorretos</div>
+  </div>
+</div>
+
+<!-- SPLASH -->
 <div id="splashScreen">
   <div class="splash-content">
     <div class="splash-logo">
       <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#7EFDE0;stop-opacity:1" />
-          </linearGradient>
-        </defs>
+        <defs><linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#FFFFFF"/><stop offset="100%" style="stop-color:#7EFDE0"/></linearGradient></defs>
         <circle cx="50" cy="50" r="45" fill="none" stroke="url(#logoGrad)" stroke-width="2" opacity="0.3"/>
         <circle cx="50" cy="50" r="35" fill="none" stroke="url(#logoGrad)" stroke-width="2" opacity="0.5"/>
         <text x="50" y="60" font-size="40" font-weight="bold" fill="url(#logoGrad)" text-anchor="middle" dominant-baseline="middle">CDA</text>
@@ -636,16 +224,13 @@
     </div>
     <h1 class="splash-title">Laboratório CDA</h1>
     <p class="splash-subtitle">Painel Administrativo</p>
-    <div class="splash-progress">
-      <div class="splash-progress-bar"></div>
-    </div>
+    <div class="splash-progress"><div class="splash-progress-bar"></div></div>
     <p class="splash-text">Carregando ambiente seguro...</p>
   </div>
 </div>
 
-<!-- APP CONTAINER -->
+<!-- APP -->
 <div class="site-wrap" style="display: none;" id="appContainer">
-  <!-- SIDEBAR -->
   <nav class="site-nav">
     <div class="brand">
       Lab CDA
@@ -664,7 +249,6 @@
     </div>
   </nav>
 
-  <!-- MAIN -->
   <main>
     <header>
       <div class="breadcrumbs"><a href="#">Home</a> / <span id="breadcrumb-active">Dashboard</span></div>
@@ -673,78 +257,38 @@
 
     <div class="content-area">
 
-      <!-- PÁGINA: HOME -->
+      <!-- HOME -->
       <section id="page-home" class="page active">
         <div class="home-grid">
           <div class="stat-card">
             <div class="stat-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-            <div class="stat-value">342</div>
-            <div class="stat-label">Orçamentos Hoje</div>
+            <div class="stat-value" id="stat-orcamentos">0</div>
+            <div class="stat-label">Orçamentos no Mês</div>
+            <div class="stat-mes" id="stat-mes-orcamentos">Junho 2026</div>
           </div>
           <div class="stat-card">
             <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
-            <div class="stat-value">128</div>
+            <div class="stat-value" id="stat-agendamentos">128</div>
             <div class="stat-label">Agendamentos</div>
+            <div class="stat-mes" id="stat-mes-agendamentos">Junho 2026</div>
           </div>
           <div class="stat-card">
             <div class="stat-icon"><i class="fa-solid fa-vial"></i></div>
-            <div class="stat-value">1.2K</div>
+            <div class="stat-value" id="stat-exames">1.2K</div>
             <div class="stat-label">Exames Processados</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
-            <div class="stat-value">856</div>
-            <div class="stat-label">Pacientes Ativos</div>
+            <div class="stat-mes" id="stat-mes-exames">Junho 2026</div>
           </div>
         </div>
 
         <div class="neumorphic-card">
-          <h2 style="font-size: 1.3rem; font-weight: 700; color: #101620; margin-bottom: 20px;">Ações Rápidas</h2>
-          <div class="action-grid">
-            <button class="neumorphic-btn primary" onclick="navigateToPage('orcamento')">
-              <i class="fa-solid fa-plus"></i> Novo Orçamento
-            </button>
-            <button class="neumorphic-btn primary" onclick="navigateToPage('agendamento')">
-              <i class="fa-regular fa-calendar"></i> Agendar Coleta
-            </button>
-            <button class="neumorphic-btn">
-              <i class="fa-solid fa-file-pdf"></i> Gerar Relatório
-            </button>
-            <button class="neumorphic-btn">
-              <i class="fa-solid fa-cog"></i> Configurações
-            </button>
-          </div>
-        </div>
-
-        <div class="neumorphic-card">
-          <h2 style="font-size: 1.3rem; font-weight: 700; color: #101620; margin-bottom: 20px;">Atividades Recentes</h2>
-          <div style="space-y-3;">
-            <div style="display: flex; align-items: center; padding: 12px; background: rgba(15, 76, 92, 0.1); border-radius: 12px; margin-bottom: 12px;">
-              <i class="fa-solid fa-check-circle" style="color: #0F4C5C; margin-right: 12px;"></i>
-              <div style="flex: 1;">
-                <p style="font-weight: 600; color: #101620;">Orçamento #1024 confirmado</p>
-                <p style="font-size: 0.85rem; color: #8c939e;">há 2 minutos</p>
-              </div>
-            </div>
-            <div style="display: flex; align-items: center; padding: 12px; background: rgba(55, 167, 170, 0.1); border-radius: 12px; margin-bottom: 12px;">
-              <i class="fa-solid fa-calendar-check" style="color: #37A7AA; margin-right: 12px;"></i>
-              <div style="flex: 1;">
-                <p style="font-weight: 600; color: #101620;">Agendamento #567 realizado</p>
-                <p style="font-size: 0.85rem; color: #8c939e;">há 15 minutos</p>
-              </div>
-            </div>
-            <div style="display: flex; align-items: center; padding: 12px; background: rgba(73, 188, 190, 0.1); border-radius: 12px;">
-              <i class="fa-solid fa-flask-vial" style="color: #49BCBE; margin-right: 12px;"></i>
-              <div style="flex: 1;">
-                <p style="font-weight: 600; color: #101620;">Exames processados: 45</p>
-                <p style="font-size: 0.85rem; color: #8c939e;">há 1 hora</p>
-              </div>
-            </div>
-          </div>
+          <h2 style="font-size: 1.3rem; font-weight: 700; color: #101620; margin-bottom: 20px;">
+            <i class="fa-solid fa-clock-rotate-left mr-2" style="color: #0F4C5C;"></i> Atividades Recentes
+          </h2>
+          <div id="atividades-recentes"></div>
         </div>
       </section>
 
-      <!-- PÁGINA: ORÇAMENTO -->
+      <!-- ORÇAMENTO -->
       <section id="page-orcamento" class="page space-y-5">
         <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
             <div class="relative z-10">
@@ -760,6 +304,12 @@
           <div class="space-y-6">
             <div class="neumorphic-card">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                    <i class="fa-solid fa-user mr-1"></i> Nome do Paciente
+                </label>
+                <input type="text" id="orc-paciente" placeholder="Digite o nome completo do paciente..." class="w-full bg-white border-none rounded-2xl pl-5 pr-5 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);">
+            </div>
+            <div class="neumorphic-card">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                     <i class="fa-solid fa-magnifying-glass mr-1"></i> Buscar exame
                 </label>
                 <div class="autocomplete-container">
@@ -767,6 +317,11 @@
                     <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fa-solid fa-search"></i></div>
                     <div id="autocomplete-list" class="autocomplete-list"></div>
                 </div>
+            </div>
+            <div class="ia-area">
+                <i class="fa-solid fa-robot"></i>
+                <h4><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Leitura Inteligente de Pedidos</h4>
+                <p>Em breve: envie uma foto ou PDF do pedido médico e nossa IA<br>identificará automaticamente os exames solicitados.</p>
             </div>
           </div>
           <div class="space-y-6">
@@ -782,16 +337,12 @@
                         <p class="text-sm font-bold text-slate-500">Nenhum exame selecionado</p>
                     </div>
                 </div>
-
-                <!-- TOTAL ESTIMADO -->
                 <div style="border-top: 1px solid rgba(72, 79, 96, 0.2); padding-top: 12px; margin-bottom: 12px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span class="text-sm text-slate-500">Total estimado</span>
                         <span id="orc-total" style="font-size: 1.4rem; font-weight: 800; color: #0F4C5C;">R$ 0,00</span>
                     </div>
                 </div>
-
-                <!-- DESCONTOS DE PAGAMENTO -->
                 <div id="descontos-area" style="display: none;">
                     <div class="desconto-card">
                         <div class="desconto-info">
@@ -806,7 +357,6 @@
                             <div class="desconto-preco" id="preco-pix">R$ 0,00</div>
                         </div>
                     </div>
-
                     <div class="desconto-card">
                         <div class="desconto-info">
                             <div class="desconto-icone">💳</div>
@@ -835,10 +385,13 @@
           <button class="neumorphic-btn neumorphic-btn-lg" onclick="agendarColeta()">
             <i class="fa-regular fa-calendar-check"></i> Agendar Coleta
           </button>
+          <button class="neumorphic-btn neumorphic-btn-lg" onclick="novoOrcamento()">
+            <i class="fa-solid fa-rotate-right"></i> Novo Orçamento
+          </button>
         </div>
       </section>
 
-      <!-- PÁGINA: AGENDAMENTO -->
+      <!-- AGENDAMENTO -->
       <section id="page-agendamento" class="page space-y-5">
         <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
             <div class="relative z-10">
@@ -887,20 +440,96 @@
 </div>
 
 <script>
-  // ==================== SPLASH SCREEN ====================
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      const splash = document.getElementById('splashScreen');
-      splash.classList.add('fade-out');
+
+  // ==================== LOGIN ====================
+  function fazerLogin() {
+    const usuario = document.getElementById('login-usuario').value.trim();
+    const senha = document.getElementById('login-senha').value.trim();
+    const errorEl = document.getElementById('login-error');
+
+    if (usuario === 'admin' && senha === 'cda2024') {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('splashScreen').style.display = 'flex';
+
       setTimeout(() => {
-        splash.style.display = 'none';
-        document.getElementById('appContainer').style.display = 'grid';
-        document.body.classList.add('app-loaded');
-        carregarExames();
-        gerarHorarios();
-      }, 600);
-    }, 2500);
+        const splash = document.getElementById('splashScreen');
+        splash.classList.add('fade-out');
+        setTimeout(() => {
+          splash.style.display = 'none';
+          document.getElementById('appContainer').style.display = 'grid';
+          document.body.classList.add('app-loaded');
+          carregarExames();
+          gerarHorarios();
+          atualizarMesStats();
+          renderAtividades();
+        }, 600);
+      }, 2500);
+    } else {
+      errorEl.style.display = 'block';
+      setTimeout(() => errorEl.style.display = 'none', 3000);
+    }
+  }
+
+  document.getElementById('login-senha').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') fazerLogin();
   });
+  document.getElementById('login-usuario').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') document.getElementById('login-senha').focus();
+  });
+
+  // ==================== DADOS MENSAIS ====================
+  let dadosMensais = { orcamentos: 0, agendamentos: 128, exames: 1247 };
+
+  let atividadesRecentes = [
+    { tipo: 'orcamento', titulo: 'Orçamento #1024 gerado para Maria Silva', tempo: 'há 2 minutos', cor: '#0F4C5C', bg: 'rgba(15,76,92,0.1)' },
+    { tipo: 'agendamento', titulo: 'Agendamento #567 confirmado - João Santos', tempo: 'há 15 minutos', cor: '#37A7AA', bg: 'rgba(55,167,170,0.1)' },
+    { tipo: 'exame', titulo: '45 exames processados no lote #892', tempo: 'há 1 hora', cor: '#49BCBE', bg: 'rgba(73,188,190,0.1)' },
+    { tipo: 'orcamento', titulo: 'Orçamento #1023 compartilhado via WhatsApp', tempo: 'há 2 horas', cor: '#0F4C5C', bg: 'rgba(15,76,92,0.1)' },
+    { tipo: 'agendamento', titulo: 'Agendamento #566 cancelado - Ana Paula', tempo: 'há 3 horas', cor: '#ef4444', bg: 'rgba(239,68,68,0.1)' }
+  ];
+
+  function atualizarMesStats() {
+    const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    const agora = new Date();
+    const mesAno = meses[agora.getMonth()] + ' ' + agora.getFullYear();
+
+    document.getElementById('stat-mes-orcamentos').innerText = mesAno;
+    document.getElementById('stat-mes-agendamentos').innerText = mesAno;
+    document.getElementById('stat-mes-exames').innerText = mesAno;
+
+    document.getElementById('stat-orcamentos').innerText = dadosMensais.orcamentos;
+    document.getElementById('stat-agendamentos').innerText = dadosMensais.agendamentos;
+    document.getElementById('stat-exames').innerText = dadosMensais.exames >= 1000 ? (dadosMensais.exames/1000).toFixed(1) + 'K' : dadosMensais.exames;
+  }
+
+  function computarOrcamento() {
+    dadosMensais.orcamentos++;
+    atualizarMesStats();
+
+    const agora = new Date();
+    const hora = agora.getHours().toString().padStart(2,'0') + ':' + agora.getMinutes().toString().padStart(2,'0');
+
+    atividadesRecentes.unshift({
+      tipo: 'orcamento',
+      titulo: 'Orçamento #' + (1000 + dadosMensais.orcamentos) + ' gerado às ' + hora,
+      tempo: 'agora',
+      cor: '#0F4C5C',
+      bg: 'rgba(15,76,92,0.1)'
+    });
+
+    if (atividadesRecentes.length > 5) atividadesRecentes.pop();
+    renderAtividades();
+  }
+
+  function renderAtividades() {
+    const container = document.getElementById('atividades-recentes');
+    const icones = { orcamento: 'fa-file-invoice-dollar', agendamento: 'fa-calendar-check', exame: 'fa-flask-vial' };
+
+    container.innerHTML = atividadesRecentes.map(at => {
+      const icone = icones[at.tipo] || 'fa-circle-check';
+      return '<div class="atividade-item" style="background: ' + at.bg + ';"><i class="fa-solid ' + icone + ' atividade-icon" style="color: ' + at.cor + ';"></i><div class="atividade-info"><p class="atividade-titulo">' + at.titulo + '</p><p class="atividade-tempo">' + at.tempo + '</p></div></div>';
+    }).join('');
+  }
 
   // ==================== NAVEGAÇÃO ====================
   const navItems = document.querySelectorAll('#main-nav > li');
@@ -909,7 +538,7 @@
   const breadcrumbActive = document.getElementById('breadcrumb-active');
 
   function navigateToPage(pageId) {
-    const navItem = document.querySelector(`[data-page="${pageId}"]`);
+    const navItem = document.querySelector('[data-page="' + pageId + '"]');
     if (navItem) navItem.click();
   }
 
@@ -933,7 +562,8 @@
   });
 
   // ==================== TOAST ====================
-  function showToast(msg, tipo = 'success') {
+  function showToast(msg, tipo) {
+    tipo = tipo || 'success';
     const t = document.getElementById('cda-toast');
     const icon = document.getElementById('cda-toast-icon');
     document.getElementById('cda-toast-msg').innerText = msg;
@@ -950,7 +580,7 @@
     setTimeout(() => t.classList.remove('toast-show'), 3000);
   }
 
-  // ==================== CARREGAR EXAMES DO JSON ====================
+  // ==================== EXAMES ====================
   let listaExames = [];
   let orcSelecionados = [];
   let ultimoOrcamento = null;
@@ -995,11 +625,7 @@
 
   searchInput.addEventListener('input', function() {
     const valor = this.value.toLowerCase().trim();
-
-    if (valor.length < 2) {
-      autocompleteList.classList.remove('show');
-      return;
-    }
+    if (valor.length < 2) { autocompleteList.classList.remove('show'); return; }
 
     const filtrados = listaExames.filter(ex => {
       const nome = (ex.nome || '').toLowerCase();
@@ -1015,35 +641,21 @@
         const nome = ex.nome || 'Sem nome';
         const codigo = ex.codigo || '---';
         const preco = ex.preco || 0;
-        return `
-          <div class="autocomplete-item" onclick="adicionarExame(${ex.id})">
-            <div class="autocomplete-item-nome">${nome}</div>
-            <div class="autocomplete-item-codigo">Código: ${codigo}</div>
-            <div class="autocomplete-item-preco">R$ ${parseFloat(preco).toFixed(2).replace('.', ',')}</div>
-          </div>
-        `;
+        return '<div class="autocomplete-item" onclick="adicionarExame(' + ex.id + ')"><div class="autocomplete-item-nome">' + nome + '</div><div class="autocomplete-item-codigo">Código: ' + codigo + '</div><div class="autocomplete-item-preco">R$ ' + parseFloat(preco).toFixed(2).replace('.', ',') + '</div></div>';
       }).join('');
     }
-
     autocompleteList.classList.add('show');
   });
 
   document.addEventListener('click', function(e) {
-    if (!e.target.closest('.autocomplete-container')) {
-      autocompleteList.classList.remove('show');
-    }
+    if (!e.target.closest('.autocomplete-container')) autocompleteList.classList.remove('show');
   });
 
-  // ==================== ADICIONAR/REMOVER/LIMPAR EXAMES ====================
+  // ==================== EXAMES SELECIONADOS ====================
   function adicionarExame(id) {
     const exame = listaExames.find(e => e.id === id);
     if (!exame) return;
-
-    if (orcSelecionados.some(e => e.id === id)) {
-      showToast('Exame já selecionado!', 'error');
-      return;
-    }
-
+    if (orcSelecionados.some(e => e.id === id)) { showToast('Exame já selecionado!', 'error'); return; }
     orcSelecionados.push(exame);
     orcRenderSelecionados();
     searchInput.value = '';
@@ -1063,6 +675,14 @@
     showToast('Todos os exames removidos');
   }
 
+  function novoOrcamento() {
+    orcSelecionados = [];
+    document.getElementById('orc-paciente').value = '';
+    document.getElementById('orc-search').value = '';
+    orcRenderSelecionados();
+    showToast('Novo orçamento iniciado!');
+  }
+
   function formatarMoeda(valor) {
     return 'R$ ' + valor.toFixed(2).replace('.', ',');
   }
@@ -1077,11 +697,7 @@
     const parcelasCc = document.getElementById('parcelas-cc');
 
     if (orcSelecionados.length === 0) {
-      container.innerHTML = `
-        <div id="orc-empty-state" class="flex flex-col items-center py-6 text-center">
-          <p class="text-sm font-bold text-slate-500">Nenhum exame selecionado</p>
-        </div>
-      `;
+      container.innerHTML = '<div id="orc-empty-state" class="flex flex-col items-center py-6 text-center"><p class="text-sm font-bold text-slate-500">Nenhum exame selecionado</p></div>';
       totalEl.innerText = 'R$ 0,00';
       btnLimpar.style.display = 'none';
       descontosArea.style.display = 'none';
@@ -1094,106 +710,63 @@
       const codigo = ex.codigo || '---';
       const preco = parseFloat(ex.preco || 0);
       total += preco;
-
-      return `
-        <div class="exame-selecionado-item">
-          <div class="exame-info">
-            <div class="exame-nome" title="${nome}">${nome}</div>
-            <div class="exame-codigo">${codigo}</div>
-          </div>
-          <div class="exame-preco">${formatarMoeda(preco)}</div>
-          <button class="btn-remover-exame" onclick="removerExame(${index})" title="Remover">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-      `;
+      return '<div class="exame-selecionado-item"><div class="exame-info"><div class="exame-nome" title="' + nome + '">' + nome + '</div><div class="exame-codigo">' + codigo + '</div></div><div class="exame-preco">' + formatarMoeda(preco) + '</div><button class="btn-remover-exame" onclick="removerExame(' + index + ')" title="Remover"><i class="fa-solid fa-xmark"></i></button></div>';
     }).join('');
 
     totalEl.innerText = formatarMoeda(total);
     btnLimpar.style.display = 'inline-flex';
     descontosArea.style.display = 'block';
 
-    // Calcular descontos
-    const precoPixValor = total * 0.60; // 40% OFF
-    const precoCcValor = total * 0.65; // 35% OFF
+    const precoPixValor = total * 0.60;
+    const precoCcValor = total * 0.65;
     const parcelaCc = precoCcValor / 10;
 
     precoPix.innerText = formatarMoeda(precoPixValor);
     precoCc.innerText = formatarMoeda(precoCcValor);
-    parcelasCc.innerText = `10x de ${formatarMoeda(parcelaCc)}`;
+    parcelasCc.innerText = '10x de ' + formatarMoeda(parcelaCc);
   }
 
-  // ==================== GERAR PDF ====================
+  // ==================== PDF ====================
   function gerarPDF() {
-    if (orcSelecionados.length === 0) {
-      showToast('Selecione pelo menos um exame!', 'error');
-      return null;
-    }
+    if (orcSelecionados.length === 0) { showToast('Selecione pelo menos um exame!', 'error'); return null; }
+    const paciente = document.getElementById('orc-paciente').value.trim() || 'Paciente';
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    // Cabeçalho
     doc.setFillColor(15, 76, 92);
     doc.rect(0, 0, 210, 40, 'F');
-
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(24);
-    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(24); doc.setFont('helvetica', 'bold');
     doc.text('Laboratório CDA', 105, 20, { align: 'center' });
-
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(12); doc.setFont('helvetica', 'normal');
     doc.text('Orçamento de Exames', 105, 30, { align: 'center' });
 
-    // Data
     const dataAtual = new Date().toLocaleDateString('pt-BR');
-    doc.setTextColor(100, 100, 100);
-    doc.setFontSize(10);
-    doc.text(`Data: ${dataAtual}`, 20, 50);
-    doc.text(`Orçamento #${Math.floor(Math.random() * 10000) + 1000}`, 20, 56);
+    doc.setTextColor(100, 100, 100); doc.setFontSize(10);
+    doc.text('Paciente: ' + paciente, 20, 50);
+    doc.text('Data: ' + dataAtual, 20, 56);
+    doc.text('Orçamento #' + (1000 + dadosMensais.orcamentos + 1), 20, 62);
 
-    // Tabela de exames
     const headers = [['Exame', 'Código', 'Valor']];
     let total = 0;
     const data = orcSelecionados.map(ex => {
-      const nome = ex.nome || 'Sem nome';
-      const codigo = ex.codigo || '---';
-      const preco = parseFloat(ex.preco || 0);
-      total += preco;
-      return [nome, codigo, `R$ ${preco.toFixed(2).replace('.', ',')}`];
+      const preco = parseFloat(ex.preco || 0); total += preco;
+      return [ex.nome || 'Sem nome', ex.codigo || '---', 'R$ ' + preco.toFixed(2).replace('.', ',')];
     });
 
     doc.autoTable({
-      head: headers,
-      body: data,
-      startY: 65,
-      theme: 'striped',
-      headStyles: {
-        fillColor: [15, 76, 92],
-        textColor: [255, 255, 255],
-        fontStyle: 'bold'
-      },
-      alternateRowStyles: {
-        fillColor: [232, 248, 248]
-      },
-      styles: {
-        fontSize: 10,
-        cellPadding: 5
-      }
+      head: headers, body: data, startY: 70, theme: 'striped',
+      headStyles: { fillColor: [15, 76, 92], textColor: [255, 255, 255], fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [232, 248, 248] },
+      styles: { fontSize: 10, cellPadding: 5 }
     });
 
-    // Total
     const finalY = doc.lastAutoTable.finalY + 10;
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(15, 76, 92);
-    doc.text(`Total: R$ ${total.toFixed(2).replace('.', ',')}`, 190, finalY, { align: 'right' });
+    doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.setTextColor(15, 76, 92);
+    doc.text('Total: R$ ' + total.toFixed(2).replace('.', ','), 190, finalY, { align: 'right' });
 
-    // Rodapé
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(150, 150, 150);
+    doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(150, 150, 150);
     doc.text('Este orçamento é válido por 7 dias. Valores sujeitos a alteração.', 105, 280, { align: 'center' });
     doc.text('Laboratório CDA - (27) XXXX-XXXX', 105, 286, { align: 'center' });
 
@@ -1203,19 +776,15 @@
   function baixarPDF() {
     const doc = gerarPDF();
     if (!doc) return;
-
+    computarOrcamento();
     const dataAtual = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
-    doc.save(`orcamento-cda-${dataAtual}.pdf`);
+    doc.save('orcamento-cda-' + dataAtual + '.pdf');
     showToast('PDF baixado com sucesso!');
   }
 
-  // ==================== COMPARTILHAR (PDF + WHATSAPP) ====================
+  // ==================== COMPARTILHAR ====================
   async function compartilharOrcamento() {
-    if (orcSelecionados.length === 0) {
-      showToast('Selecione pelo menos um exame!', 'error');
-      return;
-    }
-
+    if (orcSelecionados.length === 0) { showToast('Selecione pelo menos um exame!', 'error'); return; }
     const doc = gerarPDF();
     if (!doc) return;
 
@@ -1234,11 +803,8 @@
       try {
         const file = new File([pdfBlob], 'orcamento-cda.pdf', { type: 'application/pdf' });
         if (navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: 'Orçamento CDA',
-            text: 'Olá, segue em anexo o seu orçamento! Qualquer dúvida me chame aqui!'
-          });
+          await navigator.share({ files: [file], title: 'Orçamento CDA', text: 'Olá, segue em anexo o seu orçamento! Qualquer dúvida me chame aqui!' });
+          computarOrcamento();
           showToast('Compartilhado com sucesso!');
           return;
         }
@@ -1255,18 +821,16 @@
     document.body.removeChild(link);
 
     setTimeout(() => {
-      window.open(`https://web.whatsapp.com/send?text=${texto}`, '_blank');
+      window.open('https://web.whatsapp.com/send?text=' + texto, '_blank');
     }, 500);
 
+    computarOrcamento();
     showToast('PDF baixado! WhatsApp Web aberto para compartilhar.');
   }
 
   // ==================== AGENDAR COLETA ====================
   function agendarColeta() {
-    if (orcSelecionados.length === 0) {
-      showToast('Selecione pelo menos um exame!', 'error');
-      return;
-    }
+    if (orcSelecionados.length === 0) { showToast('Selecione pelo menos um exame!', 'error'); return; }
 
     ultimoOrcamento = {
       exames: [...orcSelecionados],
@@ -1274,6 +838,7 @@
       data: new Date().toLocaleDateString('pt-BR')
     };
 
+    computarOrcamento();
     navigateToPage('agendamento');
     showToast('Dados do orçamento transferidos para agendamento!');
   }
@@ -1286,12 +851,11 @@
       '10:00', '10:30', '11:00', '11:30', '13:00', '13:30',
       '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'
     ];
-
     const ocupados = ['08:30', '10:00', '14:30'];
 
     grid.innerHTML = horarios.map(h => {
       const isOcupado = ocupados.includes(h);
-      return `<button class="horario-btn ${isOcupado ? 'ocupado' : ''}" ${isOcupado ? 'disabled' : ''} onclick="selecionarHorario(this, '${h}')">${h}</button>`;
+      return '<button class="horario-btn ' + (isOcupado ? 'ocupado' : '') + '" ' + (isOcupado ? 'disabled' : '') + ' onclick="selecionarHorario(this, '' + h + '')">' + h + '</button>';
     }).join('');
   }
 
@@ -1299,7 +863,6 @@
 
   function selecionarHorario(btn, horario) {
     if (btn.classList.contains('ocupado')) return;
-
     document.querySelectorAll('.horario-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
     horarioSelecionado = horario;
@@ -1315,7 +878,7 @@
       return;
     }
 
-    showToast(`Agendamento confirmado para ${data} às ${horarioSelecionado}!`);
+    showToast('Agendamento confirmado para ' + data + ' às ' + horarioSelecionado + '!');
 
     document.getElementById('agen-nome').value = '';
     document.getElementById('agen-telefone').value = '';
