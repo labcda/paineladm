@@ -562,15 +562,20 @@
 <script>
 
   // ==================== LOGIN TOGGLE ANIMATION ====================
-  let switchCtn = document.getElementById('login-switch-cnt');
-  let switchC1 = document.getElementById('login-switch-c1');
-  let switchC2 = document.getElementById('login-switch-c2');
-  let switchCircle = document.querySelectorAll('.login-switch__circle');
-  let aContainer = document.getElementById('login-a-container');
-  let bContainer = document.getElementById('login-b-container');
-  let allButtons = document.querySelectorAll('.login-button');
+  let switchCtn, switchC1, switchC2, switchCircle, aContainer, bContainer;
+
+  function initLoginVars() {
+    switchCtn = document.getElementById('login-switch-cnt');
+    switchC1 = document.getElementById('login-switch-c1');
+    switchC2 = document.getElementById('login-switch-c2');
+    switchCircle = document.querySelectorAll('.login-switch__circle');
+    aContainer = document.getElementById('login-a-container');
+    bContainer = document.getElementById('login-b-container');
+  }
 
   function toggleLogin() {
+    if (!switchCtn) initLoginVars();
+
     switchCtn.classList.add('is-gx');
     setTimeout(function() {
       switchCtn.classList.remove('is-gx');
@@ -589,12 +594,24 @@
 
   // ==================== LOGIN ====================
   function fazerLogin() {
-    const usuario = document.getElementById('login-usuario').value.trim();
-    const senha = document.getElementById('login-senha').value.trim();
+    console.log('fazerLogin chamado');
+    const usuarioEl = document.getElementById('login-usuario');
+    const senhaEl = document.getElementById('login-senha');
     const errorEl = document.getElementById('login-error');
+
+    if (!usuarioEl || !senhaEl) {
+      console.error('Elementos de login não encontrados!');
+      return;
+    }
+
+    const usuario = usuarioEl.value.trim();
+    const senha = senhaEl.value.trim();
+
+    console.log('Tentando login:', usuario);
 
     // Demo credentials: admin / cda2024
     if (usuario === 'admin' && senha === 'cda2024') {
+      console.log('Login bem-sucedido!');
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('splashScreen').style.display = 'flex';
 
@@ -612,6 +629,7 @@
         }, 600);
       }, 2500);
     } else {
+      console.log('Login falhou');
       errorEl.style.display = 'block';
       setTimeout(() => errorEl.style.display = 'none', 3000);
     }
@@ -630,17 +648,38 @@
       return;
     }
 
-    // Simula cadastro e vai para login
     showToast('Cadastro realizado! Faça login.');
     toggleLogin();
   }
 
-  // Enter key handlers
-  document.getElementById('login-senha').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') fazerLogin();
-  });
-  document.getElementById('signup-password').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') fazerCadastro();
+  // Inicializar após DOM carregar
+  document.addEventListener('DOMContentLoaded', function() {
+    initLoginVars();
+
+    const senhaInput = document.getElementById('login-senha');
+    const usuarioInput = document.getElementById('login-usuario');
+
+    if (senhaInput) {
+      senhaInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') fazerLogin();
+      });
+    }
+
+    if (usuarioInput) {
+      usuarioInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          senhaInput.focus();
+        }
+      });
+    }
+
+    const signupSenha = document.getElementById('signup-password');
+    if (signupSenha) {
+      signupSenha.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') fazerCadastro();
+      });
+    }
   });
 
   // ==================== DADOS MENSAIS ====================
