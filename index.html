@@ -282,9 +282,21 @@
 <div id="loginScreen">
   <div class="login-main">
 
-    <!-- CREATE ACCOUNT (Sign Up) -->
+    <!-- FAÇA SEU LOGIN (Sign In - agora à esquerda) -->
     <div class="login-container login-a-container" id="login-a-container">
       <form class="login-form" id="login-a-form" onsubmit="return false;">
+        <h2 class="login-title">Faça seu login</h2>
+        <span class="login-form__span">Digite seu login e senha</span>
+        <input type="text" class="login-form__input" id="login-usuario" placeholder="Login" autocomplete="username">
+        <input type="password" class="login-form__input" id="login-senha" placeholder="Senha" autocomplete="current-password">
+        <button class="login-button" onclick="fazerLogin()">Acessar</button>
+        <div class="login-error-msg" id="login-error">Login ou senha incorretos</div>
+      </form>
+    </div>
+
+    <!-- SIGN UP (Cadastro - agora à direita, escondido inicialmente) -->
+    <div class="login-container login-b-container" id="login-b-container">
+      <form class="login-form" id="login-b-form" onsubmit="return false;">
         <h2 class="login-title">Create Account</h2>
         <div class="form__icons">
           <svg class="login-form__icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg"><circle cx="25" cy="25" r="22" fill="none" stroke="#181818" stroke-width="2"/><text x="25" y="30" font-size="18" font-weight="bold" fill="#181818" text-anchor="middle">f</text></svg>
@@ -300,33 +312,14 @@
       </form>
     </div>
 
-    <!-- SIGN IN (Login) -->
-    <div class="login-container login-b-container" id="login-b-container">
-      <form class="login-form" id="login-b-form" onsubmit="return false;">
-        <h2 class="login-title">Sign in to Website</h2>
-        <div class="form__icons">
-          <svg class="login-form__icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg"><circle cx="25" cy="25" r="22" fill="none" stroke="#181818" stroke-width="2"/><text x="25" y="30" font-size="18" font-weight="bold" fill="#181818" text-anchor="middle">f</text></svg>
-          <svg class="login-form__icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg"><circle cx="25" cy="25" r="22" fill="none" stroke="#181818" stroke-width="2"/><text x="25" y="32" font-size="16" font-weight="bold" fill="#181818" text-anchor="middle">in</text></svg>
-          <svg class="login-form__icon" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg"><circle cx="25" cy="25" r="22" fill="none" stroke="#181818" stroke-width="2"/><text x="25" y="32" font-size="16" font-weight="bold" fill="#181818" text-anchor="middle">X</text></svg>
-        </div>
-        <span class="login-form__span">or use your email account</span>
-        <input type="email" class="login-form__input" id="login-email" placeholder="Email" autocomplete="email">
-        <input type="password" class="login-form__input" id="login-password" placeholder="Password" autocomplete="current-password">
-        <a class="login-form__link">Forgot your password?</a>
-        <button class="login-button" onclick="fazerLogin()">SIGN IN</button>
-        <div class="login-error-msg" id="login-error">Email ou senha incorretos</div>
-      </form>
-    </div>
-
     <!-- SWITCH PANEL -->
     <div class="login-switch" id="login-switch-cnt">
       <div class="login-switch__circle"></div>
       <div class="login-switch__circle login-switch__circle--t"></div>
 
       <div class="login-switch__container" id="login-switch-c1">
-        <h2 class="login-title">Welcome Back!</h2>
-        <p class="login-description">To keep connected with us please login with your personal info</p>
-        <button class="login-switch__button" onclick="toggleLogin()">SIGN IN</button>
+        <h2 class="login-title">Seja Bem Vindo</h2>
+        <p class="login-description">Esse é o sistema de orçamentos e recoletas do Laboratório CDA.</p>
       </div>
 
       <div class="login-switch__container is-hidden" id="login-switch-c2">
@@ -338,7 +331,6 @@
 
   </div>
 </div>
-
 <!-- ==================== SPLASH SCREEN ==================== -->
 <div id="splashScreen">
   <div class="splash-content">
@@ -597,12 +589,12 @@
 
   // ==================== LOGIN ====================
   function fazerLogin() {
-    const email = document.getElementById('login-email').value.trim();
-    const senha = document.getElementById('login-password').value.trim();
+    const usuario = document.getElementById('login-usuario').value.trim();
+    const senha = document.getElementById('login-senha').value.trim();
     const errorEl = document.getElementById('login-error');
 
     // Demo credentials: admin@cda.com / cda2024
-    if (email === 'admin@cda.com' && senha === 'cda2024') {
+    if (usuario === 'admin' && senha === 'cda2024') {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('splashScreen').style.display = 'flex';
 
