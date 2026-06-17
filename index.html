@@ -4,12 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Lab CDA - Painel Administrativo</title>
-  
+
   <!-- Estilos e Bibliotecas -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Montserrat:wght@500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+  <!-- jsPDF para gerar PDFs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
   <script>
     tailwind.config = {
@@ -44,8 +48,8 @@
       --neumorphic-bg: #EBECF0;
       --neumorphic-shadow-dark: #484f60;
       --neumorphic-shadow-light: #FFFFFF;
-      --accent-blue: #1657F0;
-      --bright-blue: #36D7E0;
+      --accent-green: #0F4C5C;
+      --bright-green: #49BCBE;
     }
 
     body {
@@ -230,7 +234,7 @@
       background: #f8fafc;
     }
 
-    /* NEUMORPHIC BUTTONS */
+    /* NEUMORPHIC BUTTONS - COR VERDE */
     .neumorphic-btn {
       font-family: 'Montserrat', sans-serif;
       font-size: 18px;
@@ -266,18 +270,19 @@
       cursor: not-allowed;
     }
 
+    /* BOTÃO PRIMARY - COR VERDE DO TÍTULO ORÇAMENTO */
     .neumorphic-btn.primary {
-      background: linear-gradient(135deg, #1657F0 0%, #36D7E0 100%);
+      background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%);
       color: white;
-      box-shadow: 8px 8px 12px -2px rgba(22, 87, 240, 0.3), -6px -6px 12px -1px rgba(255, 255, 255, 0.5);
+      box-shadow: 8px 8px 12px -2px rgba(15, 76, 92, 0.3), -6px -6px 12px -1px rgba(255, 255, 255, 0.5);
     }
 
     .neumorphic-btn.primary:hover {
-      box-shadow: 12px 12px 16px -2px rgba(22, 87, 240, 0.4), -8px -8px 16px -1px rgba(255, 255, 255, 0.6);
+      box-shadow: 12px 12px 16px -2px rgba(15, 76, 92, 0.4), -8px -8px 16px -1px rgba(255, 255, 255, 0.6);
     }
 
     .neumorphic-btn.primary:active {
-      box-shadow: inset 4px 4px 8px rgba(22, 87, 240, 0.3), inset -2px -2px 6px rgba(255, 255, 255, 0.5);
+      box-shadow: inset 4px 4px 8px rgba(15, 76, 92, 0.3), inset -2px -2px 6px rgba(255, 255, 255, 0.5);
     }
 
     .neumorphic-btn-sm {
@@ -335,7 +340,7 @@
     .stat-icon {
       font-size: 2.5rem;
       margin-bottom: 12px;
-      color: var(--accent-blue);
+      color: var(--accent-green);
     }
 
     .stat-value {
@@ -372,7 +377,154 @@
       pointer-events: none; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     #cda-toast.toast-show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* AUTOCOMPLETE */
+    .autocomplete-container {
+      position: relative;
+    }
+
+    .autocomplete-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 1000;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .autocomplete-list.show {
+      display: block;
+    }
+
+    .autocomplete-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      transition: all 0.2s;
+    }
+
+    .autocomplete-item:hover {
+      background: #E8F8F8;
+    }
+
+    .autocomplete-item:last-child {
+      border-bottom: none;
+    }
+
+    .autocomplete-item-nome {
+      font-weight: 600;
+      color: #101620;
+      font-size: 0.9rem;
+    }
+
+    .autocomplete-item-codigo {
+      font-size: 0.75rem;
+      color: #8c939e;
+      margin-top: 2px;
+    }
+
+    .autocomplete-item-preco {
+      font-size: 0.85rem;
+      color: #0F4C5C;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    /* EXAME SELECIONADO ITEM */
+    .exame-selecionado-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: white;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.05);
+      transition: all 0.2s;
+    }
+
+    .exame-selecionado-item:hover {
+      transform: translateX(4px);
+    }
+
+    .exame-info {
+      flex: 1;
+    }
+
+    .exame-nome {
+      font-weight: 600;
+      color: #101620;
+      font-size: 0.9rem;
+    }
+
+    .exame-codigo {
+      font-size: 0.75rem;
+      color: #8c939e;
+    }
+
+    .exame-preco {
+      font-weight: 700;
+      color: #0F4C5C;
+      font-size: 1rem;
+      margin-right: 12px;
+    }
+
+    .btn-remover-exame {
+      background: #fee2e2;
+      color: #ef4444;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .btn-remover-exame:hover {
+      background: #ef4444;
+      color: white;
+    }
+
+    /* HORÁRIOS */
+    .horario-btn {
+      padding: 10px 8px;
+      border-radius: 12px;
+      border: none;
+      background: white;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .horario-btn:hover {
+      background: #E8F8F8;
+      color: #0F4C5C;
+    }
+
+    .horario-btn.selected {
+      background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%);
+      color: white;
+    }
+
+    .horario-btn.ocupado {
+      background: #fee2e2;
+      color: #ef4444;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
   </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -430,7 +582,7 @@
     </header>
 
     <div class="content-area">
-      
+
       <!-- PÁGINA: HOME -->
       <section id="page-home" class="page active">
         <div class="home-grid">
@@ -477,15 +629,15 @@
         <div class="neumorphic-card">
           <h2 style="font-size: 1.3rem; font-weight: 700; color: #101620; margin-bottom: 20px;">Atividades Recentes</h2>
           <div style="space-y-3;">
-            <div style="display: flex; align-items: center; padding: 12px; background: rgba(22, 87, 240, 0.1); border-radius: 12px; margin-bottom: 12px;">
-              <i class="fa-solid fa-check-circle" style="color: #1657F0; margin-right: 12px;"></i>
+            <div style="display: flex; align-items: center; padding: 12px; background: rgba(15, 76, 92, 0.1); border-radius: 12px; margin-bottom: 12px;">
+              <i class="fa-solid fa-check-circle" style="color: #0F4C5C; margin-right: 12px;"></i>
               <div style="flex: 1;">
                 <p style="font-weight: 600; color: #101620;">Orçamento #1024 confirmado</p>
                 <p style="font-size: 0.85rem; color: #8c939e;">há 2 minutos</p>
               </div>
             </div>
-            <div style="display: flex; align-items: center; padding: 12px; background: rgba(54, 215, 224, 0.1); border-radius: 12px; margin-bottom: 12px;">
-              <i class="fa-solid fa-calendar-check" style="color: #36D7E0; margin-right: 12px;"></i>
+            <div style="display: flex; align-items: center; padding: 12px; background: rgba(55, 167, 170, 0.1); border-radius: 12px; margin-bottom: 12px;">
+              <i class="fa-solid fa-calendar-check" style="color: #37A7AA; margin-right: 12px;"></i>
               <div style="flex: 1;">
                 <p style="font-weight: 600; color: #101620;">Agendamento #567 realizado</p>
                 <p style="font-size: 0.85rem; color: #8c939e;">há 15 minutos</p>
@@ -520,9 +672,10 @@
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                     <i class="fa-solid fa-magnifying-glass mr-1"></i> Buscar exame
                 </label>
-                <div class="relative">
-                    <input type="text" id="orc-search" placeholder="Digite o nome ou código..." class="w-full bg-white border-none rounded-2xl pl-5 pr-12 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);">
+                <div class="autocomplete-container">
+                    <input type="text" id="orc-search" placeholder="Digite o nome ou código..." autocomplete="off" class="w-full bg-white border-none rounded-2xl pl-5 pr-12 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);">
                     <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fa-solid fa-search"></i></div>
+                    <div id="autocomplete-list" class="autocomplete-list"></div>
                 </div>
             </div>
           </div>
@@ -537,18 +690,21 @@
                 <div style="border-top: 1px solid rgba(72, 79, 96, 0.2); padding-top: 16px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span class="text-sm text-slate-500">Total estimado</span>
-                        <span id="orc-total" style="font-size: 1.5rem; font-weight: 800; color: #1657F0;">R$ 0,00</span>
+                        <span id="orc-total" style="font-size: 1.5rem; font-weight: 800; color: #0F4C5C;">R$ 0,00</span>
                     </div>
                 </div>
             </div>
           </div>
         </div>
 
-        <div style="display: flex; gap: 12px; margin-top: 24px;">
-          <button class="neumorphic-btn primary neumorphic-btn-lg" style="flex: 1;">
-            <i class="fa-brands fa-whatsapp"></i> Confirmar pelo WhatsApp
+        <div style="display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;">
+          <button class="neumorphic-btn primary neumorphic-btn-lg" onclick="compartilharOrcamento()">
+            <i class="fa-brands fa-whatsapp"></i> Compartilhar
           </button>
-          <button class="neumorphic-btn neumorphic-btn-lg">
+          <button class="neumorphic-btn primary neumorphic-btn-lg" onclick="baixarPDF()">
+            <i class="fa-solid fa-file-pdf"></i> Baixar PDF
+          </button>
+          <button class="neumorphic-btn neumorphic-btn-lg" onclick="agendarColeta()">
             <i class="fa-regular fa-calendar-check"></i> Agendar Coleta
           </button>
         </div>
@@ -569,14 +725,14 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div class="space-y-6">
             <div class="neumorphic-card">
-                <p class="text-xs font-extrabold text-slate-400 uppercase mb-4"><span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #1657F0; color: white; font-size: 10px; margin-right: 8px;">1</span>Seus dados</p>
+                <p class="text-xs font-extrabold text-slate-400 uppercase mb-4"><span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #0F4C5C; color: white; font-size: 10px; margin-right: 8px;">1</span>Seus dados</p>
                 <div class="space-y-4">
                     <div><label class="block text-xs font-bold text-slate-500 mb-1.5">Nome completo</label><input type="text" id="agen-nome" placeholder="Seu nome" class="w-full bg-white border-none rounded-xl px-4 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);"></div>
                     <div><label class="block text-xs font-bold text-slate-500 mb-1.5">WhatsApp</label><input type="tel" id="agen-telefone" placeholder="(27) 99999-9999" class="w-full bg-white border-none rounded-xl px-4 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);"></div>
                 </div>
             </div>
             <div class="neumorphic-card">
-                <p class="text-xs font-extrabold text-slate-400 uppercase mb-4"><span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #1657F0; color: white; font-size: 10px; margin-right: 8px;">2</span>Data e período</p>
+                <p class="text-xs font-extrabold text-slate-400 uppercase mb-4"><span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #0F4C5C; color: white; font-size: 10px; margin-right: 8px;">2</span>Data e período</p>
                 <div class="space-y-4">
                     <div><label class="block text-xs font-bold text-slate-500 mb-1.5">Data da coleta</label><input type="date" id="agen-data" class="w-full bg-white border-none rounded-xl px-4 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);"></div>
                 </div>
@@ -584,9 +740,9 @@
           </div>
           <div class="space-y-6">
             <div class="neumorphic-card">
-                <p class="text-xs font-extrabold text-slate-400 uppercase mb-4"><span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #1657F0; color: white; font-size: 10px; margin-right: 8px;">3</span>Horário e Confirmação</p>
+                <p class="text-xs font-extrabold text-slate-400 uppercase mb-4"><span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #0F4C5C; color: white; font-size: 10px; margin-right: 8px;">3</span>Horário e Confirmação</p>
                 <div id="agen-horarios-grid" class="grid grid-cols-3 gap-2 mb-4"></div>
-                <button class="neumorphic-btn primary" style="width: 100%; margin-top: 16px;">Confirmar Agendamento</button>
+                <button class="neumorphic-btn primary" style="width: 100%; margin-top: 16px;" onclick="confirmarAgendamento()">Confirmar Agendamento</button>
             </div>
           </div>
         </div>
@@ -603,7 +759,7 @@
 </div>
 
 <script>
-  // Splash Screen Logic
+  // ==================== SPLASH SCREEN ====================
   window.addEventListener('load', () => {
     setTimeout(() => {
       const splash = document.getElementById('splashScreen');
@@ -612,11 +768,14 @@
         splash.style.display = 'none';
         document.getElementById('appContainer').style.display = 'grid';
         document.body.classList.add('app-loaded');
+        // Carregar exames após splash
+        carregarExames();
+        gerarHorarios();
       }, 600);
     }, 2500);
   });
 
-  // Navigation Logic
+  // ==================== NAVEGAÇÃO ====================
   const navItems = document.querySelectorAll('#main-nav > li');
   const pages = document.querySelectorAll('.page');
   const pageTitle = document.getElementById('page-title');
@@ -632,10 +791,10 @@
       const pageId = li.getAttribute('data-page');
       if (!pageId) return;
       e.preventDefault();
-      
+
       navItems.forEach(item => item.classList.remove('active'));
       li.classList.add('active');
-      
+
       pages.forEach(p => p.classList.remove('active'));
       const targetPage = document.getElementById('page-' + pageId);
       if (targetPage) targetPage.classList.add('active');
@@ -646,26 +805,389 @@
     });
   });
 
-  // Toast Function
+  // ==================== TOAST ====================
   function showToast(msg, tipo = 'success') {
     const t = document.getElementById('cda-toast');
+    const icon = document.getElementById('cda-toast-icon');
     document.getElementById('cda-toast-msg').innerText = msg;
+
+    if (tipo === 'error') {
+      icon.className = 'fa-solid fa-circle-xmark';
+      t.style.background = '#ef4444';
+    } else {
+      icon.className = 'fa-solid fa-circle-check';
+      t.style.background = '#0F4C5C';
+    }
+
     t.className = 'toast-show';
     setTimeout(() => t.classList.remove('toast-show'), 3000);
   }
 
-  // Orçamento Logic (Simplificado)
+  // ==================== CARREGAR EXAMES DO JSON ====================
+  let listaExames = [];
   let orcSelecionados = [];
+  let ultimoOrcamento = null;
+
+  async function carregarExames() {
+    try {
+      const response = await fetch('./exames.json');
+      if (!response.ok) throw new Error('Arquivo não encontrado');
+      const data = await response.json();
+
+      // Suporta diferentes estruturas: array direto ou {exames: [...]}
+      if (Array.isArray(data)) {
+        listaExames = data;
+      } else if (data.exames && Array.isArray(data.exames)) {
+        listaExames = data.exames;
+      } else {
+        // Tenta encontrar array em qualquer propriedade
+        const firstArray = Object.values(data).find(v => Array.isArray(v));
+        if (firstArray) listaExames = firstArray;
+      }
+
+      console.log('Exames carregados:', listaExames.length);
+    } catch (error) {
+      console.error('Erro ao carregar exames:', error);
+      showToast('Erro ao carregar exames. Usando dados de exemplo.', 'error');
+      // Dados de exemplo para teste
+      listaExames = [
+        { id: 1, codigo: "HEMO001", nome: "Hemograma Completo", categoria: "PARTICULAR", preco: 45.00, busca: "HEMO001 HEMOGRAMA COMPLETO PARTICULAR" },
+        { id: 2, codigo: "GLIC001", nome: "Glicemia em Jejum", categoria: "PARTICULAR", preco: 35.00, busca: "GLIC001 GLICEMIA JEJUM PARTICULAR" },
+        { id: 3, codigo: "COLE001", nome: "Colesterol Total", categoria: "PARTICULAR", preco: 40.00, busca: "COLE001 COLESTEROL TOTAL PARTICULAR" },
+        { id: 4, codigo: "TRIG001", nome: "Triglicerídeos", categoria: "PARTICULAR", preco: 38.00, busca: "TRIG001 TRIGLICERIDEOS PARTICULAR" },
+        { id: 5, codigo: "TSH0001", nome: "TSH", categoria: "PARTICULAR", preco: 55.00, busca: "TSH0001 TSH PARTICULAR" },
+        { id: 6, codigo: "T4L0001", nome: "T4 Livre", categoria: "PARTICULAR", preco: 60.00, busca: "T4L0001 T4 LIVRE PARTICULAR" },
+        { id: 7, codigo: "CREA001", nome: "Creatinina", categoria: "PARTICULAR", preco: 32.00, busca: "CREA001 CREATININA PARTICULAR" },
+        { id: 8, codigo: "UREA001", nome: "Ureia", categoria: "PARTICULAR", preco: 28.00, busca: "UREA001 UREIA PARTICULAR" },
+        { id: 9, codigo: "ACUR001", nome: "Ácido Úrico", categoria: "PARTICULAR", preco: 35.00, busca: "ACUR001 ACIDO URICO PARTICULAR" },
+        { id: 10, codigo: "FERR001", nome: "Ferro Sérico", categoria: "PARTICULAR", preco: 48.00, busca: "FERR001 FERRO SERICO PARTICULAR" }
+      ];
+    }
+  }
+
+  // ==================== AUTOCOMPLETE ====================
+  const searchInput = document.getElementById('orc-search');
+  const autocompleteList = document.getElementById('autocomplete-list');
+
+  searchInput.addEventListener('input', function() {
+    const valor = this.value.toLowerCase().trim();
+
+    if (valor.length < 2) {
+      autocompleteList.classList.remove('show');
+      return;
+    }
+
+    const filtrados = listaExames.filter(ex => {
+      const nome = (ex.nome || '').toLowerCase();
+      const codigo = (ex.codigo || '').toLowerCase();
+      const busca = (ex.busca || '').toLowerCase();
+      return nome.includes(valor) || codigo.includes(valor) || busca.includes(valor);
+    }).slice(0, 10); // Max 10 resultados
+
+    if (filtrados.length === 0) {
+      autocompleteList.innerHTML = '<div class="autocomplete-item"><div class="autocomplete-item-nome">Nenhum exame encontrado</div></div>';
+    } else {
+      autocompleteList.innerHTML = filtrados.map(ex => {
+        const nome = ex.nome || 'Sem nome';
+        const codigo = ex.codigo || '---';
+        const preco = ex.preco || 0;
+        return `
+          <div class="autocomplete-item" onclick="adicionarExame(${ex.id})">
+            <div class="autocomplete-item-nome">${nome}</div>
+            <div class="autocomplete-item-codigo">Código: ${codigo}</div>
+            <div class="autocomplete-item-preco">R$ ${parseFloat(preco).toFixed(2).replace('.', ',')}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    autocompleteList.classList.add('show');
+  });
+
+  // Fechar autocomplete ao clicar fora
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.autocomplete-container')) {
+      autocompleteList.classList.remove('show');
+    }
+  });
+
+  // ==================== ADICIONAR/REMOVER EXAMES ====================
+  function adicionarExame(id) {
+    const exame = listaExames.find(e => e.id === id);
+    if (!exame) return;
+
+    // Verifica se já está selecionado
+    if (orcSelecionados.some(e => e.id === id)) {
+      showToast('Exame já selecionado!', 'error');
+      return;
+    }
+
+    orcSelecionados.push(exame);
+    orcRenderSelecionados();
+    searchInput.value = '';
+    autocompleteList.classList.remove('show');
+    showToast('Exame adicionado!');
+  }
+
+  function removerExame(index) {
+    orcSelecionados.splice(index, 1);
+    orcRenderSelecionados();
+    showToast('Exame removido');
+  }
+
   function orcRenderSelecionados() {
     const container = document.getElementById('orc-selecionados');
     const totalEl = document.getElementById('orc-total');
-    container.innerHTML = orcSelecionados.length ? '' : '<div id="orc-empty-state" class="flex flex-col items-center py-8 text-center"><p class="text-sm font-bold text-slate-500">Nenhum exame selecionado</p></div>';
+
+    if (orcSelecionados.length === 0) {
+      container.innerHTML = `
+        <div id="orc-empty-state" class="flex flex-col items-center py-8 text-center">
+          <p class="text-sm font-bold text-slate-500">Nenhum exame selecionado</p>
+        </div>
+      `;
+      totalEl.innerText = 'R$ 0,00';
+      return;
+    }
+
     let total = 0;
-    orcSelecionados.forEach(ex => {
-      total += ex.preco || 0;
-    });
+    container.innerHTML = orcSelecionados.map((ex, index) => {
+      const nome = ex.nome || 'Sem nome';
+      const codigo = ex.codigo || '---';
+      const preco = parseFloat(ex.preco || 0);
+      total += preco;
+
+      return `
+        <div class="exame-selecionado-item">
+          <div class="exame-info">
+            <div class="exame-nome">${nome}</div>
+            <div class="exame-codigo">Código: ${codigo}</div>
+          </div>
+          <div class="exame-preco">R$ ${preco.toFixed(2).replace('.', ',')}</div>
+          <button class="btn-remover-exame" onclick="removerExame(${index})" title="Remover">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </div>
+      `;
+    }).join('');
+
     totalEl.innerText = 'R$ ' + total.toFixed(2).replace('.', ',');
   }
+
+  // ==================== GERAR PDF ====================
+  function gerarPDF() {
+    if (orcSelecionados.length === 0) {
+      showToast('Selecione pelo menos um exame!', 'error');
+      return null;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Cabeçalho
+    doc.setFillColor(15, 76, 92);
+    doc.rect(0, 0, 210, 40, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Laboratório CDA', 105, 20, { align: 'center' });
+
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Orçamento de Exames', 105, 30, { align: 'center' });
+
+    // Data
+    const dataAtual = new Date().toLocaleDateString('pt-BR');
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(10);
+    doc.text(`Data: ${dataAtual}`, 20, 50);
+    doc.text(`Orçamento #${Math.floor(Math.random() * 10000) + 1000}`, 20, 56);
+
+    // Tabela de exames
+    const headers = [['Exame', 'Código', 'Valor']];
+    let total = 0;
+    const data = orcSelecionados.map(ex => {
+      const nome = ex.nome || 'Sem nome';
+      const codigo = ex.codigo || '---';
+      const preco = parseFloat(ex.preco || 0);
+      total += preco;
+      return [nome, codigo, `R$ ${preco.toFixed(2).replace('.', ',')}`];
+    });
+
+    doc.autoTable({
+      head: headers,
+      body: data,
+      startY: 65,
+      theme: 'striped',
+      headStyles: {
+        fillColor: [15, 76, 92],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold'
+      },
+      alternateRowStyles: {
+        fillColor: [232, 248, 248]
+      },
+      styles: {
+        fontSize: 10,
+        cellPadding: 5
+      }
+    });
+
+    // Total
+    const finalY = doc.lastAutoTable.finalY + 10;
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(15, 76, 92);
+    doc.text(`Total: R$ ${total.toFixed(2).replace('.', ',')}`, 190, finalY, { align: 'right' });
+
+    // Rodapé
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(150, 150, 150);
+    doc.text('Este orçamento é válido por 7 dias. Valores sujeitos a alteração.', 105, 280, { align: 'center' });
+    doc.text('Laboratório CDA - (27) XXXX-XXXX', 105, 286, { align: 'center' });
+
+    return doc;
+  }
+
+  function baixarPDF() {
+    const doc = gerarPDF();
+    if (!doc) return;
+
+    const dataAtual = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+    doc.save(`orcamento-cda-${dataAtual}.pdf`);
+    showToast('PDF baixado com sucesso!');
+  }
+
+  // ==================== COMPARTILHAR (PDF + WHATSAPP) ====================
+  async function compartilharOrcamento() {
+    if (orcSelecionados.length === 0) {
+      showToast('Selecione pelo menos um exame!', 'error');
+      return;
+    }
+
+    const doc = gerarPDF();
+    if (!doc) return;
+
+    // Gerar PDF como blob
+    const pdfBlob = doc.output('blob');
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+
+    // Salvar último orçamento para agendamento
+    ultimoOrcamento = {
+      exames: [...orcSelecionados],
+      total: orcSelecionados.reduce((sum, ex) => sum + parseFloat(ex.preco || 0), 0),
+      data: new Date().toLocaleDateString('pt-BR')
+    };
+
+    // Texto do WhatsApp
+    const texto = encodeURIComponent('Olá, segue em anexo o seu orçamento! Qualquer dúvida me chame aqui!');
+
+    // Tentar usar Web Share API (mobile)
+    if (navigator.share && navigator.canShare) {
+      try {
+        const file = new File([pdfBlob], 'orcamento-cda.pdf', { type: 'application/pdf' });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'Orçamento CDA',
+            text: 'Olá, segue em anexo o seu orçamento! Qualquer dúvida me chame aqui!'
+          });
+          showToast('Compartilhado com sucesso!');
+          return;
+        }
+      } catch (err) {
+        console.log('Share API não disponível, usando WhatsApp Web');
+      }
+    }
+
+    // Fallback: WhatsApp Web + download do PDF
+    // Baixar o PDF automaticamente
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = 'orcamento-cda.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Abrir WhatsApp Web
+    setTimeout(() => {
+      window.open(`https://web.whatsapp.com/send?text=${texto}`, '_blank');
+    }, 500);
+
+    showToast('PDF baixado! WhatsApp Web aberto para compartilhar.');
+  }
+
+  // ==================== AGENDAR COLETA ====================
+  function agendarColeta() {
+    if (orcSelecionados.length === 0) {
+      showToast('Selecione pelo menos um exame!', 'error');
+      return;
+    }
+
+    // Salvar dados do orçamento para usar no agendamento
+    ultimoOrcamento = {
+      exames: [...orcSelecionados],
+      total: orcSelecionados.reduce((sum, ex) => sum + parseFloat(ex.preco || 0), 0),
+      data: new Date().toLocaleDateString('pt-BR')
+    };
+
+    // Preencher dados no agendamento (se houver)
+    // Por enquanto apenas navega para a página de agendamento
+    navigateToPage('agendamento');
+    showToast('Dados do orçamento transferidos para agendamento!');
+  }
+
+  // ==================== AGENDAMENTO ====================
+  function gerarHorarios() {
+    const grid = document.getElementById('agen-horarios-grid');
+    const horarios = [
+      '07:00', '07:30', '08:00', '08:30', '09:00', '09:30',
+      '10:00', '10:30', '11:00', '11:30', '13:00', '13:30',
+      '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'
+    ];
+
+    // Simular alguns horários ocupados
+    const ocupados = ['08:30', '10:00', '14:30'];
+
+    grid.innerHTML = horarios.map(h => {
+      const isOcupado = ocupados.includes(h);
+      return `<button class="horario-btn ${isOcupado ? 'ocupado' : ''}" ${isOcupado ? 'disabled' : ''} onclick="selecionarHorario(this, '${h}')">${h}</button>`;
+    }).join('');
+  }
+
+  let horarioSelecionado = null;
+
+  function selecionarHorario(btn, horario) {
+    if (btn.classList.contains('ocupado')) return;
+
+    document.querySelectorAll('.horario-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    horarioSelecionado = horario;
+  }
+
+  function confirmarAgendamento() {
+    const nome = document.getElementById('agen-nome').value.trim();
+    const telefone = document.getElementById('agen-telefone').value.trim();
+    const data = document.getElementById('agen-data').value;
+
+    if (!nome || !telefone || !data || !horarioSelecionado) {
+      showToast('Preencha todos os campos e selecione um horário!', 'error');
+      return;
+    }
+
+    showToast(`Agendamento confirmado para ${data} às ${horarioSelecionado}!`);
+
+    // Limpar formulário
+    document.getElementById('agen-nome').value = '';
+    document.getElementById('agen-telefone').value = '';
+    document.getElementById('agen-data').value = '';
+    document.querySelectorAll('.horario-btn').forEach(b => b.classList.remove('selected'));
+    horarioSelecionado = null;
+  }
+
+  // Preencher data mínima como hoje
+  document.getElementById('agen-data').min = new Date().toISOString().split('T')[0];
 </script>
 
 </body>
