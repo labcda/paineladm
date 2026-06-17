@@ -2,14 +2,50 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lab CDA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Lab CDA - Sistema de Gestão</title>
+  
+  <!-- Estilos e Bibliotecas do index(52) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            cda: {
+              primary: '#49BCBE',
+              dark: '#37A7AA',
+              light: '#E8F8F8',
+              bg: '#F0F6F7',
+              text: '#1E293B'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
+    /* Estilos Base do index(53) */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --cda-primary: #49BCBE;
+      --cda-primary-dark: #37A7AA;
+      --cda-primary-light: #E8F8F8;
+      --cda-text: #1E293B;
+      --cda-text-light: #64748B;
+      --cda-white: #FFFFFF;
+      --cda-background: #F0F6F7;
+    }
 
     body {
       background: #89909f;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       font-size: 12px;
       height: 100vh;
       overflow: hidden;
@@ -19,7 +55,7 @@
     a { text-decoration: none; color: inherit; }
     ul { list-style: none; }
 
-    /* ── LAYOUT ── */
+    /* LAYOUT index(53) */
     .site-wrap {
       display: grid;
       grid-template-columns: 280px 1fr;
@@ -28,7 +64,7 @@
       overflow: hidden;
     }
 
-    /* ── SIDEBAR ── */
+    /* SIDEBAR index(53) */
     .site-nav {
       background: #0b121b;
       color: white;
@@ -46,73 +82,32 @@
       border-bottom: 0.5px solid rgba(255,255,255,0.07);
       position: relative;
     }
-    .brand svg {
-      fill: white;
-      width: 16px;
-      height: 16px;
-    }
+    .brand svg { fill: white; width: 16px; height: 16px; }
     .brand::after {
-      content: "";
-      width: 8px;
-      height: 8px;
-      background: #4777ce;
-      border-radius: 50%;
-      position: absolute;
-      right: 1.85rem;
-      top: 1.85rem;
+      content: ""; width: 8px; height: 8px; background: #4777ce; border-radius: 50%;
+      position: absolute; right: 1.85rem; top: 1.85rem;
     }
 
-    .site-nav > ul {
-      flex: 1;
-      padding: 0.5rem 0;
-      margin-bottom: auto;
-    }
+    .site-nav > ul { flex: 1; padding: 0.5rem 0; margin-bottom: auto; }
     .site-nav > ul > li > a {
-      display: block;
-      padding: 0.7rem 0.5rem 0.7rem 2rem;
-      font-size: 0.85rem;
-      color: rgba(255,255,255,0.7);
-      position: relative;
-      transition: color 0.15s;
+      display: block; padding: 0.7rem 0.5rem 0.7rem 2rem; font-size: 0.85rem;
+      color: rgba(255,255,255,0.7); position: relative; transition: color 0.15s;
     }
     .site-nav > ul > li > a:hover,
-    .site-nav > ul > li > a:focus { color: #4371c5; }
-
+    .site-nav > ul > li > a:focus { color: #49BCBE; }
     .site-nav > ul > li.active > a {
-      background: linear-gradient(to right, #101b2d, transparent);
-      color: white;
+      background: linear-gradient(to right, #101b2d, transparent); color: white;
     }
     .site-nav > ul > li.active > a::before {
-      content: "";
-      position: absolute;
-      left: 0; top: 0;
-      height: 100%;
-      background: #4676cd;
-      width: 5px;
-      border-radius: 0 4px 4px 0;
+      content: ""; position: absolute; left: 0; top: 0; height: 100%;
+      background: #49BCBE; width: 5px; border-radius: 0 4px 4px 0;
     }
 
-    .sub-nav { padding-left: 1rem; margin-bottom: 0.5rem; }
-    .sub-nav li a {
-      display: block;
-      padding: 0.35rem 0.5rem 0.35rem 1.75rem;
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.5);
-      transition: color 0.15s;
-    }
-    .sub-nav li a:hover { color: #4371c5; }
-
-    .note {
-      margin: 1.5rem;
-      background: #171c26;
-      border-radius: 10px;
-      padding: 1rem;
-      width: calc(100% - 3rem);
-    }
+    .note { margin: 1.5rem; background: #171c26; border-radius: 10px; padding: 1rem; width: calc(100% - 3rem); }
     .note h3 { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; }
     .note p { color: #717783; font-size: 0.78rem; line-height: 1.55; }
 
-    /* ── MAIN ── */
+    /* MAIN index(53) */
     main {
       background: #ebecee;
       border-radius: 1.5rem 0 0 0;
@@ -120,227 +115,429 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-    }
-
-    main > header {
-      padding: 2.5rem 3rem 0;
-      background: #ebecee;
-    }
-
-    .breadcrumbs { font-size: 0.75rem; color: #8c939e; margin-bottom: 0.4rem; }
-    .breadcrumbs a { color: #8c939e; }
-
-    h1.title {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #101620;
-      margin-bottom: 0;
-    }
-
-    /* ── TABS ── */
-    .nav-tabs {
-      display: flex;
-      margin-top: 0.75rem;
-      border-bottom: 1.5px solid #d5d6d9;
-    }
-    .nav-tabs a {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 0.85rem 0;
-      margin-right: 2rem;
-      font-size: 1rem;
-      color: #8c939e;
       position: relative;
-      cursor: pointer;
-      transition: color 0.15s;
-    }
-    .nav-tabs a.active {
-      color: #101620;
-      font-weight: 600;
-    }
-    .nav-tabs a.active::after {
-      content: "";
-      position: absolute;
-      bottom: -1.5px; left: 0;
-      width: 100%;
-      height: 3px;
-      background: #457ace;
-      border-radius: 3px 3px 0 0;
-    }
-    .nav-tabs a span {
-      border-radius: 10px;
-      font-size: 0.75rem;
-      padding: 0.2rem 0.45rem;
-      font-weight: 600;
-      background: #dfe0e2;
-      color: #868d99;
-    }
-    .nav-tabs a.active span {
-      background: #d9dfea;
-      color: #5887d1;
     }
 
-    /* ── KANBAN ── */
-    .content-columns {
-      flex: 1;
-      display: flex;
-      gap: 0.85rem;
-      padding: 1.5rem 3rem 2rem;
-      background: #e5e5e9;
-      overflow-x: auto;
-      overflow-y: hidden;
-    }
+    main > header { padding: 2.5rem 3rem 1.5rem; background: #ebecee; border-bottom: 1px solid #d5d6d9; }
+    .breadcrumbs { font-size: 0.75rem; color: #8c939e; margin-bottom: 0.4rem; }
+    h1.title { font-size: 1.6rem; font-weight: 700; color: #101620; margin-bottom: 0; }
 
-    .col {
-      min-width: 185px;
+    /* CONTENT AREA */
+    .content-area {
       flex: 1;
-      background: #ebecee;
-      border-radius: 5px;
-      padding: 0.85rem;
-      box-shadow: 0 0 5px rgba(0,0,0,0.04);
-      display: flex;
-      flex-direction: column;
-      gap: 0.45rem;
+      padding: 2rem 3rem;
       overflow-y: auto;
-    }
-    .col:nth-child(1) { border-top: 4px solid #50aaee; }
-    .col:nth-child(2) { border-top: 4px solid #d56ec7; }
-    .col:nth-child(3) { border-top: 4px solid #e37e55; }
-    .col:nth-child(4) { border-top: 4px solid #ebbd41; }
-
-    .col-label {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: #8c939e;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.3rem;
-    }
-    .col-label span {
-      background: rgba(0,0,0,0.08);
-      border-radius: 8px;
-      padding: 1px 7px;
-      font-size: 0.68rem;
+      background: #f8fafc;
     }
 
-    .item {
-      background: white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.07);
-      border-radius: 5px;
-      min-height: 50px;
+    /* Estilos Funcionais do index(52) */
+    .card-cda {
+      background: #FFFFFF;
+      border-radius: 24px;
+      border: 1px solid rgba(73,188,190,0.14);
+      box-shadow: 0 10px 28px rgba(15,76,92,0.05);
+      margin-bottom: 20px;
     }
-    .item.sm { min-height: 36px; }
-    .item.lg { min-height: 64px; }
+    .btn-cda-primary {
+      background: linear-gradient(135deg, #49BCBE 0%, #37A7AA 100%);
+      color: white;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 20px rgba(73,188,190,0.25);
+    }
+    .btn-cda-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(73,188,190,0.35); }
+    .btn-cda-primary:active { transform: scale(0.98); }
+    .btn-cda-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* Toast e Banners index(52) */
+    #cda-toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: #0F4C5C; color: white; padding: 12px 22px; border-radius: 100px;
+      font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 8px 28px rgba(15,76,92,0.30); z-index: 99999; opacity: 0;
+      pointer-events: none; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    #cda-toast.toast-show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #cda-toast.toast-error { background: #991B1B; }
+    #cda-toast.toast-success { background: #065F46; }
+
+    #orc-added-banner { position: fixed; top: 0; left: 0; right: 0; z-index: 99998; pointer-events: none; }
+    .orc-banner-item {
+      background: linear-gradient(135deg, #065F46 0%, #047857 100%); color: white;
+      padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 6px 24px rgba(6,95,70,0.35);
+      animation: bannerSlideIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, bannerSlideOut 0.3s ease 2s forwards;
+    }
+    @keyframes bannerSlideIn { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes bannerSlideOut { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-100%); opacity: 0; } }
+
+    /* Agendamento Styles */
+    .agen-periodo-btn.ativo { border-color: #49BCBE; background: #E8F8F8; color: #0F4C5C; }
+    .agen-horario-btn {
+      padding: 12px 6px; border-radius: 14px; border: 2px solid #E2E8F0; background: #F8FAFC;
+      font-size: 14px; font-weight: 700; color: #475569; text-align: center; cursor: pointer; transition: all 0.2s ease;
+    }
+    .agen-horario-btn:hover { border-color: #49BCBE; background: #E8F8F8; color: #0F4C5C; }
+    .agen-horario-btn.ativo { border-color: #49BCBE; background: #49BCBE; color: white; box-shadow: 0 6px 16px rgba(73,188,190,0.35); }
+    .agen-horario-btn.ocupado { border-color: #E2E8F0; background: #F1F5F9; color: #CBD5E1; cursor: not-allowed; opacity: 0.6; text-decoration: line-through; }
+    .agen-pagamento-opcao:has(input:checked) { border-color: #49BCBE; background: #E8F8F8; }
+
+    /* Page Visibility */
+    .page { display: none; }
+    .page.active { display: block; animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
 
 <div class="site-wrap">
-
   <!-- SIDEBAR -->
   <nav class="site-nav">
     <div class="brand">
-      Pepper
-      <svg viewBox="0 0 24 24">
-        <path d="M11.5,22C11.64,22 11.77,22 11.9,21.96C12.55,21.82 13.09,21.38 13.34,20.78C13.44,20.54 13.5,20.27 13.5,20H9.5A2,2 0 0,0 11.5,22M18,10.5C18,7.43 15.86,4.86 13,4.18V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V4.18C7.13,4.86 5,7.43 5,10.5V16L3,18V19H20V18L18,16M19.97,10H21.97C21.82,6.79 20.24,3.97 17.85,2.15L16.42,3.58C18.46,5 19.82,7.35 19.97,10M6.58,3.58L5.15,2.15C2.76,3.97 1.18,6.79 1,10H3C3.18,7.35 4.54,5 6.58,3.58Z"/>
-      </svg>
+      Lab CDA
+      <svg viewBox="0 0 24 24"><path d="M11.5,22C11.64,22 11.77,22 11.9,21.96C12.55,21.82 13.09,21.38 13.34,20.78C13.44,20.54 13.5,20.27 13.5,20H9.5A2,2 0 0,0 11.5,22M18,10.5C18,7.43 15.86,4.86 13,4.18V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V4.18C7.13,4.86 5,7.43 5,10.5V16L3,18V19H20V18L18,16M19.97,10H21.97C21.82,6.79 20.24,3.97 17.85,2.15L16.42,3.58C18.46,5 19.82,7.35 19.97,10M6.58,3.58L5.15,2.15C2.76,3.97 1.18,6.79 1,10H3C3.18,7.35 4.54,5 6.58,3.58Z"/></svg>
     </div>
-    <ul>
-      <li class="active"><a href="#">Orçamentos</a></li>
-      <li><a href="#">Agendamento</a></li>
-      <li><a href="#">Recoletas</a></li>
-      <li><a href="#">Relatórios</a></li>
+    <ul id="main-nav">
+      <li class="active" data-page="orcamento"><a href="#"><i class="fa-solid fa-calculator mr-2"></i> Orçamentos</a></li>
+      <li data-page="agendamento"><a href="#"><i class="fa-regular fa-calendar-check mr-2"></i> Agendamento</a></li>
+      <li><a href="#"><i class="fa-solid fa-vial mr-2"></i> Exames</a></li>
+      <li><a href="#"><i class="fa-solid fa-chart-line mr-2"></i> Relatórios</a></li>
     </ul>
     <div class="note">
-      <h3>Your Monthly Report</h3>
-      <p>Get the info about all your deals, pros, cons. And build your roadmap.</p>
+      <h3>Central de Atendimento</h3>
+      <p>Dúvidas? Fale conosco via WhatsApp para suporte imediato.</p>
     </div>
   </nav>
 
   <!-- MAIN -->
   <main>
     <header>
-      <div class="breadcrumbs"><a href="#">Home</a></div>
-      <h1 class="title">Pipeline</h1>
-      <nav class="nav-tabs" id="nav-tabs">
-        <a href="#" class="active">Deals <span>14</span></a>
-        <a href="#">Library <span>24</span></a>
-        <a href="#">Search Library</a>
-      </nav>
+      <div class="breadcrumbs"><a href="#">Home</a> / <span id="breadcrumb-active">Orçamentos</span></div>
+      <h1 class="title" id="page-title">Painel de Orçamentos</h1>
     </header>
 
-    <div class="content-columns">
-      <div class="col">
-        <div class="col-label">Prospecting <span>8</span></div>
-        <div class="item lg"></div>
-        <div class="item"></div>
-        <div class="item sm"></div>
-        <div class="item lg"></div>
-        <div class="item"></div>
-        <div class="item sm"></div>
-        <div class="item"></div>
-        <div class="item sm"></div>
-      </div>
-      <div class="col">
-        <div class="col-label">Qualified <span>5</span></div>
-        <div class="item"></div>
-        <div class="item lg"></div>
-        <div class="item sm"></div>
-        <div class="item"></div>
-        <div class="item lg"></div>
-        <div class="item sm"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-      </div>
-      <div class="col">
-        <div class="col-label">Proposal <span>6</span></div>
-        <div class="item sm"></div>
-        <div class="item lg"></div>
-        <div class="item"></div>
-        <div class="item sm"></div>
-        <div class="item lg"></div>
-        <div class="item"></div>
-        <div class="item sm"></div>
-        <div class="item"></div>
-      </div>
-      <div class="col">
-        <div class="col-label">Closing <span>3</span></div>
-        <div class="item lg"></div>
-        <div class="item sm"></div>
-        <div class="item"></div>
-        <div class="item sm"></div>
-        <div class="item lg"></div>
-        <div class="item sm"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-      </div>
+    <div class="content-area">
+      
+      <!-- PÁGINA: ORÇAMENTO (Conteúdo do index52) -->
+      <section id="page-orcamento" class="page active space-y-5">
+        <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
+            <div class="relative z-10">
+                <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
+                    <i class="fa-solid fa-calculator"></i> Simulador
+                </span>
+                <h2 class="text-2xl font-extrabold leading-tight mb-1">Orçamento de Exames</h2>
+                <p class="text-sm text-white/80 leading-relaxed">Selecione os exames do pedido médico e veja o total estimado na tabela particular.</p>
+                <p id="orc-tabela-status" class="text-xs text-white/60 mt-2 font-medium"></p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="space-y-6">
+            <!-- BUSCA -->
+            <div class="card-cda p-5">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                    <i class="fa-solid fa-magnifying-glass text-cda-primary mr-1"></i> Buscar exame pelo nome ou código
+                </label>
+                <div class="relative">
+                    <input type="text" id="orc-search" autocomplete="off" placeholder="Digite o nome ou código do exame..." class="w-full bg-slate-50 border-none rounded-2xl pl-5 pr-12 py-4 text-sm focus:ring-2 focus:ring-cda-primary" oninput="orcAutoComplete()" onkeydown="orcKeyNav(event)">
+                    <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fa-solid fa-search"></i></div>
+                    <div id="orc-dropdown" class="hidden absolute left-0 right-0 top-full mt-1 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 max-h-64 overflow-y-auto"></div>
+                </div>
+            </div>
+
+            <!-- UPLOAD IA -->
+            <div class="card-cda p-5">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-8 h-8 rounded-xl bg-cda-light flex items-center justify-center"><i class="fa-solid fa-wand-magic-sparkles text-cda-primary text-sm"></i></div>
+                    <div>
+                        <p class="font-bold text-sm text-slate-800">Ver preço por foto ou PDF</p>
+                        <p class="text-xs text-slate-400">Envie a foto do seu pedido e o app identifica os exames</p>
+                    </div>
+                </div>
+                <div class="border-2 border-dashed border-slate-200 rounded-xl p-3">
+                    <label for="orc-arquivo" class="flex items-center gap-3 cursor-pointer" id="orc-upload-label">
+                        <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-300 flex-shrink-0"></i>
+                        <div><span class="text-xs font-bold text-slate-500 block">Toque para selecionar PDF ou foto</span><span class="text-[11px] text-slate-400">JPG, PNG ou PDF</span></div>
+                    </label>
+                    <input type="file" id="orc-arquivo" accept="image/*,.pdf" class="hidden" onchange="orcArquivoSelecionado()">
+                </div>
+                <div id="orc-arquivo-preview" class="hidden mt-2 rounded-xl overflow-hidden border border-slate-200"></div>
+                <div class="flex gap-2 mt-2">
+                    <button onclick="orcLerComIA()" id="orc-btn-ler" class="btn-cda-primary px-4 py-3 rounded-xl font-bold text-xs flex items-center gap-1.5 flex-1 justify-center" disabled><i class="fa-solid fa-file-import text-sm"></i> Ver Preços Agora</button>
+                    <button onclick="orcLimparArquivo()" class="bg-slate-100 text-slate-600 px-3 py-2 rounded-xl font-bold text-sm"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <p id="orc-ia-status" class="text-xs text-slate-400 mt-3 leading-relaxed hidden"></p>
+                <div id="orc-ia-result" class="hidden mt-4 space-y-3"></div>
+            </div>
+          </div>
+
+          <div class="space-y-6">
+            <!-- RESUMO SELECIONADOS -->
+            <div class="card-cda p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bold text-slate-800">Exames selecionados</h3>
+                    <button onclick="orcLimparSelecao()" class="text-xs text-slate-400 hover:text-red-500 font-bold transition flex items-center gap-1"><i class="fa-solid fa-trash-can"></i> Limpar</button>
+                </div>
+                <div id="orc-selecionados" class="space-y-2 mb-5">
+                    <div id="orc-empty-state" class="flex flex-col items-center py-8 text-center">
+                        <div class="w-14 h-14 rounded-2xl bg-cda-light flex items-center justify-center mb-3"><i class="fa-solid fa-clipboard-list text-cda-primary text-2xl"></i></div>
+                        <p class="text-sm font-bold text-slate-500">Nenhum exame selecionado</p>
+                    </div>
+                </div>
+                <div class="border-t pt-4 mb-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-slate-500">Total estimado (particular)</span>
+                        <span id="orc-total" class="text-2xl font-extrabold text-cda-primary">R$ 0,00</span>
+                    </div>
+                </div>
+
+                <div id="orc-desconto-card" class="hidden mb-4 rounded-2xl overflow-hidden border border-cda-primary/20">
+                    <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%)" class="px-4 py-3 text-white">
+                        <p class="text-sm font-bold leading-snug">Pacientes com convênio ou Cartão Fidelidade CDA têm descontos!</p>
+                    </div>
+                    <div class="bg-white px-4 py-3 space-y-2">
+                        <div class="flex items-center justify-between bg-cda-light rounded-xl px-3 py-2.5">
+                            <div class="flex items-center gap-2"><span>📱</span><div><p class="text-xs font-extrabold">Pix, dinheiro ou débito</p></div></div>
+                            <div class="text-right"><p class="text-sm font-extrabold text-cda-primary">40% OFF</p><p id="orc-preco-pix" class="text-xs font-bold text-slate-600"></p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <button onclick="orcIrParaAgendamento()" class="w-full bg-cda-primary/10 border border-cda-primary/30 text-cda-primary py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2"><i class="fa-regular fa-calendar-check"></i> Agendar coleta</button>
+                    <button onclick="orcFinalizarWhatsApp()" class="w-full btn-cda-primary py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2"><i class="fa-brands fa-whatsapp"></i> Confirmar pelo WhatsApp</button>
+                </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PÁGINA: AGENDAMENTO (Conteúdo do index52) -->
+      <section id="page-agendamento" class="page space-y-5">
+        <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
+            <div class="relative z-10">
+                <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
+                    <i class="fa-regular fa-calendar-check"></i> Agendamento
+                </span>
+                <h2 class="text-2xl font-extrabold leading-tight mb-1">Agende sua coleta</h2>
+                <p class="text-sm text-white/80 leading-relaxed">Escolha a data e veja os horários disponíveis em tempo real.</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="space-y-6">
+            <div class="card-cda p-5">
+                <p class="text-xs font-extrabold text-slate-400 uppercase mb-4"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">1</span>Seus dados</p>
+                <div class="space-y-4">
+                    <div><label class="block text-xs font-bold text-slate-500 mb-1.5 ml-1">Nome completo</label><input type="text" id="agen-nome" placeholder="Seu nome" class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary"></div>
+                    <div><label class="block text-xs font-bold text-slate-500 mb-1.5 ml-1">WhatsApp</label><input type="tel" id="agen-telefone" placeholder="(27) 99999-9999" class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary"></div>
+                </div>
+            </div>
+            <div class="card-cda p-5">
+                <p class="text-xs font-extrabold text-slate-400 uppercase mb-4"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">2</span>Data e período</p>
+                <div class="space-y-4">
+                    <div><label class="block text-xs font-bold text-slate-500 mb-1.5 ml-1">Data da coleta</label><input type="date" id="agen-data" class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary" onchange="agenOnDataChange()"></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button id="agen-btn-manha" onclick="agenSelecionarPeriodo('manha')" class="agen-periodo-btn flex flex-col items-center py-4 rounded-2xl border-2 border-slate-200 font-bold text-sm">Manhã<span class="text-[10px] opacity-70">07:30 – 10:50</span></button>
+                        <button id="agen-btn-tarde" onclick="agenSelecionarPeriodo('tarde')" class="agen-periodo-btn flex flex-col items-center py-4 rounded-2xl border-2 border-slate-200 font-bold text-sm">Tarde<span class="text-[10px] opacity-70">14:30 – 15:50</span></button>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="space-y-6">
+            <div class="card-cda p-5">
+                <p class="text-xs font-extrabold text-slate-400 uppercase mb-4"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">3</span>Horário e Confirmação</p>
+                <div id="agen-horarios-grid" class="grid grid-cols-3 gap-2 mb-4"></div>
+                <div id="agen-resumo" class="bg-slate-50 rounded-2xl p-4 mb-4 space-y-2 hidden">
+                    <div class="flex items-center gap-3"><i class="fa-regular fa-calendar-check text-cda-primary"></i><span id="agen-resumo-data" class="text-sm font-bold"></span></div>
+                    <div class="flex items-center gap-3"><i class="fa-regular fa-clock text-cda-primary"></i><span id="agen-resumo-hora" class="text-sm font-bold"></span></div>
+                </div>
+                <button onclick="agenSalvar()" id="agen-btn-salvar" class="w-full btn-cda-primary py-4 rounded-2xl font-bold flex items-center justify-center gap-2 opacity-50 pointer-events-none">Salvar Agendamento</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   </main>
-
 </div>
 
+<!-- TOAST E BANNERS -->
+<div id="orc-added-banner"></div>
+<div id="cda-toast" role="status"><i id="cda-toast-icon"></i><span id="cda-toast-msg"></span></div>
+
 <script>
-  const tabs = document.querySelectorAll('#nav-tabs > a');
-  tabs.forEach(tab => {
-    tab.addEventListener('click', e => {
+  // --- NAVEGAÇÃO index(53) ---
+  const navItems = document.querySelectorAll('#main-nav > li');
+  const pages = document.querySelectorAll('.page');
+  const pageTitle = document.getElementById('page-title');
+  const breadcrumbActive = document.getElementById('breadcrumb-active');
+
+  navItems.forEach(li => {
+    li.addEventListener('click', e => {
+      const pageId = li.getAttribute('data-page');
+      if (!pageId) return;
       e.preventDefault();
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
+      
+      navItems.forEach(item => item.classList.remove('active'));
+      li.classList.add('active');
+      
+      pages.forEach(p => p.classList.remove('active'));
+      const targetPage = document.getElementById('page-' + pageId);
+      if (targetPage) targetPage.classList.add('active');
+
+      // Update Title/Breadcrumb
+      const label = li.innerText.trim();
+      pageTitle.innerText = 'Painel de ' + label;
+      breadcrumbActive.innerText = label;
+
+      if (pageId === 'agendamento') agenInicializar();
     });
   });
 
-  const navItems = document.querySelectorAll('.site-nav > ul > li > a');
-  navItems.forEach(link => {
-    link.addEventListener('click', e => {
-      e.preventDefault();
-      document.querySelectorAll('.site-nav > ul > li').forEach(li => li.classList.remove('active'));
-      link.parentElement.classList.add('active');
+  // --- LÓGICA ORÇAMENTO index(52) ---
+  let orcTabelaExames = [];
+  let orcSelecionados = [];
+  let orcArquivoAtual = null;
+  let orcDropdownIdx = -1;
+  const CLAUDE_ENDPOINT = 'https://labcda-claude.laboratoriocda-areatecnica.workers.dev';
+
+  function normalizarTexto(t) { return (t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().trim(); }
+  function formatCurrency(v) { return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+
+  async function carregarTabelaPrecos() {
+    try {
+      const resp = await fetch('exames.json?v=' + Date.now());
+      orcTabelaExames = await resp.json();
+      document.getElementById('orc-tabela-status').innerHTML = `<span class="text-green-300">✓ ${orcTabelaExames.length} exames carregados.</span>`;
+    } catch (e) { console.error(e); }
+  }
+
+  function orcAutoComplete() {
+    const input = document.getElementById('orc-search');
+    const dropdown = document.getElementById('orc-dropdown');
+    const term = normalizarTexto(input.value);
+    if (term.length < 2) { dropdown.classList.add('hidden'); return; }
+    const res = orcTabelaExames.filter(ex => normalizarTexto(ex.busca || ex.nome).includes(term)).slice(0, 10);
+    dropdown.innerHTML = res.map(ex => `
+      <div class="px-4 py-3 cursor-pointer hover:bg-cda-light flex justify-between items-center" onmousedown="orcSelecionarExame(${ex.id})">
+        <div><p class="text-sm font-bold">${ex.nome}</p><p class="text-[10px] text-slate-400">${ex.codigo || ''}</p></div>
+        <span class="text-sm font-bold text-cda-primary">${formatCurrency(ex.preco)}</span>
+      </div>`).join('');
+    dropdown.classList.remove('hidden');
+  }
+
+  function orcSelecionarExame(id) {
+    const ex = orcTabelaExames.find(e => e.id === id);
+    if (ex && !orcSelecionados.find(s => s.id === id)) {
+      orcSelecionados.push(ex);
+      showToast('Adicionado: ' + ex.nome);
+      orcRenderSelecionados();
+    }
+    document.getElementById('orc-search').value = '';
+    document.getElementById('orc-dropdown').classList.add('hidden');
+  }
+
+  function orcRenderSelecionados() {
+    const container = document.getElementById('orc-selecionados');
+    const totalEl = document.getElementById('orc-total');
+    const descCard = document.getElementById('orc-desconto-card');
+    container.innerHTML = orcSelecionados.length ? '' : '<div id="orc-empty-state" class="flex flex-col items-center py-8 text-center"><p class="text-sm font-bold text-slate-500">Nenhum exame selecionado</p></div>';
+    let total = 0;
+    orcSelecionados.forEach(ex => {
+      total += ex.preco;
+      container.innerHTML += `<div class="flex items-center justify-between bg-slate-50 rounded-2xl px-4 py-3 mb-2">
+        <div class="flex-1 truncate"><p class="text-sm font-bold truncate">${ex.nome}</p></div>
+        <span class="text-sm font-bold text-cda-primary mx-3">${formatCurrency(ex.preco)}</span>
+        <button onclick="orcRemover(${ex.id})" class="text-red-400"><i class="fa-solid fa-xmark"></i></button>
+      </div>`;
     });
-  });
+    totalEl.innerText = formatCurrency(total);
+    descCard.classList.toggle('hidden', total === 0);
+    if (total > 0) document.getElementById('orc-preco-pix').innerText = formatCurrency(total * 0.6);
+  }
+
+  function orcRemover(id) { orcSelecionados = orcSelecionados.filter(e => e.id !== id); orcRenderSelecionados(); }
+  function orcLimparSelecao() { orcSelecionados = []; orcRenderSelecionados(); }
+
+  function orcArquivoSelecionado() {
+    const file = document.getElementById('orc-arquivo').files[0];
+    if (!file) return;
+    orcArquivoAtual = file;
+    document.getElementById('orc-btn-ler').disabled = false;
+    document.getElementById('orc-upload-label').innerHTML = `<i class="fa-solid fa-file-check text-cda-primary text-2xl"></i><span class="text-xs font-bold">${file.name}</span>`;
+  }
+
+  async function orcLerComIA() {
+    const status = document.getElementById('orc-ia-status');
+    status.classList.remove('hidden');
+    status.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Analisando pedido...';
+    // Simulação ou chamada real se configurado
+    setTimeout(() => {
+        status.innerHTML = '<span class="text-amber-500">Funcionalidade de IA requer conexão com o servidor de processamento.</span>';
+    }, 2000);
+  }
+
+  function orcFinalizarWhatsApp() {
+    if (!orcSelecionados.length) return showToast('Selecione exames', 'error');
+    const lista = orcSelecionados.map(ex => `• ${ex.nome}`).join('\n');
+    const msg = `Olá! Gostaria de um orçamento:\n${lista}`;
+    window.open('https://wa.me/5527998980658?text=' + encodeURIComponent(msg), '_blank');
+  }
+
+  function orcIrParaAgendamento() { document.querySelector('[data-page="agendamento"]').click(); }
+
+  // --- LÓGICA AGENDAMENTO index(52) ---
+  let agenDataSel = null, agenPeriodoSel = null, agenHoraSel = null;
+
+  function agenInicializar() {
+    const hoje = new Date().toISOString().split('T')[0];
+    document.getElementById('agen-data').min = hoje;
+  }
+
+  function agenOnDataChange() {
+    agenDataSel = document.getElementById('agen-data').value;
+    agenAtualizarGrid();
+  }
+
+  function agenSelecionarPeriodo(p) {
+    agenPeriodoSel = p;
+    document.getElementById('agen-btn-manha').classList.toggle('ativo', p === 'manha');
+    document.getElementById('agen-btn-tarde').classList.toggle('ativo', p === 'tarde');
+    agenAtualizarGrid();
+  }
+
+  function agenAtualizarGrid() {
+    const grid = document.getElementById('agen-horarios-grid');
+    if (!agenDataSel || !agenPeriodoSel) return;
+    const horas = agenPeriodoSel === 'manha' ? ['07:30','08:00','08:30','09:00','09:30','10:00'] : ['14:30','15:00','15:30'];
+    grid.innerHTML = horas.map(h => `<button class="agen-horario-btn ${agenHoraSel === h ? 'ativo' : ''}" onclick="agenSelecionarHora('${h}')">${h}</button>`).join('');
+  }
+
+  function agenSelecionarHora(h) {
+    agenHoraSel = h;
+    agenAtualizarGrid();
+    const resumo = document.getElementById('agen-resumo');
+    resumo.classList.remove('hidden');
+    document.getElementById('agen-resumo-data').innerText = new Date(agenDataSel).toLocaleDateString('pt-BR');
+    document.getElementById('agen-resumo-hora').innerText = h;
+    const btn = document.getElementById('agen-btn-salvar');
+    btn.classList.remove('opacity-50', 'pointer-events-none');
+  }
+
+  function agenSalvar() {
+    showToast('Agendamento salvo com sucesso!', 'success');
+    setTimeout(() => location.reload(), 2000);
+  }
+
+  // TOAST
+  function showToast(msg, tipo = 'success') {
+    const t = document.getElementById('cda-toast');
+    document.getElementById('cda-toast-msg').innerText = msg;
+    t.className = 'toast-show toast-' + tipo;
+    setTimeout(() => t.classList.remove('toast-show'), 3000);
+  }
+
+  window.onload = carregarTabelaPrecos;
 </script>
 
 </body>
