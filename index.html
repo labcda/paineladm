@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pepper CRM — Pipeline</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #89909f;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 12px;
+      height: 100vh;
+      overflow: hidden;
+      padding: 3rem 0 0 3rem;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+
+    /* ── LAYOUT ── */
+    .site-wrap {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      height: calc(100vh - 3rem);
+      border-radius: 1.5rem 1.5rem 0 0;
+      overflow: hidden;
+    }
+
+    /* ── SIDEBAR ── */
+    .site-nav {
+      background: #0b121b;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      border-radius: 1.5rem 0 0 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 1.3rem;
+      padding: 1.75rem 2rem 1.25rem;
+      border-bottom: 0.5px solid rgba(255,255,255,0.07);
+      position: relative;
+    }
+    .brand svg {
+      fill: white;
+      width: 16px;
+      height: 16px;
+    }
+    .brand::after {
+      content: "";
+      width: 8px;
+      height: 8px;
+      background: #4777ce;
+      border-radius: 50%;
+      position: absolute;
+      right: 1.85rem;
+      top: 1.85rem;
+    }
+
+    .site-nav > ul {
+      flex: 1;
+      padding: 0.5rem 0;
+      margin-bottom: auto;
+    }
+    .site-nav > ul > li > a {
+      display: block;
+      padding: 0.7rem 0.5rem 0.7rem 2rem;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.7);
+      position: relative;
+      transition: color 0.15s;
+    }
+    .site-nav > ul > li > a:hover,
+    .site-nav > ul > li > a:focus { color: #4371c5; }
+
+    .site-nav > ul > li.active > a {
+      background: linear-gradient(to right, #101b2d, transparent);
+      color: white;
+    }
+    .site-nav > ul > li.active > a::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0;
+      height: 100%;
+      background: #4676cd;
+      width: 5px;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .sub-nav { padding-left: 1rem; margin-bottom: 0.5rem; }
+    .sub-nav li a {
+      display: block;
+      padding: 0.35rem 0.5rem 0.35rem 1.75rem;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.5);
+      transition: color 0.15s;
+    }
+    .sub-nav li a:hover { color: #4371c5; }
+
+    .note {
+      margin: 1.5rem;
+      background: #171c26;
+      border-radius: 10px;
+      padding: 1rem;
+      width: calc(100% - 3rem);
+    }
+    .note h3 { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; }
+    .note p { color: #717783; font-size: 0.78rem; line-height: 1.55; }
+
+    /* ── MAIN ── */
+    main {
+      background: #ebecee;
+      border-radius: 1.5rem 0 0 0;
+      margin-left: -1.5rem;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    main > header {
+      padding: 2.5rem 3rem 0;
+      background: #ebecee;
+    }
+
+    .breadcrumbs { font-size: 0.75rem; color: #8c939e; margin-bottom: 0.4rem; }
+    .breadcrumbs a { color: #8c939e; }
+
+    h1.title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #101620;
+      margin-bottom: 0;
+    }
+
+    /* ── TABS ── */
+    .nav-tabs {
+      display: flex;
+      margin-top: 0.75rem;
+      border-bottom: 1.5px solid #d5d6d9;
+    }
+    .nav-tabs a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.85rem 0;
+      margin-right: 2rem;
+      font-size: 1rem;
+      color: #8c939e;
+      position: relative;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    .nav-tabs a.active {
+      color: #101620;
+      font-weight: 600;
+    }
+    .nav-tabs a.active::after {
+      content: "";
+      position: absolute;
+      bottom: -1.5px; left: 0;
+      width: 100%;
+      height: 3px;
+      background: #457ace;
+      border-radius: 3px 3px 0 0;
+    }
+    .nav-tabs a span {
+      border-radius: 10px;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.45rem;
+      font-weight: 600;
+      background: #dfe0e2;
+      color: #868d99;
+    }
+    .nav-tabs a.active span {
+      background: #d9dfea;
+      color: #5887d1;
+    }
+
+    /* ── KANBAN ── */
+    .content-columns {
+      flex: 1;
+      display: flex;
+      gap: 0.85rem;
+      padding: 1.5rem 3rem 2rem;
+      background: #e5e5e9;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    .col {
+      min-width: 185px;
+      flex: 1;
+      background: #ebecee;
+      border-radius: 5px;
+      padding: 0.85rem;
+      box-shadow: 0 0 5px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      overflow-y: auto;
+    }
+    .col:nth-child(1) { border-top: 4px solid #50aaee; }
+    .col:nth-child(2) { border-top: 4px solid #d56ec7; }
+    .col:nth-child(3) { border-top: 4px solid #e37e55; }
+    .col:nth-child(4) { border-top: 4px solid #ebbd41; }
+
+    .col-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #8c939e;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.3rem;
+    }
+    .col-label span {
+      background: rgba(0,0,0,0.08);
+      border-radius: 8px;
+      padding: 1px 7px;
+      font-size: 0.68rem;
+    }
+
+    .item {
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.07);
+      border-radius: 5px;
+      min-height: 50px;
+    }
+    .item.sm { min-height: 36px; }
+    .item.lg { min-height: 64px; }
+  </style>
+</head>
+<body>
+
+<div class="site-wrap">
+
+  <!-- SIDEBAR -->
+  <nav class="site-nav">
+    <div class="brand">
+      Pepper
+      <svg viewBox="0 0 24 24">
+        <path d="M11.5,22C11.64,22 11.77,22 11.9,21.96C12.55,21.82 13.09,21.38 13.34,20.78C13.44,20.54 13.5,20.27 13.5,20H9.5A2,2 0 0,0 11.5,22M18,10.5C18,7.43 15.86,4.86 13,4.18V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V4.18C7.13,4.86 5,7.43 5,10.5V16L3,18V19H20V18L18,16M19.97,10H21.97C21.82,6.79 20.24,3.97 17.85,2.15L16.42,3.58C18.46,5 19.82,7.35 19.97,10M6.58,3.58L5.15,2.15C2.76,3.97 1.18,6.79 1,10H3C3.18,7.35 4.54,5 6.58,3.58Z"/>
+      </svg>
+    </div>
+    <ul>
+      <li class="active">
+        <a href="#">Deals</a>
+        <ul class="sub-nav">
+          <li><a href="#">Create New Deal</a></li>
+          <li><a href="#">Modify Deal</a></li>
+          <li><a href="#">Pipeline</a></li>
+        </ul>
+      </li>
+      <li><a href="#">Activities</a></li>
+      <li><a href="#">Asset Libraries</a></li>
+      <li><a href="#">Funds</a></li>
+      <li><a href="#">Investors</a></li>
+      <li><a href="#">Reports</a></li>
+    </ul>
+    <div class="note">
+      <h3>Your Monthly Report</h3>
+      <p>Get the info about all your deals, pros, cons. And build your roadmap.</p>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main>
+    <header>
+      <div class="breadcrumbs"><a href="#">Home</a></div>
+      <h1 class="title">Pipeline</h1>
+      <nav class="nav-tabs" id="nav-tabs">
+        <a href="#" class="active">Deals <span>14</span></a>
+        <a href="#">Library <span>24</span></a>
+        <a href="#">Search Library</a>
+      </nav>
+    </header>
+
+    <div class="content-columns">
+      <div class="col">
+        <div class="col-label">Prospecting <span>8</span></div>
+        <div class="item lg"></div>
+        <div class="item"></div>
+        <div class="item sm"></div>
+        <div class="item lg"></div>
+        <div class="item"></div>
+        <div class="item sm"></div>
+        <div class="item"></div>
+        <div class="item sm"></div>
+      </div>
+      <div class="col">
+        <div class="col-label">Qualified <span>5</span></div>
+        <div class="item"></div>
+        <div class="item lg"></div>
+        <div class="item sm"></div>
+        <div class="item"></div>
+        <div class="item lg"></div>
+        <div class="item sm"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+      </div>
+      <div class="col">
+        <div class="col-label">Proposal <span>6</span></div>
+        <div class="item sm"></div>
+        <div class="item lg"></div>
+        <div class="item"></div>
+        <div class="item sm"></div>
+        <div class="item lg"></div>
+        <div class="item"></div>
+        <div class="item sm"></div>
+        <div class="item"></div>
+      </div>
+      <div class="col">
+        <div class="col-label">Closing <span>3</span></div>
+        <div class="item lg"></div>
+        <div class="item sm"></div>
+        <div class="item"></div>
+        <div class="item sm"></div>
+        <div class="item lg"></div>
+        <div class="item sm"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+      </div>
+    </div>
+  </main>
+
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('#nav-tabs > a');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', e => {
+      e.preventDefault();
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+
+  const navItems = document.querySelectorAll('.site-nav > ul > li > a');
+  navItems.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelectorAll('.site-nav > ul > li').forEach(li => li.classList.remove('active'));
+      link.parentElement.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
