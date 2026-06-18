@@ -272,20 +272,14 @@
     .horario-btn.ocupado, .agen-horario-btn.ocupado { background: #fee2e2; color: #ef4444; cursor: not-allowed; opacity: 0.6; }
 
     
-    /* UPPERCASE para campos de login, senha, nome */
     #login-usuario, #login-senha, #signup-name, #signup-email, #signup-password,
     #orc-paciente, #agen-nome, #agen-telefone,
     #config-login, #config-senha, #config-senha-confirm,
-    #senha-config-input {
-        text-transform: uppercase;
-    }
+    #senha-config-input { text-transform: uppercase; }
     #login-usuario::placeholder, #login-senha::placeholder,
-    #signup-name::placeholder, #signup-email::placeholder, #signup-password::placeholder,
     #orc-paciente::placeholder, #agen-nome::placeholder, #agen-telefone::placeholder,
     #config-login::placeholder, #config-senha::placeholder, #config-senha-confirm::placeholder,
-    #senha-config-input::placeholder {
-        text-transform: none;
-    }
+    #senha-config-input::placeholder { text-transform: none; }
 
     @media (max-width: 1024px) { .home-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 768px) { .home-grid { grid-template-columns: 1fr; } body.app-loaded { padding: 1rem 0 0 1rem; } .site-wrap { grid-template-columns: 1fr; } .site-nav { display: none; } }
@@ -762,61 +756,28 @@
                 <p class="text-sm text-white/80 leading-relaxed">Gerencie usuários e configurações do sistema.</p>
             </div>
         </div>
-
-        <!-- REGISTRO DE USUÁRIO -->
         <div class="neumorphic-card">
             <h3 style="font-size: 1.2rem; font-weight: 700; color: #101620; margin-bottom: 20px;">
                 <i class="fa-solid fa-user-plus mr-2" style="color: #0F4C5C;"></i> Registro de Usuário
             </h3>
             <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                        <i class="fa-solid fa-user mr-1"></i> Login
-                    </label>
-                    <input type="text" id="config-login" placeholder="Digite o login do usuário..." 
-                        class="w-full bg-white border-none rounded-2xl pl-5 pr-5 py-3 text-sm" 
-                        style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                        <i class="fa-solid fa-lock mr-1"></i> Senha
-                    </label>
-                    <input type="password" id="config-senha" placeholder="Digite a senha..." 
-                        class="w-full bg-white border-none rounded-2xl pl-5 pr-5 py-3 text-sm" 
-                        style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                        <i class="fa-solid fa-lock mr-1"></i> Confirmar Senha
-                    </label>
-                    <input type="password" id="config-senha-confirm" placeholder="Confirme a senha..." 
-                        class="w-full bg-white border-none rounded-2xl pl-5 pr-5 py-3 text-sm" 
-                        style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);">
-                </div>
+                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-user mr-1"></i> Login</label>
+                    <input type="text" id="config-login" placeholder="Digite o login do usuário..." class="w-full bg-white border-none rounded-2xl pl-5 pr-5 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);"></div>
+                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-lock mr-1"></i> Senha</label>
+                    <input type="password" id="config-senha" placeholder="Digite a senha..." class="w-full bg-white border-none rounded-2xl pl-5 pr-5 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);"></div>
+                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-lock mr-1"></i> Confirmar Senha</label>
+                    <input type="password" id="config-senha-confirm" placeholder="Confirme a senha..." class="w-full bg-white border-none rounded-2xl pl-5 pr-5 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);"></div>
                 <div id="config-error" class="login-error-msg" style="display: none; margin-top: 10px;">Preencha todos os campos</div>
-                <div id="config-success" style="color: #0F4C5C; font-size: 0.85rem; margin-top: 10px; text-align: center; display: none; font-weight: 600;">
-                    <i class="fa-solid fa-circle-check mr-1"></i> Usuário cadastrado com sucesso!
-                </div>
-                <button class="neumorphic-btn primary neumorphic-btn-lg" onclick="cadastrarUsuario()" style="width: 100%; margin-top: 10px;">
-                    <i class="fa-solid fa-user-plus"></i> Cadastrar Usuário
-                </button>
+                <div id="config-success" style="color: #0F4C5C; font-size: 0.85rem; margin-top: 10px; text-align: center; display: none; font-weight: 600;"><i class="fa-solid fa-circle-check mr-1"></i> Usuário cadastrado com sucesso!</div>
+                <button class="neumorphic-btn primary neumorphic-btn-lg" onclick="cadastrarUsuario()" style="width: 100%; margin-top: 10px;"><i class="fa-solid fa-user-plus"></i> Cadastrar Usuário</button>
             </div>
         </div>
-
-        <!-- LISTA DE USUÁRIOS -->
         <div class="neumorphic-card">
-            <h3 style="font-size: 1.2rem; font-weight: 700; color: #101620; margin-bottom: 20px;">
-                <i class="fa-solid fa-users mr-2" style="color: #0F4C5C;"></i> Usuários Cadastrados
-            </h3>
-            <div id="config-lista-usuarios" class="space-y-2">
-                <p class="text-sm text-slate-500 text-center py-4">Carregando usuários...</p>
-            </div>
-            <button class="btn-limpar" onclick="carregarUsuarios()" style="margin-top: 12px;">
-                <i class="fa-solid fa-rotate-right"></i> Atualizar Lista
-            </button>
+            <h3 style="font-size: 1.2rem; font-weight: 700; color: #101620; margin-bottom: 20px;"><i class="fa-solid fa-users mr-2" style="color: #0F4C5C;"></i> Usuários Cadastrados</h3>
+            <div id="config-lista-usuarios" class="space-y-2"><p class="text-sm text-slate-500 text-center py-4">Carregando usuários...</p></div>
+            <button class="btn-limpar" onclick="carregarUsuarios()" style="margin-top: 12px;"><i class="fa-solid fa-rotate-right"></i> Atualizar Lista</button>
         </div>
       </section>
-
     </div>
   </main>
 </div>
@@ -861,7 +822,119 @@
   }
 
   // ==================== LOGIN ====================
-  function fazerCadastro() {
+  async function fazerLogin() {
+    console.log('fazerLogin chamado');
+    const usuarioEl = document.getElementById('login-usuario');
+    const senhaEl = document.getElementById('login-senha');
+    const errorEl = document.getElementById('login-error');
+
+    if (!usuarioEl || !senhaEl) {
+      console.error('Elementos de login não encontrados!');
+      errorEl.innerText = 'Erro interno do sistema. Recarregue a página.';
+      errorEl.style.display = 'block';
+      errorEl.style.color = '#ef4444';
+      return;
+    }
+
+    const usuario = usuarioEl.value.trim().toUpperCase();
+    const senha = senhaEl.value.trim().toUpperCase();
+
+    console.log('Tentando login:', usuario);
+
+    // Validar campos preenchidos
+    if (!usuario || !senha) {
+      errorEl.innerText = 'PREENCHA O LOGIN E A SENHA';
+      errorEl.style.display = 'block';
+      errorEl.style.color = '#ef4444';
+      setTimeout(() => errorEl.style.display = 'none', 3000);
+      return;
+    }
+
+    // Demo credentials: admin / cda2024
+    if (usuario === 'ADMIN' && senha === 'CDA2024') {
+      console.log('Login bem-sucedido (admin)!');
+      loginSucesso();
+      return;
+    }
+
+    // Verificar no Google Sheets
+    errorEl.innerText = 'VERIFICANDO CREDENCIAIS NA PLANILHA...';
+    errorEl.style.display = 'block';
+    errorEl.style.color = '#0F4C5C';
+
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      const url = APPS_SCRIPT_URL + '?action=verificarLogin&login=' + encodeURIComponent(usuario) + '&senha=' + encodeURIComponent(senha) + '&token=' + encodeURIComponent(CDA_TOKEN);
+
+      console.log('URL da requisição:', url);
+
+      const resp = await fetch(url, { 
+        method: 'GET',
+        signal: controller.signal
+      });
+
+      clearTimeout(timeout);
+
+      console.log('Status da resposta:', resp.status);
+
+      if (!resp.ok) {
+        throw new Error('Erro HTTP: ' + resp.status);
+      }
+
+      const json = await resp.json();
+      console.log('Resposta do servidor:', json);
+
+      if (json.ok && json.autorizado) {
+        console.log('Login bem-sucedido (Sheets)!');
+        loginSucesso();
+      } else if (json.ok && !json.autorizado) {
+        console.log('Login falhou: credenciais incorretas');
+        errorEl.innerText = 'LOGIN OU SENHA INCORRETOS. VERIFIQUE NA PLANILHA.';
+        errorEl.style.color = '#ef4444';
+        setTimeout(() => errorEl.style.display = 'none', 5000);
+      } else {
+        console.log('Erro do servidor:', json.erro);
+        errorEl.innerText = 'ERRO: ' + (json.erro || 'Token inválido ou acesso negado');
+        errorEl.style.color = '#ef4444';
+        setTimeout(() => errorEl.style.display = 'none', 5000);
+      }
+    } catch(err) {
+      console.error('Erro ao verificar login:', err);
+
+      if (err.name === 'AbortError') {
+        errorEl.innerText = 'TEMPO ESGOTADO: O servidor não respondeu. Verifique sua conexão.';
+      } else if (err.message.includes('Failed to fetch')) {
+        errorEl.innerText = 'ERRO DE CONEXÃO: Não foi possível acessar o servidor. Verifique se o Apps Script está publicado corretamente.';
+      } else {
+        errorEl.innerText = 'ERRO: ' + err.message + '. Verifique o console (F12) para detalhes.';
+      }
+
+      errorEl.style.color = '#ef4444';
+      setTimeout(() => errorEl.style.display = 'none', 8000);
+    }
+  }
+
+  function loginSucesso() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('splashScreen').style.display = 'flex';
+
+    setTimeout(() => {
+      const splash = document.getElementById('splashScreen');
+      splash.classList.add('fade-out');
+      setTimeout(() => {
+        splash.style.display = 'none';
+        document.getElementById('appContainer').style.display = 'grid';
+        document.body.classList.add('app-loaded');
+        carregarExames();
+        gerarHorarios();
+        atualizarMesStats();
+        renderAtividades();
+        contarOrcamentosDoMes();
+      }, 600);
+    }, 2500);
+  }
+function fazerCadastro() {
     const nome = document.getElementById('signup-name').value.trim();
     const email = document.getElementById('signup-email').value.trim();
     const senha = document.getElementById('signup-password').value.trim();
@@ -879,27 +952,7 @@
   }
 
   // Inicializar após DOM carregar
-  
-  // ==================== UPPERCASE EM TODOS OS CAMPOS ====================
-  function forcarUppercase() {
-    const campos = ['login-usuario', 'login-senha', 'signup-name', 'signup-email', 'signup-password',
-                    'orc-paciente', 'agen-nome', 'agen-telefone',
-                    'config-login', 'config-senha', 'config-senha-confirm', 'senha-config-input'];
-    campos.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.addEventListener('input', function() {
-          this.value = this.value.toUpperCase();
-        });
-        el.addEventListener('blur', function() {
-          this.value = this.value.toUpperCase();
-        });
-      }
-    });
-  }
-
   document.addEventListener('DOMContentLoaded', function() {
-    forcarUppercase();
     initLoginVars();
 
     const senhaInput = document.getElementById('login-senha');
@@ -1528,7 +1581,7 @@
   }
 
   // ==================== AGENDAR COLETA ====================
-  function agendarColeta() {
+  async function agendarColeta() {
     // Validar se há exames selecionados
     if (orcSelecionados.length === 0) { 
       showToast('Selecione pelo menos um exame!', 'error'); 
@@ -1558,7 +1611,7 @@
     const parcelaCredito = totalCredito / 10;
 
     ultimoOrcamento = {
-      exames: JSON.parse(JSON.stringify(orcSelecionados)), // Deep copy
+      exames: JSON.parse(JSON.stringify(orcSelecionados)),
       total: totalBruto,
       totalPix: totalPix,
       totalCredito: totalCredito,
@@ -1567,15 +1620,13 @@
       paciente: paciente
     };
 
-    // Salvar também no localStorage como backup
+    // Salvar no localStorage como backup
     localStorage.setItem('cda_ultimo_orcamento', JSON.stringify(ultimoOrcamento));
 
     // Salvar orçamento na planilha antes de navegar
     await salvarOrcamentoNaPlanilha('agendamento');
 
     computarOrcamento();
-
-    // Navegar para agendamento
     navigateToPage('agendamento');
 
     // Preencher dados e forçar atualização do resumo após navegação
@@ -1585,7 +1636,6 @@
         agenNome.value = paciente;
         agenNome.dispatchEvent(new Event('input'));
       }
-      // Forçar atualização do resumo com os dados do orçamento
       agenAtualizarResumo();
     }, 500);
 
@@ -1617,7 +1667,7 @@
     horarioSelecionado = horario;
   }
 
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwjC9sCh0nORWfhCfQVrJ2v25kPJ-hQrwiW7ZjbC3iaL0cw5hTk1pJQYOgjNLSLoPwhmw/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzXj8wLELw524gLe9Vmn2NxIE4pzoBoM4VKQrlQu3hWony8hotzE4aI81dkonyxcuJWzQ/exec';
         // Token compartilhado com o Apps Script — valida que a requisição veio do app CDA
         const CDA_TOKEN = 'CDA-2025-xK9#mPqL';
 
@@ -1850,7 +1900,6 @@
               totalCredito = ultimoOrcamento.totalCredito || (totalBruto * 0.65);
               parcelaCredito = ultimoOrcamento.parcelaCredito || (totalCredito / 10);
               temExames = true;
-              // Restaurar orcSelecionados para uso posterior
               orcSelecionados = [...examesAtuais];
             }
             // Tentativa 3: localStorage
@@ -1866,7 +1915,6 @@
                     totalCredito = parsed.totalCredito || (totalBruto * 0.65);
                     parcelaCredito = parsed.parcelaCredito || (totalCredito / 10);
                     temExames = true;
-                    // Restaurar variáveis
                     ultimoOrcamento = parsed;
                     orcSelecionados = [...examesAtuais];
                   }
@@ -1899,7 +1947,7 @@
                 const examesWrap = document.getElementById('agen-resumo-exames-wrap');
                 if (temExames) {
                     examesWrap.classList.remove('hidden');
-                    const pagamentoLinha = pagamento ? `<div class="text-slate-600 dark:text-slate-300 font-bold mt-1">Pagamento escolhido: ${pagamento}</div>` : '';
+                    const pagamentoLinha = pagamento ? '<div class="text-slate-600 dark:text-slate-300 font-bold mt-1">Pagamento escolhido: ' + pagamento + '</div>' : '';
 
                     // Renderizar lista de exames
                     let examesHTML = '';
@@ -2126,6 +2174,24 @@
   document.getElementById('agen-data').min = new Date().toISOString().split('T')[0];
 
 
+  // ==================== UPPERCASE EM TODOS OS CAMPOS ====================
+  function forcarUppercase() {
+    const campos = ['login-usuario', 'login-senha', 'signup-name', 'signup-email', 'signup-password',
+                    'orc-paciente', 'agen-nome', 'agen-telefone',
+                    'config-login', 'config-senha', 'config-senha-confirm', 'senha-config-input'];
+    campos.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', function() {
+          this.value = this.value.toUpperCase();
+        });
+        el.addEventListener('blur', function() {
+          this.value = this.value.toUpperCase();
+        });
+      }
+    });
+  }
+
   // ==================== CONFIGURAÇÕES - MODAL SENHA ====================
   const SENHA_CONFIG = '5912';
   let configAutorizado = false;
@@ -2168,270 +2234,6 @@
     if (e.key === 'Enter') verificarSenhaConfig();
   });
 
-  // ==================== LOGIN COM GOOGLE SHEETS ====================
-  async function fazerLogin() {
-    console.log('fazerLogin chamado');
-    const usuarioEl = document.getElementById('login-usuario');
-    const senhaEl = document.getElementById('login-senha');
-    const errorEl = document.getElementById('login-error');
-
-    if (!usuarioEl || !senhaEl) {
-      console.error('Elementos de login não encontrados!');
-      errorEl.innerText = 'Erro interno do sistema. Recarregue a página.';
-      errorEl.style.display = 'block';
-      errorEl.style.color = '#ef4444';
-      return;
-    }
-
-    const usuario = usuarioEl.value.trim().toUpperCase();
-    const senha = senhaEl.value.trim().toUpperCase();
-
-    console.log('Tentando login:', usuario);
-
-    // Validar campos preenchidos
-    if (!usuario || !senha) {
-      errorEl.innerText = 'Preencha o login e a senha';
-      errorEl.style.display = 'block';
-      errorEl.style.color = '#ef4444';
-      setTimeout(() => errorEl.style.display = 'none', 3000);
-      return;
-    }
-
-    // Demo credentials: admin / cda2024
-    if (usuario === 'ADMIN' && senha === 'CDA2024') {
-      console.log('Login bem-sucedido (admin)!');
-      loginSucesso();
-      return;
-    }
-
-    // Verificar no Google Sheets
-    errorEl.innerText = 'Verificando credenciais na planilha...';
-    errorEl.style.display = 'block';
-    errorEl.style.color = '#0F4C5C';
-
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 10000);
-      const url = APPS_SCRIPT_URL + '?action=verificarLogin&login=' + encodeURIComponent(usuario) + '&senha=' + encodeURIComponent(senha) + '&token=' + encodeURIComponent(CDA_TOKEN);
-
-      console.log('URL da requisição:', url);
-
-      const resp = await fetch(url, { 
-        method: 'GET',
-        signal: controller.signal,
-        mode: 'cors'
-      });
-
-      clearTimeout(timeout);
-
-      console.log('Status da resposta:', resp.status);
-
-      if (!resp.ok) {
-        throw new Error('Erro HTTP: ' + resp.status);
-      }
-
-      const json = await resp.json();
-      console.log('Resposta do servidor:', json);
-
-      if (json.ok && json.autorizado) {
-        console.log('Login bem-sucedido (Sheets)!');
-        loginSucesso();
-      } else if (json.ok && !json.autorizado) {
-        console.log('Login falhou: credenciais incorretas');
-        errorEl.innerText = 'LOGIN OU SENHA INCORRETOS. Verifique na planilha.';
-        errorEl.style.color = '#ef4444';
-        setTimeout(() => errorEl.style.display = 'none', 5000);
-      } else {
-        console.log('Erro do servidor:', json.erro);
-        errorEl.innerText = 'ERRO: ' + (json.erro || 'Token inválido ou acesso negado');
-        errorEl.style.color = '#ef4444';
-        setTimeout(() => errorEl.style.display = 'none', 5000);
-      }
-    } catch(err) {
-      console.error('Erro ao verificar login:', err);
-
-      if (err.name === 'AbortError') {
-        errorEl.innerText = 'TEMPO ESGOTADO: O servidor não respondeu. Verifique sua conexão.';
-      } else if (err.message.includes('Failed to fetch')) {
-        errorEl.innerText = 'ERRO DE CONEXÃO: Não foi possível acessar o servidor. Verifique se o Apps Script está publicado corretamente.';
-      } else if (err.message.includes('CORS')) {
-        errorEl.innerText = 'ERRO CORS: O servidor não permite acesso. Verifique as configurações do Apps Script.';
-      } else {
-        errorEl.innerText = 'ERRO: ' + err.message + '. Verifique o console (F12) para detalhes.';
-      }
-
-      errorEl.style.color = '#ef4444';
-      setTimeout(() => errorEl.style.display = 'none', 8000);
-    }
-  }
-
-  function loginSucesso() {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('splashScreen').style.display = 'flex';
-
-    setTimeout(() => {
-      const splash = document.getElementById('splashScreen');
-      splash.classList.add('fade-out');
-      setTimeout(() => {
-        splash.style.display = 'none';
-        document.getElementById('appContainer').style.display = 'grid';
-        document.body.classList.add('app-loaded');
-        carregarExames();
-        gerarHorarios();
-        atualizarMesStats();
-        renderAtividades();
-      }, 600);
-    }, 2500);
-  }
-
-  // ==================== CADASTRO DE USUÁRIOS NO GOOGLE SHEETS ====================
-  async function cadastrarUsuario() {
-    const login = document.getElementById('config-login').value.trim();
-    const senha = document.getElementById('config-senha').value.trim();
-    const senhaConfirm = document.getElementById('config-senha-confirm').value.trim();
-    const errorEl = document.getElementById('config-error');
-    const successEl = document.getElementById('config-success');
-
-    if (!login || !senha || !senhaConfirm) {
-      errorEl.innerText = 'Preencha todos os campos';
-      errorEl.style.display = 'block';
-      successEl.style.display = 'none';
-      setTimeout(() => errorEl.style.display = 'none', 3000);
-      return;
-    }
-
-    if (senha !== senhaConfirm) {
-      errorEl.innerText = 'As senhas não conferem';
-      errorEl.style.display = 'block';
-      successEl.style.display = 'none';
-      setTimeout(() => errorEl.style.display = 'none', 3000);
-      return;
-    }
-
-    if (senha.length < 4) {
-      errorEl.innerText = 'A senha deve ter no mínimo 4 caracteres';
-      errorEl.style.display = 'block';
-      successEl.style.display = 'none';
-      setTimeout(() => errorEl.style.display = 'none', 3000);
-      return;
-    }
-
-    errorEl.style.display = 'none';
-
-    try {
-      const btn = document.querySelector('button[onclick="cadastrarUsuario()"]');
-      const originalText = btn.innerHTML;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Cadastrando...';
-      btn.disabled = true;
-
-      const resp = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({
-          action: 'cadastrarUsuario',
-          token: CDA_TOKEN,
-          login: login,
-          senha: senha
-        })
-      });
-
-      const json = await resp.json();
-
-      btn.innerHTML = originalText;
-      btn.disabled = false;
-
-      if (json.ok) {
-        successEl.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Usuário cadastrado com sucesso!';
-        successEl.style.display = 'block';
-        document.getElementById('config-login').value = '';
-        document.getElementById('config-senha').value = '';
-        document.getElementById('config-senha-confirm').value = '';
-        carregarUsuarios();
-        setTimeout(() => successEl.style.display = 'none', 3000);
-      } else if (json.existe) {
-        errorEl.innerText = 'Este login já está cadastrado';
-        errorEl.style.display = 'block';
-        setTimeout(() => errorEl.style.display = 'none', 3000);
-      } else {
-        throw new Error(json.erro || 'Erro ao cadastrar');
-      }
-    } catch(err) {
-      console.error('Erro cadastro:', err);
-      errorEl.innerText = 'Erro ao cadastrar. Tente novamente.';
-      errorEl.style.display = 'block';
-      setTimeout(() => errorEl.style.display = 'none', 3000);
-    }
-  }
-
-  // ==================== CARREGAR USUÁRIOS DO GOOGLE SHEETS ====================
-  async function carregarUsuarios() {
-    const container = document.getElementById('config-lista-usuarios');
-    container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Carregando...</p>';
-
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000);
-      const url = APPS_SCRIPT_URL + '?action=listarUsuarios&token=' + encodeURIComponent(CDA_TOKEN);
-
-      const resp = await fetch(url, { signal: controller.signal });
-      clearTimeout(timeout);
-      const json = await resp.json();
-
-      if (json.ok && Array.isArray(json.usuarios)) {
-        if (json.usuarios.length === 0) {
-          container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhum usuário cadastrado</p>';
-          return;
-        }
-        container.innerHTML = json.usuarios.map((u, idx) => {
-          return '<div class="exame-selecionado-item" style="padding: 12px 16px;">' +
-            '<div class="exame-info">' +
-              '<div class="exame-nome" style="font-size: 0.9rem;"><i class="fa-solid fa-user mr-2" style="color: #0F4C5C;"></i>' + (u.login || '---') + '</div>' +
-              '<div class="exame-codigo">Cadastrado em: ' + (u.data || '---') + '</div>' +
-            '</div>' +
-            '<div style="display: flex; gap: 8px;">' +
-              '<button class="btn-remover-exame" onclick="excluirUsuario(' + idx + ', '' + (u.login || '') + '')" title="Excluir" style="width: 32px; height: 32px;">' +
-                '<i class="fa-solid fa-trash"></i>' +
-              '</button>' +
-            '</div>' +
-          '</div>';
-        }).join('');
-      } else {
-        container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Erro ao carregar usuários</p>';
-      }
-    } catch(err) {
-      console.error('Erro listar usuários:', err);
-      container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Erro ao carregar. Tente novamente.</p>';
-    }
-  }
-
-  // ==================== EXCLUIR USUÁRIO ====================
-  async function excluirUsuario(index, login) {
-    if (!confirm('Tem certeza que deseja excluir o usuário "' + login + '"?')) return;
-
-    try {
-      const resp = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({
-          action: 'excluirUsuario',
-          token: CDA_TOKEN,
-          login: login
-        })
-      });
-
-      const json = await resp.json();
-      if (json.ok) {
-        showToast('Usuário excluído com sucesso!');
-        carregarUsuarios();
-      } else {
-        throw new Error(json.erro || 'Erro ao excluir');
-      }
-    } catch(err) {
-      console.error('Erro excluir:', err);
-      showToast('Erro ao excluir usuário', 'error');
-    }
-  }
-
   // Resetar autorização ao sair da página de configurações
   navItems.forEach(li => {
     li.addEventListener('click', e => {
@@ -2442,7 +2244,7 @@
     });
   });
 
-  // ==================== SALVAR ORÇAMENTO NA PLANILHA DASHBOARD ====================
+  // ==================== SALVAR ORÇAMENTO NA PLANILHA ====================
   async function salvarOrcamentoNaPlanilha(origem) {
     const paciente = document.getElementById('orc-paciente')?.value?.trim().toUpperCase() || '';
     if (!paciente || orcSelecionados.length === 0) return false;
@@ -2456,7 +2258,7 @@
     const mesAno = new Date().toLocaleDateString('pt-BR', {month: '2-digit', year: 'numeric'});
 
     try {
-      // Verificar se já existe orçamento duplicado (mesmo paciente + mesmos exames)
+      // Verificar se já existe orçamento duplicado
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 8000);
       const url = APPS_SCRIPT_URL + '?action=verificarDuplicado&paciente=' + encodeURIComponent(paciente) + '&exames=' + encodeURIComponent(examesNomes) + '&token=' + encodeURIComponent(CDA_TOKEN);
@@ -2467,10 +2269,10 @@
 
       if (json.duplicado) {
         console.log('Orçamento duplicado encontrado, não será salvo novamente.');
-        return true; // Já existe, considera como sucesso
+        return true;
       }
 
-      // Salvar novo orçamento na planilha DASHBOARD
+      // Salvar novo orçamento
       const salvarResp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
@@ -2491,20 +2293,14 @@
       });
 
       const salvarJson = await salvarResp.json();
-      if (salvarJson.ok) {
-        console.log('Orçamento salvo na planilha com sucesso!');
-        return true;
-      } else {
-        console.error('Erro ao salvar orçamento:', salvarJson.erro);
-        return false;
-      }
+      return salvarJson.ok;
     } catch(err) {
-      console.error('Erro ao verificar/salvar orçamento:', err);
+      console.error('Erro ao salvar orçamento:', err);
       return false;
     }
   }
 
-  // ==================== CONTAR ORÇAMENTOS DO MÊS NA PLANILHA ====================
+  // ==================== CONTAR ORÇAMENTOS DO MÊS ====================
   async function contarOrcamentosDoMes() {
     try {
       const agora = new Date();
@@ -2521,10 +2317,157 @@
       if (json.ok && typeof json.total === 'number') {
         dadosMensais.orcamentos = json.total;
         atualizarMesStats();
-        console.log('Orçamentos do mês atualizados:', json.total);
       }
     } catch(err) {
       console.error('Erro ao contar orçamentos:', err);
+    }
+  }
+
+  // ==================== CADASTRAR USUÁRIO ====================
+  async function cadastrarUsuario() {
+    const login = document.getElementById('config-login').value.trim().toUpperCase();
+    const senha = document.getElementById('config-senha').value.trim().toUpperCase();
+    const senhaConfirm = document.getElementById('config-senha-confirm').value.trim().toUpperCase();
+    const errorEl = document.getElementById('config-error');
+    const successEl = document.getElementById('config-success');
+
+    if (!login || !senha || !senhaConfirm) {
+      errorEl.innerText = 'PREENCHA TODOS OS CAMPOS';
+      errorEl.style.display = 'block';
+      successEl.style.display = 'none';
+      setTimeout(() => errorEl.style.display = 'none', 3000);
+      return;
+    }
+
+    if (senha !== senhaConfirm) {
+      errorEl.innerText = 'AS SENHAS NÃO CONFEREM';
+      errorEl.style.display = 'block';
+      successEl.style.display = 'none';
+      setTimeout(() => errorEl.style.display = 'none', 3000);
+      return;
+    }
+
+    if (senha.length < 4) {
+      errorEl.innerText = 'A SENHA DEVE TER NO MÍNIMO 4 CARACTERES';
+      errorEl.style.display = 'block';
+      successEl.style.display = 'none';
+      setTimeout(() => errorEl.style.display = 'none', 3000);
+      return;
+    }
+
+    errorEl.style.display = 'none';
+
+    try {
+      const btn = document.querySelector('button[onclick="cadastrarUsuario()"]');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> CADASTRANDO...';
+      btn.disabled = true;
+
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'cadastrarUsuario',
+          token: CDA_TOKEN,
+          login: login,
+          senha: senha
+        })
+      });
+
+      const json = await resp.json();
+
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+
+      if (json.ok) {
+        successEl.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> USUÁRIO CADASTRADO COM SUCESSO!';
+        successEl.style.display = 'block';
+        document.getElementById('config-login').value = '';
+        document.getElementById('config-senha').value = '';
+        document.getElementById('config-senha-confirm').value = '';
+        carregarUsuarios();
+        setTimeout(() => successEl.style.display = 'none', 3000);
+      } else if (json.existe) {
+        errorEl.innerText = 'ESTE LOGIN JÁ ESTÁ CADASTRADO';
+        errorEl.style.display = 'block';
+        setTimeout(() => errorEl.style.display = 'none', 3000);
+      } else {
+        throw new Error(json.erro || 'Erro ao cadastrar');
+      }
+    } catch(err) {
+      console.error('Erro cadastro:', err);
+      errorEl.innerText = 'ERRO AO CADASTRAR. TENTE NOVAMENTE.';
+      errorEl.style.display = 'block';
+      setTimeout(() => errorEl.style.display = 'none', 3000);
+    }
+  }
+
+  // ==================== CARREGAR USUÁRIOS ====================
+  async function carregarUsuarios() {
+    const container = document.getElementById('config-lista-usuarios');
+    container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>CARREGANDO...</p>';
+
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      const url = APPS_SCRIPT_URL + '?action=listarUsuarios&token=' + encodeURIComponent(CDA_TOKEN);
+
+      const resp = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeout);
+      const json = await resp.json();
+
+      if (json.ok && Array.isArray(json.usuarios)) {
+        if (json.usuarios.length === 0) {
+          container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">NENHUM USUÁRIO CADASTRADO</p>';
+          return;
+        }
+        container.innerHTML = json.usuarios.map((u, idx) => {
+          return '<div class="exame-selecionado-item" style="padding: 12px 16px;">' +
+            '<div class="exame-info">' +
+              '<div class="exame-nome" style="font-size: 0.9rem;"><i class="fa-solid fa-user mr-2" style="color: #0F4C5C;"></i>' + (u.login || '---') + '</div>' +
+              '<div class="exame-codigo">Cadastrado em: ' + (u.data || '---') + '</div>' +
+            '</div>' +
+            '<div style="display: flex; gap: 8px;">' +
+              '<button class="btn-remover-exame" onclick="excluirUsuario(' + idx + ', '' + (u.login || '') + '')" title="Excluir" style="width: 32px; height: 32px;">' +
+                '<i class="fa-solid fa-trash"></i>' +
+              '</button>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      } else {
+        container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">ERRO AO CARREGAR USUÁRIOS</p>';
+      }
+    } catch(err) {
+      console.error('Erro listar usuários:', err);
+      container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">ERRO AO CARREGAR. TENTE NOVAMENTE.</p>';
+    }
+  }
+
+  // ==================== EXCLUIR USUÁRIO ====================
+  async function excluirUsuario(index, login) {
+    if (!confirm('TEM CERTEZA QUE DESEJA EXCLUIR O USUÁRIO "' + login + '"?')) return;
+
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'excluirUsuario',
+          token: CDA_TOKEN,
+          login: login
+        })
+      });
+
+      const json = await resp.json();
+      if (json.ok) {
+        showToast('USUÁRIO EXCLUÍDO COM SUCESSO!');
+        carregarUsuarios();
+      } else {
+        throw new Error(json.erro || 'Erro ao excluir');
+      }
+    } catch(err) {
+      console.error('Erro excluir:', err);
+      showToast('ERRO AO EXCLUIR USUÁRIO', 'error');
     }
   }
 </script>
@@ -2586,21 +2529,13 @@
         </div>
         <h2 style="font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 700; color: #181818; margin-bottom: 8px;">Área Restrita</h2>
         <p style="font-size: 13px; color: #a0a5a8; margin-bottom: 24px;">Digite a senha de administrador para acessar as configurações.</p>
-        <input type="password" id="senha-config-input" placeholder="Senha de acesso" 
-            style="width: 100%; height: 45px; padding-left: 20px; font-size: 14px; letter-spacing: 2px; border: none; outline: none; font-family: 'Montserrat', sans-serif; background-color: #ecf0f3; border-radius: 12px; box-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #f9f9f9; color: #181818; text-align: center; margin-bottom: 16px;">
+        <input type="password" id="senha-config-input" placeholder="Senha de acesso" style="width: 100%; height: 45px; padding-left: 20px; font-size: 14px; letter-spacing: 2px; border: none; outline: none; font-family: 'Montserrat', sans-serif; background-color: #ecf0f3; border-radius: 12px; box-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #f9f9f9; color: #181818; text-align: center; margin-bottom: 16px;">
         <div id="senha-config-error" style="color: #ef4444; font-size: 0.8rem; margin-bottom: 12px; display: none;">Senha incorreta</div>
         <div style="display: flex; gap: 10px;">
-            <button onclick="fecharModalSenha()" 
-                style="flex: 1; height: 45px; border-radius: 22px; font-weight: 600; font-size: 13px; background: #d1d9e6; color: #64748B; border: none; cursor: pointer; font-family: 'Montserrat', sans-serif; transition: all 0.25s;">
-                Cancelar
-            </button>
-            <button onclick="verificarSenhaConfig()" 
-                style="flex: 1; height: 45px; border-radius: 22px; font-weight: 700; font-size: 13px; background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); color: #f9f9f9; border: none; cursor: pointer; font-family: 'Montserrat', sans-serif; transition: all 0.25s; box-shadow: 4px 4px 10px rgba(15,76,92,0.3);">
-                Acessar
-            </button>
+            <button onclick="fecharModalSenha()" style="flex: 1; height: 45px; border-radius: 22px; font-weight: 600; font-size: 13px; background: #d1d9e6; color: #64748B; border: none; cursor: pointer; font-family: 'Montserrat', sans-serif;">Cancelar</button>
+            <button onclick="verificarSenhaConfig()" style="flex: 1; height: 45px; border-radius: 22px; font-weight: 700; font-size: 13px; background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); color: #f9f9f9; border: none; cursor: pointer; font-family: 'Montserrat', sans-serif; box-shadow: 4px 4px 10px rgba(15,76,92,0.3);">Acessar</button>
         </div>
     </div>
 </div>
-
 </body>
 </html>
