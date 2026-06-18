@@ -273,6 +273,61 @@
 
     @media (max-width: 1024px) { .home-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 768px) { .home-grid { grid-template-columns: 1fr; } body.app-loaded { padding: 1rem 0 0 1rem; } .site-wrap { grid-template-columns: 1fr; } .site-nav { display: none; } }
+
+    /* ===== SEND BUTTON (Neumorphic) ===== */
+    .send {
+      position: relative;
+      display: flex;
+      align-items: center;
+      color: #353535;
+      background: #e0e5ec;
+      border: none;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      padding: 0;
+      border-radius: 3rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.4s ease-out;
+      box-shadow: 9px 9px 16px 0px #a3b1c6, -9px -9px 16px 0px rgba(255, 255, 255, 0.6);
+    }
+    .send:hover {
+      transform: translateY(-2px);
+    }
+    .send:hover .icon svg {
+      transform: translate(-5px, 5px);
+    }
+    .send .text {
+      height: 4.5rem;
+      padding: 1rem 1rem 1rem 2rem;
+      display: flex;
+      align-items: center;
+    }
+    .send .icon {
+      display: block;
+      padding: 1rem;
+      box-shadow: 9px 9px 16px 0px #a3b1c6, -9px -9px 16px 0px rgba(255, 255, 255, 0.6);
+      border-radius: 50%;
+      width: 4.5rem;
+      height: 4.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #e0e5ec;
+    }
+    .send .icon svg {
+      fill: currentColor;
+      width: 2rem;
+      height: 2rem;
+      transition: transform 0.4s ease-out;
+    }
+    .send:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .send:disabled .icon svg {
+      transform: none !important;
+    }
   </style>
 <base target="_blank">
 <base target="_blank">
@@ -666,8 +721,14 @@
                     </div>
                 </div>
                 <button onclick="agenSalvar()" id="agen-btn-salvar"
-                    class="w-full btn-cda-primary py-4 rounded-2xl font-bold flex items-center justify-center gap-2 opacity-50 pointer-events-none">
-                    <i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento
+                    class="send opacity-50 pointer-events-none"
+                    style="width: 100%; justify-content: center;">
+                    <span class="text">Salvar Agendamento</span>
+                    <span class="icon">
+                        <svg viewBox="0 0 512.005 512.005">
+                            <path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594zM175 296.245l204.668-145.757c-176.114 185.79-166.916 176.011-167.684 177.045-1.141 1.535 1.985-4.448-36.984 72.882zm191.858 127.546l-120.296-89.276 217.511-229.462z"/>
+                        </svg>
+                    </span>
                 </button>
                 <p id="agen-status" class="text-xs text-center mt-3 hidden"></p>
             </div>
@@ -1689,153 +1750,125 @@
         }
 
         async function agenSalvar() {
-            const { data, periodo, horario } = agenState;
-            const nome     = document.getElementById('agen-nome')?.value?.trim();
-            const telefone = document.getElementById('agen-telefone')?.value?.trim();
-            const pagamento = agenPagamentoSelecionado();
-            const btnSalvar = document.getElementById('agen-btn-salvar');
-            const statusEl  = document.getElementById('agen-status');
-            const totalBruto = agenTotalSelecionado();
+    const { data, periodo, horario } = agenState;
+    const nome     = document.getElementById('agen-nome')?.value?.trim();
+    const telefone = document.getElementById('agen-telefone')?.value?.trim();
+    const pagamento = agenPagamentoSelecionado();
+    const btnSalvar = document.getElementById('agen-btn-salvar');
+    const statusEl  = document.getElementById('agen-status');
+    const totalBruto = agenTotalSelecionado();
 
-            if (!nome)     { showToast('Informe o nome do paciente.', 'error'); return; }
-            if (!telefone) { showToast('Informe o telefone de contato.', 'error'); return; }
-            if (!validarTelefoneBR(telefone)) { showToast('Informe um telefone válido com DDD.', 'error'); return; }
-            if (!data)     { showToast('Selecione a data.', 'error'); return; }
-            if (!periodo)  { showToast('Selecione o período.', 'error'); return; }
-            if (!horario)  { showToast('Selecione o horário.', 'error'); return; }
-            if (typeof orcSelecionados === 'undefined' || !orcSelecionados.length) { showToast('Adicione ao menos um exame à lista antes de agendar.', 'error'); return; }
-            if (totalBruto < 150) { showToast('Olá! Informamos que a coleta agendada está disponível para orçamentos a partir de R$ 150,00.', 'info', 6000); return; }
-            if (!pagamento) { showToast('Selecione a forma de pagamento.', 'error'); return; }
+    if (!nome)     { showToast('Informe o nome do paciente.', 'error'); return; }
+    if (!telefone) { showToast('Informe o telefone de contato.', 'error'); return; }
+    if (!validarTelefoneBR(telefone)) { showToast('Informe um telefone válido com DDD.', 'error'); return; }
+    if (!data)     { showToast('Selecione a data.', 'error'); return; }
+    if (!periodo)  { showToast('Selecione o período.', 'error'); return; }
+    if (!horario)  { showToast('Selecione o horário.', 'error'); return; }
+    if (typeof orcSelecionados === 'undefined' || !orcSelecionados.length) { showToast('Adicione ao menos um exame à lista antes de agendar.', 'error'); return; }
+    if (totalBruto < 150) { showToast('Olá! Informamos que a coleta agendada está disponível para orçamentos a partir de R$ 150,00.', 'info', 6000); return; }
+    if (!pagamento) { showToast('Selecione a forma de pagamento.', 'error'); return; }
 
-            btnSalvar.disabled = true;
-            btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Verificando disponibilidade...';
-            statusEl.classList.add('hidden');
+    btnSalvar.disabled = true;
+    btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Verificando disponibilidade...';
+    statusEl.classList.add('hidden');
 
-            // Double-check: verifica se o horário ainda está disponível
-            try {
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 6000);
-                const checkResp = await fetch(`${APPS_SCRIPT_URL}?action=listar&data=${data}&token=${CDA_TOKEN}`, { signal: controller.signal });
-                clearTimeout(timeout);
-                const checkJson = await checkResp.json();
-                const ocupados = Array.isArray(checkJson.ocupados) ? checkJson.ocupados : [];
-                if (ocupados.includes(horario)) {
-                    showToast(`O horário ${horario} acabou de ser reservado. Por favor, escolha outro horário.`, 'error', 5000);
-                    btnSalvar.disabled = false;
-                    btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
-                    // Rebusca horários para atualizar
-                    agenState.horario = null;
-                    agenAtualizarResumo();
-                    agenBuscarHorarios();
-                    return;
-                }
-            } catch(err) {
-                // Se não conseguir verificar, continua e tenta salvar (o servidor rejeitará se ocupado)
-                console.warn('Verificação prévia falhou, tentando salvar:', err);
-            }
+    // Double-check: verifica se o horário ainda está disponível
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 6000);
+      const checkResp = await fetch(`${APPS_SCRIPT_URL}?action=listar&data=${data}&token=${CDA_TOKEN}`, { signal: controller.signal });
+      clearTimeout(timeout);
+      const checkJson = await checkResp.json();
+      const ocupados = Array.isArray(checkJson.ocupados) ? checkJson.ocupados : [];
+      if (ocupados.includes(horario)) {
+        showToast(`O horário ${horario} acabou de ser reservado. Por favor, escolha outro horário.`, 'error', 5000);
+        btnSalvar.disabled = false;
+        btnSalvar.innerHTML = '<span class="text">Salvar Agendamento</span><span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594zM175 296.245l204.668-145.757c-176.114 185.79-166.916 176.011-167.684 177.045-1.141 1.535 1.985-4.448-36.984 72.882zm191.858 127.546l-120.296-89.276 217.511-229.462z"/></svg></span>';
+        agenState.horario = null;
+        agenAtualizarResumo();
+        agenBuscarHorarios();
+        return;
+      }
+    } catch(err) {
+      console.warn('Verificação prévia falhou, tentando salvar:', err);
+    }
 
-            btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Salvando...';
+    btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Salvando...';
 
-            let descExames = '';
-            if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
-                const totalPix = totalBruto * 0.60;
-                const totalCredito = totalBruto * 0.65;
-                const linhas = orcSelecionados.map(ex => `${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
-                descExames = `\n\nLista de Exames:\n${linhas}\n\nTotal particular: ${formatCurrency(totalBruto)}\nPIX/Dinheiro/Débito (40% desc): ${formatCurrency(totalPix)}\nCartão de crédito (35% desc): ${formatCurrency(totalCredito)}\nForma de pagamento escolhida: ${pagamento}`;
-            }
+    // Monta a descrição completa
+    let descExames = '';
+    let listaExames = '';
+    if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
+      const totalPix = totalBruto * 0.60;
+      const totalCredito = totalBruto * 0.65;
+      listaExames = orcSelecionados.map(ex => `${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
+      descExames = `\n\nLista de Exames:\n${listaExames}\n\nTotal particular: ${formatCurrency(totalBruto)}\nPIX/Dinheiro/Débito (40% desc): ${formatCurrency(totalPix)}\nCartão de crédito (35% desc): ${formatCurrency(totalCredito)}\nForma de pagamento escolhida: ${pagamento}`;
+    }
 
-            try {
-                // Monta horários ISO para o Google Calendar usar corretamente
-                const [hh, mm] = horario.split(':').map(Number);
-                const startDateTime = `${data}T${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`;
-                const endHh = hh + 1;
-                const endDateTime = `${data}T${String(endHh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`;
+    const descricao = `Paciente: ${nome}\nTelefone: ${telefone}\nForma de pagamento: ${pagamento}\nOrigem: Aplicativo CDA${descExames}`;
 
-                const resp = await fetch(APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify({
-                        action: 'criar', token: CDA_TOKEN, data, horario, nome, telefone, pagamento,
-                        startTime: startDateTime,
-                        endTime: endDateTime,
-                        descricao: `Paciente: ${nome}\nTelefone: ${telefone}\nForma de pagamento: ${pagamento}\nOrigem: Aplicativo CDA${descExames}`
-                    })
-                });
-                const json = await resp.json();
-                if (json.ocupado) {
-                    showToast(`O horário ${horario} acabou de ser reservado. Por favor, escolha outro.`, 'error', 5000);
-                    btnSalvar.disabled = false;
-                    btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
-                    agenState.horario = null;
-                    agenAtualizarResumo();
-                    agenBuscarHorarios();
-                    return;
-                }
-                if (!json.ok) throw new Error(json.erro || 'Erro ao salvar');
-                btnSalvar.disabled = false;
-                btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
-                agenSucesso(nome, data, horario);
-            } catch(err) {
-                console.error('Erro agendamento:', err);
-                agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento);
-            }
-        }
+    try {
+      const [y, m, d] = data.split('-').map(Number);
+      const [hh, mm] = horario.split(':').map(Number);
+      const startDateTime = `${data}T${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`;
+      const endHh = hh + 1;
+      const endDateTime = `${data}T${String(endHh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`;
 
-        function agenSucesso(nome, data, horario) {
-            const [y,m,d] = data.split('-').map(Number);
-            const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
-            const pagamento = agenPagamentoSelecionado() || '—';
-            const totalBruto = agenTotalSelecionado();
-            const totalPix = totalBruto * 0.60;
-            const totalCredito = totalBruto * 0.65;
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'criar', token: CDA_TOKEN, data, horario, nome, telefone, pagamento,
+          startTime: startDateTime,
+          endTime: endDateTime,
+          descricao: descricao
+        })
+      });
+      const json = await resp.json();
+      if (json.ocupado) {
+        showToast(`O horário ${horario} acabou de ser reservado. Por favor, escolha outro.`, 'error', 5000);
+        btnSalvar.disabled = false;
+        btnSalvar.innerHTML = '<span class="text">Salvar Agendamento</span><span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594zM175 296.245l204.668-145.757c-176.114 185.79-166.916 176.011-167.684 177.045-1.141 1.535 1.985-4.448-36.984 72.882zm191.858 127.546l-120.296-89.276 217.511-229.462z"/></svg></span>';
+        agenState.horario = null;
+        agenAtualizarResumo();
+        agenBuscarHorarios();
+        return;
+      }
+      if (!json.ok) throw new Error(json.erro || 'Erro ao salvar');
+      btnSalvar.disabled = false;
+      btnSalvar.innerHTML = '<span class="text">Salvar Agendamento</span><span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594zM175 296.245l204.668-145.757c-176.114 185.79-166.916 176.011-167.684 177.045-1.141 1.535 1.985-4.448-36.984 72.882zm191.858 127.546l-120.296-89.276 217.511-229.462z"/></svg></span>';
+      agenSucesso(nome, data, horario);
+    } catch(err) {
+      console.error('Erro agendamento:', err);
+      agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento);
+    }
+  }function agenSucesso(nome, data, horario) {
+    const [y,m,d] = data.split('-').map(Number);
+    const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+    const pagamento = agenPagamentoSelecionado() || '—';
+    const totalBruto = agenTotalSelecionado();
+    const totalPix = totalBruto * 0.60;
+    const totalCredito = totalBruto * 0.65;
 
-            if (nome) localStorage.setItem('patient_name', nome);
-            const telefone = document.getElementById('agen-telefone')?.value?.trim();
-            if (telefone) localStorage.setItem('patient_phone', telefone);
+    if (nome) localStorage.setItem('patient_name', nome);
+    const telefone = document.getElementById('agen-telefone')?.value?.trim();
+    if (telefone) localStorage.setItem('patient_phone', telefone);
 
-            // Preenche dados do modal
-            document.getElementById('modal-agen-nome').textContent = nome;
-            document.getElementById('modal-agen-data').textContent = `${dataExt} às ${horario}`;
+    // Preenche dados do modal
+    document.getElementById('modal-agen-nome').textContent = nome;
+    document.getElementById('modal-agen-data').textContent = `${dataExt} às ${horario}`;
 
-            const qtd = (typeof orcSelecionados !== 'undefined' && orcSelecionados.length)
-                ? `${orcSelecionados.length} exame${orcSelecionados.length > 1 ? 's' : ''} — PIX: ${formatCurrency(totalPix)} / Crédito: ${formatCurrency(totalCredito)}`
-                : '—';
-            document.getElementById('modal-agen-exames').textContent = qtd;
-            document.getElementById('modal-agen-pagamento').textContent = pagamento;
+    const qtd = (typeof orcSelecionados !== 'undefined' && orcSelecionados.length)
+      ? `${orcSelecionados.length} exame${orcSelecionados.length > 1 ? 's' : ''} — PIX: ${formatCurrency(totalPix)} / Crédito: ${formatCurrency(totalCredito)}`
+      : '—';
+    document.getElementById('modal-agen-exames').textContent = qtd;
+    document.getElementById('modal-agen-pagamento').textContent = pagamento;
 
-            // Exibe o modal
-            const modal = document.getElementById('modal-agen-confirmacao');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function modalAgenOk() {
-            // Fecha modal
-            const modal = document.getElementById('modal-agen-confirmacao');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-
-            // Limpa orçamento e agendamento
-            orcSelecionados = [];
-            orcRenderSelecionados();
-            agenInicializar();
-
-            const btnSalvar = document.getElementById('agen-btn-salvar');
-            const statusEl  = document.getElementById('agen-status');
-            if (statusEl) statusEl.classList.add('hidden');
-            if (btnSalvar) {
-                btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
-                btnSalvar.disabled = false;
-                btnSalvar.classList.remove('opacity-50','pointer-events-none');
-            }
-            const agenTel = document.getElementById('agen-telefone');
-            if (agenTel) agenTel.value = _getItem('patient_phone') || '';
-
-            // Retorna para Home
-            navigateTo('home');
-        }
-
-        function agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento) {
+    // Exibe o modal
+    const modal = document.getElementById('modal-agen-confirmacao');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }function agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento) {
             const [y,m,d] = data.split('-').map(Number);
             const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
             const msg = `Olá! Gostaria de agendar uma coleta pelo aplicativo.\n\n*Nome:* ${nome}\n*Telefone:* ${telefone}\n*Data:* ${dataExt}\n*Horário:* ${horario}\n*Forma de pagamento:* ${pagamento || 'Não informada'}${descExames}\n\n_Agendamento via Aplicativo CDA_`;
@@ -1878,6 +1911,29 @@
     agenInicializar();
 
     navigateToPage('home');
+  }
+
+  // GSAP Animation for send button
+  const sendButton = document.getElementById('agen-btn-salvar');
+  if (sendButton) {
+    sendButton.addEventListener('click', function() {
+      if (sendButton.disabled) return;
+      const svg = sendButton.querySelector('.icon svg');
+      if (svg) {
+        svg.style.transition = 'none';
+        svg.style.transform = 'translate(-8px, 8px)';
+        setTimeout(() => {
+          svg.style.transform = 'translate(50vw, -50vh)';
+        }, 400);
+        setTimeout(() => {
+          svg.style.transform = 'translate(-50vw, 50vh)';
+        }, 800);
+        setTimeout(() => {
+          svg.style.transition = 'transform 0.4s ease-out';
+          svg.style.transform = 'translate(0, 0)';
+        }, 1100);
+      }
+    });
   }
 
   // Inicializa data mínima
