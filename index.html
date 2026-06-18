@@ -266,10 +266,10 @@
     .ia-area p { font-size: 0.75rem; color: #8c939e; }
 
     /* HORARIOS */
-    .horario-btn { padding: 10px 8px; border-radius: 12px; border: none; background: white; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; box-shadow: 2px 2px 8px rgba(0,0,0,0.08); }
-    .horario-btn:hover { background: #E8F8F8; color: #0F4C5C; }
-    .horario-btn.selected { background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); color: white; }
-    .horario-btn.ocupado { background: #fee2e2; color: #ef4444; cursor: not-allowed; opacity: 0.6; }
+    .horario-btn, .agen-horario-btn { padding: 10px 8px; border-radius: 12px; border: none; background: white; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; box-shadow: 2px 2px 8px rgba(0,0,0,0.08); }
+    .horario-btn:hover, .agen-horario-btn:hover { background: #E8F8F8; color: #0F4C5C; }
+    .horario-btn.selected, .agen-horario-btn.ativo { background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); color: white; }
+    .horario-btn.ocupado, .agen-horario-btn.ocupado { background: #fee2e2; color: #ef4444; cursor: not-allowed; opacity: 0.6; }
 
     @media (max-width: 1024px) { .home-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 768px) { .home-grid { grid-template-columns: 1fr; } body.app-loaded { padding: 1rem 0 0 1rem; } .site-wrap { grid-template-columns: 1fr; } .site-nav { display: none; } }
@@ -329,7 +329,6 @@
       transform: none !important;
     }
   </style>
-<base target="_blank">
 <base target="_blank">
 </head>
 <body>
