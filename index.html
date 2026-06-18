@@ -2177,49 +2177,91 @@
 
     if (!usuarioEl || !senhaEl) {
       console.error('Elementos de login não encontrados!');
+      errorEl.innerText = 'Erro interno do sistema. Recarregue a página.';
+      errorEl.style.display = 'block';
+      errorEl.style.color = '#ef4444';
       return;
     }
 
-    const usuario = usuarioEl.value.trim();
-    const senha = senhaEl.value.trim();
+    const usuario = usuarioEl.value.trim().toUpperCase();
+    const senha = senhaEl.value.trim().toUpperCase();
 
     console.log('Tentando login:', usuario);
 
+    // Validar campos preenchidos
+    if (!usuario || !senha) {
+      errorEl.innerText = 'Preencha o login e a senha';
+      errorEl.style.display = 'block';
+      errorEl.style.color = '#ef4444';
+      setTimeout(() => errorEl.style.display = 'none', 3000);
+      return;
+    }
+
     // Demo credentials: admin / cda2024
-    if (usuario === 'admin' && senha === 'cda2024') {
+    if (usuario === 'ADMIN' && senha === 'CDA2024') {
       console.log('Login bem-sucedido (admin)!');
       loginSucesso();
       return;
     }
 
     // Verificar no Google Sheets
-    try {
-      errorEl.innerText = 'Verificando credenciais...';
-      errorEl.style.display = 'block';
-      errorEl.style.color = '#0F4C5C';
+    errorEl.innerText = 'Verificando credenciais na planilha...';
+    errorEl.style.display = 'block';
+    errorEl.style.color = '#0F4C5C';
 
+    try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000);
+      const timeout = setTimeout(() => controller.abort(), 10000);
       const url = APPS_SCRIPT_URL + '?action=verificarLogin&login=' + encodeURIComponent(usuario) + '&senha=' + encodeURIComponent(senha) + '&token=' + encodeURIComponent(CDA_TOKEN);
 
-      const resp = await fetch(url, { signal: controller.signal });
+      console.log('URL da requisição:', url);
+
+      const resp = await fetch(url, { 
+        method: 'GET',
+        signal: controller.signal,
+        mode: 'cors'
+      });
+
       clearTimeout(timeout);
+
+      console.log('Status da resposta:', resp.status);
+
+      if (!resp.ok) {
+        throw new Error('Erro HTTP: ' + resp.status);
+      }
+
       const json = await resp.json();
+      console.log('Resposta do servidor:', json);
 
       if (json.ok && json.autorizado) {
         console.log('Login bem-sucedido (Sheets)!');
         loginSucesso();
-      } else {
-        console.log('Login falhou (Sheets)');
-        errorEl.innerText = 'Login ou senha incorretos';
+      } else if (json.ok && !json.autorizado) {
+        console.log('Login falhou: credenciais incorretas');
+        errorEl.innerText = 'LOGIN OU SENHA INCORRETOS. Verifique na planilha.';
         errorEl.style.color = '#ef4444';
-        setTimeout(() => errorEl.style.display = 'none', 3000);
+        setTimeout(() => errorEl.style.display = 'none', 5000);
+      } else {
+        console.log('Erro do servidor:', json.erro);
+        errorEl.innerText = 'ERRO: ' + (json.erro || 'Token inválido ou acesso negado');
+        errorEl.style.color = '#ef4444';
+        setTimeout(() => errorEl.style.display = 'none', 5000);
       }
     } catch(err) {
       console.error('Erro ao verificar login:', err);
-      errorEl.innerText = 'Login ou senha incorretos';
+
+      if (err.name === 'AbortError') {
+        errorEl.innerText = 'TEMPO ESGOTADO: O servidor não respondeu. Verifique sua conexão.';
+      } else if (err.message.includes('Failed to fetch')) {
+        errorEl.innerText = 'ERRO DE CONEXÃO: Não foi possível acessar o servidor. Verifique se o Apps Script está publicado corretamente.';
+      } else if (err.message.includes('CORS')) {
+        errorEl.innerText = 'ERRO CORS: O servidor não permite acesso. Verifique as configurações do Apps Script.';
+      } else {
+        errorEl.innerText = 'ERRO: ' + err.message + '. Verifique o console (F12) para detalhes.';
+      }
+
       errorEl.style.color = '#ef4444';
-      setTimeout(() => errorEl.style.display = 'none', 3000);
+      setTimeout(() => errorEl.style.display = 'none', 8000);
     }
   }
 
