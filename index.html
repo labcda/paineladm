@@ -970,6 +970,11 @@
 
     if (atividadesRecentes.length > 5) atividadesRecentes.pop();
     renderAtividades();
+
+    // Salvar orçamento na planilha DASHBOARD (sem bloquear a UI)
+    salvarOrcamentoNaPlanilha('orcamento').then(ok => {
+      if (ok) console.log('Orçamento registrado na planilha');
+    });
   }
 
   function renderAtividades() {
@@ -1464,6 +1469,10 @@
     const doc = gerarPDF();
     if (!doc) return;
     computarOrcamento();
+    // Salvar orçamento na planilha quando baixar PDF
+    salvarOrcamentoNaPlanilha('pdf').then(ok => {
+      if (ok) console.log('Orçamento PDF registrado na planilha');
+    });
     const dataAtual = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
     doc.save('orcamento-cda-' + dataAtual + '.pdf');
     showToast('PDF baixado com sucesso!');
@@ -1485,6 +1494,9 @@
     };
 
     const texto = encodeURIComponent('Olá, segue em anexo o seu orçamento! Qualquer dúvida me chame aqui!');
+
+    // Salvar orçamento na planilha quando compartilhar
+    await salvarOrcamentoNaPlanilha('compartilhado');
 
     if (navigator.share && navigator.canShare) {
       try {
@@ -1557,6 +1569,9 @@
 
     // Salvar também no localStorage como backup
     localStorage.setItem('cda_ultimo_orcamento', JSON.stringify(ultimoOrcamento));
+
+    // Salvar orçamento na planilha antes de navegar
+    await salvarOrcamentoNaPlanilha('agendamento');
 
     computarOrcamento();
 
@@ -2384,6 +2399,92 @@
       }
     });
   });
+
+  // ==================== SALVAR ORÇAMENTO NA PLANILHA DASHBOARD ====================
+  async function salvarOrcamentoNaPlanilha(origem) {
+    const paciente = document.getElementById('orc-paciente')?.value?.trim().toUpperCase() || '';
+    if (!paciente || orcSelecionados.length === 0) return false;
+
+    const examesNomes = orcSelecionados.map(ex => ex.nome).join(' | ');
+    const examesCodigos = orcSelecionados.map(ex => ex.codigo).join(' | ');
+    const totalBruto = orcSelecionados.reduce((sum, ex) => sum + parseFloat(ex.preco || 0), 0);
+    const totalPix = totalBruto * 0.60;
+    const totalCredito = totalBruto * 0.65;
+    const dataAtual = new Date().toLocaleDateString('pt-BR');
+    const mesAno = new Date().toLocaleDateString('pt-BR', {month: '2-digit', year: 'numeric'});
+
+    try {
+      // Verificar se já existe orçamento duplicado (mesmo paciente + mesmos exames)
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      const url = APPS_SCRIPT_URL + '?action=verificarDuplicado&paciente=' + encodeURIComponent(paciente) + '&exames=' + encodeURIComponent(examesNomes) + '&token=' + encodeURIComponent(CDA_TOKEN);
+
+      const resp = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeout);
+      const json = await resp.json();
+
+      if (json.duplicado) {
+        console.log('Orçamento duplicado encontrado, não será salvo novamente.');
+        return true; // Já existe, considera como sucesso
+      }
+
+      // Salvar novo orçamento na planilha DASHBOARD
+      const salvarResp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'salvarOrcamento',
+          token: CDA_TOKEN,
+          paciente: paciente,
+          exames: examesNomes,
+          codigos: examesCodigos,
+          totalBruto: totalBruto,
+          totalPix: totalPix,
+          totalCredito: totalCredito,
+          quantidadeExames: orcSelecionados.length,
+          data: dataAtual,
+          mesAno: mesAno,
+          origem: origem || 'sistema'
+        })
+      });
+
+      const salvarJson = await salvarResp.json();
+      if (salvarJson.ok) {
+        console.log('Orçamento salvo na planilha com sucesso!');
+        return true;
+      } else {
+        console.error('Erro ao salvar orçamento:', salvarJson.erro);
+        return false;
+      }
+    } catch(err) {
+      console.error('Erro ao verificar/salvar orçamento:', err);
+      return false;
+    }
+  }
+
+  // ==================== CONTAR ORÇAMENTOS DO MÊS NA PLANILHA ====================
+  async function contarOrcamentosDoMes() {
+    try {
+      const agora = new Date();
+      const mesAno = String(agora.getMonth() + 1).padStart(2, '0') + '/' + agora.getFullYear();
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      const url = APPS_SCRIPT_URL + '?action=contarOrcamentos&mesAno=' + encodeURIComponent(mesAno) + '&token=' + encodeURIComponent(CDA_TOKEN);
+
+      const resp = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeout);
+      const json = await resp.json();
+
+      if (json.ok && typeof json.total === 'number') {
+        dadosMensais.orcamentos = json.total;
+        atualizarMesStats();
+        console.log('Orçamentos do mês atualizados:', json.total);
+      }
+    } catch(err) {
+      console.error('Erro ao contar orçamentos:', err);
+    }
+  }
 </script>
 
 
