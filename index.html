@@ -1478,6 +1478,7 @@
       return;
     }
 
+    // Guardar no ultimoOrcamento para persistência
     ultimoOrcamento = {
       exames: [...orcSelecionados],
       total: orcSelecionados.reduce((sum, ex) => sum + parseFloat(ex.preco || 0), 0),
@@ -1489,7 +1490,13 @@
     navigateToPage('agendamento');
 
     // Preencher o nome do paciente na tela de agendamento
-    document.getElementById('agen-nome').value = paciente;
+    const agenNome = document.getElementById('agen-nome');
+    if (agenNome) agenNome.value = paciente;
+
+    // Forçar atualização do resumo após navegação
+    setTimeout(() => {
+      agenAtualizarResumo();
+    }, 100);
 
     showToast('Dados do orçamento transferidos para agendamento!');
   }
@@ -1692,8 +1699,13 @@
         }
 
         function agenTotalSelecionado() {
-            if (typeof orcSelecionados === 'undefined' || !Array.isArray(orcSelecionados)) return 0;
-            return orcSelecionados.reduce((s,e) => s + (Number(e.preco) || 0), 0);
+            if (typeof orcSelecionados !== 'undefined' && Array.isArray(orcSelecionados) && orcSelecionados.length > 0) {
+              return orcSelecionados.reduce((s,e) => s + (Number(e.preco) || 0), 0);
+            }
+            if (ultimoOrcamento && ultimoOrcamento.exames) {
+              return ultimoOrcamento.exames.reduce((s,e) => s + (Number(e.preco) || 0), 0);
+            }
+            return 0;
         }
 
         function agenPagamentoSelecionado() {
@@ -1710,8 +1722,23 @@
             const pagamentoWrap = document.getElementById('agen-pagamento-wrap');
             const pagamento = agenPagamentoSelecionado();
             agenState.pagamento = pagamento || null;
-            const totalBruto = agenTotalSelecionado();
-            const temExames = typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0;
+
+            // Verificar exames em orcSelecionados ou ultimoOrcamento
+            let examesAtuais = orcSelecionados || [];
+            let totalBruto = 0;
+            let temExames = false;
+
+            if (examesAtuais.length > 0) {
+              totalBruto = examesAtuais.reduce((s, e) => s + (Number(e.preco) || 0), 0);
+              temExames = true;
+            } else if (ultimoOrcamento && ultimoOrcamento.exames && ultimoOrcamento.exames.length > 0) {
+              // Restaurar exames do ultimoOrcamento se orcSelecionados estiver vazio
+              orcSelecionados = [...ultimoOrcamento.exames];
+              examesAtuais = orcSelecionados;
+              totalBruto = ultimoOrcamento.total || 0;
+              temExames = true;
+            }
+
             const pronto = data && periodo && horario && nome && telefone && validarTelefoneBR(telefone) && temExames && totalBruto >= 150 && pagamento;
 
             if (data && periodo && horario) {
@@ -1733,7 +1760,7 @@
                     const totalPix = totalBruto * 0.60;
                     const totalCredito = totalBruto * 0.65;
                     const pagamentoLinha = pagamento ? `<div class="text-slate-600 dark:text-slate-300 font-bold mt-1">Pagamento escolhido: ${pagamento}</div>` : '';
-                    document.getElementById('agen-resumo-exames').innerHTML = orcSelecionados
+                    document.getElementById('agen-resumo-exames').innerHTML = examesAtuais
                         .map(ex => `<div class="flex justify-between gap-3"><span>${ex.nome}</span><span class="font-bold whitespace-nowrap">${formatCurrency(ex.preco)}</span></div>`).join('');
                     document.getElementById('agen-resumo-total').innerHTML =
                         `<div class="text-slate-500 dark:text-slate-400 line-through text-xs">Particular: ${formatCurrency(totalBruto)}</div>
