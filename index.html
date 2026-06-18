@@ -271,6 +271,22 @@
     .horario-btn.selected, .agen-horario-btn.ativo { background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); color: white; }
     .horario-btn.ocupado, .agen-horario-btn.ocupado { background: #fee2e2; color: #ef4444; cursor: not-allowed; opacity: 0.6; }
 
+    
+    /* UPPERCASE para campos de login, senha, nome */
+    #login-usuario, #login-senha, #signup-name, #signup-email, #signup-password,
+    #orc-paciente, #agen-nome, #agen-telefone,
+    #config-login, #config-senha, #config-senha-confirm,
+    #senha-config-input {
+        text-transform: uppercase;
+    }
+    #login-usuario::placeholder, #login-senha::placeholder,
+    #signup-name::placeholder, #signup-email::placeholder, #signup-password::placeholder,
+    #orc-paciente::placeholder, #agen-nome::placeholder, #agen-telefone::placeholder,
+    #config-login::placeholder, #config-senha::placeholder, #config-senha-confirm::placeholder,
+    #senha-config-input::placeholder {
+        text-transform: none;
+    }
+
     @media (max-width: 1024px) { .home-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 768px) { .home-grid { grid-template-columns: 1fr; } body.app-loaded { padding: 1rem 0 0 1rem; } .site-wrap { grid-template-columns: 1fr; } .site-nav { display: none; } }
 
@@ -863,7 +879,27 @@
   }
 
   // Inicializar após DOM carregar
+  
+  // ==================== UPPERCASE EM TODOS OS CAMPOS ====================
+  function forcarUppercase() {
+    const campos = ['login-usuario', 'login-senha', 'signup-name', 'signup-email', 'signup-password',
+                    'orc-paciente', 'agen-nome', 'agen-telefone',
+                    'config-login', 'config-senha', 'config-senha-confirm', 'senha-config-input'];
+    campos.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', function() {
+          this.value = this.value.toUpperCase();
+        });
+        el.addEventListener('blur', function() {
+          this.value = this.value.toUpperCase();
+        });
+      }
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function() {
+    forcarUppercase();
     initLoginVars();
 
     const senhaInput = document.getElementById('login-senha');
@@ -1488,7 +1524,7 @@
     }
 
     // Validar se o nome do paciente está preenchido (pelo menos nome + 1 sobrenome)
-    const paciente = document.getElementById('orc-paciente').value.trim();
+    const paciente = document.getElementById('orc-paciente').value.trim().toUpperCase();
     if (!paciente) {
       showToast('Digite o nome do paciente!', 'error');
       document.getElementById('orc-paciente').focus();
@@ -1503,25 +1539,40 @@
       return;
     }
 
-    // Guardar no ultimoOrcamento para persistência
+    // Guardar no ultimoOrcamento para persistência COMPLETA
+    const totalBruto = orcSelecionados.reduce((sum, ex) => sum + parseFloat(ex.preco || 0), 0);
+    const totalPix = totalBruto * 0.60;
+    const totalCredito = totalBruto * 0.65;
+    const parcelaCredito = totalCredito / 10;
+
     ultimoOrcamento = {
-      exames: [...orcSelecionados],
-      total: orcSelecionados.reduce((sum, ex) => sum + parseFloat(ex.preco || 0), 0),
+      exames: JSON.parse(JSON.stringify(orcSelecionados)), // Deep copy
+      total: totalBruto,
+      totalPix: totalPix,
+      totalCredito: totalCredito,
+      parcelaCredito: parcelaCredito,
       data: new Date().toLocaleDateString('pt-BR'),
       paciente: paciente
     };
+
+    // Salvar também no localStorage como backup
+    localStorage.setItem('cda_ultimo_orcamento', JSON.stringify(ultimoOrcamento));
 
     computarOrcamento();
 
     // Navegar para agendamento
     navigateToPage('agendamento');
 
-    // Preencher o nome do paciente na tela de agendamento e forçar atualização do resumo
+    // Preencher dados e forçar atualização do resumo após navegação
     setTimeout(function() {
       const agenNome = document.getElementById('agen-nome');
-      if (agenNome) agenNome.value = paciente;
+      if (agenNome) {
+        agenNome.value = paciente;
+        agenNome.dispatchEvent(new Event('input'));
+      }
+      // Forçar atualização do resumo com os dados do orçamento
       agenAtualizarResumo();
-    }, 300);
+    }, 500);
 
     showToast('Dados do orçamento transferidos para agendamento!');
   }
@@ -1551,7 +1602,7 @@
     horarioSelecionado = horario;
   }
 
-  const APPS_SCRIPT_URL = 'SUBSTITUA_PELA_URL_DA_SUA_WEB_APP'; // Cole aqui a URL da sua Web App
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwjC9sCh0nORWfhCfQVrJ2v25kPJ-hQrwiW7ZjbC3iaL0cw5hTk1pJQYOgjNLSLoPwhmw/exec';
         // Token compartilhado com o Apps Script — valida que a requisição veio do app CDA
         const CDA_TOKEN = 'CDA-2025-xK9#mPqL';
 
@@ -1727,9 +1778,20 @@
             if (typeof orcSelecionados !== 'undefined' && Array.isArray(orcSelecionados) && orcSelecionados.length > 0) {
               return orcSelecionados.reduce((s,e) => s + (Number(e.preco) || 0), 0);
             }
+            if (ultimoOrcamento && ultimoOrcamento.total) {
+              return ultimoOrcamento.total;
+            }
             if (ultimoOrcamento && ultimoOrcamento.exames) {
               return ultimoOrcamento.exames.reduce((s,e) => s + (Number(e.preco) || 0), 0);
             }
+            try {
+              const saved = localStorage.getItem('cda_ultimo_orcamento');
+              if (saved) {
+                const parsed = JSON.parse(saved);
+                if (parsed.total) return parsed.total;
+                if (parsed.exames) return parsed.exames.reduce((s,e) => s + (Number(e.preco) || 0), 0);
+              }
+            } catch(e) {}
             return 0;
         }
 
@@ -1748,19 +1810,60 @@
             const pagamento = agenPagamentoSelecionado();
             agenState.pagamento = pagamento || null;
 
-            // Verificar exames em orcSelecionados ou ultimoOrcamento
-            let examesAtuais = orcSelecionados || [];
+            // RECUPERAR DADOS DO ORÇAMENTO - PRIORIDADE:
+            // 1. orcSelecionados (se estiver na página de orçamento)
+            // 2. ultimoOrcamento (dados transferidos via agendarColeta)
+            // 3. localStorage (backup caso a navegação limpe as variáveis)
+            let examesAtuais = [];
             let totalBruto = 0;
+            let totalPix = 0;
+            let totalCredito = 0;
+            let parcelaCredito = 0;
             let temExames = false;
 
-            if (examesAtuais.length > 0) {
+            // Tentativa 1: orcSelecionados
+            if (typeof orcSelecionados !== 'undefined' && Array.isArray(orcSelecionados) && orcSelecionados.length > 0) {
+              examesAtuais = orcSelecionados;
               totalBruto = examesAtuais.reduce((s, e) => s + (Number(e.preco) || 0), 0);
               temExames = true;
-            } else if (ultimoOrcamento && ultimoOrcamento.exames && ultimoOrcamento.exames.length > 0) {
-              orcSelecionados = [...ultimoOrcamento.exames];
-              examesAtuais = orcSelecionados;
+            }
+            // Tentativa 2: ultimoOrcamento
+            else if (ultimoOrcamento && ultimoOrcamento.exames && ultimoOrcamento.exames.length > 0) {
+              examesAtuais = ultimoOrcamento.exames;
               totalBruto = ultimoOrcamento.total || 0;
+              totalPix = ultimoOrcamento.totalPix || (totalBruto * 0.60);
+              totalCredito = ultimoOrcamento.totalCredito || (totalBruto * 0.65);
+              parcelaCredito = ultimoOrcamento.parcelaCredito || (totalCredito / 10);
               temExames = true;
+              // Restaurar orcSelecionados para uso posterior
+              orcSelecionados = [...examesAtuais];
+            }
+            // Tentativa 3: localStorage
+            else {
+              try {
+                const saved = localStorage.getItem('cda_ultimo_orcamento');
+                if (saved) {
+                  const parsed = JSON.parse(saved);
+                  if (parsed.exames && parsed.exames.length > 0) {
+                    examesAtuais = parsed.exames;
+                    totalBruto = parsed.total || 0;
+                    totalPix = parsed.totalPix || (totalBruto * 0.60);
+                    totalCredito = parsed.totalCredito || (totalBruto * 0.65);
+                    parcelaCredito = parsed.parcelaCredito || (totalCredito / 10);
+                    temExames = true;
+                    // Restaurar variáveis
+                    ultimoOrcamento = parsed;
+                    orcSelecionados = [...examesAtuais];
+                  }
+                }
+              } catch(e) { console.error('Erro ao recuperar do localStorage:', e); }
+            }
+
+            // Calcular valores se ainda não foram calculados
+            if (temExames && totalPix === 0) {
+              totalPix = totalBruto * 0.60;
+              totalCredito = totalBruto * 0.65;
+              parcelaCredito = totalCredito / 10;
             }
 
             const pronto = data && periodo && horario && nome && telefone && validarTelefoneBR(telefone) && temExames && totalBruto >= 150 && pagamento;
@@ -1781,16 +1884,27 @@
                 const examesWrap = document.getElementById('agen-resumo-exames-wrap');
                 if (temExames) {
                     examesWrap.classList.remove('hidden');
-                    const totalPix = totalBruto * 0.60;
-                    const totalCredito = totalBruto * 0.65;
                     const pagamentoLinha = pagamento ? `<div class="text-slate-600 dark:text-slate-300 font-bold mt-1">Pagamento escolhido: ${pagamento}</div>` : '';
-                    document.getElementById('agen-resumo-exames').innerHTML = examesAtuais
-                        .map(ex => `<div class="flex justify-between gap-3"><span>${ex.nome}</span><span class="font-bold whitespace-nowrap">${formatCurrency(ex.preco)}</span></div>`).join('');
+
+                    // Renderizar lista de exames
+                    let examesHTML = '';
+                    for (let i = 0; i < examesAtuais.length; i++) {
+                      const ex = examesAtuais[i];
+                      const preco = Number(ex.preco) || 0;
+                      examesHTML += '<div class="flex justify-between gap-3" style="padding: 4px 0; border-bottom: 1px solid #f0f0f0;">' +
+                        '<span style="font-size: 0.85rem; color: #334155;">' + (ex.nome || 'Sem nome') + '</span>' +
+                        '<span style="font-weight: 700; font-size: 0.85rem; color: #0F4C5C; white-space: nowrap;">' + formatCurrency(preco) + '</span>' +
+                      '</div>';
+                    }
+                    document.getElementById('agen-resumo-exames').innerHTML = examesHTML;
+
+                    // Renderizar totais
                     document.getElementById('agen-resumo-total').innerHTML =
-                        `<div class="text-slate-500 dark:text-slate-400 line-through text-xs">Particular: ${formatCurrency(totalBruto)}</div>
-                         <div class="text-cda-primary font-extrabold">PIX/Dinheiro/Débito: ${formatCurrency(totalPix)}</div>
-                         <div class="text-slate-600 dark:text-slate-300 font-bold">Cartão de crédito: ${formatCurrency(totalCredito)}</div>
-                         ${pagamentoLinha}`;
+                        '<div style="text-decoration: line-through; color: #94a3b8; font-size: 0.75rem; margin-bottom: 4px;">Particular: ' + formatCurrency(totalBruto) + '</div>' +
+                        '<div style="color: #0F4C5C; font-weight: 800; font-size: 1rem; margin-bottom: 2px;">PIX/Dinheiro/Débito: ' + formatCurrency(totalPix) + '</div>' +
+                        '<div style="color: #475569; font-weight: 700; font-size: 0.9rem; margin-bottom: 2px;">Cartão de crédito: ' + formatCurrency(totalCredito) + '</div>' +
+                        '<div style="color: #64748b; font-size: 0.75rem;">10x de ' + formatCurrency(parcelaCredito) + '</div>' +
+                        pagamentoLinha;
                 } else {
                     examesWrap.classList.add('hidden');
                 }
