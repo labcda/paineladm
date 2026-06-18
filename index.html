@@ -275,6 +275,7 @@
     @media (max-width: 768px) { .home-grid { grid-template-columns: 1fr; } body.app-loaded { padding: 1rem 0 0 1rem; } .site-wrap { grid-template-columns: 1fr; } .site-nav { display: none; } }
   </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -529,11 +530,12 @@
                 <p class="text-xs font-extrabold text-slate-400 uppercase mb-4"><span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #0F4C5C; color: white; font-size: 10px; margin-right: 8px;">1</span>Seus dados</p>
                 <div class="space-y-4">
                     <div><label class="block text-xs font-bold text-slate-500 mb-1.5">Nome completo</label><input type="text" id="agen-nome" placeholder="Seu nome" class="w-full bg-white border-none rounded-xl px-4 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);"></div>
+                    <div><label class="block text-xs font-bold text-slate-500 mb-1.5">Data de nascimento</label><input type="date" id="agen-nascimento" class="w-full bg-white border-none rounded-xl px-4 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);"></div>
                     <div><label class="block text-xs font-bold text-slate-500 mb-1.5">WhatsApp</label><input type="tel" id="agen-telefone" placeholder="(27) 99999-9999" class="w-full bg-white border-none rounded-xl px-4 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);"></div>
                 </div>
             </div>
             <div class="neumorphic-card">
-                <p class="text-xs font-extrabold text-slate-400 uppercase mb-4"><span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #0F4C5C; color: white; font-size: 10px; margin-right: 8px;">2</span>Data e período</p>
+                <p class="text-xs font-extrabold text-slate-400 uppercase mb-4"><span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #0F4C5C; color: white; font-size: 10px; margin-right: 8px;">2</span>Data</p>
                 <div class="space-y-4">
                     <div><label class="block text-xs font-bold text-slate-500 mb-1.5">Data da coleta</label><input type="date" id="agen-data" class="w-full bg-white border-none rounded-xl px-4 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);"></div>
                 </div>
@@ -940,47 +942,47 @@
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
 
     const pageW = 210;
-    const margin = 15;
-    let y = 10;
+    const margin = 20;
+    let y = 15;
 
-    // === HEADER COM FUNDO VERDE ESCURO ===
-    doc.setFillColor(15, 76, 92); // #0F4C5C
-    doc.roundedRect(margin, y, pageW - margin*2, 35, 3, 3, 'F');
-
-    // Logo CDA (texto simulado)
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(10);
+    // === HEADER: LABORATÓRIO CDA LOGO ===
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
-    doc.text('LABORAT', margin + 8, y + 12);
-    doc.setFontSize(18);
+    doc.text('LABORAT', margin, y);
+    doc.setFontSize(7);
+    doc.text('ÓRIO', margin + 22, y);
+
+    // Green CDA symbol (cross/plus in circle)
+    doc.setFillColor(34, 139, 34);
+    doc.setDrawColor(34, 139, 34);
+    doc.setLineWidth(1.5);
+    doc.line(margin + 50, y - 5, margin + 50, y + 5);
+    doc.line(margin + 45, y, margin + 55, y);
+
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(28);
     doc.setFont('helvetica', 'bold');
-    doc.text('CDA', margin + 8, y + 22);
+    doc.text('CDA', margin + 58, y + 2);
 
-    // Símbolo verde (círculo simulado)
-    doc.setFillColor(73, 188, 190);
-    doc.circle(margin + 45, y + 15, 8, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(10);
-    doc.text('✚', margin + 42, y + 18);
-
-    y += 40;
+    y += 18;
 
     // === PACIENTE ===
     doc.setTextColor(15, 76, 92);
-    doc.setFontSize(9);
+    doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.text('PACIENTE', margin, y);
 
     doc.setTextColor(15, 76, 92);
-    doc.setFontSize(22);
+    doc.setFontSize(26);
     doc.setFont('helvetica', 'bold');
     doc.text(paciente.toUpperCase(), margin, y + 10);
 
-    y += 18;
+    y += 20;
 
-    // === EXAMES ===
+    // === EXAME ===
     doc.setTextColor(15, 76, 92);
-    doc.setFontSize(9);
+    doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.text('EXAME', margin, y);
 
@@ -990,44 +992,43 @@
 
     let examesTexto = '';
     orcSelecionados.forEach((ex, idx) => {
-      examesTexto += (idx + 1) + ex.nome + '  ';
+      examesTexto += (idx + 1) + ex.nome;
     });
 
-    // Quebrar texto se for muito longo
-    const splitExames = doc.splitTextToSize(examesTexto, pageW - margin*2);
-    doc.text(splitExames, margin, y + 7);
-    y += 7 + (splitExames.length * 5);
+    const splitExames = doc.splitTextToSize(examesTexto, pageW - margin * 2);
+    doc.text(splitExames, margin, y + 6);
+    y += 6 + (splitExames.length * 5);
 
-    // === SUBTÍTULO ===
+    // === LAB INFO LINE ===
     doc.setTextColor(100, 100, 100);
-    doc.setFontSize(8);
+    doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
-    doc.text('Laboratório CDA', margin, y);
-    doc.setTextColor(73, 188, 190);
-    doc.text('Diagnóstico de Confiança', margin + 35, y);
+    doc.text('Laboratorio CDA', margin, y);
+    doc.setTextColor(34, 139, 34);
+    doc.text('Diagnostico de Confianca', margin + 28, y);
 
     y += 5;
     doc.setTextColor(100, 100, 100);
-    doc.text('Afonso Cláudio, ES  (27) 99898-0658', margin, y);
+    doc.text('Afonso Claudio,ES .(27)99898-0658', margin, y);
 
-    y += 10;
+    y += 12;
 
     // === DATA ===
     const dataAtual = new Date();
-    const meses = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+    const meses = ['janeiro', 'fevereiro', 'marco', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
     const dataFormatada = dataAtual.getDate() + ' de ' + meses[dataAtual.getMonth()] + ' de ' + dataAtual.getFullYear();
 
     doc.setTextColor(15, 76, 92);
-    doc.setFontSize(9);
+    doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.text('DATA', margin, y);
 
     doc.setTextColor(15, 76, 92);
-    doc.setFontSize(11);
+    doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
-    doc.text(dataFormatada, margin, y + 7);
+    doc.text(dataFormatada, margin, y + 6);
 
-    y += 15;
+    y += 14;
 
     // === TOTAL ESTIMADO ===
     let total = 0;
@@ -1036,122 +1037,123 @@
     });
 
     doc.setTextColor(15, 76, 92);
-    doc.setFontSize(9);
+    doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.text('TOTAL ESTIMADO (tabela particular)', margin, y);
 
     doc.setTextColor(15, 76, 92);
-    doc.setFontSize(24);
+    doc.setFontSize(28);
     doc.setFont('helvetica', 'bold');
     doc.text('R$ ' + total.toFixed(2).replace('.', ','), margin, y + 12);
 
-    y += 20;
+    y += 22;
 
     // === DESCONTOS ESPECIAIS CDA ===
     doc.setTextColor(15, 76, 92);
-    doc.setFontSize(10);
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.text('Descontos Especiais CDA', margin, y);
-
-    y += 8;
-
-    doc.setTextColor(100, 100, 100);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Pacientes com convênio ou Cartão Fidelidade', margin, y);
-
-    y += 12;
-
-    // === BOX PIX/DINHEIRO/DÉBITO ===
-    const boxH = 18;
-    doc.setFillColor(232, 248, 248); // #E8F8F8
-    doc.roundedRect(margin, y, pageW - margin*2, boxH, 2, 2, 'F');
-
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Pix, dinheiro ou débito', margin + 5, y + 6);
-
-    doc.setTextColor(100, 100, 100);
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'normal');
-    doc.text('à vista', margin + 5, y + 11);
-
-    const precoPix = total * 0.60;
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.text('40% OFF', pageW - margin - 25, y + 6);
-
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text('R$ ' + precoPix.toFixed(2).replace('.', ','), pageW - margin - 25, y + 12);
-
-    y += boxH + 5;
-
-    // === BOX CARTÃO DE CRÉDITO ===
-    doc.setFillColor(232, 248, 248);
-    doc.roundedRect(margin, y, pageW - margin*2, boxH, 2, 2, 'F');
-
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Cartão de crédito', margin + 5, y + 6);
-
-    doc.setTextColor(100, 100, 100);
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'normal');
-    doc.text('parcelado em até 10x', margin + 5, y + 11);
-
-    const precoCc = total * 0.65;
-    const parcelaCc = precoCc / 10;
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.text('35% OFF', pageW - margin - 25, y + 6);
-
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text('10x R$ ' + parcelaCc.toFixed(2).replace('.', ','), pageW - margin - 25, y + 12);
-
-    y += boxH + 10;
-
-    // === COBRIMOS QUALQUER ORÇAMENTO ===
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Cobrimos qualquer orçamento! Apresente uma proposta e faremos a diferença.', margin, y);
-
-    y += 10;
-
-    // === AGENDE E GANHE MIMOS ===
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Agende e ganhe mimos especiais!', margin, y);
 
     y += 6;
 
     doc.setTextColor(100, 100, 100);
     doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
-    doc.text('✓ Atendimento sem fila   ✓ Sala VIP com TV e ar-condicionado', margin, y);
-    y += 4;
-    doc.text('✓ Café expresso   ✓ Biscoitinho Club Social', margin, y);
+    doc.text('Pacientes com convenio ou Cartao Fidelidade', margin, y);
 
     y += 10;
 
-    // === ORÇAMENTO - TABELA DE EXAMES ===
+    // === BOX PIX/DINHEIRO/DÉBITO ===
+    const boxH = 16;
+    doc.setFillColor(232, 248, 248);
+    doc.setDrawColor(200, 230, 230);
+    doc.roundedRect(margin, y, pageW - margin * 2, boxH, 2, 2, 'FD');
+
+    doc.setTextColor(15, 76, 92);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Pix, dinheiro ou debito', margin + 5, y + 5);
+
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(6);
+    doc.setFont('helvetica', 'normal');
+    doc.text('(a vista)', margin + 5, y + 9);
+
+    const precoPix = total * 0.60;
+    doc.setTextColor(15, 76, 92);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.text('40% OFF', pageW - margin - 22, y + 5);
+
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
-    doc.text('ORÇAMENTO', margin, y);
+    doc.text('R$ ' + precoPix.toFixed(2).replace('.', ','), pageW - margin - 22, y + 10);
+
+    y += boxH + 4;
+
+    // === BOX CARTÃO DE CRÉDITO ===
+    doc.setFillColor(232, 248, 248);
+    doc.setDrawColor(200, 230, 230);
+    doc.roundedRect(margin, y, pageW - margin * 2, boxH, 2, 2, 'FD');
+
+    doc.setTextColor(15, 76, 92);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Cartao de credito', margin + 5, y + 5);
+
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(6);
+    doc.setFont('helvetica', 'normal');
+    doc.text('(parcelado em ate 10x)', margin + 5, y + 9);
+
+    const precoCc = total * 0.65;
+    const parcelaCc = precoCc / 10;
+    doc.setTextColor(15, 76, 92);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.text('35% OFF', pageW - margin - 22, y + 5);
+
+    doc.setTextColor(15, 76, 92);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('10x R$ ' + parcelaCc.toFixed(2).replace('.', ','), pageW - margin - 22, y + 10);
+
+    y += boxH + 8;
+
+    // === COBRIMOS QUALQUER ORÇAMENTO ===
+    doc.setTextColor(15, 76, 92);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Cobrimos qualquer orcamento! Apresente uma proposta e faremos a diferenca.', margin, y);
 
     y += 8;
 
-    // Tabela de exames
+    // === AGENDE E GANHE MIMOS ===
+    doc.setTextColor(15, 76, 92);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Agende e ganhe mimos especiais!', margin, y);
+
+    y += 5;
+
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(6);
+    doc.setFont('helvetica', 'normal');
+    doc.text('v Atendimento sem fila   v Sala VIP com TV e ar-condicionado', margin, y);
+    y += 3.5;
+    doc.text('v Cafe expresso   v Biscoitinho Club Social', margin, y);
+
+    y += 8;
+
+    // === ORÇAMENTO - TABELA DE EXAMES ===
+    doc.setTextColor(15, 76, 92);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text('ORCAMENTO', margin, y);
+
+    y += 6;
+
     const tableData = orcSelecionados.map(ex => {
       return [ex.nome || 'Sem nome', 'R$ ' + parseFloat(ex.preco || 0).toFixed(2).replace('.', ',')];
     });
@@ -1165,54 +1167,53 @@
         fillColor: [15, 76, 92],
         textColor: [255, 255, 255],
         fontStyle: 'bold',
-        fontSize: 8
+        fontSize: 7,
+        cellPadding: 2
       },
       bodyStyles: {
-        fontSize: 8,
-        textColor: [15, 76, 92]
+        fontSize: 7,
+        textColor: [15, 76, 92],
+        cellPadding: 2
       },
       styles: {
-        cellPadding: 3,
         lineColor: [200, 200, 200],
         lineWidth: 0.1
       },
       columnStyles: {
-        0: { cellWidth: 120 },
-        1: { cellWidth: 50, halign: 'right' }
+        0: { cellWidth: 130 },
+        1: { cellWidth: 40, halign: 'right' }
       },
       margin: { left: margin, right: margin }
     });
 
-    y = doc.lastAutoTable.finalY + 5;
+    y = doc.lastAutoTable.finalY + 4;
 
-    // Total
     doc.setTextColor(15, 76, 92);
-    doc.setFontSize(10);
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.text('VALOR', margin, y);
-    doc.text('R$ ' + total.toFixed(2).replace('.', ','), pageW - margin - 30, y);
+    doc.text('R$ ' + total.toFixed(2).replace('.', ','), pageW - margin - 35, y);
 
-    y += 8;
+    y += 6;
 
-    // Descontos na tabela
     doc.setTextColor(15, 76, 92);
-    doc.setFontSize(8);
+    doc.setFontSize(7);
     doc.setFont('helvetica', 'bold');
     doc.text('40% OFF -> R$ ' + precoPix.toFixed(2).replace('.', ','), margin, y);
-    y += 5;
+    y += 4;
     doc.text('35% OFF -> 10x R$ ' + parcelaCc.toFixed(2).replace('.', ','), margin, y);
 
     // === RODAPÉ ===
-    const footerY = 280;
+    const footerY = 285;
     doc.setDrawColor(15, 76, 92);
-    doc.setLineWidth(0.5);
-    doc.line(margin, footerY - 5, pageW - margin, footerY - 5);
+    doc.setLineWidth(0.3);
+    doc.line(margin, footerY - 4, pageW - margin, footerY - 4);
 
     doc.setTextColor(100, 100, 100);
-    doc.setFontSize(7);
+    doc.setFontSize(6);
     doc.setFont('helvetica', 'normal');
-    doc.text('Laboratório CDA . Afonso Cláudio, ES . (27) 99898-0658', margin, footerY);
-    doc.text('*Valores estimados da tabela particular. Sujeitos a confirmação. Convênios sob consulta.', margin, footerY + 4);
+    doc.text('Laboratorio CDA . Afonso Claudio, ES . (27) 99898-0658', margin, footerY);
+    doc.text('*Valores estimados da tabela particular. Sujeitos a confirmacao. Convenios sob consulta.', margin, footerY + 3);
 
     return doc;
   }function baixarPDF() {
@@ -1272,16 +1273,41 @@
 
   // ==================== AGENDAR COLETA ====================
   function agendarColeta() {
-    if (orcSelecionados.length === 0) { showToast('Selecione pelo menos um exame!', 'error'); return; }
+    // Validar se há exames selecionados
+    if (orcSelecionados.length === 0) { 
+      showToast('Selecione pelo menos um exame!', 'error'); 
+      return; 
+    }
+
+    // Validar se o nome do paciente está preenchido (pelo menos nome + 1 sobrenome)
+    const paciente = document.getElementById('orc-paciente').value.trim();
+    if (!paciente) {
+      showToast('Digite o nome do paciente!', 'error');
+      document.getElementById('orc-paciente').focus();
+      return;
+    }
+
+    // Validar nome completo (pelo menos 2 palavras)
+    const palavras = paciente.split(/\s+/).filter(p => p.length > 0);
+    if (palavras.length < 2) {
+      showToast('Digite o nome completo (nome e sobrenome)!', 'error');
+      document.getElementById('orc-paciente').focus();
+      return;
+    }
 
     ultimoOrcamento = {
       exames: [...orcSelecionados],
       total: orcSelecionados.reduce((sum, ex) => sum + parseFloat(ex.preco || 0), 0),
-      data: new Date().toLocaleDateString('pt-BR')
+      data: new Date().toLocaleDateString('pt-BR'),
+      paciente: paciente
     };
 
     computarOrcamento();
     navigateToPage('agendamento');
+
+    // Preencher o nome do paciente na tela de agendamento
+    document.getElementById('agen-nome').value = paciente;
+
     showToast('Dados do orçamento transferidos para agendamento!');
   }
 
@@ -1312,17 +1338,26 @@
 
   function confirmarAgendamento() {
     const nome = document.getElementById('agen-nome').value.trim();
+    const nascimento = document.getElementById('agen-nascimento').value;
     const telefone = document.getElementById('agen-telefone').value.trim();
     const data = document.getElementById('agen-data').value;
 
-    if (!nome || !telefone || !data || !horarioSelecionado) {
+    if (!nome || !nascimento || !telefone || !data || !horarioSelecionado) {
       showToast('Preencha todos os campos e selecione um horário!', 'error');
+      return;
+    }
+
+    // Validar nome completo (pelo menos 2 palavras)
+    const palavras = nome.split(/\s+/).filter(p => p.length > 0);
+    if (palavras.length < 2) {
+      showToast('Digite o nome completo (nome e sobrenome)!', 'error');
       return;
     }
 
     showToast('Agendamento confirmado para ' + data + ' às ' + horarioSelecionado + '!');
 
     document.getElementById('agen-nome').value = '';
+    document.getElementById('agen-nascimento').value = '';
     document.getElementById('agen-telefone').value = '';
     document.getElementById('agen-data').value = '';
     document.querySelectorAll('.horario-btn').forEach(b => b.classList.remove('selected'));
