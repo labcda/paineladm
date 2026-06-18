@@ -2428,7 +2428,7 @@ function fazerCadastro() {
               '<div class="exame-codigo">Cadastrado em: ' + (u.data || '---') + '</div>' +
             '</div>' +
             '<div style="display: flex; gap: 8px;">' +
-              '<button class="btn-remover-exame" onclick="excluirUsuario(' + idx + ', '' + (u.login || '') + '')" title="Excluir" style="width: 32px; height: 32px;">' +
+              '<button class="btn-remover-exame" onclick="excluirUsuario(' + idx + ', ' + (u.login ? "\'" + u.login + "\'" : "\'\'") + ')" title="Excluir" style="width: 32px; height: 32px;">' +
                 '<i class="fa-solid fa-trash"></i>' +
               '</button>' +
             '</div>' +
