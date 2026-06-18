@@ -1615,7 +1615,6 @@
                 console.log('[CDA] Consultando agenda:', url);
                 const resp = await fetch(url, {
                     method: 'GET',
-                    redirect: 'follow',
                     signal: controller.signal
                 });
                 clearTimeout(timeout);
