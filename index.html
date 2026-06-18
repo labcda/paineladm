@@ -417,6 +417,7 @@
       <li data-page="agendamento"><a href="#"><i class="fa-regular fa-calendar-check mr-2"></i> Agendamento</a></li>
       <li><a href="#"><i class="fa-solid fa-vial mr-2"></i> Exames</a></li>
       <li><a href="#"><i class="fa-solid fa-chart-line mr-2"></i> Relatórios</a></li>
+      <li data-page="configuracoes" id="nav-configuracoes"><a href="#" onclick="abrirConfiguracoes(event)"><i class="fa-solid fa-gear mr-2"></i> Configurações</a></li>
     </ul>
     <div class="note">
       <h3>Central de Atendimento</h3>
@@ -734,6 +735,72 @@
 
         </section>
 
+    <!-- CONFIGURAÇÕES -->
+      <section id="page-configuracoes" class="page space-y-5">
+        <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
+            <div class="relative z-10">
+                <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
+                    <i class="fa-solid fa-gear"></i> Configurações
+                </span>
+                <h2 class="text-2xl font-extrabold leading-tight mb-1">Área Administrativa</h2>
+                <p class="text-sm text-white/80 leading-relaxed">Gerencie usuários e configurações do sistema.</p>
+            </div>
+        </div>
+
+        <!-- REGISTRO DE USUÁRIO -->
+        <div class="neumorphic-card">
+            <h3 style="font-size: 1.2rem; font-weight: 700; color: #101620; margin-bottom: 20px;">
+                <i class="fa-solid fa-user-plus mr-2" style="color: #0F4C5C;"></i> Registro de Usuário
+            </h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-user mr-1"></i> Login
+                    </label>
+                    <input type="text" id="config-login" placeholder="Digite o login do usuário..." 
+                        class="w-full bg-white border-none rounded-2xl pl-5 pr-5 py-3 text-sm" 
+                        style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-lock mr-1"></i> Senha
+                    </label>
+                    <input type="password" id="config-senha" placeholder="Digite a senha..." 
+                        class="w-full bg-white border-none rounded-2xl pl-5 pr-5 py-3 text-sm" 
+                        style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-lock mr-1"></i> Confirmar Senha
+                    </label>
+                    <input type="password" id="config-senha-confirm" placeholder="Confirme a senha..." 
+                        class="w-full bg-white border-none rounded-2xl pl-5 pr-5 py-3 text-sm" 
+                        style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);">
+                </div>
+                <div id="config-error" class="login-error-msg" style="display: none; margin-top: 10px;">Preencha todos os campos</div>
+                <div id="config-success" style="color: #0F4C5C; font-size: 0.85rem; margin-top: 10px; text-align: center; display: none; font-weight: 600;">
+                    <i class="fa-solid fa-circle-check mr-1"></i> Usuário cadastrado com sucesso!
+                </div>
+                <button class="neumorphic-btn primary neumorphic-btn-lg" onclick="cadastrarUsuario()" style="width: 100%; margin-top: 10px;">
+                    <i class="fa-solid fa-user-plus"></i> Cadastrar Usuário
+                </button>
+            </div>
+        </div>
+
+        <!-- LISTA DE USUÁRIOS -->
+        <div class="neumorphic-card">
+            <h3 style="font-size: 1.2rem; font-weight: 700; color: #101620; margin-bottom: 20px;">
+                <i class="fa-solid fa-users mr-2" style="color: #0F4C5C;"></i> Usuários Cadastrados
+            </h3>
+            <div id="config-lista-usuarios" class="space-y-2">
+                <p class="text-sm text-slate-500 text-center py-4">Carregando usuários...</p>
+            </div>
+            <button class="btn-limpar" onclick="carregarUsuarios()" style="margin-top: 12px;">
+                <i class="fa-solid fa-rotate-right"></i> Atualizar Lista
+            </button>
+        </div>
+      </section>
+
     </div>
   </main>
 </div>
@@ -778,48 +845,6 @@
   }
 
   // ==================== LOGIN ====================
-  function fazerLogin() {
-    console.log('fazerLogin chamado');
-    const usuarioEl = document.getElementById('login-usuario');
-    const senhaEl = document.getElementById('login-senha');
-    const errorEl = document.getElementById('login-error');
-
-    if (!usuarioEl || !senhaEl) {
-      console.error('Elementos de login não encontrados!');
-      return;
-    }
-
-    const usuario = usuarioEl.value.trim();
-    const senha = senhaEl.value.trim();
-
-    console.log('Tentando login:', usuario);
-
-    // Demo credentials: admin / cda2024
-    if (usuario === 'admin' && senha === 'cda2024') {
-      console.log('Login bem-sucedido!');
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('splashScreen').style.display = 'flex';
-
-      setTimeout(() => {
-        const splash = document.getElementById('splashScreen');
-        splash.classList.add('fade-out');
-        setTimeout(() => {
-          splash.style.display = 'none';
-          document.getElementById('appContainer').style.display = 'grid';
-          document.body.classList.add('app-loaded');
-          carregarExames();
-          gerarHorarios();
-          atualizarMesStats();
-          renderAtividades();
-        }, 600);
-      }, 2500);
-    } else {
-      console.log('Login falhou');
-      errorEl.style.display = 'block';
-      setTimeout(() => errorEl.style.display = 'none', 3000);
-    }
-  }
-
   function fazerCadastro() {
     const nome = document.getElementById('signup-name').value.trim();
     const email = document.getElementById('signup-email').value.trim();
@@ -1970,6 +1995,281 @@
 
   // Inicializa data mínima
   document.getElementById('agen-data').min = new Date().toISOString().split('T')[0];
+
+
+  // ==================== CONFIGURAÇÕES - MODAL SENHA ====================
+  const SENHA_CONFIG = '5912';
+  let configAutorizado = false;
+
+  function abrirConfiguracoes(e) {
+    e.preventDefault();
+    if (!configAutorizado) {
+      document.getElementById('modal-senha-config').style.display = 'flex';
+      document.getElementById('senha-config-input').value = '';
+      document.getElementById('senha-config-error').style.display = 'none';
+      setTimeout(() => document.getElementById('senha-config-input').focus(), 100);
+    } else {
+      navigateToPage('configuracoes');
+    }
+  }
+
+  function fecharModalSenha() {
+    document.getElementById('modal-senha-config').style.display = 'none';
+    document.getElementById('senha-config-input').value = '';
+    document.getElementById('senha-config-error').style.display = 'none';
+  }
+
+  function verificarSenhaConfig() {
+    const input = document.getElementById('senha-config-input');
+    const error = document.getElementById('senha-config-error');
+    if (input.value === SENHA_CONFIG) {
+      configAutorizado = true;
+      fecharModalSenha();
+      navigateToPage('configuracoes');
+      carregarUsuarios();
+    } else {
+      error.style.display = 'block';
+      input.value = '';
+      input.focus();
+      setTimeout(() => error.style.display = 'none', 3000);
+    }
+  }
+
+  document.getElementById('senha-config-input')?.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') verificarSenhaConfig();
+  });
+
+  // ==================== LOGIN COM GOOGLE SHEETS ====================
+  async function fazerLogin() {
+    console.log('fazerLogin chamado');
+    const usuarioEl = document.getElementById('login-usuario');
+    const senhaEl = document.getElementById('login-senha');
+    const errorEl = document.getElementById('login-error');
+
+    if (!usuarioEl || !senhaEl) {
+      console.error('Elementos de login não encontrados!');
+      return;
+    }
+
+    const usuario = usuarioEl.value.trim();
+    const senha = senhaEl.value.trim();
+
+    console.log('Tentando login:', usuario);
+
+    // Demo credentials: admin / cda2024
+    if (usuario === 'admin' && senha === 'cda2024') {
+      console.log('Login bem-sucedido (admin)!');
+      loginSucesso();
+      return;
+    }
+
+    // Verificar no Google Sheets
+    try {
+      errorEl.innerText = 'Verificando credenciais...';
+      errorEl.style.display = 'block';
+      errorEl.style.color = '#0F4C5C';
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      const url = APPS_SCRIPT_URL + '?action=verificarLogin&login=' + encodeURIComponent(usuario) + '&senha=' + encodeURIComponent(senha) + '&token=' + encodeURIComponent(CDA_TOKEN);
+
+      const resp = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeout);
+      const json = await resp.json();
+
+      if (json.ok && json.autorizado) {
+        console.log('Login bem-sucedido (Sheets)!');
+        loginSucesso();
+      } else {
+        console.log('Login falhou (Sheets)');
+        errorEl.innerText = 'Login ou senha incorretos';
+        errorEl.style.color = '#ef4444';
+        setTimeout(() => errorEl.style.display = 'none', 3000);
+      }
+    } catch(err) {
+      console.error('Erro ao verificar login:', err);
+      errorEl.innerText = 'Login ou senha incorretos';
+      errorEl.style.color = '#ef4444';
+      setTimeout(() => errorEl.style.display = 'none', 3000);
+    }
+  }
+
+  function loginSucesso() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('splashScreen').style.display = 'flex';
+
+    setTimeout(() => {
+      const splash = document.getElementById('splashScreen');
+      splash.classList.add('fade-out');
+      setTimeout(() => {
+        splash.style.display = 'none';
+        document.getElementById('appContainer').style.display = 'grid';
+        document.body.classList.add('app-loaded');
+        carregarExames();
+        gerarHorarios();
+        atualizarMesStats();
+        renderAtividades();
+      }, 600);
+    }, 2500);
+  }
+
+  // ==================== CADASTRO DE USUÁRIOS NO GOOGLE SHEETS ====================
+  async function cadastrarUsuario() {
+    const login = document.getElementById('config-login').value.trim();
+    const senha = document.getElementById('config-senha').value.trim();
+    const senhaConfirm = document.getElementById('config-senha-confirm').value.trim();
+    const errorEl = document.getElementById('config-error');
+    const successEl = document.getElementById('config-success');
+
+    if (!login || !senha || !senhaConfirm) {
+      errorEl.innerText = 'Preencha todos os campos';
+      errorEl.style.display = 'block';
+      successEl.style.display = 'none';
+      setTimeout(() => errorEl.style.display = 'none', 3000);
+      return;
+    }
+
+    if (senha !== senhaConfirm) {
+      errorEl.innerText = 'As senhas não conferem';
+      errorEl.style.display = 'block';
+      successEl.style.display = 'none';
+      setTimeout(() => errorEl.style.display = 'none', 3000);
+      return;
+    }
+
+    if (senha.length < 4) {
+      errorEl.innerText = 'A senha deve ter no mínimo 4 caracteres';
+      errorEl.style.display = 'block';
+      successEl.style.display = 'none';
+      setTimeout(() => errorEl.style.display = 'none', 3000);
+      return;
+    }
+
+    errorEl.style.display = 'none';
+
+    try {
+      const btn = document.querySelector('button[onclick="cadastrarUsuario()"]');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Cadastrando...';
+      btn.disabled = true;
+
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'cadastrarUsuario',
+          token: CDA_TOKEN,
+          login: login,
+          senha: senha
+        })
+      });
+
+      const json = await resp.json();
+
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+
+      if (json.ok) {
+        successEl.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Usuário cadastrado com sucesso!';
+        successEl.style.display = 'block';
+        document.getElementById('config-login').value = '';
+        document.getElementById('config-senha').value = '';
+        document.getElementById('config-senha-confirm').value = '';
+        carregarUsuarios();
+        setTimeout(() => successEl.style.display = 'none', 3000);
+      } else if (json.existe) {
+        errorEl.innerText = 'Este login já está cadastrado';
+        errorEl.style.display = 'block';
+        setTimeout(() => errorEl.style.display = 'none', 3000);
+      } else {
+        throw new Error(json.erro || 'Erro ao cadastrar');
+      }
+    } catch(err) {
+      console.error('Erro cadastro:', err);
+      errorEl.innerText = 'Erro ao cadastrar. Tente novamente.';
+      errorEl.style.display = 'block';
+      setTimeout(() => errorEl.style.display = 'none', 3000);
+    }
+  }
+
+  // ==================== CARREGAR USUÁRIOS DO GOOGLE SHEETS ====================
+  async function carregarUsuarios() {
+    const container = document.getElementById('config-lista-usuarios');
+    container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Carregando...</p>';
+
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      const url = APPS_SCRIPT_URL + '?action=listarUsuarios&token=' + encodeURIComponent(CDA_TOKEN);
+
+      const resp = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeout);
+      const json = await resp.json();
+
+      if (json.ok && Array.isArray(json.usuarios)) {
+        if (json.usuarios.length === 0) {
+          container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhum usuário cadastrado</p>';
+          return;
+        }
+        container.innerHTML = json.usuarios.map((u, idx) => {
+          return '<div class="exame-selecionado-item" style="padding: 12px 16px;">' +
+            '<div class="exame-info">' +
+              '<div class="exame-nome" style="font-size: 0.9rem;"><i class="fa-solid fa-user mr-2" style="color: #0F4C5C;"></i>' + (u.login || '---') + '</div>' +
+              '<div class="exame-codigo">Cadastrado em: ' + (u.data || '---') + '</div>' +
+            '</div>' +
+            '<div style="display: flex; gap: 8px;">' +
+              '<button class="btn-remover-exame" onclick="excluirUsuario(' + idx + ', '' + (u.login || '') + '')" title="Excluir" style="width: 32px; height: 32px;">' +
+                '<i class="fa-solid fa-trash"></i>' +
+              '</button>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      } else {
+        container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Erro ao carregar usuários</p>';
+      }
+    } catch(err) {
+      console.error('Erro listar usuários:', err);
+      container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Erro ao carregar. Tente novamente.</p>';
+    }
+  }
+
+  // ==================== EXCLUIR USUÁRIO ====================
+  async function excluirUsuario(index, login) {
+    if (!confirm('Tem certeza que deseja excluir o usuário "' + login + '"?')) return;
+
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'excluirUsuario',
+          token: CDA_TOKEN,
+          login: login
+        })
+      });
+
+      const json = await resp.json();
+      if (json.ok) {
+        showToast('Usuário excluído com sucesso!');
+        carregarUsuarios();
+      } else {
+        throw new Error(json.erro || 'Erro ao excluir');
+      }
+    } catch(err) {
+      console.error('Erro excluir:', err);
+      showToast('Erro ao excluir usuário', 'error');
+    }
+  }
+
+  // Resetar autorização ao sair da página de configurações
+  navItems.forEach(li => {
+    li.addEventListener('click', e => {
+      const pageId = li.getAttribute('data-page');
+      if (pageId !== 'configuracoes') {
+        configAutorizado = false;
+      }
+    });
+  });
 </script>
 
 
@@ -2020,6 +2320,30 @@
             </div>
         </div>
     </div>
+
+<!-- MODAL SENHA CONFIGURAÇÕES -->
+<div id="modal-senha-config" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 76, 92, 0.85); z-index: 99998; display: none; justify-content: center; align-items: center; backdrop-filter: blur(8px);">
+    <div style="background: #ecf0f3; border-radius: 24px; padding: 40px; width: 400px; max-width: 90vw; box-shadow: 10px 10px 30px rgba(0,0,0,0.3); text-align: center;">
+        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+            <i class="fa-solid fa-lock" style="color: white; font-size: 24px;"></i>
+        </div>
+        <h2 style="font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 700; color: #181818; margin-bottom: 8px;">Área Restrita</h2>
+        <p style="font-size: 13px; color: #a0a5a8; margin-bottom: 24px;">Digite a senha de administrador para acessar as configurações.</p>
+        <input type="password" id="senha-config-input" placeholder="Senha de acesso" 
+            style="width: 100%; height: 45px; padding-left: 20px; font-size: 14px; letter-spacing: 2px; border: none; outline: none; font-family: 'Montserrat', sans-serif; background-color: #ecf0f3; border-radius: 12px; box-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #f9f9f9; color: #181818; text-align: center; margin-bottom: 16px;">
+        <div id="senha-config-error" style="color: #ef4444; font-size: 0.8rem; margin-bottom: 12px; display: none;">Senha incorreta</div>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="fecharModalSenha()" 
+                style="flex: 1; height: 45px; border-radius: 22px; font-weight: 600; font-size: 13px; background: #d1d9e6; color: #64748B; border: none; cursor: pointer; font-family: 'Montserrat', sans-serif; transition: all 0.25s;">
+                Cancelar
+            </button>
+            <button onclick="verificarSenhaConfig()" 
+                style="flex: 1; height: 45px; border-radius: 22px; font-weight: 700; font-size: 13px; background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); color: #f9f9f9; border: none; cursor: pointer; font-family: 'Montserrat', sans-serif; transition: all 0.25s; box-shadow: 4px 4px 10px rgba(15,76,92,0.3);">
+                Acessar
+            </button>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
