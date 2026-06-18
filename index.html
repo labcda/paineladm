@@ -1663,9 +1663,16 @@
             grid.innerHTML = disponiveis.map(h => {
                 const isOcupado = ocupados.includes(h);
                 return `<button type="button" class="agen-horario-btn${isOcupado ? ' ocupado' : ''}" data-hora="${h}" 
-                    ${isOcupado ? 'disabled title="Horário já reservado"' : `onclick="agenSelecionarHorario('${h}')"`}
+                    ${isOcupado ? 'disabled title="Horário já reservado"' : ''}
                     >${h}${isOcupado ? '<br><span style="font-size:9px;opacity:0.7">Ocupado</span>' : ''}</button>`;
             }).join('');
+
+            // Add click event listeners to all buttons
+            grid.querySelectorAll('.agen-horario-btn:not(.ocupado)').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    agenSelecionarHorario(this.dataset.hora);
+                });
+            });
             grid.classList.remove('hidden');
         }
 
