@@ -1487,16 +1487,16 @@
     };
 
     computarOrcamento();
+
+    // Navegar para agendamento
     navigateToPage('agendamento');
 
-    // Preencher o nome do paciente na tela de agendamento
-    const agenNome = document.getElementById('agen-nome');
-    if (agenNome) agenNome.value = paciente;
-
-    // Forçar atualização do resumo após navegação
-    setTimeout(() => {
+    // Preencher o nome do paciente na tela de agendamento e forçar atualização do resumo
+    setTimeout(function() {
+      const agenNome = document.getElementById('agen-nome');
+      if (agenNome) agenNome.value = paciente;
       agenAtualizarResumo();
-    }, 100);
+    }, 300);
 
     showToast('Dados do orçamento transferidos para agendamento!');
   }
@@ -1732,7 +1732,6 @@
               totalBruto = examesAtuais.reduce((s, e) => s + (Number(e.preco) || 0), 0);
               temExames = true;
             } else if (ultimoOrcamento && ultimoOrcamento.exames && ultimoOrcamento.exames.length > 0) {
-              // Restaurar exames do ultimoOrcamento se orcSelecionados estiver vazio
               orcSelecionados = [...ultimoOrcamento.exames];
               examesAtuais = orcSelecionados;
               totalBruto = ultimoOrcamento.total || 0;
