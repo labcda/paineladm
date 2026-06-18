@@ -513,43 +513,166 @@
       </section>
 
       <!-- AGENDAMENTO -->
-      <section id="page-agendamento" class="page space-y-5">
-        <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
-            <div class="relative z-10">
-                <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
-                    <i class="fa-regular fa-calendar-check"></i> Agendamento
-                </span>
-                <h2 class="text-2xl font-extrabold leading-tight mb-1">Agende uma coleta</h2>
-                <p class="text-sm text-white/80 leading-relaxed">Escolha a data e veja os horários disponíveis em tempo real.</p>
-            </div>
-        </div>
+      <section id="page-agendar" class="page space-y-5">
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div class="space-y-6">
-            <div class="neumorphic-card">
-                <p class="text-xs font-extrabold text-slate-400 uppercase mb-4"><span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #0F4C5C; color: white; font-size: 10px; margin-right: 8px;">1</span>Seus dados</p>
-                <div class="space-y-4">
-                    <div><label class="block text-xs font-bold text-slate-500 mb-1.5">Nome completo</label><input type="text" id="agen-nome" placeholder="Seu nome" class="w-full bg-white border-none rounded-xl px-4 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);"></div>
-                    <div><label class="block text-xs font-bold text-slate-500 mb-1.5">Data de nascimento</label><input type="date" id="agen-nascimento" class="w-full bg-white border-none rounded-xl px-4 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);"></div>
-                    <div><label class="block text-xs font-bold text-slate-500 mb-1.5">WhatsApp</label><input type="tel" id="agen-telefone" placeholder="(27) 99999-9999" class="w-full bg-white border-none rounded-xl px-4 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);"></div>
+            <!-- HERO -->
+            <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
+                <div style="position:absolute;right:-50px;top:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.12);pointer-events:none;"></div>
+                <div class="relative z-10">
+                    <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
+                        <i class="fa-regular fa-calendar-check"></i> Agendamento
+                    </span>
+                    <h2 class="text-2xl font-extrabold leading-tight mb-1">Agende sua coleta</h2>
+                    <p class="text-sm text-white/80 leading-relaxed">Escolha a data e veja os horários disponíveis em tempo real.</p>
                 </div>
             </div>
-            <div class="neumorphic-card">
-                <p class="text-xs font-extrabold text-slate-400 uppercase mb-4"><span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #0F4C5C; color: white; font-size: 10px; margin-right: 8px;">2</span>Data</p>
+
+            <!-- ETAPA 1 — DADOS DO PACIENTE -->
+            <div class="card-cda p-5" id="agen-step-1">
+                <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">1</span>
+                    Seus dados
+                </p>
                 <div class="space-y-4">
-                    <div><label class="block text-xs font-bold text-slate-500 mb-1.5">Data da coleta</label><input type="date" id="agen-data" class="w-full bg-white border-none rounded-xl px-4 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);"></div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
+                            <i class="fa-regular fa-user text-cda-primary mr-1"></i> Nome completo
+                        </label>
+                        <input type="text" id="agen-nome" placeholder="Digite seu nome completo"
+                            class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
+                            <i class="fa-solid fa-phone text-cda-primary mr-1"></i> Telefone / WhatsApp
+                        </label>
+                        <input type="tel" id="agen-telefone" placeholder="(27) 99999-9999" inputmode="tel" autocomplete="tel"
+                            class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                    </div>
                 </div>
             </div>
-          </div>
-          <div class="space-y-6">
-            <div class="neumorphic-card">
-                <p class="text-xs font-extrabold text-slate-400 uppercase mb-4"><span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #0F4C5C; color: white; font-size: 10px; margin-right: 8px;">3</span>Horário e Confirmação</p>
-                <div id="agen-horarios-grid" class="grid grid-cols-3 gap-2 mb-4"></div>
-                <button class="neumorphic-btn primary" style="width: 100%; margin-top: 16px;" onclick="confirmarAgendamento()">Confirmar Agendamento</button>
+
+            <!-- ETAPA 2 — DATA E PERÍODO -->
+            <div class="card-cda p-5" id="agen-step-2">
+                <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">2</span>
+                    Data e período
+                </p>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
+                            <i class="fa-regular fa-calendar text-cda-primary mr-1"></i> Data da coleta
+                        </label>
+                        <input type="date" id="agen-data"
+                            class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white"
+                            onchange="agenOnDataChange()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1">
+                            <i class="fa-regular fa-sun text-cda-primary mr-1"></i> Período
+                        </label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button type="button" id="agen-btn-manha"
+                                onclick="agenSelecionarPeriodo('manha')"
+                                class="agen-periodo-btn flex flex-col items-center gap-1.5 py-4 rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 font-bold text-sm transition-all">
+                                <i class="fa-regular fa-sun text-xl"></i>
+                                <span>Manhã</span>
+                                <span class="text-[10px] font-medium opacity-70">07:30 – 10:50</span>
+                            </button>
+                            <button type="button" id="agen-btn-tarde"
+                                onclick="agenSelecionarPeriodo('tarde')"
+                                class="agen-periodo-btn flex flex-col items-center gap-1.5 py-4 rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 font-bold text-sm transition-all">
+                                <i class="fa-solid fa-cloud-sun text-xl"></i>
+                                <span>Tarde</span>
+                                <span class="text-[10px] font-medium opacity-70">14:30 – 15:50</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </section>
+
+            <!-- ETAPA 3 — HORÁRIOS DISPONÍVEIS -->
+            <div class="card-cda p-5" id="agen-step-3">
+                <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">3</span>
+                    Horário disponível
+                </p>
+                <div id="agen-horarios-placeholder" class="flex flex-col items-center py-6 text-center">
+                    <div class="w-12 h-12 rounded-2xl bg-cda-light dark:bg-slate-700 flex items-center justify-center mb-3">
+                        <i class="fa-regular fa-clock text-cda-primary text-xl"></i>
+                    </div>
+                    <p class="text-sm font-bold text-slate-400">Selecione a data e o período</p>
+                    <p class="text-xs text-slate-400 mt-1">Os horários livres aparecerão aqui</p>
+                </div>
+                <div id="agen-horarios-loading" class="hidden flex flex-col items-center py-6 gap-3">
+                    <i class="fa-solid fa-spinner fa-spin text-cda-primary text-2xl"></i>
+                    <p class="text-sm text-slate-400 font-medium">Consultando agenda...</p>
+                </div>
+                <div id="agen-horarios-grid" class="hidden grid grid-cols-3 gap-2"></div>
+                <div id="agen-horarios-vazio" class="hidden flex flex-col items-center py-6 text-center">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center mb-3">
+                        <i class="fa-solid fa-calendar-xmark text-amber-500 text-xl"></i>
+                    </div>
+                    <p class="text-sm font-bold text-slate-600 dark:text-slate-300">Sem horários disponíveis</p>
+                    <p class="text-xs text-slate-400 mt-1">Tente outra data ou entre em contato</p>
+                    <a href="https://wa.me/5527998980658" target="_blank" class="mt-3 text-xs font-bold text-cda-primary underline">Falar pelo WhatsApp →</a>
+                </div>
+                <div id="agen-horarios-erro" class="hidden">
+                    <div class="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-3 mb-3">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5 shrink-0"></i>
+                        <p class="text-xs text-amber-700 dark:text-amber-300 leading-relaxed">Não foi possível consultar a agenda em tempo real. Os horários exibidos são estimados — o laboratório confirmará disponibilidade após o agendamento.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ETAPA 4 — RESUMO E CONFIRMAÇÃO -->
+            <div class="card-cda p-5" id="agen-step-4">
+                <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">4</span>
+                    Confirmar agendamento
+                </p>
+                <div id="agen-resumo" class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 mb-4 space-y-2 hidden">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-regular fa-calendar-check text-cda-primary w-4"></i>
+                        <span id="agen-resumo-data" class="text-sm font-bold text-slate-700 dark:text-slate-200"></span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="fa-regular fa-clock text-cda-primary w-4"></i>
+                        <span id="agen-resumo-hora" class="text-sm font-bold text-slate-700 dark:text-slate-200"></span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="fa-regular fa-user text-cda-primary w-4"></i>
+                        <span id="agen-resumo-nome" class="text-sm text-slate-600 dark:text-slate-300"></span>
+                    </div>
+                    <div id="agen-resumo-exames-wrap" class="hidden pt-2 border-t border-slate-200 dark:border-slate-600">
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1.5">Exames solicitados</p>
+                        <div id="agen-resumo-exames" class="text-xs text-slate-500 dark:text-slate-400 space-y-0.5"></div>
+                        <p id="agen-resumo-total" class="text-sm font-extrabold text-cda-primary mt-2"></p>
+                    </div>
+                </div>
+                <div id="agen-resumo-placeholder" class="flex flex-col items-center py-4 text-center mb-4">
+                    <p class="text-xs text-slate-400">Preencha os dados e selecione um horário para confirmar</p>
+                </div>
+                <div id="agen-pagamento-wrap" class="mb-4 hidden">
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2 ml-1">Forma de pagamento</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <label class="agen-pagamento-opcao flex items-center gap-3 rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 p-3 cursor-pointer transition-all">
+                            <input type="radio" name="agen-pagamento" value="Pix, dinheiro ou cartão de débito (40% de desconto)" onchange="agenAtualizarResumo()">
+                            <span class="text-sm font-bold text-slate-700 dark:text-slate-200 leading-snug">Pix, dinheiro ou cartão de débito <span class="text-cda-primary">40% OFF</span></span>
+                        </label>
+                        <label class="agen-pagamento-opcao flex items-center gap-3 rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 p-3 cursor-pointer transition-all">
+                            <input type="radio" name="agen-pagamento" value="Cartão de crédito" onchange="agenAtualizarResumo()">
+                            <span class="text-sm font-bold text-slate-700 dark:text-slate-200 leading-snug">Cartão de crédito</span>
+                        </label>
+                    </div>
+                </div>
+                <button onclick="agenSalvar()" id="agen-btn-salvar"
+                    class="w-full btn-cda-primary py-4 rounded-2xl font-bold flex items-center justify-center gap-2 opacity-50 pointer-events-none">
+                    <i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento
+                </button>
+                <p id="agen-status" class="text-xs text-center mt-3 hidden"></p>
+            </div>
+
+        </section>
 
     </div>
   </main>
@@ -1336,36 +1459,479 @@
     horarioSelecionado = horario;
   }
 
-  function confirmarAgendamento() {
-    const nome = document.getElementById('agen-nome').value.trim();
-    const nascimento = document.getElementById('agen-nascimento').value;
-    const telefone = document.getElementById('agen-telefone').value.trim();
-    const data = document.getElementById('agen-data').value;
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzXj8wLELw524gLe9Vmn2NxIE4pzoBoM4VKQrlQu3hWony8hotzE4aI81dkonyxcuJWzQ/exec';
+        // Token compartilhado com o Apps Script — valida que a requisição veio do app CDA
+        const CDA_TOKEN = 'CDA-2025-xK9#mPqL';
 
-    if (!nome || !nascimento || !telefone || !data || !horarioSelecionado) {
-      showToast('Preencha todos os campos e selecione um horário!', 'error');
-      return;
-    }
+        const FERIADOS_NACIONAIS = ['01-01','04-21','05-01','09-07','10-12','11-02','11-15','11-20','12-25'];
+        const SLOTS_MANHA = ['07:30','08:10','08:50','09:30','10:10','10:50'];
+        const SLOTS_TARDE = ['14:30','15:10','15:50'];
 
-    // Validar nome completo (pelo menos 2 palavras)
-    const palavras = nome.split(/\s+/).filter(p => p.length > 0);
-    if (palavras.length < 2) {
-      showToast('Digite o nome completo (nome e sobrenome)!', 'error');
-      return;
-    }
+        let agenState = { data: null, periodo: null, horario: null, pagamento: null };
 
-    showToast('Agendamento confirmado para ' + data + ' às ' + horarioSelecionado + '!');
+        function agenInicializar() {
+            const inp = document.getElementById('agen-data');
+            if (!inp) return;
+            const hoje = new Date();
+            inp.min = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
+            inp.value = '';
+            agenState = { data: null, periodo: null, horario: null, pagamento: null };
+            ['manha','tarde'].forEach(p => document.getElementById(`agen-btn-${p}`)?.classList.remove('ativo'));
+            document.querySelectorAll('input[name="agen-pagamento"]').forEach(r => { r.checked = false; });
+            const pagamentoWrap = document.getElementById('agen-pagamento-wrap');
+            if (pagamentoWrap) pagamentoWrap.classList.add('hidden');
+            agenEsconderHorarios();
+            agenAtualizarResumo();
+            const nome = _getItem('patient_name');
+            const telefone = _getItem('patient_phone');
+            if (nome) document.getElementById('agen-nome').value = nome;
+            if (telefone) document.getElementById('agen-telefone').value = telefone;
+        }
 
-    document.getElementById('agen-nome').value = '';
-    document.getElementById('agen-nascimento').value = '';
-    document.getElementById('agen-telefone').value = '';
-    document.getElementById('agen-data').value = '';
-    document.querySelectorAll('.horario-btn').forEach(b => b.classList.remove('selected'));
-    horarioSelecionado = null;
+        function agenIsDiaUtil(dataStr) {
+            const [y,m,d] = dataStr.split('-').map(Number);
+            const dia = new Date(y, m-1, d).getDay();
+            if (dia === 0 || dia === 6) return false;
+            const mmdd = `${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            return !FERIADOS_NACIONAIS.includes(mmdd);
+        }
+
+        function agenOnDataChange() {
+            const inp = document.getElementById('agen-data');
+            if (!inp.value) return;
+            if (!agenIsDiaUtil(inp.value)) {
+                showToast('Esta data não está disponível (fim de semana ou feriado).', 'error');
+                inp.value = '';
+                agenState.data = null;
+                return;
+            }
+            agenState.data = inp.value;
+            agenState.horario = null;
+            ['manha','tarde'].forEach(p => document.getElementById(`agen-btn-${p}`)?.classList.remove('ativo'));
+            agenEsconderHorarios();
+            agenAtualizarResumo();
+            if (agenState.periodo) agenBuscarHorarios();
+        }
+
+        function agenSelecionarPeriodo(periodo) {
+            agenState.periodo = periodo;
+            agenState.horario = null;
+            ['manha','tarde'].forEach(p => {
+                document.getElementById(`agen-btn-${p}`)?.classList.toggle('ativo', p === periodo);
+            });
+            agenAtualizarResumo();
+            if (agenState.data) agenBuscarHorarios();
+            else showToast('Selecione a data primeiro.', 'info', 2000);
+        }
+
+        function agenEsconderHorarios() {
+            ['agen-horarios-placeholder','agen-horarios-loading','agen-horarios-grid','agen-horarios-vazio','agen-horarios-erro']
+                .forEach(id => document.getElementById(id)?.classList.add('hidden'));
+            document.getElementById('agen-horarios-placeholder')?.classList.remove('hidden');
+        }
+
+        async function agenBuscarHorarios() {
+            const { data, periodo } = agenState;
+            if (!data || !periodo) return;
+            const slots = periodo === 'manha' ? SLOTS_MANHA : SLOTS_TARDE;
+
+            // Esconde tudo e mostra loading
+            ['agen-horarios-placeholder','agen-horarios-grid','agen-horarios-vazio','agen-horarios-erro']
+                .forEach(id => document.getElementById(id)?.classList.add('hidden'));
+            document.getElementById('agen-horarios-loading')?.classList.remove('hidden');
+
+            // Limpa horário selecionado ao buscar novamente
+            agenState.horario = null;
+            document.querySelectorAll('.agen-horario-btn').forEach(btn => btn.classList.remove('ativo'));
+            agenAtualizarResumo();
+
+            let ocupados = [];
+            let agendaOk = false;
+            try {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 10000);
+                const url = `${APPS_SCRIPT_URL}?action=listar&data=${data}&token=${encodeURIComponent(CDA_TOKEN)}`;
+                console.log('[CDA] Consultando agenda:', url);
+                const resp = await fetch(url, {
+                    method: 'GET',
+                    redirect: 'follow',
+                    signal: controller.signal
+                });
+                clearTimeout(timeout);
+                const texto = await resp.text();
+                console.log('[CDA] Resposta bruta:', texto);
+                const json = JSON.parse(texto);
+                ocupados = Array.isArray(json.ocupados) ? json.ocupados : [];
+                console.log('[CDA] Ocupados:', ocupados);
+                agendaOk = true;
+            } catch(err) {
+                console.warn('[CDA] Agenda indisponível:', err);
+                agendaOk = false;
+            }
+
+            document.getElementById('agen-horarios-loading')?.classList.add('hidden');
+
+            // Se a agenda falhou, mostra todos os horários disponíveis localmente com aviso
+            if (!agendaOk) {
+                const erroEl = document.getElementById('agen-horarios-erro');
+                if (erroEl) erroEl.classList.remove('hidden');
+                // Continua com ocupados vazio (mostra todos os slots filtrados por hora)
+            }
+
+            // Se for hoje, filtrar horários que já passaram (com 30min de margem)
+            const agora = new Date();
+            const [selY, selM, selD] = data.split('-').map(Number);
+            const isHoje = agora.getFullYear() === selY && (agora.getMonth()+1) === selM && agora.getDate() === selD;
+            const minutosAgora = agora.getHours() * 60 + agora.getMinutes() + 30;
+
+            const disponiveis = slots.filter(h => {
+                if (ocupados.includes(h)) return false;
+                if (isHoje) {
+                    const [hh, mm] = h.split(':').map(Number);
+                    return (hh * 60 + mm) > minutosAgora;
+                }
+                return true;
+            });
+
+            if (!disponiveis.length) {
+                document.getElementById('agen-horarios-vazio')?.classList.remove('hidden');
+                return;
+            }
+
+            const grid = document.getElementById('agen-horarios-grid');
+            grid.innerHTML = disponiveis.map(h => {
+                const isOcupado = ocupados.includes(h);
+                return `<button type="button" class="agen-horario-btn${isOcupado ? ' ocupado' : ''}" data-hora="${h}" 
+                    ${isOcupado ? 'disabled title="Horário já reservado"' : `onclick="agenSelecionarHorario('${h}')"`}
+                    >${h}${isOcupado ? '<br><span style="font-size:9px;opacity:0.7">Ocupado</span>' : ''}</button>`;
+            }).join('');
+            grid.classList.remove('hidden');
+        }
+
+        function agenSelecionarHorario(hora) {
+            agenState.horario = hora;
+            document.querySelectorAll('.agen-horario-btn').forEach(btn => {
+                btn.classList.toggle('ativo', btn.dataset.hora === hora);
+            });
+            agenAtualizarResumo();
+            showToast(`Horário ${hora} selecionado`, 'success', 1500);
+        }
+
+        function validarTelefoneBR(valor) {
+            const digitos = String(valor || '').replace(/\D/g, '');
+            if (digitos.length === 10) return /^[1-9]{2}[2-9][0-9]{7}$/.test(digitos);
+            if (digitos.length === 11) return /^[1-9]{2}9[0-9]{8}$/.test(digitos);
+            return false;
+        }
+
+        function agenTotalSelecionado() {
+            if (typeof orcSelecionados === 'undefined' || !Array.isArray(orcSelecionados)) return 0;
+            return orcSelecionados.reduce((s,e) => s + (Number(e.preco) || 0), 0);
+        }
+
+        function agenPagamentoSelecionado() {
+            return document.querySelector('input[name="agen-pagamento"]:checked')?.value || '';
+        }
+
+        function agenAtualizarResumo() {
+            const { data, periodo, horario } = agenState;
+            const nome = document.getElementById('agen-nome')?.value?.trim() || '';
+            const telefone = document.getElementById('agen-telefone')?.value?.trim() || '';
+            const resumo = document.getElementById('agen-resumo');
+            const placeholder = document.getElementById('agen-resumo-placeholder');
+            const btnSalvar = document.getElementById('agen-btn-salvar');
+            const pagamentoWrap = document.getElementById('agen-pagamento-wrap');
+            const pagamento = agenPagamentoSelecionado();
+            agenState.pagamento = pagamento || null;
+            const totalBruto = agenTotalSelecionado();
+            const temExames = typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0;
+            const pronto = data && periodo && horario && nome && telefone && validarTelefoneBR(telefone) && temExames && totalBruto >= 150 && pagamento;
+
+            if (data && periodo && horario) {
+                if (pagamentoWrap) pagamentoWrap.classList.remove('hidden');
+            } else if (pagamentoWrap) {
+                pagamentoWrap.classList.add('hidden');
+            }
+
+            if (data && periodo && horario && nome) {
+                const [y,m,d] = data.split('-').map(Number);
+                const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+                document.getElementById('agen-resumo-data').textContent = `${dataExt} — ${periodo === 'manha' ? 'Manhã' : 'Tarde'}`;
+                document.getElementById('agen-resumo-hora').textContent = `Horário: ${horario}`;
+                document.getElementById('agen-resumo-nome').textContent = nome;
+
+                const examesWrap = document.getElementById('agen-resumo-exames-wrap');
+                if (temExames) {
+                    examesWrap.classList.remove('hidden');
+                    const totalPix = totalBruto * 0.60;
+                    const totalCredito = totalBruto * 0.65;
+                    const pagamentoLinha = pagamento ? `<div class="text-slate-600 dark:text-slate-300 font-bold mt-1">Pagamento escolhido: ${pagamento}</div>` : '';
+                    document.getElementById('agen-resumo-exames').innerHTML = orcSelecionados
+                        .map(ex => `<div class="flex justify-between gap-3"><span>${ex.nome}</span><span class="font-bold whitespace-nowrap">${formatCurrency(ex.preco)}</span></div>`).join('');
+                    document.getElementById('agen-resumo-total').innerHTML =
+                        `<div class="text-slate-500 dark:text-slate-400 line-through text-xs">Particular: ${formatCurrency(totalBruto)}</div>
+                         <div class="text-cda-primary font-extrabold">PIX/Dinheiro/Débito: ${formatCurrency(totalPix)}</div>
+                         <div class="text-slate-600 dark:text-slate-300 font-bold">Cartão de crédito: ${formatCurrency(totalCredito)}</div>
+                         ${pagamentoLinha}`;
+                } else {
+                    examesWrap.classList.add('hidden');
+                }
+
+                resumo.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            } else {
+                resumo.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+            }
+
+            if (pronto) btnSalvar.classList.remove('opacity-50','pointer-events-none');
+            else btnSalvar.classList.add('opacity-50','pointer-events-none');
+        }
+
+        async function agenSalvar() {
+            const { data, periodo, horario } = agenState;
+            const nome     = document.getElementById('agen-nome')?.value?.trim();
+            const telefone = document.getElementById('agen-telefone')?.value?.trim();
+            const pagamento = agenPagamentoSelecionado();
+            const btnSalvar = document.getElementById('agen-btn-salvar');
+            const statusEl  = document.getElementById('agen-status');
+            const totalBruto = agenTotalSelecionado();
+
+            if (!nome)     { showToast('Informe o nome do paciente.', 'error'); return; }
+            if (!telefone) { showToast('Informe o telefone de contato.', 'error'); return; }
+            if (!validarTelefoneBR(telefone)) { showToast('Informe um telefone válido com DDD.', 'error'); return; }
+            if (!data)     { showToast('Selecione a data.', 'error'); return; }
+            if (!periodo)  { showToast('Selecione o período.', 'error'); return; }
+            if (!horario)  { showToast('Selecione o horário.', 'error'); return; }
+            if (typeof orcSelecionados === 'undefined' || !orcSelecionados.length) { showToast('Adicione ao menos um exame à lista antes de agendar.', 'error'); return; }
+            if (totalBruto < 150) { showToast('Olá! Informamos que a coleta agendada está disponível para orçamentos a partir de R$ 150,00.', 'info', 6000); return; }
+            if (!pagamento) { showToast('Selecione a forma de pagamento.', 'error'); return; }
+
+            btnSalvar.disabled = true;
+            btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Verificando disponibilidade...';
+            statusEl.classList.add('hidden');
+
+            // Double-check: verifica se o horário ainda está disponível
+            try {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 6000);
+                const checkResp = await fetch(`${APPS_SCRIPT_URL}?action=listar&data=${data}&token=${CDA_TOKEN}`, { signal: controller.signal });
+                clearTimeout(timeout);
+                const checkJson = await checkResp.json();
+                const ocupados = Array.isArray(checkJson.ocupados) ? checkJson.ocupados : [];
+                if (ocupados.includes(horario)) {
+                    showToast(`O horário ${horario} acabou de ser reservado. Por favor, escolha outro horário.`, 'error', 5000);
+                    btnSalvar.disabled = false;
+                    btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+                    // Rebusca horários para atualizar
+                    agenState.horario = null;
+                    agenAtualizarResumo();
+                    agenBuscarHorarios();
+                    return;
+                }
+            } catch(err) {
+                // Se não conseguir verificar, continua e tenta salvar (o servidor rejeitará se ocupado)
+                console.warn('Verificação prévia falhou, tentando salvar:', err);
+            }
+
+            btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Salvando...';
+
+            let descExames = '';
+            if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
+                const totalPix = totalBruto * 0.60;
+                const totalCredito = totalBruto * 0.65;
+                const linhas = orcSelecionados.map(ex => `${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
+                descExames = `\n\nLista de Exames:\n${linhas}\n\nTotal particular: ${formatCurrency(totalBruto)}\nPIX/Dinheiro/Débito (40% desc): ${formatCurrency(totalPix)}\nCartão de crédito (35% desc): ${formatCurrency(totalCredito)}\nForma de pagamento escolhida: ${pagamento}`;
+            }
+
+            try {
+                // Monta horários ISO para o Google Calendar usar corretamente
+                const [hh, mm] = horario.split(':').map(Number);
+                const startDateTime = `${data}T${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`;
+                const endHh = hh + 1;
+                const endDateTime = `${data}T${String(endHh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`;
+
+                const resp = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: 'criar', token: CDA_TOKEN, data, horario, nome, telefone, pagamento,
+                        startTime: startDateTime,
+                        endTime: endDateTime,
+                        descricao: `Paciente: ${nome}\nTelefone: ${telefone}\nForma de pagamento: ${pagamento}\nOrigem: Aplicativo CDA${descExames}`
+                    })
+                });
+                const json = await resp.json();
+                if (json.ocupado) {
+                    showToast(`O horário ${horario} acabou de ser reservado. Por favor, escolha outro.`, 'error', 5000);
+                    btnSalvar.disabled = false;
+                    btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+                    agenState.horario = null;
+                    agenAtualizarResumo();
+                    agenBuscarHorarios();
+                    return;
+                }
+                if (!json.ok) throw new Error(json.erro || 'Erro ao salvar');
+                btnSalvar.disabled = false;
+                btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+                agenSucesso(nome, data, horario);
+            } catch(err) {
+                console.error('Erro agendamento:', err);
+                agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento);
+            }
+        }
+
+        function agenSucesso(nome, data, horario) {
+            const [y,m,d] = data.split('-').map(Number);
+            const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+            const pagamento = agenPagamentoSelecionado() || '—';
+            const totalBruto = agenTotalSelecionado();
+            const totalPix = totalBruto * 0.60;
+            const totalCredito = totalBruto * 0.65;
+
+            if (nome) localStorage.setItem('patient_name', nome);
+            const telefone = document.getElementById('agen-telefone')?.value?.trim();
+            if (telefone) localStorage.setItem('patient_phone', telefone);
+
+            // Preenche dados do modal
+            document.getElementById('modal-agen-nome').textContent = nome;
+            document.getElementById('modal-agen-data').textContent = `${dataExt} às ${horario}`;
+
+            const qtd = (typeof orcSelecionados !== 'undefined' && orcSelecionados.length)
+                ? `${orcSelecionados.length} exame${orcSelecionados.length > 1 ? 's' : ''} — PIX: ${formatCurrency(totalPix)} / Crédito: ${formatCurrency(totalCredito)}`
+                : '—';
+            document.getElementById('modal-agen-exames').textContent = qtd;
+            document.getElementById('modal-agen-pagamento').textContent = pagamento;
+
+            // Exibe o modal
+            const modal = document.getElementById('modal-agen-confirmacao');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function modalAgenOk() {
+            // Fecha modal
+            const modal = document.getElementById('modal-agen-confirmacao');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+
+            // Limpa orçamento e agendamento
+            orcSelecionados = [];
+            orcRenderSelecionados();
+            agenInicializar();
+
+            const btnSalvar = document.getElementById('agen-btn-salvar');
+            const statusEl  = document.getElementById('agen-status');
+            if (statusEl) statusEl.classList.add('hidden');
+            if (btnSalvar) {
+                btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+                btnSalvar.disabled = false;
+                btnSalvar.classList.remove('opacity-50','pointer-events-none');
+            }
+            const agenTel = document.getElementById('agen-telefone');
+            if (agenTel) agenTel.value = _getItem('patient_phone') || '';
+
+            // Retorna para Home
+            navigateTo('home');
+        }
+
+        function agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento) {
+            const [y,m,d] = data.split('-').map(Number);
+            const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+            const msg = `Olá! Gostaria de agendar uma coleta pelo aplicativo.\n\n*Nome:* ${nome}\n*Telefone:* ${telefone}\n*Data:* ${dataExt}\n*Horário:* ${horario}\n*Forma de pagamento:* ${pagamento || 'Não informada'}${descExames}\n\n_Agendamento via Aplicativo CDA_`;
+            window.open('https://wa.me/5527998980658?text=' + encodeURIComponent(msg), '_blank');
+            const btnSalvar = document.getElementById('agen-btn-salvar');
+            btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+            btnSalvar.disabled = false;
+        }
+
+        function orcIrParaAgendamento() {
+            if (!orcSelecionados.length) {
+                showToast('Selecione ao menos um exame para agendar a coleta.', 'error');
+                return;
+            }
+            const totalBruto = orcSelecionados.reduce((s,e)=>s+e.preco,0);
+            if (totalBruto < 150) {
+                showToast('Olá! Informamos que a coleta agendada está disponível para orçamentos a partir de R$ 150,00.', 'info', 6000);
+                return;
+            }
+            navigateTo('agendar');
+            setTimeout(() => {
+                const nome = _getItem('patient_name');
+                const telefone = _getItem('patient_phone');
+                if (nome) document.getElementById('agen-nome').value = nome;
+                if (telefone) document.getElementById('agen-telefone').value = telefone;
+                agenAtualizarResumo();
+            }, 100);
+        }
+
+        
+
+  function modalAgenOk() {
+    const modal = document.getElementById('modal-agen-confirmacao');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+
+    // Limpa orçamento e agendamento
+    orcSelecionados = [];
+    orcRenderSelecionados();
+    agenInicializar();
+
+    navigateToPage('home');
   }
 
+  // Inicializa data mínima
   document.getElementById('agen-data').min = new Date().toISOString().split('T')[0];
 </script>
+
+
+    <!-- MODAL CONFIRMAÇÃO DE AGENDAMENTO -->
+    <div id="modal-agen-confirmacao" class="fixed inset-0 z-[110] hidden items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-[32px] shadow-2xl overflow-hidden anim-in">
+            <div class="bg-gradient-to-br from-green-400 to-emerald-500 p-8 flex flex-col items-center gap-3">
+                <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-calendar-check text-white text-4xl"></i>
+                </div>
+                <p class="text-white font-extrabold text-xl text-center">Agendamento Confirmado!</p>
+            </div>
+            <div class="p-6 space-y-3">
+                <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-3">
+                    <i class="fa-solid fa-user text-cda-primary w-5 text-center"></i>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wide">Paciente</p>
+                        <p id="modal-agen-nome" class="font-bold text-slate-800 dark:text-white text-sm"></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-3">
+                    <i class="fa-regular fa-calendar text-cda-primary w-5 text-center"></i>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wide">Data e Horário</p>
+                        <p id="modal-agen-data" class="font-bold text-slate-800 dark:text-white text-sm"></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-3">
+                    <i class="fa-solid fa-flask text-cda-primary w-5 text-center"></i>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wide">Exames</p>
+                        <p id="modal-agen-exames" class="font-bold text-slate-800 dark:text-white text-sm"></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-3">
+                    <i class="fa-solid fa-credit-card text-cda-primary w-5 text-center"></i>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wide">Pagamento</p>
+                        <p id="modal-agen-pagamento" class="font-bold text-slate-800 dark:text-white text-sm"></p>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 text-center pt-1">Um evento foi criado na agenda do laboratório. Até lá! 😊</p>
+            </div>
+            <div class="px-6 pb-6">
+                <button onclick="modalAgenOk()" class="w-full btn-cda-primary py-4 rounded-2xl font-extrabold text-base flex items-center justify-center gap-2 shadow-lg shadow-cda-primary/20">
+                    <i class="fa-solid fa-check"></i> OK, entendido!
+                </button>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
