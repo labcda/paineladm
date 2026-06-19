@@ -355,7 +355,7 @@
         <span class="login-form__span">Digite seu login e senha</span>
         <input type="text" class="login-form__input" id="login-usuario" placeholder="Login" autocomplete="username">
         <input type="password" class="login-form__input" id="login-senha" placeholder="Senha" autocomplete="current-password">
-        <button type="button" class="login-button" onclick="fazerLogin()">Acessar</button>
+        <button type="button" class="login-button" onclick="handleLoginClick()">Acessar</button>
         <div class="login-error-msg" id="login-error">Login ou senha incorretos</div>
       </form>
     </div>
@@ -886,6 +886,20 @@ function fazerCadastro() {
       });
     }
   });
+
+  // Wrapper para onclick funcionar com async
+  function handleLoginClick() {
+    console.log('handleLoginClick chamado');
+    fazerLogin().catch(function(err) {
+      console.error('Erro no login:', err);
+      var errorEl = document.getElementById('login-error');
+      if (errorEl) {
+        errorEl.innerText = 'Erro inesperado. Tente novamente.';
+        errorEl.style.display = 'block';
+        errorEl.style.color = '#ef4444';
+      }
+    });
+  }
 
   async function fazerLogin() {
     console.log('fazerLogin chamado');
