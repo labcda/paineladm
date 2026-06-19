@@ -1662,7 +1662,7 @@ function fazerCadastro() {
     btn.style.opacity = '1';
   }
 
-  function agendarColeta() {
+  async function agendarColeta() {
     // Validar se há exames selecionados
     if (orcSelecionados.length === 0) { 
       showToast('Selecione pelo menos um exame!', 'error'); 
