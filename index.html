@@ -355,7 +355,7 @@
         <span class="login-form__span">Digite seu login e senha</span>
         <input type="text" class="login-form__input" id="login-usuario" placeholder="Login" autocomplete="username">
         <input type="password" class="login-form__input" id="login-senha" placeholder="Senha" autocomplete="current-password">
-        <button class="login-button" onclick="fazerLogin()">Acessar</button>
+        <button type="button" class="login-button" onclick="fazerLogin()">Acessar</button>
         <div class="login-error-msg" id="login-error">Login ou senha incorretos</div>
       </form>
     </div>
@@ -823,6 +823,72 @@
   }
 
   // ==================== LOGIN ====================
+  function loginSucesso() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('splashScreen').style.display = 'flex';
+
+    setTimeout(() => {
+      const splash = document.getElementById('splashScreen');
+      splash.classList.add('fade-out');
+      setTimeout(() => {
+        splash.style.display = 'none';
+        document.getElementById('appContainer').style.display = 'grid';
+        document.body.classList.add('app-loaded');
+        carregarExames();
+        gerarHorarios();
+        atualizarMesStats();
+        renderAtividades();
+        contarOrcamentosDoMes();
+      }, 600);
+    }, 2500);
+  }
+function fazerCadastro() {
+    const nome = document.getElementById('signup-name').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
+    const senha = document.getElementById('signup-password').value.trim();
+    const errorEl = document.getElementById('signup-error');
+
+    if (!nome || !email || !senha) {
+      errorEl.innerText = 'Preencha todos os campos';
+      errorEl.style.display = 'block';
+      setTimeout(() => errorEl.style.display = 'none', 3000);
+      return;
+    }
+
+    showToast('Cadastro realizado! Faça login.');
+    toggleLogin();
+  }
+
+  // Inicializar após DOM carregar
+  document.addEventListener('DOMContentLoaded', function() {
+    initLoginVars();
+
+    const senhaInput = document.getElementById('login-senha');
+    const usuarioInput = document.getElementById('login-usuario');
+
+    if (senhaInput) {
+      senhaInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') fazerLogin();
+      });
+    }
+
+    if (usuarioInput) {
+      usuarioInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          senhaInput.focus();
+        }
+      });
+    }
+
+    const signupSenha = document.getElementById('signup-password');
+    if (signupSenha) {
+      signupSenha.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') fazerCadastro();
+      });
+    }
+  });
+
   async function fazerLogin() {
     console.log('fazerLogin chamado');
     const usuarioEl = document.getElementById('login-usuario');
