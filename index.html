@@ -26,7 +26,6 @@
   </script>
 
   <style>
-    /* ========== RESET & BASE ========== */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --cda-primary: #49BCBE; --cda-primary-dark: #37A7AA; --cda-primary-light: #E8F8F8;
@@ -37,7 +36,6 @@
     }
     body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; background: var(--neumorphic-bg); }
 
-    /* ========== LOGIN NEUMORFICO ========== */
     #loginScreen {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%);
@@ -139,7 +137,6 @@
       display: none; font-family: 'Montserrat', sans-serif;
     }
 
-    /* ========== SPLASH SCREEN ========== */
     #splashScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%);
       z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center;
@@ -157,13 +154,11 @@
     @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes progress { 0% { width: 0%; } 100% { width: 100%; } }
 
-    /* ========== LAYOUT APP ========== */
     body.app-loaded { overflow: hidden; height: 100vh; padding: 3rem 0 0 3rem; }
     a { text-decoration: none; color: inherit; }
     ul { list-style: none; }
     .site-wrap { display: grid; grid-template-columns: 280px 1fr; height: calc(100vh - 3rem); border-radius: 1.5rem 1.5rem 0 0; overflow: hidden; }
 
-    /* SIDEBAR */
     .site-nav { background: #0b121b; color: white; display: flex; flex-direction: column; border-radius: 1.5rem 0 0 0; overflow-y: auto; }
     .brand { display: flex; align-items: center; justify-content: space-between; font-size: 1.3rem; padding: 1.75rem 2rem 1.25rem; border-bottom: 0.5px solid rgba(255,255,255,0.07); position: relative; }
     .brand svg { fill: white; width: 16px; height: 16px; }
@@ -177,14 +172,12 @@
     .note h3 { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; }
     .note p { color: #717783; font-size: 0.78rem; line-height: 1.55; }
 
-    /* MAIN */
     main { background: #ebecee; border-radius: 1.5rem 0 0 0; margin-left: -1.5rem; display: flex; flex-direction: column; overflow: hidden; position: relative; }
     main > header { padding: 2.5rem 3rem 1.5rem; background: #ebecee; border-bottom: 1px solid #d5d6d9; }
     .breadcrumbs { font-size: 0.75rem; color: #8c939e; margin-bottom: 0.4rem; }
     h1.title { font-size: 1.6rem; font-weight: 700; color: #101620; margin-bottom: 0; }
     .content-area { flex: 1; padding: 2rem 3rem; overflow-y: auto; background: #f8fafc; }
 
-    /* BUTTONS */
     .neumorphic-btn { font-family: 'Montserrat', sans-serif; font-size: 18px; color: #6C7587; background-color: var(--neumorphic-bg); border: 3px solid rgba(255,255,255,0); border-radius: 40px; padding: 0 28px; height: 54px; cursor: pointer; transition: all 250ms ease-in-out; box-shadow: 8px 8px 12px -2px rgba(72,79,96,0.4), -6px -6px 12px -1px rgba(255,255,255,1); display: inline-flex; align-items: center; justify-content: center; gap: 8px; outline: none; position: relative; }
     .neumorphic-btn:hover { box-shadow: none; border-color: rgba(255,255,255,0.5); }
     .neumorphic-btn:active { box-shadow: inset -4px -4px 6px -1px rgba(255,255,255,1), inset 2px 2px 8px -1px rgba(72,79,96,0.5); border-color: rgba(255,255,255,0); }
@@ -194,10 +187,9 @@
     .neumorphic-btn.primary:active { box-shadow: inset 4px 4px 8px rgba(15,76,92,0.3), inset -2px -2px 6px rgba(255,255,255,0.5); }
     .neumorphic-btn-lg { padding: 0 40px; height: 60px; font-size: 16px; border-radius: 50px; }
 
-    /* CARDS */
     .neumorphic-card { background-color: var(--neumorphic-bg); border-radius: 24px; padding: 24px; box-shadow: 8px 8px 12px -2px rgba(72,79,96,0.4), -6px -6px 12px -1px rgba(255,255,255,1); margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.3); }
+    .card-cda { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.04); }
 
-    /* HOME */
     .home-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px; }
     .stat-card { background-color: var(--neumorphic-bg); border-radius: 20px; padding: 24px; box-shadow: 8px 8px 12px -2px rgba(72,79,96,0.4), -6px -6px 12px -1px rgba(255,255,255,1); text-align: center; transition: all 300ms ease-in-out; }
     .stat-card:hover { transform: translateY(-5px); box-shadow: 12px 12px 16px -2px rgba(72,79,96,0.3), -8px -8px 16px -1px rgba(255,255,255,1); }
@@ -206,7 +198,6 @@
     .stat-label { font-size: 0.9rem; color: #8c939e; font-weight: 500; }
     .stat-mes { font-size: 0.7rem; color: #0F4C5C; font-weight: 700; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
 
-    /* ATIVIDADES */
     .atividade-item { display: flex; align-items: center; padding: 12px; border-radius: 12px; margin-bottom: 10px; transition: all 0.2s; }
     .atividade-item:hover { transform: translateX(4px); }
     .atividade-icon { margin-right: 12px; font-size: 1.1rem; }
@@ -214,16 +205,13 @@
     .atividade-titulo { font-weight: 600; color: #101620; font-size: 0.85rem; }
     .atividade-tempo { font-size: 0.75rem; color: #8c939e; }
 
-    /* PAGES */
     .page { display: none; }
     .page.active { display: block; animation: fadeIn 0.4s ease-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* TOAST */
     #cda-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: #0F4C5C; color: white; padding: 12px 22px; border-radius: 100px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; box-shadow: 8px 8px 12px -2px rgba(15,76,92,0.4); z-index: 99999; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
     #cda-toast.toast-show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* AUTOCOMPLETE */
     .autocomplete-container { position: relative; }
     .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-height: 300px; overflow-y: auto; z-index: 1000; margin-top: 8px; display: none; }
     .autocomplete-list.show { display: block; }
@@ -234,7 +222,6 @@
     .autocomplete-item-codigo { font-size: 0.75rem; color: #8c939e; margin-top: 2px; }
     .autocomplete-item-preco { font-size: 0.85rem; color: #0F4C5C; font-weight: 700; margin-top: 2px; }
 
-    /* EXAMES */
     .exame-selecionado-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: white; border-radius: 10px; margin-bottom: 6px; box-shadow: 1px 1px 4px rgba(0,0,0,0.05); transition: all 0.2s; }
     .exame-selecionado-item:hover { transform: translateX(3px); }
     .exame-info { flex: 1; min-width: 0; }
@@ -246,7 +233,6 @@
     .btn-limpar { background: transparent; color: #8c939e; border: 1px solid #d5d6d9; border-radius: 20px; padding: 6px 14px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; }
     .btn-limpar:hover { background: #fee2e2; color: #ef4444; border-color: #ef4444; }
 
-    /* DESCONTOS */
     .desconto-card { background: #E8F8F8; border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s; }
     .desconto-card:hover { transform: translateX(3px); box-shadow: 2px 2px 8px rgba(0,0,0,0.08); }
     .desconto-info { display: flex; align-items: center; gap: 10px; }
@@ -258,20 +244,114 @@
     .desconto-preco { color: #101620; font-weight: 700; font-size: 1rem; }
     .desconto-parcela { color: #8c939e; font-size: 0.75rem; }
 
-    /* IA AREA */
     .ia-area { background: linear-gradient(135deg, rgba(15,76,92,0.05) 0%, rgba(73,188,190,0.05) 100%); border: 2px dashed #37A7AA; border-radius: 16px; padding: 20px; text-align: center; margin-top: 16px; transition: all 0.3s; }
     .ia-area:hover { border-color: #0F4C5C; background: linear-gradient(135deg, rgba(15,76,92,0.08) 0%, rgba(73,188,190,0.08) 100%); }
     .ia-area i { font-size: 2rem; color: #37A7AA; margin-bottom: 8px; }
     .ia-area h4 { font-size: 0.9rem; font-weight: 700; color: #0F4C5C; margin-bottom: 4px; }
     .ia-area p { font-size: 0.75rem; color: #8c939e; }
 
-    /* HORARIOS */
+    /* ===== CORRECAO BOTOES MANHA/TARDE ===== */
+    .agen-periodo-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 16px; border-radius: 16px; border: 2px solid #e2e8f0;
+      background: #f8fafc; color: #64748b; font-weight: 700; font-size: 0.9rem;
+      cursor: pointer; transition: all 0.25s ease; font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .agen-periodo-btn:hover {
+      border-color: #49BCBE; background: #E8F8F8; color: #0F4C5C;
+      transform: translateY(-2px); box-shadow: 0 4px 12px rgba(73,188,190,0.2);
+    }
+    .agen-periodo-btn.ativo {
+      background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%) !important;
+      color: white !important; border-color: #0F4C5C !important;
+      box-shadow: 0 6px 20px rgba(15,76,92,0.3); transform: translateY(-2px);
+    }
+    .agen-periodo-btn.ativo span { color: rgba(255,255,255,0.85) !important; }
+
     .horario-btn, .agen-horario-btn { padding: 10px 8px; border-radius: 12px; border: none; background: white; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; box-shadow: 2px 2px 8px rgba(0,0,0,0.08); }
     .horario-btn:hover, .agen-horario-btn:hover { background: #E8F8F8; color: #0F4C5C; }
     .horario-btn.selected, .agen-horario-btn.ativo { background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); color: white; }
     .horario-btn.ocupado, .agen-horario-btn.ocupado { background: #fee2e2; color: #ef4444; cursor: not-allowed; opacity: 0.6; }
 
-    
+    .send {
+      position: relative; display: flex; align-items: center; color: #353535;
+      background: #e0e5ec; border: none; font-family: 'Plus Jakarta Sans', sans-serif;
+      padding: 0; border-radius: 3rem; font-size: 1.2rem; font-weight: 600;
+      cursor: pointer; transition: transform 0.4s ease-out;
+      box-shadow: 9px 9px 16px 0px #a3b1c6, -9px -9px 16px 0px rgba(255, 255, 255, 0.6);
+    }
+    .send:hover { transform: translateY(-2px); }
+    .send:hover .icon svg { transform: translate(-5px, 5px); }
+    .send .text { height: 4.5rem; padding: 1rem 1rem 1rem 2rem; display: flex; align-items: center; }
+    .send .icon { display: block; padding: 1rem; box-shadow: 9px 9px 16px 0px #a3b1c6, -9px -9px 16px 0px rgba(255, 255, 255, 0.6); border-radius: 50%; width: 4.5rem; height: 4.5rem; display: flex; justify-content: center; align-items: center; background: #e0e5ec; }
+    .send .icon svg { fill: currentColor; width: 2rem; height: 2rem; transition: transform 0.4s ease-out; }
+    .send:disabled { opacity: 0.5; cursor: not-allowed; }
+    .send:disabled .icon svg { transform: none !important; }
+
+    /* ===== RECOLETAS ===== */
+    .recoleta-card {
+      background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.04);
+      transition: all 0.2s ease;
+    }
+    .recoleta-card:hover { transform: translateX(4px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .recoleta-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .recoleta-codigo { font-size: 0.7rem; color: #8c939e; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .recoleta-nome { font-size: 1rem; font-weight: 700; color: #101620; }
+    .recoleta-badge {
+      display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px;
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .recoleta-badge.interno { background: #E8F8F8; color: #0F4C5C; }
+    .recoleta-badge.externo { background: #fef3c7; color: #92400e; }
+    .recoleta-externo-lab { font-size: 0.75rem; color: #64748b; font-weight: 600; }
+    .recoleta-exames { font-size: 0.8rem; color: #475569; line-height: 1.5; margin-top: 6px; }
+    .recoleta-motivo { font-size: 0.75rem; color: #8c939e; margin-top: 6px; font-style: italic; }
+    .recoleta-obs { font-size: 0.75rem; color: #64748b; margin-top: 4px; background: #f8fafc; padding: 8px; border-radius: 8px; }
+
+    .recoleta-form-field {
+      background: white; border: 1px solid #e2e8f0; border-radius: 12px;
+      padding: 12px 14px; font-size: 0.9rem; color: #101620; width: 100%;
+      transition: all 0.2s; outline: none; font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .recoleta-form-field:focus { border-color: #49BCBE; box-shadow: 0 0 0 3px rgba(73,188,190,0.15); }
+    .recoleta-form-field::placeholder { color: #a0a5a8; }
+
+    .recoleta-radio-group { display: flex; gap: 10px; flex-wrap: wrap; }
+    .recoleta-radio-label {
+      display: flex; align-items: center; gap: 8px; padding: 10px 16px;
+      border-radius: 12px; border: 2px solid #e2e8f0; background: #f8fafc;
+      cursor: pointer; transition: all 0.2s; font-size: 0.85rem; font-weight: 600; color: #475569;
+    }
+    .recoleta-radio-label:hover { border-color: #49BCBE; background: #E8F8F8; }
+    .recoleta-radio-label input[type="radio"] { accent-color: #0F4C5C; }
+    .recoleta-radio-label.ativo {
+      background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%);
+      color: white; border-color: #0F4C5C;
+    }
+    .recoleta-radio-label.ativo input[type="radio"] { accent-color: white; }
+
+    .recoleta-externo-options {
+      display: none; gap: 8px; flex-wrap: wrap; margin-top: 8px;
+    }
+    .recoleta-externo-options.show { display: flex; }
+    .recoleta-externo-btn {
+      padding: 8px 14px; border-radius: 10px; border: 2px solid #e2e8f0;
+      background: white; cursor: pointer; font-size: 0.8rem; font-weight: 600;
+      color: #475569; transition: all 0.2s;
+    }
+    .recoleta-externo-btn:hover { border-color: #49BCBE; background: #E8F8F8; }
+    .recoleta-externo-btn.ativo { background: #0F4C5C; color: white; border-color: #0F4C5C; }
+
+    .btn-cda-primary {
+      background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%);
+      color: white; border: none; border-radius: 16px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s; font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .btn-cda-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(15,76,92,0.3); }
+
+    .hidden { display: none !important; }
+
     #login-usuario, #login-senha, #signup-name, #signup-email, #signup-password,
     #orc-paciente, #agen-nome, #agen-telefone,
     #config-login, #config-senha, #config-senha-confirm,
@@ -283,63 +363,7 @@
 
     @media (max-width: 1024px) { .home-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 768px) { .home-grid { grid-template-columns: 1fr; } body.app-loaded { padding: 1rem 0 0 1rem; } .site-wrap { grid-template-columns: 1fr; } .site-nav { display: none; } }
-
-    /* ===== SEND BUTTON (Neumorphic) ===== */
-    .send {
-      position: relative;
-      display: flex;
-      align-items: center;
-      color: #353535;
-      background: #e0e5ec;
-      border: none;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      padding: 0;
-      border-radius: 3rem;
-      font-size: 1.2rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.4s ease-out;
-      box-shadow: 9px 9px 16px 0px #a3b1c6, -9px -9px 16px 0px rgba(255, 255, 255, 0.6);
-    }
-    .send:hover {
-      transform: translateY(-2px);
-    }
-    .send:hover .icon svg {
-      transform: translate(-5px, 5px);
-    }
-    .send .text {
-      height: 4.5rem;
-      padding: 1rem 1rem 1rem 2rem;
-      display: flex;
-      align-items: center;
-    }
-    .send .icon {
-      display: block;
-      padding: 1rem;
-      box-shadow: 9px 9px 16px 0px #a3b1c6, -9px -9px 16px 0px rgba(255, 255, 255, 0.6);
-      border-radius: 50%;
-      width: 4.5rem;
-      height: 4.5rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #e0e5ec;
-    }
-    .send .icon svg {
-      fill: currentColor;
-      width: 2rem;
-      height: 2rem;
-      transition: transform 0.4s ease-out;
-    }
-    .send:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .send:disabled .icon svg {
-      transform: none !important;
-    }
   </style>
-<base target="_blank">
 <base target="_blank">
 </head>
 <body>
@@ -347,8 +371,6 @@
 <!-- ==================== LOGIN NEUMORFICO ==================== -->
 <div id="loginScreen">
   <div class="login-main">
-
-    <!-- FAÇA SEU LOGIN (Sign In - agora à esquerda) -->
     <div class="login-container login-a-container" id="login-a-container">
       <form class="login-form" id="login-a-form" onsubmit="return false;">
         <h2 class="login-title">Faça seu login</h2>
@@ -359,8 +381,6 @@
         <div class="login-error-msg" id="login-error">Login ou senha incorretos</div>
       </form>
     </div>
-
-    <!-- SIGN UP (Cadastro - agora à direita, escondido inicialmente) -->
     <div class="login-container login-b-container" id="login-b-container">
       <form class="login-form" id="login-b-form" onsubmit="return false;">
         <h2 class="login-title">Create Account</h2>
@@ -377,26 +397,22 @@
         <div class="login-error-msg" id="signup-error">Preencha todos os campos</div>
       </form>
     </div>
-
-    <!-- SWITCH PANEL -->
     <div class="login-switch" id="login-switch-cnt">
       <div class="login-switch__circle"></div>
       <div class="login-switch__circle login-switch__circle--t"></div>
-
       <div class="login-switch__container" id="login-switch-c1">
         <h2 class="login-title">Seja Bem Vindo</h2>
         <p class="login-description">Esse é o sistema de orçamentos e recoletas do Laboratório CDA.</p>
       </div>
-
       <div class="login-switch__container is-hidden" id="login-switch-c2">
         <h2 class="login-title">Hello Friend!</h2>
         <p class="login-description">Enter your personal details and start journey with us</p>
         <button class="login-switch__button" onclick="toggleLogin()">SIGN UP</button>
       </div>
     </div>
-
   </div>
 </div>
+
 <!-- ==================== SPLASH SCREEN ==================== -->
 <div id="splashScreen">
   <div class="splash-content">
@@ -426,7 +442,7 @@
       <li class="active" data-page="home"><a href="#"><i class="fa-solid fa-home mr-2"></i> Home</a></li>
       <li data-page="orcamento"><a href="#"><i class="fa-solid fa-calculator mr-2"></i> Orçamentos</a></li>
       <li data-page="agendamento"><a href="#"><i class="fa-regular fa-calendar-check mr-2"></i> Agendamento</a></li>
-      <li><a href="#"><i class="fa-solid fa-vial mr-2"></i> Exames</a></li>
+      <li data-page="recoletas"><a href="#"><i class="fa-solid fa-vial mr-2"></i> Recoletas</a></li>
       <li><a href="#"><i class="fa-solid fa-chart-line mr-2"></i> Relatórios</a></li>
       <li data-page="configuracoes" id="nav-configuracoes"><a href="#" onclick="abrirConfiguracoes(event)"><i class="fa-solid fa-gear mr-2"></i> Configurações</a></li>
     </ul>
@@ -466,7 +482,6 @@
             <div class="stat-mes" id="stat-mes-exames">Junho 2026</div>
           </div>
         </div>
-
         <div class="neumorphic-card">
           <h2 style="font-size: 1.3rem; font-weight: 700; color: #101620; margin-bottom: 20px;">
             <i class="fa-solid fa-clock-rotate-left mr-2" style="color: #0F4C5C;"></i> Atividades Recentes
@@ -486,19 +501,14 @@
                 <p class="text-sm text-white/80 leading-relaxed">Selecione os exames do pedido médico e veja o total estimado na tabela particular.</p>
             </div>
         </div>
-
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div class="space-y-6">
             <div class="neumorphic-card">
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                    <i class="fa-solid fa-user mr-1"></i> Nome do Paciente
-                </label>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-user mr-1"></i> Nome do Paciente</label>
                 <input type="text" id="orc-paciente" placeholder="Digite o nome completo do paciente..." class="w-full bg-white border-none rounded-2xl pl-5 pr-5 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);">
             </div>
             <div class="neumorphic-card">
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                    <i class="fa-solid fa-magnifying-glass mr-1"></i> Buscar exame
-                </label>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-magnifying-glass mr-1"></i> Buscar exame</label>
                 <div class="autocomplete-container">
                     <input type="text" id="orc-search" placeholder="Digite o nome ou código..." autocomplete="off" class="w-full bg-white border-none rounded-2xl pl-5 pr-12 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);">
                     <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fa-solid fa-search"></i></div>
@@ -515,14 +525,10 @@
             <div class="neumorphic-card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                     <h3 class="font-bold text-slate-800">Exames selecionados</h3>
-                    <button class="btn-limpar" onclick="limparExames()" id="btn-limpar" style="display: none;">
-                        <i class="fa-solid fa-trash-can"></i> Limpar
-                    </button>
+                    <button class="btn-limpar" onclick="limparExames()" id="btn-limpar" style="display: none;"><i class="fa-solid fa-trash-can"></i> Limpar</button>
                 </div>
                 <div id="orc-selecionados" class="space-y-2 mb-4">
-                    <div id="orc-empty-state" class="flex flex-col items-center py-6 text-center">
-                        <p class="text-sm font-bold text-slate-500">Nenhum exame selecionado</p>
-                    </div>
+                    <div id="orc-empty-state" class="flex flex-col items-center py-6 text-center"><p class="text-sm font-bold text-slate-500">Nenhum exame selecionado</p></div>
                 </div>
                 <div style="border-top: 1px solid rgba(72, 79, 96, 0.2); padding-top: 12px; margin-bottom: 12px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -532,56 +538,27 @@
                 </div>
                 <div id="descontos-area" style="display: none;">
                     <div class="desconto-card">
-                        <div class="desconto-info">
-                            <div class="desconto-icone">📱</div>
-                            <div>
-                                <div class="desconto-titulo">Pix, dinheiro ou débito</div>
-                                <div class="desconto-subtitulo">à vista</div>
-                            </div>
-                        </div>
-                        <div class="desconto-valores">
-                            <div class="desconto-off">40% OFF</div>
-                            <div class="desconto-preco" id="preco-pix">R$ 0,00</div>
-                        </div>
+                        <div class="desconto-info"><div class="desconto-icone">📱</div><div><div class="desconto-titulo">Pix, dinheiro ou débito</div><div class="desconto-subtitulo">à vista</div></div></div>
+                        <div class="desconto-valores"><div class="desconto-off">40% OFF</div><div class="desconto-preco" id="preco-pix">R$ 0,00</div></div>
                     </div>
                     <div class="desconto-card">
-                        <div class="desconto-info">
-                            <div class="desconto-icone">💳</div>
-                            <div>
-                                <div class="desconto-titulo">Cartão de crédito</div>
-                                <div class="desconto-subtitulo" id="parcelas-cc">10x de R$ 0,00</div>
-                            </div>
-                        </div>
-                        <div class="desconto-valores">
-                            <div class="desconto-off">35% OFF</div>
-                            <div class="desconto-preco" id="preco-cc">R$ 0,00</div>
-                        </div>
+                        <div class="desconto-info"><div class="desconto-icone">💳</div><div><div class="desconto-titulo">Cartão de crédito</div><div class="desconto-subtitulo" id="parcelas-cc">10x de R$ 0,00</div></div></div>
+                        <div class="desconto-valores"><div class="desconto-off">35% OFF</div><div class="desconto-preco" id="preco-cc">R$ 0,00</div></div>
                     </div>
                 </div>
             </div>
           </div>
         </div>
-
         <div style="display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;">
-          <button class="neumorphic-btn primary neumorphic-btn-lg" onclick="compartilharOrcamento()">
-            <i class="fa-brands fa-whatsapp"></i> Compartilhar
-          </button>
-          <button class="neumorphic-btn primary neumorphic-btn-lg" onclick="baixarPDF()">
-            <i class="fa-solid fa-file-pdf"></i> Baixar PDF
-          </button>
-          <button class="neumorphic-btn neumorphic-btn-lg" id="btn-agendar-coleta" onclick="agendarColetaComLoading(this)">
-            <i class="fa-regular fa-calendar-check"></i> Agendar Coleta
-          </button>
-          <button class="neumorphic-btn neumorphic-btn-lg" onclick="novoOrcamento()">
-            <i class="fa-solid fa-rotate-right"></i> Novo Orçamento
-          </button>
+          <button class="neumorphic-btn primary neumorphic-btn-lg" onclick="compartilharOrcamento()"><i class="fa-brands fa-whatsapp"></i> Compartilhar</button>
+          <button class="neumorphic-btn primary neumorphic-btn-lg" onclick="baixarPDF()"><i class="fa-solid fa-file-pdf"></i> Baixar PDF</button>
+          <button class="neumorphic-btn neumorphic-btn-lg" id="btn-agendar-coleta" onclick="agendarColetaComLoading(this)"><i class="fa-regular fa-calendar-check"></i> Agendar Coleta</button>
+          <button class="neumorphic-btn neumorphic-btn-lg" onclick="novoOrcamento()"><i class="fa-solid fa-rotate-right"></i> Novo Orçamento</button>
         </div>
       </section>
 
       <!-- AGENDAMENTO -->
       <section id="page-agendamento" class="page space-y-5">
-
-            <!-- HERO -->
             <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
                 <div style="position:absolute;right:-50px;top:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.12);pointer-events:none;"></div>
                 <div class="relative z-10">
@@ -592,127 +569,76 @@
                     <p class="text-sm text-white/80 leading-relaxed">Escolha a data e veja os horários disponíveis em tempo real.</p>
                 </div>
             </div>
-
-            <!-- ETAPA 1 — DADOS DO PACIENTE -->
             <div class="card-cda p-5" id="agen-step-1">
                 <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
-                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">1</span>
-                    Dados do paciente
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">1</span> Dados do paciente
                 </p>
-                <div id="agen-resumo-paciente" class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 space-y-2">
-                    <div class="flex items-center gap-3">
-                        <i class="fa-regular fa-user text-cda-primary w-4"></i>
-                        <span id="agen-resumo-paciente-nome" class="text-sm font-bold text-slate-700 dark:text-slate-200">Carregando...</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-vial text-cda-primary w-4"></i>
-                        <span id="agen-resumo-paciente-exames" class="text-sm text-slate-600 dark:text-slate-300">Carregando...</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-money-bill text-cda-primary w-4"></i>
-                        <span id="agen-resumo-paciente-valor" class="text-sm font-bold text-cda-primary">Carregando...</span>
-                    </div>
+                <div id="agen-resumo-paciente" class="bg-slate-50 rounded-2xl p-4 space-y-2">
+                    <div class="flex items-center gap-3"><i class="fa-regular fa-user text-cda-primary w-4"></i><span id="agen-resumo-paciente-nome" class="text-sm font-bold text-slate-700">Carregando...</span></div>
+                    <div class="flex items-center gap-3"><i class="fa-solid fa-vial text-cda-primary w-4"></i><span id="agen-resumo-paciente-exames" class="text-sm text-slate-600">Carregando...</span></div>
+                    <div class="flex items-center gap-3"><i class="fa-solid fa-money-bill text-cda-primary w-4"></i><span id="agen-resumo-paciente-valor" class="text-sm font-bold text-cda-primary">Carregando...</span></div>
                 </div>
-                <!-- Inputs hidden para manter compatibilidade -->
-                <input type="hidden" id="agen-nome" value="">
-                <input type="hidden" id="agen-telefone" value="">
+                <input type="hidden" id="agen-nome" value=""><input type="hidden" id="agen-telefone" value="">
             </div>
-
-            <!-- ETAPA 2 — DATA E PERÍODO -->
             <div class="card-cda p-5" id="agen-step-2">
                 <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
-                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">2</span>
-                    Data e período
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">2</span> Data e período
                 </p>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
-                            <i class="fa-regular fa-calendar text-cda-primary mr-1"></i> Data da coleta
-                        </label>
-                        <input type="date" id="agen-data"
-                            class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white"
-                            onchange="agenOnDataChange(); agenAtualizarResumo();">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1"><i class="fa-regular fa-calendar text-cda-primary mr-1"></i> Data da coleta</label>
+                        <input type="date" id="agen-data" class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary" onchange="agenOnDataChange(); agenAtualizarResumo();">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1">
-                            <i class="fa-regular fa-sun text-cda-primary mr-1"></i> Período
-                        </label>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1"><i class="fa-regular fa-sun text-cda-primary mr-1"></i> Período</label>
                         <div class="grid grid-cols-2 gap-3">
-                            <button type="button" id="agen-btn-manha"
-                                onclick="agenSelecionarPeriodo('manha')"
-                                class="agen-periodo-btn flex flex-col items-center gap-1.5 py-4 rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 font-bold text-sm transition-all">
-                                <i class="fa-regular fa-sun text-xl"></i>
-                                <span>Manhã</span>
-                                <span class="text-[10px] font-medium opacity-70">07:30 – 10:50</span>
+                            <button type="button" id="agen-btn-manha" onclick="agenSelecionarPeriodo('manha')" class="agen-periodo-btn">
+                                <i class="fa-regular fa-sun text-xl"></i><span>Manhã</span><span style="font-size:10px;font-weight:500;opacity:0.7">07:30 – 10:50</span>
                             </button>
-                            <button type="button" id="agen-btn-tarde"
-                                onclick="agenSelecionarPeriodo('tarde')"
-                                class="agen-periodo-btn flex flex-col items-center gap-1.5 py-4 rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 font-bold text-sm transition-all">
-                                <i class="fa-solid fa-cloud-sun text-xl"></i>
-                                <span>Tarde</span>
-                                <span class="text-[10px] font-medium opacity-70">14:30 – 15:50</span>
+                            <button type="button" id="agen-btn-tarde" onclick="agenSelecionarPeriodo('tarde')" class="agen-periodo-btn">
+                                <i class="fa-solid fa-cloud-sun text-xl"></i><span>Tarde</span><span style="font-size:10px;font-weight:500;opacity:0.7">14:30 – 15:50</span>
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- ETAPA 3 — HORÁRIOS DISPONÍVEIS -->
             <div class="card-cda p-5" id="agen-step-3">
                 <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
-                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">3</span>
-                    Horário disponível
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">3</span> Horário disponível
                 </p>
                 <div id="agen-horarios-placeholder" class="flex flex-col items-center py-6 text-center">
-                    <div class="w-12 h-12 rounded-2xl bg-cda-light dark:bg-slate-700 flex items-center justify-center mb-3">
-                        <i class="fa-regular fa-clock text-cda-primary text-xl"></i>
-                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-cda-light flex items-center justify-center mb-3"><i class="fa-regular fa-clock text-cda-primary text-xl"></i></div>
                     <p class="text-sm font-bold text-slate-400">Selecione a data e o período</p>
                     <p class="text-xs text-slate-400 mt-1">Os horários livres aparecerão aqui</p>
                 </div>
                 <div id="agen-horarios-loading" class="hidden flex flex-col items-center py-6 gap-3">
-                    <i class="fa-solid fa-spinner fa-spin text-cda-primary text-2xl"></i>
-                    <p class="text-sm text-slate-400 font-medium">Consultando agenda...</p>
+                    <i class="fa-solid fa-spinner fa-spin text-cda-primary text-2xl"></i><p class="text-sm text-slate-400 font-medium">Consultando agenda...</p>
                 </div>
                 <div id="agen-horarios-grid" class="hidden grid grid-cols-3 gap-2"></div>
                 <div id="agen-horarios-vazio" class="hidden flex flex-col items-center py-6 text-center">
-                    <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center mb-3">
-                        <i class="fa-solid fa-calendar-xmark text-amber-500 text-xl"></i>
-                    </div>
-                    <p class="text-sm font-bold text-slate-600 dark:text-slate-300">Sem horários disponíveis</p>
+                    <div class="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center mb-3"><i class="fa-solid fa-calendar-xmark text-amber-500 text-xl"></i></div>
+                    <p class="text-sm font-bold text-slate-600">Sem horários disponíveis</p>
                     <p class="text-xs text-slate-400 mt-1">Tente outra data ou entre em contato</p>
                     <a href="https://wa.me/5527998980658" target="_blank" class="mt-3 text-xs font-bold text-cda-primary underline">Falar pelo WhatsApp →</a>
                 </div>
                 <div id="agen-horarios-erro" class="hidden">
-                    <div class="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-3 mb-3">
+                    <div class="flex items-start gap-3 bg-amber-50 rounded-2xl p-3 mb-3">
                         <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5 shrink-0"></i>
-                        <p class="text-xs text-amber-700 dark:text-amber-300 leading-relaxed">Não foi possível consultar a agenda em tempo real. Os horários exibidos são estimados — o laboratório confirmará disponibilidade após o agendamento.</p>
+                        <p class="text-xs text-amber-700 leading-relaxed">Não foi possível consultar a agenda em tempo real. Os horários exibidos são estimados.</p>
                     </div>
                 </div>
             </div>
-
-            <!-- ETAPA 4 — RESUMO E CONFIRMAÇÃO -->
             <div class="card-cda p-5" id="agen-step-4">
                 <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
-                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">4</span>
-                    Confirmar agendamento
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">4</span> Confirmar agendamento
                 </p>
-                <div id="agen-resumo" class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 mb-4 space-y-2 hidden">
-                    <div class="flex items-center gap-3">
-                        <i class="fa-regular fa-calendar-check text-cda-primary w-4"></i>
-                        <span id="agen-resumo-data" class="text-sm font-bold text-slate-700 dark:text-slate-200"></span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <i class="fa-regular fa-clock text-cda-primary w-4"></i>
-                        <span id="agen-resumo-hora" class="text-sm font-bold text-slate-700 dark:text-slate-200"></span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <i class="fa-regular fa-user text-cda-primary w-4"></i>
-                        <span id="agen-resumo-nome" class="text-sm text-slate-600 dark:text-slate-300"></span>
-                    </div>
-                    <div id="agen-resumo-exames-wrap" class="hidden pt-2 border-t border-slate-200 dark:border-slate-600">
+                <div id="agen-resumo" class="bg-slate-50 rounded-2xl p-4 mb-4 space-y-2 hidden">
+                    <div class="flex items-center gap-3"><i class="fa-regular fa-calendar-check text-cda-primary w-4"></i><span id="agen-resumo-data" class="text-sm font-bold text-slate-700"></span></div>
+                    <div class="flex items-center gap-3"><i class="fa-regular fa-clock text-cda-primary w-4"></i><span id="agen-resumo-hora" class="text-sm font-bold text-slate-700"></span></div>
+                    <div class="flex items-center gap-3"><i class="fa-regular fa-user text-cda-primary w-4"></i><span id="agen-resumo-nome" class="text-sm text-slate-600"></span></div>
+                    <div id="agen-resumo-exames-wrap" class="hidden pt-2 border-t border-slate-200">
                         <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1.5">Exames solicitados</p>
-                        <div id="agen-resumo-exames" class="text-xs text-slate-500 dark:text-slate-400 space-y-0.5"></div>
+                        <div id="agen-resumo-exames" class="text-xs text-slate-500 space-y-0.5"></div>
                         <p id="agen-resumo-total" class="text-sm font-extrabold text-cda-primary mt-2"></p>
                     </div>
                 </div>
@@ -722,32 +648,112 @@
                 <div id="agen-pagamento-wrap" class="mb-4 hidden">
                     <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2 ml-1">Forma de pagamento</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <label class="agen-pagamento-opcao flex items-center gap-3 rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 p-3 cursor-pointer transition-all">
+                        <label class="agen-pagamento-opcao flex items-center gap-3 rounded-2xl border-2 border-slate-200 bg-slate-50 p-3 cursor-pointer transition-all">
                             <input type="radio" name="agen-pagamento" value="Pix, dinheiro ou cartão de débito (40% de desconto)" onchange="agenAtualizarResumo()">
-                            <span class="text-sm font-bold text-slate-700 dark:text-slate-200 leading-snug">Pix, dinheiro ou cartão de débito <span class="text-cda-primary">40% OFF</span></span>
+                            <span class="text-sm font-bold text-slate-700 leading-snug">Pix, dinheiro ou cartão de débito <span class="text-cda-primary">40% OFF</span></span>
                         </label>
-                        <label class="agen-pagamento-opcao flex items-center gap-3 rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 p-3 cursor-pointer transition-all">
+                        <label class="agen-pagamento-opcao flex items-center gap-3 rounded-2xl border-2 border-slate-200 bg-slate-50 p-3 cursor-pointer transition-all">
                             <input type="radio" name="agen-pagamento" value="Cartão de crédito" onchange="agenAtualizarResumo()">
-                            <span class="text-sm font-bold text-slate-700 dark:text-slate-200 leading-snug">Cartão de crédito</span>
+                            <span class="text-sm font-bold text-slate-700 leading-snug">Cartão de crédito</span>
                         </label>
                     </div>
                 </div>
-                <button onclick="agenSalvar()" id="agen-btn-salvar"
-                    class="send opacity-50 pointer-events-none"
-                    style="width: 100%; justify-content: center;">
+                <button onclick="agenSalvar()" id="agen-btn-salvar" class="send opacity-50 pointer-events-none" style="width: 100%; justify-content: center;">
                     <span class="text">Salvar Agendamento</span>
-                    <span class="icon">
-                        <svg viewBox="0 0 512.005 512.005">
-                            <path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594zM175 296.245l204.668-145.757c-176.114 185.79-166.916 176.011-167.684 177.045-1.141 1.535 1.985-4.448-36.984 72.882zm191.858 127.546l-120.296-89.276 217.511-229.462z"/>
-                        </svg>
-                    </span>
+                    <span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594zM175 296.245l204.668-145.757c-176.114 185.79-166.916 176.011-167.684 177.045-1.141 1.535 1.985-4.448-36.984 72.882zm191.858 127.546l-120.296-89.276 217.511-229.462z"/></svg></span>
                 </button>
                 <p id="agen-status" class="text-xs text-center mt-3 hidden"></p>
             </div>
-
         </section>
 
-    <!-- CONFIGURAÇÕES -->
+      <!-- RECOLETAS -->
+      <section id="page-recoletas" class="page space-y-5">
+        <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
+            <div class="relative z-10">
+                <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
+                    <i class="fa-solid fa-vial"></i> Recoletas
+                </span>
+                <h2 class="text-2xl font-extrabold leading-tight mb-1">Controle de Recoletas</h2>
+                <p class="text-sm text-white/80 leading-relaxed">Cadastre e acompanhe todos os pacientes que precisam de recoleta.</p>
+            </div>
+        </div>
+
+        <div class="neumorphic-card">
+            <h3 style="font-size: 1.2rem; font-weight: 700; color: #101620; margin-bottom: 20px;">
+                <i class="fa-solid fa-user-plus mr-2" style="color: #0F4C5C;"></i> Nova Recoleta
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-barcode mr-1"></i> Código</label>
+                    <input type="text" id="rec-codigo" placeholder="Código do paciente..." class="recoleta-form-field">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-user mr-1"></i> Nome do Paciente</label>
+                    <input type="text" id="rec-nome" placeholder="Nome completo..." class="recoleta-form-field">
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-magnifying-glass mr-1"></i> Exames para recoleta</label>
+                <div class="autocomplete-container">
+                    <input type="text" id="rec-search" placeholder="Digite o nome ou código do exame..." autocomplete="off" class="recoleta-form-field" style="padding-right: 40px;">
+                    <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fa-solid fa-search"></i></div>
+                    <div id="rec-autocomplete-list" class="autocomplete-list"></div>
+                </div>
+                <div id="rec-exames-selecionados" class="mt-3 space-y-2"></div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-hospital mr-1"></i> Tipo de exame</label>
+                <div class="recoleta-radio-group">
+                    <label class="recoleta-radio-label" id="rec-label-interno" onclick="recSelecionarTipo('interno')">
+                        <input type="radio" name="rec-tipo" value="interno" style="display:none;">
+                        <i class="fa-solid fa-house-medical"></i> Interno
+                    </label>
+                    <label class="recoleta-radio-label" id="rec-label-externo" onclick="recSelecionarTipo('externo')">
+                        <input type="radio" name="rec-tipo" value="externo" style="display:none;">
+                        <i class="fa-solid fa-truck-medical"></i> Externo
+                    </label>
+                </div>
+                <div id="rec-externo-options" class="recoleta-externo-options">
+                    <button type="button" class="recoleta-externo-btn" data-lab="Hermes Pardini" onclick="recSelecionarLabExterno(this)">Hermes Pardini</button>
+                    <button type="button" class="recoleta-externo-btn" data-lab="DB - Diagnósticos do Brasil" onclick="recSelecionarLabExterno(this)">DB - Diagnósticos do Brasil</button>
+                    <button type="button" class="recoleta-externo-btn" data-lab="Álvaro Apoio" onclick="recSelecionarLabExterno(this)">Álvaro Apoio</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Motivo da recoleta</label>
+                    <input type="text" id="rec-motivo" placeholder="Ex: hemólise, volume insuficiente..." class="recoleta-form-field">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-note-sticky mr-1"></i> Observações</label>
+                    <input type="text" id="rec-obs" placeholder="Observações adicionais..." class="recoleta-form-field">
+                </div>
+            </div>
+
+            <div id="rec-error" class="login-error-msg" style="margin-bottom: 12px; display: none;"></div>
+            <div id="rec-success" style="color: #0F4C5C; font-size: 0.85rem; margin-bottom: 12px; text-align: center; display: none; font-weight: 600;">
+                <i class="fa-solid fa-circle-check mr-1"></i> Recoleta cadastrada com sucesso!
+            </div>
+            <button class="neumorphic-btn primary neumorphic-btn-lg" onclick="salvarRecoleta()" style="width: 100%;">
+                <i class="fa-solid fa-plus"></i> Cadastrar Recoleta
+            </button>
+        </div>
+
+        <div class="neumorphic-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-size: 1.2rem; font-weight: 700; color: #101620;"><i class="fa-solid fa-list-check mr-2" style="color: #0F4C5C;"></i> Pacientes com Recoleta</h3>
+                <button class="btn-limpar" onclick="carregarRecoletas()"><i class="fa-solid fa-rotate-right"></i> Atualizar</button>
+            </div>
+            <div id="rec-lista" class="space-y-3">
+                <p class="text-sm text-slate-500 text-center py-4">Nenhuma recoleta cadastrada.</p>
+            </div>
+        </div>
+      </section>
+
+      <!-- CONFIGURACOES -->
       <section id="page-configuracoes" class="page space-y-5">
         <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
             <div class="relative z-10">
@@ -759,9 +765,7 @@
             </div>
         </div>
         <div class="neumorphic-card">
-            <h3 style="font-size: 1.2rem; font-weight: 700; color: #101620; margin-bottom: 20px;">
-                <i class="fa-solid fa-user-plus mr-2" style="color: #0F4C5C;"></i> Registro de Usuário
-            </h3>
+            <h3 style="font-size: 1.2rem; font-weight: 700; color: #101620; margin-bottom: 20px;"><i class="fa-solid fa-user-plus mr-2" style="color: #0F4C5C;"></i> Registro de Usuário</h3>
             <div class="space-y-4">
                 <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-user mr-1"></i> Login</label>
                     <input type="text" id="config-login" placeholder="Digite o login do usuário..." class="w-full bg-white border-none rounded-2xl pl-5 pr-5 py-3 text-sm" style="box-shadow: inset -4px -4px 6px -1px rgba(255, 255, 255, 1), inset 2px 2px 8px -1px rgba(72, 79, 96, 0.5);"></div>
@@ -790,6 +794,57 @@
   <span id="cda-toast-msg"></span>
 </div>
 
+<!-- MODAL CONFIRMACAO DE AGENDAMENTO -->
+<div id="modal-agen-confirmacao" class="fixed inset-0 z-[110] hidden items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-sm rounded-[32px] shadow-2xl overflow-hidden">
+        <div class="bg-gradient-to-br from-green-400 to-emerald-500 p-8 flex flex-col items-center gap-3">
+            <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center"><i class="fa-solid fa-calendar-check text-white text-4xl"></i></div>
+            <p class="text-white font-extrabold text-xl text-center">Agendamento Confirmado!</p>
+        </div>
+        <div class="p-6 space-y-3">
+            <div class="flex items-center gap-3 bg-slate-50 rounded-2xl p-3">
+                <i class="fa-solid fa-user text-cda-primary w-5 text-center"></i>
+                <div><p class="text-xs text-slate-400 font-semibold uppercase tracking-wide">Paciente</p><p id="modal-agen-nome" class="font-bold text-slate-800 text-sm"></p></div>
+            </div>
+            <div class="flex items-center gap-3 bg-slate-50 rounded-2xl p-3">
+                <i class="fa-regular fa-calendar text-cda-primary w-5 text-center"></i>
+                <div><p class="text-xs text-slate-400 font-semibold uppercase tracking-wide">Data e Horário</p><p id="modal-agen-data" class="font-bold text-slate-800 text-sm"></p></div>
+            </div>
+            <div class="flex items-center gap-3 bg-slate-50 rounded-2xl p-3">
+                <i class="fa-solid fa-flask text-cda-primary w-5 text-center"></i>
+                <div><p class="text-xs text-slate-400 font-semibold uppercase tracking-wide">Exames</p><p id="modal-agen-exames" class="font-bold text-slate-800 text-sm"></p></div>
+            </div>
+            <div class="flex items-center gap-3 bg-slate-50 rounded-2xl p-3">
+                <i class="fa-solid fa-credit-card text-cda-primary w-5 text-center"></i>
+                <div><p class="text-xs text-slate-400 font-semibold uppercase tracking-wide">Pagamento</p><p id="modal-agen-pagamento" class="font-bold text-slate-800 text-sm"></p></div>
+            </div>
+            <p class="text-xs text-slate-400 text-center pt-1">Um evento foi criado na agenda do laboratório. Até lá! 😊</p>
+        </div>
+        <div class="px-6 pb-6">
+            <button onclick="modalAgenOk()" class="w-full btn-cda-primary py-4 rounded-2xl font-extrabold text-base flex items-center justify-center gap-2 shadow-lg shadow-cda-primary/20">
+                <i class="fa-solid fa-check"></i> OK, entendido!
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL SENHA CONFIGURACOES -->
+<div id="modal-senha-config" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 76, 92, 0.85); z-index: 99998; display: none; justify-content: center; align-items: center; backdrop-filter: blur(8px);">
+    <div style="background: #ecf0f3; border-radius: 24px; padding: 40px; width: 400px; max-width: 90vw; box-shadow: 10px 10px 30px rgba(0,0,0,0.3); text-align: center;">
+        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+            <i class="fa-solid fa-lock" style="color: white; font-size: 24px;"></i>
+        </div>
+        <h2 style="font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 700; color: #181818; margin-bottom: 8px;">Área Restrita</h2>
+        <p style="font-size: 13px; color: #a0a5a8; margin-bottom: 24px;">Digite a senha de administrador para acessar as configurações.</p>
+        <input type="password" id="senha-config-input" placeholder="Senha de acesso" style="width: 100%; height: 45px; padding-left: 20px; font-size: 14px; letter-spacing: 2px; border: none; outline: none; font-family: 'Montserrat', sans-serif; background-color: #ecf0f3; border-radius: 12px; box-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #f9f9f9; color: #181818; text-align: center; margin-bottom: 16px;">
+        <div id="senha-config-error" style="color: #ef4444; font-size: 0.8rem; margin-bottom: 12px; display: none;">Senha incorreta</div>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="fecharModalSenha()" style="flex: 1; height: 45px; border-radius: 22px; font-weight: 600; font-size: 13px; background: #d1d9e6; color: #64748B; border: none; cursor: pointer; font-family: 'Montserrat', sans-serif;">Cancelar</button>
+            <button onclick="verificarSenhaConfig()" style="flex: 1; height: 45px; border-radius: 22px; font-weight: 700; font-size: 13px; background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); color: #f9f9f9; border: none; cursor: pointer; font-family: 'Montserrat', sans-serif; box-shadow: 4px 4px 10px rgba(15,76,92,0.3);">Acessar</button>
+        </div>
+    </div>
+</div>
+
 <script>
 
   // ==================== LOGIN TOGGLE ANIMATION ====================
@@ -806,16 +861,11 @@
 
   function toggleLogin() {
     if (!switchCtn) initLoginVars();
-
     switchCtn.classList.add('is-gx');
-    setTimeout(function() {
-      switchCtn.classList.remove('is-gx');
-    }, 1500);
-
+    setTimeout(function() { switchCtn.classList.remove('is-gx'); }, 1500);
     switchCtn.classList.toggle('is-txr');
     switchCircle[0].classList.toggle('is-txr');
     switchCircle[1].classList.toggle('is-txr');
-
     switchC1.classList.toggle('is-hidden');
     switchC2.classList.toggle('is-hidden');
     aContainer.classList.toggle('is-txl');
@@ -823,11 +873,9 @@
     bContainer.classList.toggle('is-z200');
   }
 
-  // ==================== LOGIN ====================
   function loginSucesso() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('splashScreen').style.display = 'flex';
-
     setTimeout(() => {
       const splash = document.getElementById('splashScreen');
       splash.classList.add('fade-out');
@@ -840,48 +888,40 @@
         atualizarMesStats();
         renderAtividades();
         contarOrcamentosDoMes();
+        carregarRecoletas();
       }, 600);
     }, 2500);
   }
-function fazerCadastro() {
+
+  function fazerCadastro() {
     const nome = document.getElementById('signup-name').value.trim();
     const email = document.getElementById('signup-email').value.trim();
     const senha = document.getElementById('signup-password').value.trim();
     const errorEl = document.getElementById('signup-error');
-
     if (!nome || !email || !senha) {
       errorEl.innerText = 'Preencha todos os campos';
       errorEl.style.display = 'block';
       setTimeout(() => errorEl.style.display = 'none', 3000);
       return;
     }
-
     showToast('Cadastro realizado! Faça login.');
     toggleLogin();
   }
 
-  // Inicializar após DOM carregar
   document.addEventListener('DOMContentLoaded', function() {
     initLoginVars();
-
     const senhaInput = document.getElementById('login-senha');
     const usuarioInput = document.getElementById('login-usuario');
-
     if (senhaInput) {
       senhaInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') fazerLogin();
       });
     }
-
     if (usuarioInput) {
       usuarioInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          senhaInput.focus();
-        }
+        if (e.key === 'Enter') { e.preventDefault(); senhaInput.focus(); }
       });
     }
-
     const signupSenha = document.getElementById('signup-password');
     if (signupSenha) {
       signupSenha.addEventListener('keypress', function(e) {
@@ -890,11 +930,8 @@ function fazerCadastro() {
     }
   });
 
-  // Wrapper para onclick funcionar com async
   function handleLoginClick() {
-    console.log('handleLoginClick chamado');
     fazerLogin().catch(function(err) {
-      console.error('Erro no login:', err);
       var errorEl = document.getElementById('login-error');
       if (errorEl) {
         errorEl.innerText = 'Erro inesperado. Tente novamente.';
@@ -905,25 +942,17 @@ function fazerCadastro() {
   }
 
   async function fazerLogin() {
-    console.log('fazerLogin chamado');
     const usuarioEl = document.getElementById('login-usuario');
     const senhaEl = document.getElementById('login-senha');
     const errorEl = document.getElementById('login-error');
-
     if (!usuarioEl || !senhaEl) {
-      console.error('Elementos de login não encontrados!');
       errorEl.innerText = 'Erro interno do sistema. Recarregue a página.';
       errorEl.style.display = 'block';
       errorEl.style.color = '#ef4444';
       return;
     }
-
     const usuario = usuarioEl.value.trim().toUpperCase();
     const senha = senhaEl.value.trim().toUpperCase();
-
-    console.log('Tentando login:', usuario);
-
-    // Validar campos preenchidos
     if (!usuario || !senha) {
       errorEl.innerText = 'PREENCHA O LOGIN E A SENHA';
       errorEl.style.display = 'block';
@@ -931,64 +960,33 @@ function fazerCadastro() {
       setTimeout(() => errorEl.style.display = 'none', 3000);
       return;
     }
-
-    // ============================================================
-    // LOGIN HARDCODED - FUNCIONA 100% OFFLINE (SEM INTERNET)
-    // ============================================================
     if (usuario === 'ADMIN' && senha === 'CDA2024') {
-      console.log('Login bem-sucedido (admin hardcoded)!');
       loginSucesso();
       return;
     }
-
-    // ============================================================
-    // LOGIN VIA GOOGLE APPS SCRIPT (PLANILHA)
-    // ============================================================
     errorEl.innerText = 'VERIFICANDO CREDENCIAIS...';
     errorEl.style.display = 'block';
     errorEl.style.color = '#0F4C5C';
-
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
       const url = APPS_SCRIPT_URL + '?action=verificarLogin&login=' + encodeURIComponent(usuario) + '&senha=' + encodeURIComponent(senha) + '&token=' + encodeURIComponent(CDA_TOKEN);
-
-      console.log('URL da requisição:', url);
-
-      const resp = await fetch(url, { 
-        method: 'GET',
-        signal: controller.signal,
-        redirect: 'follow'
-      });
-
+      const resp = await fetch(url, { method: 'GET', signal: controller.signal, redirect: 'follow' });
       clearTimeout(timeout);
-
-      console.log('Status da resposta:', resp.status);
-
-      if (!resp.ok) {
-        throw new Error('Erro HTTP: ' + resp.status);
-      }
-
+      if (!resp.ok) throw new Error('Erro HTTP: ' + resp.status);
       const json = await resp.json();
-      console.log('Resposta do servidor:', json);
-
       if (json.ok && json.autorizado) {
-        console.log('Login bem-sucedido (Sheets)!');
         loginSucesso();
       } else if (json.ok && !json.autorizado) {
-        console.log('Login falhou: credenciais incorretas');
         errorEl.innerText = 'LOGIN OU SENHA INCORRETOS.';
         errorEl.style.color = '#ef4444';
         setTimeout(() => errorEl.style.display = 'none', 5000);
       } else {
-        console.log('Erro do servidor:', json.erro);
         errorEl.innerText = 'ERRO: ' + (json.erro || 'Acesso negado');
         errorEl.style.color = '#ef4444';
         setTimeout(() => errorEl.style.display = 'none', 5000);
       }
     } catch(err) {
-      console.error('Erro ao verificar login:', err);
-
       if (err.name === 'AbortError') {
         errorEl.innerText = 'TEMPO ESGOTADO: Servidor não respondeu.';
       } else if (err.message.includes('Failed to fetch')) {
@@ -996,62 +994,12 @@ function fazerCadastro() {
       } else {
         errorEl.innerText = 'ERRO: ' + err.message;
       }
-
       errorEl.style.color = '#ef4444';
       setTimeout(() => errorEl.style.display = 'none', 8000);
     }
   }
 
-  function fazerCadastro() {
-    const nome = document.getElementById('signup-name').value.trim();
-    const email = document.getElementById('signup-email').value.trim();
-    const senha = document.getElementById('signup-password').value.trim();
-    const errorEl = document.getElementById('signup-error');
-
-    if (!nome || !email || !senha) {
-      errorEl.innerText = 'Preencha todos os campos';
-      errorEl.style.display = 'block';
-      setTimeout(() => errorEl.style.display = 'none', 3000);
-      return;
-    }
-
-    showToast('Cadastro realizado! Faça login.');
-    toggleLogin();
-  }
-
-  // Inicializar após DOM carregar
-  document.addEventListener('DOMContentLoaded', function() {
-    initLoginVars();
-
-    const senhaInput = document.getElementById('login-senha');
-    const usuarioInput = document.getElementById('login-usuario');
-
-    if (senhaInput) {
-      senhaInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') fazerLogin();
-      });
-    }
-
-    if (usuarioInput) {
-      usuarioInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          senhaInput.focus();
-        }
-      });
-    }
-
-    const signupSenha = document.getElementById('signup-password');
-    if (signupSenha) {
-      signupSenha.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') fazerCadastro();
-      });
-    }
-  });
-
-  // ==================== DADOS MENSAIS ====================
   let dadosMensais = { orcamentos: 0, agendamentos: 128, exames: 1247 };
-
   let atividadesRecentes = [
     { tipo: 'orcamento', titulo: 'Orçamento #1024 gerado para Maria Silva', tempo: 'há 2 minutos', cor: '#0F4C5C', bg: 'rgba(15,76,92,0.1)' },
     { tipo: 'agendamento', titulo: 'Agendamento #567 confirmado - João Santos', tempo: 'há 15 minutos', cor: '#37A7AA', bg: 'rgba(55,167,170,0.1)' },
@@ -1064,11 +1012,9 @@ function fazerCadastro() {
     const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
     const agora = new Date();
     const mesAno = meses[agora.getMonth()] + ' ' + agora.getFullYear();
-
     document.getElementById('stat-mes-orcamentos').innerText = mesAno;
     document.getElementById('stat-mes-agendamentos').innerText = mesAno;
     document.getElementById('stat-mes-exames').innerText = mesAno;
-
     document.getElementById('stat-orcamentos').innerText = dadosMensais.orcamentos;
     document.getElementById('stat-agendamentos').innerText = dadosMensais.agendamentos;
     document.getElementById('stat-exames').innerText = dadosMensais.exames >= 1000 ? (dadosMensais.exames/1000).toFixed(1) + 'K' : dadosMensais.exames;
@@ -1077,38 +1023,26 @@ function fazerCadastro() {
   function computarOrcamento() {
     dadosMensais.orcamentos++;
     atualizarMesStats();
-
     const agora = new Date();
     const hora = agora.getHours().toString().padStart(2,'0') + ':' + agora.getMinutes().toString().padStart(2,'0');
-
     atividadesRecentes.unshift({
-      tipo: 'orcamento',
-      titulo: 'Orçamento #' + (1000 + dadosMensais.orcamentos) + ' gerado às ' + hora,
-      tempo: 'agora',
-      cor: '#0F4C5C',
-      bg: 'rgba(15,76,92,0.1)'
+      tipo: 'orcamento', titulo: 'Orçamento #' + (1000 + dadosMensais.orcamentos) + ' gerado às ' + hora,
+      tempo: 'agora', cor: '#0F4C5C', bg: 'rgba(15,76,92,0.1)'
     });
-
     if (atividadesRecentes.length > 5) atividadesRecentes.pop();
     renderAtividades();
-
-    // Salvar orçamento na planilha DASHBOARD (sem bloquear a UI)
-    salvarOrcamentoNaPlanilha('orcamento').then(ok => {
-      if (ok) console.log('Orçamento registrado na planilha');
-    });
+    salvarOrcamentoNaPlanilha('orcamento').then(ok => { if (ok) console.log('Orçamento registrado'); });
   }
 
   function renderAtividades() {
     const container = document.getElementById('atividades-recentes');
     const icones = { orcamento: 'fa-file-invoice-dollar', agendamento: 'fa-calendar-check', exame: 'fa-flask-vial' };
-
     container.innerHTML = atividadesRecentes.map(at => {
       const icone = icones[at.tipo] || 'fa-circle-check';
       return '<div class="atividade-item" style="background: ' + at.bg + ';"><i class="fa-solid ' + icone + ' atividade-icon" style="color: ' + at.cor + ';"></i><div class="atividade-info"><p class="atividade-titulo">' + at.titulo + '</p><p class="atividade-tempo">' + at.tempo + '</p></div></div>';
     }).join('');
   }
 
-  // ==================== NAVEGAÇÃO ====================
   const navItems = document.querySelectorAll('#main-nav > li');
   const pages = document.querySelectorAll('.page');
   const pageTitle = document.getElementById('page-title');
@@ -1124,27 +1058,23 @@ function fazerCadastro() {
       const pageId = li.getAttribute('data-page');
       if (!pageId) return;
       e.preventDefault();
-
       navItems.forEach(item => item.classList.remove('active'));
       li.classList.add('active');
-
       pages.forEach(p => p.classList.remove('active'));
       const targetPage = document.getElementById('page-' + pageId);
       if (targetPage) targetPage.classList.add('active');
-
       const label = li.innerText.trim();
       pageTitle.innerText = label.charAt(0).toUpperCase() + label.slice(1);
       breadcrumbActive.innerText = label;
+      if (pageId !== 'configuracoes') configAutorizado = false;
     });
   });
 
-  // ==================== TOAST ====================
   function showToast(msg, tipo) {
     tipo = tipo || 'success';
     const t = document.getElementById('cda-toast');
     const icon = document.getElementById('cda-toast-icon');
     document.getElementById('cda-toast-msg').innerText = msg;
-
     if (tipo === 'error') {
       icon.className = 'fa-solid fa-circle-xmark';
       t.style.background = '#ef4444';
@@ -1152,12 +1082,10 @@ function fazerCadastro() {
       icon.className = 'fa-solid fa-circle-check';
       t.style.background = '#0F4C5C';
     }
-
     t.className = 'toast-show';
     setTimeout(() => t.classList.remove('toast-show'), 3000);
   }
 
-  // ==================== EXAMES ====================
   let listaExames = [];
   let orcSelecionados = [];
   let ultimoOrcamento = null;
@@ -1167,7 +1095,6 @@ function fazerCadastro() {
       const response = await fetch('./exames.json');
       if (!response.ok) throw new Error('Arquivo não encontrado');
       const data = await response.json();
-
       if (Array.isArray(data)) {
         listaExames = data;
       } else if (data.exames && Array.isArray(data.exames)) {
@@ -1176,7 +1103,6 @@ function fazerCadastro() {
         const firstArray = Object.values(data).find(v => Array.isArray(v));
         if (firstArray) listaExames = firstArray;
       }
-
       console.log('Exames carregados:', listaExames.length);
     } catch (error) {
       console.error('Erro ao carregar exames:', error);
@@ -1196,47 +1122,47 @@ function fazerCadastro() {
     }
   }
 
-  // ==================== AUTOCOMPLETE ====================
   const searchInput = document.getElementById('orc-search');
   const autocompleteList = document.getElementById('autocomplete-list');
 
-  searchInput.addEventListener('input', function() {
-    const valor = this.value.toLowerCase().trim();
-    if (valor.length < 2) { autocompleteList.classList.remove('show'); return; }
-
-    const filtrados = listaExames.filter(ex => {
-      const nome = (ex.nome || '').toLowerCase();
-      const codigo = (ex.codigo || '').toLowerCase();
-      const busca = (ex.busca || '').toLowerCase();
-      return nome.includes(valor) || codigo.includes(valor) || busca.includes(valor);
-    }).slice(0, 10);
-
-    if (filtrados.length === 0) {
-      autocompleteList.innerHTML = '<div class="autocomplete-item"><div class="autocomplete-item-nome">Nenhum exame encontrado</div></div>';
-    } else {
-      autocompleteList.innerHTML = filtrados.map(ex => {
-        const nome = ex.nome || 'Sem nome';
-        const codigo = ex.codigo || '---';
-        const preco = ex.preco || 0;
-        return '<div class="autocomplete-item" onclick="adicionarExame(' + ex.id + ')"><div class="autocomplete-item-nome">' + nome + '</div><div class="autocomplete-item-codigo">Código: ' + codigo + '</div><div class="autocomplete-item-preco">R$ ' + parseFloat(preco).toFixed(2).replace('.', ',') + '</div></div>';
-      }).join('');
-    }
-    autocompleteList.classList.add('show');
-  });
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const valor = this.value.toLowerCase().trim();
+      if (valor.length < 2) { autocompleteList.classList.remove('show'); return; }
+      const filtrados = listaExames.filter(ex => {
+        const nome = (ex.nome || '').toLowerCase();
+        const codigo = (ex.codigo || '').toLowerCase();
+        const busca = (ex.busca || '').toLowerCase();
+        return nome.includes(valor) || codigo.includes(valor) || busca.includes(valor);
+      }).slice(0, 10);
+      if (filtrados.length === 0) {
+        autocompleteList.innerHTML = '<div class="autocomplete-item"><div class="autocomplete-item-nome">Nenhum exame encontrado</div></div>';
+      } else {
+        autocompleteList.innerHTML = filtrados.map(ex => {
+          const nome = ex.nome || 'Sem nome';
+          const codigo = ex.codigo || '---';
+          const preco = ex.preco || 0;
+          return '<div class="autocomplete-item" onclick="adicionarExame(' + ex.id + ')"><div class="autocomplete-item-nome">' + nome + '</div><div class="autocomplete-item-codigo">Código: ' + codigo + '</div><div class="autocomplete-item-preco">R$ ' + parseFloat(preco).toFixed(2).replace('.', ',') + '</div></div>';
+        }).join('');
+      }
+      autocompleteList.classList.add('show');
+    });
+  }
 
   document.addEventListener('click', function(e) {
-    if (!e.target.closest('.autocomplete-container')) autocompleteList.classList.remove('show');
+    if (autocompleteList && !e.target.closest('.autocomplete-container')) autocompleteList.classList.remove('show');
+    const recList = document.getElementById('rec-autocomplete-list');
+    if (recList && !e.target.closest('#rec-search')) recList.classList.remove('show');
   });
 
-  // ==================== EXAMES SELECIONADOS ====================
   function adicionarExame(id) {
     const exame = listaExames.find(e => e.id === id);
     if (!exame) return;
     if (orcSelecionados.some(e => e.id === id)) { showToast('Exame já selecionado!', 'error'); return; }
     orcSelecionados.push(exame);
     orcRenderSelecionados();
-    searchInput.value = '';
-    autocompleteList.classList.remove('show');
+    if (searchInput) searchInput.value = '';
+    if (autocompleteList) autocompleteList.classList.remove('show');
     showToast('Exame adicionado!');
   }
 
@@ -1264,6 +1190,10 @@ function fazerCadastro() {
     return 'R$ ' + valor.toFixed(2).replace('.', ',');
   }
 
+  function formatCurrency(valor) {
+    return 'R$ ' + Number(valor).toFixed(2).replace('.', ',');
+  }
+
   function orcRenderSelecionados() {
     const container = document.getElementById('orc-selecionados');
     const totalEl = document.getElementById('orc-total');
@@ -1272,7 +1202,6 @@ function fazerCadastro() {
     const precoPix = document.getElementById('preco-pix');
     const precoCc = document.getElementById('preco-cc');
     const parcelasCc = document.getElementById('parcelas-cc');
-
     if (orcSelecionados.length === 0) {
       container.innerHTML = '<div id="orc-empty-state" class="flex flex-col items-center py-6 text-center"><p class="text-sm font-bold text-slate-500">Nenhum exame selecionado</p></div>';
       totalEl.innerText = 'R$ 0,00';
@@ -1280,7 +1209,6 @@ function fazerCadastro() {
       descontosArea.style.display = 'none';
       return;
     }
-
     let total = 0;
     container.innerHTML = orcSelecionados.map((ex, index) => {
       const nome = ex.nome || 'Sem nome';
@@ -1289,239 +1217,182 @@ function fazerCadastro() {
       total += preco;
       return '<div class="exame-selecionado-item"><div class="exame-info"><div class="exame-nome" title="' + nome + '">' + nome + '</div><div class="exame-codigo">' + codigo + '</div></div><div class="exame-preco">' + formatarMoeda(preco) + '</div><button class="btn-remover-exame" onclick="removerExame(' + index + ')" title="Remover"><i class="fa-solid fa-xmark"></i></button></div>';
     }).join('');
-
     totalEl.innerText = formatarMoeda(total);
     btnLimpar.style.display = 'inline-flex';
     descontosArea.style.display = 'block';
-
     const precoPixValor = total * 0.60;
     const precoCcValor = total * 0.65;
     const parcelaCc = precoCcValor / 10;
-
     precoPix.innerText = formatarMoeda(precoPixValor);
     precoCc.innerText = formatarMoeda(precoCcValor);
     parcelasCc.innerText = '10x de ' + formatarMoeda(parcelaCc);
   }
 
-  // ==================== PDF ====================
   function gerarPDF() {
     if (orcSelecionados.length === 0) { showToast('Selecione pelo menos um exame!', 'error'); return null; }
     const paciente = document.getElementById('orc-paciente').value.trim() || 'Paciente';
-
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-
     const pageW = 210;
     const margin = 20;
     let y = 15;
 
-    // === HEADER: LABORATÓRIO CDA LOGO ===
     doc.setTextColor(80, 80, 80);
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
     doc.text('LABORAT', margin, y);
     doc.setFontSize(7);
     doc.text('ÓRIO', margin + 22, y);
-
-    // Green CDA symbol (cross/plus in circle)
     doc.setFillColor(34, 139, 34);
     doc.setDrawColor(34, 139, 34);
     doc.setLineWidth(1.5);
     doc.line(margin + 50, y - 5, margin + 50, y + 5);
     doc.line(margin + 45, y, margin + 55, y);
-
     doc.setTextColor(80, 80, 80);
     doc.setFontSize(28);
     doc.setFont('helvetica', 'bold');
     doc.text('CDA', margin + 58, y + 2);
-
     y += 18;
 
-    // === PACIENTE ===
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.text('PACIENTE', margin, y);
-
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(26);
     doc.setFont('helvetica', 'bold');
     doc.text(paciente.toUpperCase(), margin, y + 10);
-
     y += 20;
 
-    // === EXAME ===
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.text('EXAME', margin, y);
-
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
-
     let examesTexto = '';
-    orcSelecionados.forEach((ex, idx) => {
-      examesTexto += (idx + 1) + ex.nome;
-    });
-
+    orcSelecionados.forEach((ex, idx) => { examesTexto += (idx + 1) + '. ' + ex.nome + ' '; });
     const splitExames = doc.splitTextToSize(examesTexto, pageW - margin * 2);
     doc.text(splitExames, margin, y + 6);
     y += 6 + (splitExames.length * 5);
 
-    // === LAB INFO LINE ===
     doc.setTextColor(100, 100, 100);
     doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
     doc.text('Laboratorio CDA', margin, y);
     doc.setTextColor(34, 139, 34);
     doc.text('Diagnostico de Confianca', margin + 28, y);
-
     y += 5;
     doc.setTextColor(100, 100, 100);
     doc.text('Afonso Claudio,ES .(27)99898-0658', margin, y);
-
     y += 12;
 
-    // === DATA ===
     const dataAtual = new Date();
     const meses = ['janeiro', 'fevereiro', 'marco', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
     const dataFormatada = dataAtual.getDate() + ' de ' + meses[dataAtual.getMonth()] + ' de ' + dataAtual.getFullYear();
-
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.text('DATA', margin, y);
-
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.text(dataFormatada, margin, y + 6);
-
     y += 14;
 
-    // === TOTAL ESTIMADO ===
     let total = 0;
-    orcSelecionados.forEach(ex => {
-      total += parseFloat(ex.preco || 0);
-    });
-
+    orcSelecionados.forEach(ex => { total += parseFloat(ex.preco || 0); });
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.text('TOTAL ESTIMADO (tabela particular)', margin, y);
-
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(28);
     doc.setFont('helvetica', 'bold');
     doc.text('R$ ' + total.toFixed(2).replace('.', ','), margin, y + 12);
-
     y += 22;
 
-    // === DESCONTOS ESPECIAIS CDA ===
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.text('Descontos Especiais CDA', margin, y);
-
     y += 6;
-
     doc.setTextColor(100, 100, 100);
     doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
     doc.text('Pacientes com convenio ou Cartao Fidelidade', margin, y);
-
     y += 10;
 
-    // === BOX PIX/DINHEIRO/DÉBITO ===
     const boxH = 16;
+    const precoPix = total * 0.60;
+    const precoCc = total * 0.65;
+    const parcelaCc = precoCc / 10;
+
     doc.setFillColor(232, 248, 248);
     doc.setDrawColor(200, 230, 230);
-    doc.roundedRect(margin, y, pageW - margin * 2, boxH, 2, 2, 'FD');
-
+    doc.rect(margin, y, pageW - margin * 2, boxH, 'FD');
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.text('Pix, dinheiro ou debito', margin + 5, y + 5);
-
     doc.setTextColor(100, 100, 100);
     doc.setFontSize(6);
     doc.setFont('helvetica', 'normal');
     doc.text('(a vista)', margin + 5, y + 9);
-
-    const precoPix = total * 0.60;
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.text('40% OFF', pageW - margin - 22, y + 5);
-
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.text('R$ ' + precoPix.toFixed(2).replace('.', ','), pageW - margin - 22, y + 10);
-
     y += boxH + 4;
 
-    // === BOX CARTÃO DE CRÉDITO ===
     doc.setFillColor(232, 248, 248);
     doc.setDrawColor(200, 230, 230);
-    doc.roundedRect(margin, y, pageW - margin * 2, boxH, 2, 2, 'FD');
-
+    doc.rect(margin, y, pageW - margin * 2, boxH, 'FD');
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.text('Cartao de credito', margin + 5, y + 5);
-
     doc.setTextColor(100, 100, 100);
     doc.setFontSize(6);
     doc.setFont('helvetica', 'normal');
     doc.text('(parcelado em ate 10x)', margin + 5, y + 9);
-
-    const precoCc = total * 0.65;
-    const parcelaCc = precoCc / 10;
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.text('35% OFF', pageW - margin - 22, y + 5);
-
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.text('10x R$ ' + parcelaCc.toFixed(2).replace('.', ','), pageW - margin - 22, y + 10);
-
     y += boxH + 8;
 
-    // === COBRIMOS QUALQUER ORÇAMENTO ===
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.text('Cobrimos qualquer orcamento! Apresente uma proposta e faremos a diferenca.', margin, y);
-
     y += 8;
-
-    // === AGENDE E GANHE MIMOS ===
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.text('Agende e ganhe mimos especiais!', margin, y);
-
     y += 5;
-
     doc.setTextColor(100, 100, 100);
     doc.setFontSize(6);
     doc.setFont('helvetica', 'normal');
     doc.text('v Atendimento sem fila   v Sala VIP com TV e ar-condicionado', margin, y);
     y += 3.5;
     doc.text('v Cafe expresso   v Biscoitinho Club Social', margin, y);
-
     y += 8;
 
-    // === ORÇAMENTO - TABELA DE EXAMES ===
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.text('ORCAMENTO', margin, y);
-
     y += 6;
 
     const tableData = orcSelecionados.map(ex => {
@@ -1533,39 +1404,20 @@ function fazerCadastro() {
       head: [['Exame', 'Valor']],
       body: tableData,
       theme: 'plain',
-      headStyles: {
-        fillColor: [15, 76, 92],
-        textColor: [255, 255, 255],
-        fontStyle: 'bold',
-        fontSize: 7,
-        cellPadding: 2
-      },
-      bodyStyles: {
-        fontSize: 7,
-        textColor: [15, 76, 92],
-        cellPadding: 2
-      },
-      styles: {
-        lineColor: [200, 200, 200],
-        lineWidth: 0.1
-      },
-      columnStyles: {
-        0: { cellWidth: 130 },
-        1: { cellWidth: 40, halign: 'right' }
-      },
+      headStyles: { fillColor: [15, 76, 92], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 7, cellPadding: 2 },
+      bodyStyles: { fontSize: 7, textColor: [15, 76, 92], cellPadding: 2 },
+      styles: { lineColor: [200, 200, 200], lineWidth: 0.1 },
+      columnStyles: { 0: { cellWidth: 130 }, 1: { cellWidth: 40, halign: 'right' } },
       margin: { left: margin, right: margin }
     });
 
     y = doc.lastAutoTable.finalY + 4;
-
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.text('VALOR', margin, y);
     doc.text('R$ ' + total.toFixed(2).replace('.', ','), pageW - margin - 35, y);
-
     y += 6;
-
     doc.setTextColor(15, 76, 92);
     doc.setFontSize(7);
     doc.setFont('helvetica', 'bold');
@@ -1573,12 +1425,10 @@ function fazerCadastro() {
     y += 4;
     doc.text('35% OFF -> 10x R$ ' + parcelaCc.toFixed(2).replace('.', ','), margin, y);
 
-    // === RODAPÉ ===
     const footerY = 285;
     doc.setDrawColor(15, 76, 92);
     doc.setLineWidth(0.3);
     doc.line(margin, footerY - 4, pageW - margin, footerY - 4);
-
     doc.setTextColor(100, 100, 100);
     doc.setFontSize(6);
     doc.setFont('helvetica', 'normal');
@@ -1586,39 +1436,31 @@ function fazerCadastro() {
     doc.text('*Valores estimados da tabela particular. Sujeitos a confirmacao. Convenios sob consulta.', margin, footerY + 3);
 
     return doc;
-  }function baixarPDF() {
+  }
+
+  function baixarPDF() {
     const doc = gerarPDF();
     if (!doc) return;
     computarOrcamento();
-    // Salvar orçamento na planilha quando baixar PDF
-    salvarOrcamentoNaPlanilha('pdf').then(ok => {
-      if (ok) console.log('Orçamento PDF registrado na planilha');
-    });
+    salvarOrcamentoNaPlanilha('pdf').then(ok => { if (ok) console.log('PDF registrado'); });
     const dataAtual = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
     doc.save('orcamento-cda-' + dataAtual + '.pdf');
     showToast('PDF baixado com sucesso!');
   }
 
-  // ==================== COMPARTILHAR ====================
   async function compartilharOrcamento() {
     if (orcSelecionados.length === 0) { showToast('Selecione pelo menos um exame!', 'error'); return; }
     const doc = gerarPDF();
     if (!doc) return;
-
     const pdfBlob = doc.output('blob');
     const pdfUrl = URL.createObjectURL(pdfBlob);
-
     ultimoOrcamento = {
       exames: [...orcSelecionados],
       total: orcSelecionados.reduce((sum, ex) => sum + parseFloat(ex.preco || 0), 0),
       data: new Date().toLocaleDateString('pt-BR')
     };
-
     const texto = encodeURIComponent('Olá, segue em anexo o seu orçamento! Qualquer dúvida me chame aqui!');
-
-    // Salvar orçamento na planilha quando compartilhar
     await salvarOrcamentoNaPlanilha('compartilhado');
-
     if (navigator.share && navigator.canShare) {
       try {
         const file = new File([pdfBlob], 'orcamento-cda.pdf', { type: 'application/pdf' });
@@ -1628,140 +1470,85 @@ function fazerCadastro() {
           showToast('Compartilhado com sucesso!');
           return;
         }
-      } catch (err) {
-        console.log('Share API não disponível, usando WhatsApp Web');
-      }
+      } catch (err) { console.log('Share API não disponível'); }
     }
-
     const link = document.createElement('a');
     link.href = pdfUrl;
     link.download = 'orcamento-cda.pdf';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-
-    setTimeout(() => {
-      window.open('https://web.whatsapp.com/send?text=' + texto, '_blank');
-    }, 500);
-
+    setTimeout(() => { window.open('https://web.whatsapp.com/send?text=' + texto, '_blank'); }, 500);
     computarOrcamento();
     showToast('PDF baixado! WhatsApp Web aberto para compartilhar.');
   }
 
-  // ==================== AGENDAR COLETA ====================
-  async // ==================== AGENDAR COLETA COM ANIMAÇÃO ====================
   async function agendarColetaComLoading(btn) {
-    // Animar botão
     btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Carregando...';
     btn.disabled = true;
     btn.style.opacity = '0.7';
-
-    // Chamar função original
     await agendarColeta();
-
-    // Restaurar botão (caso volte para a tela)
     btn.innerHTML = '<i class="fa-regular fa-calendar-check"></i> Agendar Coleta';
     btn.disabled = false;
     btn.style.opacity = '1';
   }
 
   async function agendarColeta() {
-    // Validar se há exames selecionados
-    if (orcSelecionados.length === 0) { 
-      showToast('Selecione pelo menos um exame!', 'error'); 
-      return; 
-    }
-
-    // Validar se o nome do paciente está preenchido (pelo menos nome + 1 sobrenome)
+    if (orcSelecionados.length === 0) { showToast('Selecione pelo menos um exame!', 'error'); return; }
     const paciente = document.getElementById('orc-paciente').value.trim().toUpperCase();
     if (!paciente) {
       showToast('Digite o nome do paciente!', 'error');
       document.getElementById('orc-paciente').focus();
       return;
     }
-
-    // Validar nome completo (pelo menos 2 palavras)
     const palavras = paciente.split(/\s+/).filter(p => p.length > 0);
     if (palavras.length < 2) {
       showToast('Digite o nome completo (nome e sobrenome)!', 'error');
       document.getElementById('orc-paciente').focus();
       return;
     }
-
-    // Guardar no ultimoOrcamento para persistência COMPLETA
     const totalBruto = orcSelecionados.reduce((sum, ex) => sum + parseFloat(ex.preco || 0), 0);
     const totalPix = totalBruto * 0.60;
     const totalCredito = totalBruto * 0.65;
     const parcelaCredito = totalCredito / 10;
-
     ultimoOrcamento = {
       exames: JSON.parse(JSON.stringify(orcSelecionados)),
-      total: totalBruto,
-      totalPix: totalPix,
-      totalCredito: totalCredito,
-      parcelaCredito: parcelaCredito,
-      data: new Date().toLocaleDateString('pt-BR'),
-      paciente: paciente
+      total: totalBruto, totalPix: totalPix, totalCredito: totalCredito, parcelaCredito: parcelaCredito,
+      data: new Date().toLocaleDateString('pt-BR'), paciente: paciente
     };
-
-    // Salvar no localStorage como backup
     localStorage.setItem('cda_ultimo_orcamento', JSON.stringify(ultimoOrcamento));
-
-    // Salvar orçamento na planilha antes de navegar
     await salvarOrcamentoNaPlanilha('agendamento');
-
     computarOrcamento();
     navigateToPage('agendamento');
-
-    // Preencher dados e forçar atualização do resumo após navegação
     setTimeout(function() {
-      // Preencher inputs hidden
       const agenNome = document.getElementById('agen-nome');
-      const agenTelefone = document.getElementById('agen-telefone');
-      if (agenNome) {
-        agenNome.value = paciente;
-        agenNome.dispatchEvent(new Event('input'));
-      }
-
-      // Preencher resumo visual do paciente
+      if (agenNome) { agenNome.value = paciente; agenNome.dispatchEvent(new Event('input')); }
       const nomeEl = document.getElementById('agen-resumo-paciente-nome');
       const examesEl = document.getElementById('agen-resumo-paciente-exames');
       const valorEl = document.getElementById('agen-resumo-paciente-valor');
-
       if (nomeEl) nomeEl.textContent = paciente;
       if (examesEl) {
         const qtd = orcSelecionados.length;
         const nomes = orcSelecionados.map(e => e.nome).join(', ');
         examesEl.textContent = qtd + ' exame' + (qtd > 1 ? 's' : '') + ': ' + (nomes.length > 50 ? nomes.substring(0, 50) + '...' : nomes);
       }
-      if (valorEl) {
-        const totalPix = totalBruto * 0.60;
-        valorEl.textContent = 'R$ ' + totalPix.toFixed(2).replace('.', ',') + ' (PIX/Débito)';
-      }
-
+      if (valorEl) valorEl.textContent = 'R$ ' + totalPix.toFixed(2).replace('.', ',') + ' (PIX/Débito)';
       agenAtualizarResumo();
     }, 300);
     showToast('Dados do orçamento transferidos para agendamento!');
   }
 
-  // ==================== AGENDAMENTO ====================
   function gerarHorarios() {
     const grid = document.getElementById('agen-horarios-grid');
-    const horarios = [
-      '07:00', '07:30', '08:00', '08:30', '09:00', '09:30',
-      '10:00', '10:30', '11:00', '11:30', '13:00', '13:30',
-      '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'
-    ];
+    const horarios = ['07:00', '07:30', '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'];
     const ocupados = ['08:30', '10:00', '14:30'];
-
     grid.innerHTML = horarios.map(h => {
       const isOcupado = ocupados.includes(h);
-      return '<button class="horario-btn ' + (isOcupado ? 'ocupado' : '') + '" ' + (isOcupado ? 'disabled' : '') + ' onclick="selecionarHorario(this, \' + h + \')">' + h + '</button>';
+      return '<button class="horario-btn ' + (isOcupado ? 'ocupado' : '') + '" ' + (isOcupado ? 'disabled' : '') + ' onclick="selecionarHorario(this, \' + h + '\')">' + h + '</button>';
     }).join('');
   }
 
   let horarioSelecionado = null;
-
   function selecionarHorario(btn, horario) {
     if (btn.classList.contains('ocupado')) return;
     document.querySelectorAll('.horario-btn').forEach(b => b.classList.remove('selected'));
@@ -1770,355 +1557,306 @@ function fazerCadastro() {
   }
 
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyNAnEvW3JJ0-STfXV13kb0H8KWmGAXdWpeqf7fMKM8To7l3h4YMceIjDDYC8V8207llQ/exec';
-        // Token compartilhado com o Apps Script — valida que a requisição veio do app CDA
-        const CDA_TOKEN = 'CDA-2025-xK9#mPqL';
+  const CDA_TOKEN = 'CDA-2025-xK9#mPqL';
+  const FERIADOS_NACIONAIS = ['01-01','04-21','05-01','09-07','10-12','11-02','11-15','11-20','12-25'];
+  const SLOTS_MANHA = ['07:30','08:10','08:50','09:30','10:10','10:50'];
+  const SLOTS_TARDE = ['14:30','15:10','15:50'];
+  let agenState = { data: null, periodo: null, horario: null, pagamento: null };
 
-        const FERIADOS_NACIONAIS = ['01-01','04-21','05-01','09-07','10-12','11-02','11-15','11-20','12-25'];
-        const SLOTS_MANHA = ['07:30','08:10','08:50','09:30','10:10','10:50'];
-        const SLOTS_TARDE = ['14:30','15:10','15:50'];
+  function agenInicializar() {
+    const inp = document.getElementById('agen-data');
+    if (!inp) return;
+    const hoje = new Date();
+    inp.min = hoje.getFullYear() + '-' + String(hoje.getMonth()+1).padStart(2,'0') + '-' + String(hoje.getDate()).padStart(2,'0');
+    inp.value = '';
+    agenState = { data: null, periodo: null, horario: null, pagamento: null };
+    ['manha','tarde'].forEach(p => {
+      const btn = document.getElementById('agen-btn-' + p);
+      if (btn) btn.classList.remove('ativo');
+    });
+    document.querySelectorAll('input[name="agen-pagamento"]').forEach(r => { r.checked = false; });
+    const pagamentoWrap = document.getElementById('agen-pagamento-wrap');
+    if (pagamentoWrap) pagamentoWrap.classList.add('hidden');
+    agenEsconderHorarios();
+    agenAtualizarResumo();
+    const nome = localStorage.getItem('patient_name') || '';
+    const telefone = localStorage.getItem('patient_phone') || '';
+    if (nome) document.getElementById('agen-nome').value = nome;
+    if (telefone) document.getElementById('agen-telefone').value = telefone;
+  }
 
-        let agenState = { data: null, periodo: null, horario: null, pagamento: null };
+  function agenIsDiaUtil(dataStr) {
+    const [y,m,d] = dataStr.split('-').map(Number);
+    const dia = new Date(y, m-1, d).getDay();
+    if (dia === 0 || dia === 6) return false;
+    const mmdd = String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    return !FERIADOS_NACIONAIS.includes(mmdd);
+  }
 
-        function agenInicializar() {
-            const inp = document.getElementById('agen-data');
-            if (!inp) return;
-            const hoje = new Date();
-            inp.min = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
-            inp.value = '';
-            agenState = { data: null, periodo: null, horario: null, pagamento: null };
-            ['manha','tarde'].forEach(p => document.getElementById(`agen-btn-${p}`)?.classList.remove('ativo'));
-            document.querySelectorAll('input[name="agen-pagamento"]').forEach(r => { r.checked = false; });
-            const pagamentoWrap = document.getElementById('agen-pagamento-wrap');
-            if (pagamentoWrap) pagamentoWrap.classList.add('hidden');
-            agenEsconderHorarios();
-            agenAtualizarResumo();
-            const nome = _getItem('patient_name');
-            const telefone = _getItem('patient_phone');
-            if (nome) document.getElementById('agen-nome').value = nome;
-            if (telefone) document.getElementById('agen-telefone').value = telefone;
-        }
+  function agenOnDataChange() {
+    const inp = document.getElementById('agen-data');
+    if (!inp.value) return;
+    if (!agenIsDiaUtil(inp.value)) {
+      showToast('Esta data não está disponível (fim de semana ou feriado).', 'error');
+      inp.value = '';
+      agenState.data = null;
+      return;
+    }
+    agenState.data = inp.value;
+    agenState.horario = null;
+    ['manha','tarde'].forEach(p => {
+      const btn = document.getElementById('agen-btn-' + p);
+      if (btn) btn.classList.remove('ativo');
+    });
+    agenEsconderHorarios();
+    agenAtualizarResumo();
+    if (agenState.periodo) agenBuscarHorarios();
+  }
 
-        function agenIsDiaUtil(dataStr) {
-            const [y,m,d] = dataStr.split('-').map(Number);
-            const dia = new Date(y, m-1, d).getDay();
-            if (dia === 0 || dia === 6) return false;
-            const mmdd = `${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-            return !FERIADOS_NACIONAIS.includes(mmdd);
-        }
+  function agenSelecionarPeriodo(periodo) {
+    agenState.periodo = periodo;
+    agenState.horario = null;
+    ['manha','tarde'].forEach(p => {
+      const btn = document.getElementById('agen-btn-' + p);
+      if (btn) btn.classList.toggle('ativo', p === periodo);
+    });
+    agenAtualizarResumo();
+    if (agenState.data) agenBuscarHorarios();
+    else showToast('Selecione a data primeiro.', 'info', 2000);
+  }
 
-        function agenOnDataChange() {
-            const inp = document.getElementById('agen-data');
-            if (!inp.value) return;
-            if (!agenIsDiaUtil(inp.value)) {
-                showToast('Esta data não está disponível (fim de semana ou feriado).', 'error');
-                inp.value = '';
-                agenState.data = null;
-                return;
-            }
-            agenState.data = inp.value;
-            agenState.horario = null;
-            ['manha','tarde'].forEach(p => document.getElementById(`agen-btn-${p}`)?.classList.remove('ativo'));
-            agenEsconderHorarios();
-            agenAtualizarResumo();
-            if (agenState.periodo) agenBuscarHorarios();
-        }
+  function agenEsconderHorarios() {
+    ['agen-horarios-placeholder','agen-horarios-loading','agen-horarios-grid','agen-horarios-vazio','agen-horarios-erro']
+      .forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
+    const ph = document.getElementById('agen-horarios-placeholder');
+    if (ph) ph.classList.remove('hidden');
+  }
 
-        function agenSelecionarPeriodo(periodo) {
-            agenState.periodo = periodo;
-            agenState.horario = null;
-            ['manha','tarde'].forEach(p => {
-                document.getElementById(`agen-btn-${p}`)?.classList.toggle('ativo', p === periodo);
-            });
-            agenAtualizarResumo();
-            if (agenState.data) agenBuscarHorarios();
-            else showToast('Selecione a data primeiro.', 'info', 2000);
-        }
+  async function agenBuscarHorarios() {
+    const { data, periodo } = agenState;
+    if (!data || !periodo) return;
+    const slots = periodo === 'manha' ? SLOTS_MANHA : SLOTS_TARDE;
+    ['agen-horarios-placeholder','agen-horarios-grid','agen-horarios-vazio','agen-horarios-erro']
+      .forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
+    const loading = document.getElementById('agen-horarios-loading');
+    if (loading) loading.classList.remove('hidden');
+    agenState.horario = null;
+    document.querySelectorAll('.agen-horario-btn').forEach(btn => btn.classList.remove('ativo'));
+    agenAtualizarResumo();
+    let ocupados = [];
+    let agendaOk = false;
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      const url = APPS_SCRIPT_URL + '?action=listar&data=' + data + '&token=' + encodeURIComponent(CDA_TOKEN);
+      const resp = await fetch(url, { method: 'GET', signal: controller.signal });
+      clearTimeout(timeout);
+      const texto = await resp.text();
+      const json = JSON.parse(texto);
+      ocupados = Array.isArray(json.ocupados) ? json.ocupados : [];
+      agendaOk = true;
+    } catch(err) {
+      console.warn('[CDA] Agenda indisponível:', err);
+      agendaOk = false;
+    }
+    if (loading) loading.classList.add('hidden');
+    if (!agendaOk) {
+      const erroEl = document.getElementById('agen-horarios-erro');
+      if (erroEl) erroEl.classList.remove('hidden');
+    }
+    const agora = new Date();
+    const [selY, selM, selD] = data.split('-').map(Number);
+    const isHoje = agora.getFullYear() === selY && (agora.getMonth()+1) === selM && agora.getDate() === selD;
+    const minutosAgora = agora.getHours() * 60 + agora.getMinutes() + 30;
+    const disponiveis = slots.filter(h => {
+      if (ocupados.includes(h)) return false;
+      if (isHoje) {
+        const [hh, mm] = h.split(':').map(Number);
+        return (hh * 60 + mm) > minutosAgora;
+      }
+      return true;
+    });
+    if (!disponiveis.length) {
+      const vazio = document.getElementById('agen-horarios-vazio');
+      if (vazio) vazio.classList.remove('hidden');
+      return;
+    }
+    const grid = document.getElementById('agen-horarios-grid');
+    grid.innerHTML = disponiveis.map(h => {
+      const isOcupado = ocupados.includes(h);
+      return '<button type="button" class="agen-horario-btn' + (isOcupado ? ' ocupado' : '') + '" data-hora="' + h + '" ' + (isOcupado ? 'disabled title="Horário já reservado"' : '') + '>' + h + (isOcupado ? '<br><span style="font-size:9px;opacity:0.7">Ocupado</span>' : '') + '</button>';
+    }).join('');
+    grid.onclick = function(e) {
+      const btn = e.target.closest('.agen-horario-btn:not(.ocupado)');
+      if (btn) agenSelecionarHorario(btn.dataset.hora);
+    };
+    grid.classList.remove('hidden');
+  }
 
-        function agenEsconderHorarios() {
-            ['agen-horarios-placeholder','agen-horarios-loading','agen-horarios-grid','agen-horarios-vazio','agen-horarios-erro']
-                .forEach(id => document.getElementById(id)?.classList.add('hidden'));
-            document.getElementById('agen-horarios-placeholder')?.classList.remove('hidden');
-        }
+  function agenSelecionarHorario(hora) {
+    agenState.horario = hora;
+    document.querySelectorAll('.agen-horario-btn').forEach(btn => {
+      btn.classList.toggle('ativo', btn.dataset.hora === hora);
+    });
+    agenAtualizarResumo();
+    showToast('Horário ' + hora + ' selecionado', 'success', 1500);
+  }
 
-        async function agenBuscarHorarios() {
-            const { data, periodo } = agenState;
-            if (!data || !periodo) return;
-            const slots = periodo === 'manha' ? SLOTS_MANHA : SLOTS_TARDE;
+  function validarTelefoneBR(valor) {
+    const digitos = String(valor || '').replace(/\D/g, '');
+    if (digitos.length === 10) return /^[1-9]{2}[2-9][0-9]{7}$/.test(digitos);
+    if (digitos.length === 11) return /^[1-9]{2}9[0-9]{8}$/.test(digitos);
+    return false;
+  }
 
-            // Esconde tudo e mostra loading
-            ['agen-horarios-placeholder','agen-horarios-grid','agen-horarios-vazio','agen-horarios-erro']
-                .forEach(id => document.getElementById(id)?.classList.add('hidden'));
-            document.getElementById('agen-horarios-loading')?.classList.remove('hidden');
+  function agenTotalSelecionado() {
+    if (typeof orcSelecionados !== 'undefined' && Array.isArray(orcSelecionados) && orcSelecionados.length > 0) {
+      return orcSelecionados.reduce((s,e) => s + (Number(e.preco) || 0), 0);
+    }
+    if (ultimoOrcamento && ultimoOrcamento.total) return ultimoOrcamento.total;
+    if (ultimoOrcamento && ultimoOrcamento.exames) return ultimoOrcamento.exames.reduce((s,e) => s + (Number(e.preco) || 0), 0);
+    try {
+      const saved = localStorage.getItem('cda_ultimo_orcamento');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.total) return parsed.total;
+        if (parsed.exames) return parsed.exames.reduce((s,e) => s + (Number(e.preco) || 0), 0);
+      }
+    } catch(e) {}
+    return 0;
+  }
 
-            // Limpa horário selecionado ao buscar novamente
-            agenState.horario = null;
-            document.querySelectorAll('.agen-horario-btn').forEach(btn => btn.classList.remove('ativo'));
-            agenAtualizarResumo();
+  function agenPagamentoSelecionado() {
+    const checked = document.querySelector('input[name="agen-pagamento"]:checked');
+    return checked ? checked.value : '';
+  }
 
-            let ocupados = [];
-            let agendaOk = false;
-            try {
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 10000);
-                const url = `${APPS_SCRIPT_URL}?action=listar&data=${data}&token=${encodeURIComponent(CDA_TOKEN)}`;
-                console.log('[CDA] Consultando agenda:', url);
-                const resp = await fetch(url, {
-                    method: 'GET',
-                    signal: controller.signal
-                });
-                clearTimeout(timeout);
-                const texto = await resp.text();
-                console.log('[CDA] Resposta bruta:', texto);
-                const json = JSON.parse(texto);
-                ocupados = Array.isArray(json.ocupados) ? json.ocupados : [];
-                console.log('[CDA] Ocupados:', ocupados);
-                agendaOk = true;
-            } catch(err) {
-                console.warn('[CDA] Agenda indisponível:', err);
-                agendaOk = false;
-            }
-
-            document.getElementById('agen-horarios-loading')?.classList.add('hidden');
-
-            // Se a agenda falhou, mostra todos os horários disponíveis localmente com aviso
-            if (!agendaOk) {
-                const erroEl = document.getElementById('agen-horarios-erro');
-                if (erroEl) erroEl.classList.remove('hidden');
-                // Continua com ocupados vazio (mostra todos os slots filtrados por hora)
-            }
-
-            // Se for hoje, filtrar horários que já passaram (com 30min de margem)
-            const agora = new Date();
-            const [selY, selM, selD] = data.split('-').map(Number);
-            const isHoje = agora.getFullYear() === selY && (agora.getMonth()+1) === selM && agora.getDate() === selD;
-            const minutosAgora = agora.getHours() * 60 + agora.getMinutes() + 30;
-
-            const disponiveis = slots.filter(h => {
-                if (ocupados.includes(h)) return false;
-                if (isHoje) {
-                    const [hh, mm] = h.split(':').map(Number);
-                    return (hh * 60 + mm) > minutosAgora;
-                }
-                return true;
-            });
-
-            if (!disponiveis.length) {
-                document.getElementById('agen-horarios-vazio')?.classList.remove('hidden');
-                return;
-            }
-
-            const grid = document.getElementById('agen-horarios-grid');
-            grid.innerHTML = disponiveis.map(h => {
-                const isOcupado = ocupados.includes(h);
-                return `<button type="button" class="agen-horario-btn${isOcupado ? ' ocupado' : ''}" data-hora="${h}" 
-                    ${isOcupado ? 'disabled title="Horário já reservado"' : ''}
-                    >${h}${isOcupado ? '<br><span style="font-size:9px;opacity:0.7">Ocupado</span>' : ''}</button>`;
-            }).join('');
-
-            // Add event delegation for horario buttons
-            grid.onclick = function(e) {
-                const btn = e.target.closest('.agen-horario-btn:not(.ocupado)');
-                if (btn) {
-                    agenSelecionarHorario(btn.dataset.hora);
-                }
-            };
-            grid.classList.remove('hidden');
-        }
-
-        function agenSelecionarHorario(hora) {
-            agenState.horario = hora;
-            document.querySelectorAll('.agen-horario-btn').forEach(btn => {
-                btn.classList.toggle('ativo', btn.dataset.hora === hora);
-            });
-            agenAtualizarResumo();
-            showToast(`Horário ${hora} selecionado`, 'success', 1500);
-        }
-
-        function validarTelefoneBR(valor) {
-            const digitos = String(valor || '').replace(/\D/g, '');
-            if (digitos.length === 10) return /^[1-9]{2}[2-9][0-9]{7}$/.test(digitos);
-            if (digitos.length === 11) return /^[1-9]{2}9[0-9]{8}$/.test(digitos);
-            return false;
-        }
-
-        function agenTotalSelecionado() {
-            if (typeof orcSelecionados !== 'undefined' && Array.isArray(orcSelecionados) && orcSelecionados.length > 0) {
-              return orcSelecionados.reduce((s,e) => s + (Number(e.preco) || 0), 0);
-            }
-            if (ultimoOrcamento && ultimoOrcamento.total) {
-              return ultimoOrcamento.total;
-            }
-            if (ultimoOrcamento && ultimoOrcamento.exames) {
-              return ultimoOrcamento.exames.reduce((s,e) => s + (Number(e.preco) || 0), 0);
-            }
-            try {
-              const saved = localStorage.getItem('cda_ultimo_orcamento');
-              if (saved) {
-                const parsed = JSON.parse(saved);
-                if (parsed.total) return parsed.total;
-                if (parsed.exames) return parsed.exames.reduce((s,e) => s + (Number(e.preco) || 0), 0);
-              }
-            } catch(e) {}
-            return 0;
-        }
-
-        function agenPagamentoSelecionado() {
-            return document.querySelector('input[name="agen-pagamento"]:checked')?.value || '';
-        }
-
-        function agenAtualizarResumo() {
-            const { data, periodo, horario } = agenState;
-            const nome = document.getElementById('agen-nome')?.value?.trim() || '';
-            const telefone = document.getElementById('agen-telefone')?.value?.trim() || '';
-            const resumo = document.getElementById('agen-resumo');
-            const placeholder = document.getElementById('agen-resumo-placeholder');
-            const btnSalvar = document.getElementById('agen-btn-salvar');
-            const pagamentoWrap = document.getElementById('agen-pagamento-wrap');
-            const pagamento = agenPagamentoSelecionado();
-            agenState.pagamento = pagamento || null;
-
-            // RECUPERAR DADOS DO ORÇAMENTO - PRIORIDADE:
-            // 1. orcSelecionados (se estiver na página de orçamento)
-            // 2. ultimoOrcamento (dados transferidos via agendarColeta)
-            // 3. localStorage (backup caso a navegação limpe as variáveis)
-            let examesAtuais = [];
-            let totalBruto = 0;
-            let totalPix = 0;
-            let totalCredito = 0;
-            let parcelaCredito = 0;
-            let temExames = false;
-
-            // Tentativa 1: orcSelecionados
-            if (typeof orcSelecionados !== 'undefined' && Array.isArray(orcSelecionados) && orcSelecionados.length > 0) {
-              examesAtuais = orcSelecionados;
-              totalBruto = examesAtuais.reduce((s, e) => s + (Number(e.preco) || 0), 0);
-              temExames = true;
-            }
-            // Tentativa 2: ultimoOrcamento
-            else if (ultimoOrcamento && ultimoOrcamento.exames && ultimoOrcamento.exames.length > 0) {
-              examesAtuais = ultimoOrcamento.exames;
-              totalBruto = ultimoOrcamento.total || 0;
-              totalPix = ultimoOrcamento.totalPix || (totalBruto * 0.60);
-              totalCredito = ultimoOrcamento.totalCredito || (totalBruto * 0.65);
-              parcelaCredito = ultimoOrcamento.parcelaCredito || (totalCredito / 10);
-              temExames = true;
-              orcSelecionados = [...examesAtuais];
-            }
-            // Tentativa 3: localStorage
-            else {
-              try {
-                const saved = localStorage.getItem('cda_ultimo_orcamento');
-                if (saved) {
-                  const parsed = JSON.parse(saved);
-                  if (parsed.exames && parsed.exames.length > 0) {
-                    examesAtuais = parsed.exames;
-                    totalBruto = parsed.total || 0;
-                    totalPix = parsed.totalPix || (totalBruto * 0.60);
-                    totalCredito = parsed.totalCredito || (totalBruto * 0.65);
-                    parcelaCredito = parsed.parcelaCredito || (totalCredito / 10);
-                    temExames = true;
-                    ultimoOrcamento = parsed;
-                    orcSelecionados = [...examesAtuais];
-                  }
-                }
-              } catch(e) { console.error('Erro ao recuperar do localStorage:', e); }
-            }
-
-            // Calcular valores se ainda não foram calculados
-            if (temExames && totalPix === 0) {
-              totalPix = totalBruto * 0.60;
-              totalCredito = totalBruto * 0.65;
-              parcelaCredito = totalCredito / 10;
-            }
-
-            const temDadosOrcamento = temExames && totalBruto >= 150;
-            const pronto = data && periodo && horario && nome && temDadosOrcamento && pagamento;
-
-            if (data && periodo && horario) {
-                if (pagamentoWrap) pagamentoWrap.classList.remove('hidden');
-            } else if (pagamentoWrap) {
-                pagamentoWrap.classList.add('hidden');
-            }
-
-            if (data && periodo && horario && nome && temExames) {
-                const [y,m,d] = data.split('-').map(Number);
-                const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-                document.getElementById('agen-resumo-data').textContent = `${dataExt} — ${periodo === 'manha' ? 'Manhã' : 'Tarde'}`;
-                document.getElementById('agen-resumo-hora').textContent = `Horário: ${horario}`;
-                document.getElementById('agen-resumo-nome').textContent = nome;
-
-                const examesWrap = document.getElementById('agen-resumo-exames-wrap');
-                if (temExames) {
-                    examesWrap.classList.remove('hidden');
-                    const pagamentoLinha = pagamento ? '<div class="text-slate-600 dark:text-slate-300 font-bold mt-1">Pagamento escolhido: ' + pagamento + '</div>' : '';
-
-                    // Renderizar lista de exames
-                    let examesHTML = '';
-                    for (let i = 0; i < examesAtuais.length; i++) {
-                      const ex = examesAtuais[i];
-                      const preco = Number(ex.preco) || 0;
-                      examesHTML += '<div class="flex justify-between gap-3" style="padding: 4px 0; border-bottom: 1px solid #f0f0f0;">' +
-                        '<span style="font-size: 0.85rem; color: #334155;">' + (ex.nome || 'Sem nome') + '</span>' +
-                        '<span style="font-weight: 700; font-size: 0.85rem; color: #0F4C5C; white-space: nowrap;">' + formatCurrency(preco) + '</span>' +
-                      '</div>';
-                    }
-                    document.getElementById('agen-resumo-exames').innerHTML = examesHTML;
-
-                    // Renderizar totais
-                    document.getElementById('agen-resumo-total').innerHTML =
-                        '<div style="text-decoration: line-through; color: #94a3b8; font-size: 0.75rem; margin-bottom: 4px;">Particular: ' + formatCurrency(totalBruto) + '</div>' +
-                        '<div style="color: #0F4C5C; font-weight: 800; font-size: 1rem; margin-bottom: 2px;">PIX/Dinheiro/Débito: ' + formatCurrency(totalPix) + '</div>' +
-                        '<div style="color: #475569; font-weight: 700; font-size: 0.9rem; margin-bottom: 2px;">Cartão de crédito: ' + formatCurrency(totalCredito) + '</div>' +
-                        '<div style="color: #64748b; font-size: 0.75rem;">10x de ' + formatCurrency(parcelaCredito) + '</div>' +
-                        pagamentoLinha;
-                } else {
-                    examesWrap.classList.add('hidden');
-                }
-
-                resumo.classList.remove('hidden');
-                placeholder.classList.add('hidden');
-            } else {
-                resumo.classList.add('hidden');
-                placeholder.classList.remove('hidden');
-            }
-
-            if (pronto) btnSalvar.classList.remove('opacity-50','pointer-events-none');
-            else btnSalvar.classList.add('opacity-50','pointer-events-none');
-        }
-
-        async function agenSalvar() {
+  function agenAtualizarResumo() {
     const { data, periodo, horario } = agenState;
-    const nome     = document.getElementById('agen-nome')?.value?.trim();
-    const telefone = document.getElementById('agen-telefone')?.value?.trim();
+    const nome = document.getElementById('agen-nome') ? document.getElementById('agen-nome').value.trim() : '';
+    const telefone = document.getElementById('agen-telefone') ? document.getElementById('agen-telefone').value.trim() : '';
+    const resumo = document.getElementById('agen-resumo');
+    const placeholder = document.getElementById('agen-resumo-placeholder');
+    const btnSalvar = document.getElementById('agen-btn-salvar');
+    const pagamentoWrap = document.getElementById('agen-pagamento-wrap');
+    const pagamento = agenPagamentoSelecionado();
+    agenState.pagamento = pagamento || null;
+    let examesAtuais = [];
+    let totalBruto = 0;
+    let totalPix = 0;
+    let totalCredito = 0;
+    let parcelaCredito = 0;
+    let temExames = false;
+    if (typeof orcSelecionados !== 'undefined' && Array.isArray(orcSelecionados) && orcSelecionados.length > 0) {
+      examesAtuais = orcSelecionados;
+      totalBruto = examesAtuais.reduce((s, e) => s + (Number(e.preco) || 0), 0);
+      temExames = true;
+    } else if (ultimoOrcamento && ultimoOrcamento.exames && ultimoOrcamento.exames.length > 0) {
+      examesAtuais = ultimoOrcamento.exames;
+      totalBruto = ultimoOrcamento.total || 0;
+      totalPix = ultimoOrcamento.totalPix || (totalBruto * 0.60);
+      totalCredito = ultimoOrcamento.totalCredito || (totalBruto * 0.65);
+      parcelaCredito = ultimoOrcamento.parcelaCredito || (totalCredito / 10);
+      temExames = true;
+      orcSelecionados = [...examesAtuais];
+    } else {
+      try {
+        const saved = localStorage.getItem('cda_ultimo_orcamento');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed.exames && parsed.exames.length > 0) {
+            examesAtuais = parsed.exames;
+            totalBruto = parsed.total || 0;
+            totalPix = parsed.totalPix || (totalBruto * 0.60);
+            totalCredito = parsed.totalCredito || (totalBruto * 0.65);
+            parcelaCredito = parsed.parcelaCredito || (totalCredito / 10);
+            temExames = true;
+            ultimoOrcamento = parsed;
+            orcSelecionados = [...examesAtuais];
+          }
+        }
+      } catch(e) {}
+    }
+    if (temExames && totalPix === 0) {
+      totalPix = totalBruto * 0.60;
+      totalCredito = totalBruto * 0.65;
+      parcelaCredito = totalCredito / 10;
+    }
+    const temDadosOrcamento = temExames && totalBruto >= 150;
+    const pronto = data && periodo && horario && nome && temDadosOrcamento && pagamento;
+    if (data && periodo && horario) {
+      if (pagamentoWrap) pagamentoWrap.classList.remove('hidden');
+    } else if (pagamentoWrap) {
+      pagamentoWrap.classList.add('hidden');
+    }
+    if (data && periodo && horario && nome && temExames) {
+      const [y,m,d] = data.split('-').map(Number);
+      const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+      document.getElementById('agen-resumo-data').textContent = dataExt + ' — ' + (periodo === 'manha' ? 'Manhã' : 'Tarde');
+      document.getElementById('agen-resumo-hora').textContent = 'Horário: ' + horario;
+      document.getElementById('agen-resumo-nome').textContent = nome;
+      const examesWrap = document.getElementById('agen-resumo-exames-wrap');
+      if (temExames) {
+        examesWrap.classList.remove('hidden');
+        const pagamentoLinha = pagamento ? '<div class="text-slate-600 font-bold mt-1">Pagamento escolhido: ' + pagamento + '</div>' : '';
+        let examesHTML = '';
+        for (let i = 0; i < examesAtuais.length; i++) {
+          const ex = examesAtuais[i];
+          const preco = Number(ex.preco) || 0;
+          examesHTML += '<div class="flex justify-between gap-3" style="padding: 4px 0; border-bottom: 1px solid #f0f0f0;">' +
+            '<span style="font-size: 0.85rem; color: #334155;">' + (ex.nome || 'Sem nome') + '</span>' +
+            '<span style="font-weight: 700; font-size: 0.85rem; color: #0F4C5C; white-space: nowrap;">' + formatCurrency(preco) + '</span>' +
+          '</div>';
+        }
+        document.getElementById('agen-resumo-exames').innerHTML = examesHTML;
+        document.getElementById('agen-resumo-total').innerHTML =
+          '<div style="text-decoration: line-through; color: #94a3b8; font-size: 0.75rem; margin-bottom: 4px;">Particular: ' + formatCurrency(totalBruto) + '</div>' +
+          '<div style="color: #0F4C5C; font-weight: 800; font-size: 1rem; margin-bottom: 2px;">PIX/Dinheiro/Débito: ' + formatCurrency(totalPix) + '</div>' +
+          '<div style="color: #475569; font-weight: 700; font-size: 0.9rem; margin-bottom: 2px;">Cartão de crédito: ' + formatCurrency(totalCredito) + '</div>' +
+          '<div style="color: #64748b; font-size: 0.75rem;">10x de ' + formatCurrency(parcelaCredito) + '</div>' +
+          pagamentoLinha;
+      } else {
+        examesWrap.classList.add('hidden');
+      }
+      resumo.classList.remove('hidden');
+      placeholder.classList.add('hidden');
+    } else {
+      resumo.classList.add('hidden');
+      placeholder.classList.remove('hidden');
+    }
+    if (pronto) btnSalvar.classList.remove('opacity-50','pointer-events-none');
+    else btnSalvar.classList.add('opacity-50','pointer-events-none');
+  }
+
+  async function agenSalvar() {
+    const { data, periodo, horario } = agenState;
+    const nome = document.getElementById('agen-nome') ? document.getElementById('agen-nome').value.trim() : '';
+    const telefone = document.getElementById('agen-telefone') ? document.getElementById('agen-telefone').value.trim() : '';
     const pagamento = agenPagamentoSelecionado();
     const btnSalvar = document.getElementById('agen-btn-salvar');
-    const statusEl  = document.getElementById('agen-status');
+    const statusEl = document.getElementById('agen-status');
     const totalBruto = agenTotalSelecionado();
-
-    if (!nome)     { showToast('Informe o nome do paciente.', 'error'); return; }
+    if (!nome) { showToast('Informe o nome do paciente.', 'error'); return; }
     if (!telefone) { showToast('Informe o telefone de contato.', 'error'); return; }
     if (!validarTelefoneBR(telefone)) { showToast('Informe um telefone válido com DDD.', 'error'); return; }
-    if (!data)     { showToast('Selecione a data.', 'error'); return; }
-    if (!periodo)  { showToast('Selecione o período.', 'error'); return; }
-    if (!horario)  { showToast('Selecione o horário.', 'error'); return; }
+    if (!data) { showToast('Selecione a data.', 'error'); return; }
+    if (!periodo) { showToast('Selecione o período.', 'error'); return; }
+    if (!horario) { showToast('Selecione o horário.', 'error'); return; }
     if (typeof orcSelecionados === 'undefined' || !orcSelecionados.length) { showToast('Adicione ao menos um exame à lista antes de agendar.', 'error'); return; }
     if (totalBruto < 150) { showToast('Olá! Informamos que a coleta agendada está disponível para orçamentos a partir de R$ 150,00.', 'info', 6000); return; }
     if (!pagamento) { showToast('Selecione a forma de pagamento.', 'error'); return; }
-
     btnSalvar.disabled = true;
     btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Verificando disponibilidade...';
-    statusEl.classList.add('hidden');
-
-    // Double-check: verifica se o horário ainda está disponível
+    if (statusEl) statusEl.classList.add('hidden');
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 6000);
-      const checkResp = await fetch(`${APPS_SCRIPT_URL}?action=listar&data=${data}&token=${CDA_TOKEN}`, { signal: controller.signal });
+      const checkResp = await fetch(APPS_SCRIPT_URL + '?action=listar&data=' + data + '&token=' + CDA_TOKEN, { signal: controller.signal });
       clearTimeout(timeout);
       const checkJson = await checkResp.json();
       const ocupados = Array.isArray(checkJson.ocupados) ? checkJson.ocupados : [];
       if (ocupados.includes(horario)) {
-        showToast(`O horário ${horario} acabou de ser reservado. Por favor, escolha outro horário.`, 'error', 5000);
+        showToast('O horário ' + horario + ' acabou de ser reservado. Por favor, escolha outro horário.', 'error', 5000);
         btnSalvar.disabled = false;
         btnSalvar.innerHTML = '<span class="text">Salvar Agendamento</span><span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594zM175 296.245l204.668-145.757c-176.114 185.79-166.916 176.011-167.684 177.045-1.141 1.535 1.985-4.448-36.984 72.882zm191.858 127.546l-120.296-89.276 217.511-229.462z"/></svg></span>';
         agenState.horario = null;
@@ -2126,44 +1864,34 @@ function fazerCadastro() {
         agenBuscarHorarios();
         return;
       }
-    } catch(err) {
-      console.warn('Verificação prévia falhou, tentando salvar:', err);
-    }
-
+    } catch(err) {}
     btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Salvando...';
-
-    // Monta a descrição completa
     let descExames = '';
     let listaExames = '';
     if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
       const totalPix = totalBruto * 0.60;
       const totalCredito = totalBruto * 0.65;
-      listaExames = orcSelecionados.map(ex => `${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
-      descExames = `\n\nLista de Exames:\n${listaExames}\n\nTotal particular: ${formatCurrency(totalBruto)}\nPIX/Dinheiro/Débito (40% desc): ${formatCurrency(totalPix)}\nCartão de crédito (35% desc): ${formatCurrency(totalCredito)}\nForma de pagamento escolhida: ${pagamento}`;
+      listaExames = orcSelecionados.map(ex => ex.nome + ': ' + formatCurrency(ex.preco)).join('\n');
+      descExames = '\n\nLista de Exames:\n' + listaExames + '\n\nTotal particular: ' + formatCurrency(totalBruto) + '\nPIX/Dinheiro/Débito (40% desc): ' + formatCurrency(totalPix) + '\nCartão de crédito (35% desc): ' + formatCurrency(totalCredito) + '\nForma de pagamento escolhida: ' + pagamento;
     }
-
-    const descricao = `Paciente: ${nome}\nTelefone: ${telefone}\nForma de pagamento: ${pagamento}\nOrigem: Aplicativo CDA${descExames}`;
-
+    const descricao = 'Paciente: ' + nome + '\nTelefone: ' + telefone + '\nForma de pagamento: ' + pagamento + '\nOrigem: Aplicativo CDA' + descExames;
     try {
       const [y, m, d] = data.split('-').map(Number);
       const [hh, mm] = horario.split(':').map(Number);
-      const startDateTime = `${data}T${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`;
+      const startDateTime = data + 'T' + String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0') + ':00';
       const endHh = hh + 1;
-      const endDateTime = `${data}T${String(endHh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`;
-
+      const endDateTime = data + 'T' + String(endHh).padStart(2,'0') + ':' + String(mm).padStart(2,'0') + ':00';
       const resp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
-          action: 'criar', token: CDA_TOKEN, data, horario, nome, telefone, pagamento,
-          startTime: startDateTime,
-          endTime: endDateTime,
-          descricao: descricao
+          action: 'criar', token: CDA_TOKEN, data: data, horario: horario, nome: nome, telefone: telefone, pagamento: pagamento,
+          startTime: startDateTime, endTime: endDateTime, descricao: descricao
         })
       });
       const json = await resp.json();
       if (json.ocupado) {
-        showToast(`O horário ${horario} acabou de ser reservado. Por favor, escolha outro.`, 'error', 5000);
+        showToast('O horário ' + horario + ' acabou de ser reservado. Por favor, escolha outro.', 'error', 5000);
         btnSalvar.disabled = false;
         btnSalvar.innerHTML = '<span class="text">Salvar Agendamento</span><span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594zM175 296.245l204.668-145.757c-176.114 185.79-166.916 176.011-167.684 177.045-1.141 1.535 1.985-4.448-36.984 72.882zm191.858 127.546l-120.296-89.276 217.511-229.462z"/></svg></span>';
         agenState.horario = null;
@@ -2179,123 +1907,53 @@ function fazerCadastro() {
       console.error('Erro agendamento:', err);
       agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento);
     }
-  }function agenSucesso(nome, data, horario) {
+  }
+
+  function agenSucesso(nome, data, horario) {
     const [y,m,d] = data.split('-').map(Number);
     const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
     const pagamento = agenPagamentoSelecionado() || '—';
     const totalBruto = agenTotalSelecionado();
     const totalPix = totalBruto * 0.60;
     const totalCredito = totalBruto * 0.65;
-
     if (nome) localStorage.setItem('patient_name', nome);
-    const telefone = document.getElementById('agen-telefone')?.value?.trim();
+    const telefone = document.getElementById('agen-telefone') ? document.getElementById('agen-telefone').value.trim() : '';
     if (telefone) localStorage.setItem('patient_phone', telefone);
-
-    // Preenche dados do modal
     document.getElementById('modal-agen-nome').textContent = nome;
-    document.getElementById('modal-agen-data').textContent = `${dataExt} às ${horario}`;
-
+    document.getElementById('modal-agen-data').textContent = dataExt + ' às ' + horario;
     const qtd = (typeof orcSelecionados !== 'undefined' && orcSelecionados.length)
-      ? `${orcSelecionados.length} exame${orcSelecionados.length > 1 ? 's' : ''} — PIX: ${formatCurrency(totalPix)} / Crédito: ${formatCurrency(totalCredito)}`
+      ? orcSelecionados.length + ' exame' + (orcSelecionados.length > 1 ? 's' : '') + ' — PIX: ' + formatCurrency(totalPix) + ' / Crédito: ' + formatCurrency(totalCredito)
       : '—';
     document.getElementById('modal-agen-exames').textContent = qtd;
     document.getElementById('modal-agen-pagamento').textContent = pagamento;
-
-    // Exibe o modal
     const modal = document.getElementById('modal-agen-confirmacao');
     modal.classList.remove('hidden');
     modal.classList.add('flex');
-  }function agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento) {
-            const [y,m,d] = data.split('-').map(Number);
-            const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
-            const msg = `Olá! Gostaria de agendar uma coleta pelo aplicativo.\n\n*Nome:* ${nome}\n*Telefone:* ${telefone}\n*Data:* ${dataExt}\n*Horário:* ${horario}\n*Forma de pagamento:* ${pagamento || 'Não informada'}${descExames}\n\n_Agendamento via Aplicativo CDA_`;
-            window.open('https://wa.me/5527998980658?text=' + encodeURIComponent(msg), '_blank');
-            const btnSalvar = document.getElementById('agen-btn-salvar');
-            btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
-            btnSalvar.disabled = false;
-        }
+  }
 
-        function orcIrParaAgendamento() {
-            if (!orcSelecionados.length) {
-                showToast('Selecione ao menos um exame para agendar a coleta.', 'error');
-                return;
-            }
-            const totalBruto = orcSelecionados.reduce((s,e)=>s+e.preco,0);
-            if (totalBruto < 150) {
-                showToast('Olá! Informamos que a coleta agendada está disponível para orçamentos a partir de R$ 150,00.', 'info', 6000);
-                return;
-            }
-            navigateTo('agendar');
-            setTimeout(() => {
-                const nome = _getItem('patient_name');
-                const telefone = _getItem('patient_phone');
-                if (nome) document.getElementById('agen-nome').value = nome;
-                if (telefone) document.getElementById('agen-telefone').value = telefone;
-                agenAtualizarResumo();
-            }, 100);
-        }
-
-        
+  function agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento) {
+    const [y,m,d] = data.split('-').map(Number);
+    const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+    const msg = 'Olá! Gostaria de agendar uma coleta pelo aplicativo.\n\n*Nome:* ' + nome + '\n*Telefone:* ' + telefone + '\n*Data:* ' + dataExt + '\n*Horário:* ' + horario + '\n*Forma de pagamento:* ' + (pagamento || 'Não informada') + descExames + '\n\n_Agendamento via Aplicativo CDA_';
+    window.open('https://wa.me/5527998980658?text=' + encodeURIComponent(msg), '_blank');
+    const btnSalvar = document.getElementById('agen-btn-salvar');
+    btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+    btnSalvar.disabled = false;
+  }
 
   function modalAgenOk() {
     const modal = document.getElementById('modal-agen-confirmacao');
     modal.classList.add('hidden');
     modal.classList.remove('flex');
-
-    // Limpa orçamento e agendamento
     orcSelecionados = [];
     orcRenderSelecionados();
     agenInicializar();
-
     navigateToPage('home');
   }
 
-  // GSAP Animation for send button
-  const sendButton = document.getElementById('agen-btn-salvar');
-  if (sendButton) {
-    sendButton.addEventListener('click', function() {
-      if (sendButton.disabled) return;
-      const svg = sendButton.querySelector('.icon svg');
-      if (svg) {
-        svg.style.transition = 'none';
-        svg.style.transform = 'translate(-8px, 8px)';
-        setTimeout(() => {
-          svg.style.transform = 'translate(50vw, -50vh)';
-        }, 400);
-        setTimeout(() => {
-          svg.style.transform = 'translate(-50vw, 50vh)';
-        }, 800);
-        setTimeout(() => {
-          svg.style.transition = 'transform 0.4s ease-out';
-          svg.style.transform = 'translate(0, 0)';
-        }, 1100);
-      }
-    });
-  }
-
-  // Inicializa data mínima
   document.getElementById('agen-data').min = new Date().toISOString().split('T')[0];
 
-
-  // ==================== UPPERCASE EM TODOS OS CAMPOS ====================
-  function forcarUppercase() {
-    const campos = ['login-usuario', 'login-senha', 'signup-name', 'signup-email', 'signup-password',
-                    'orc-paciente', 'agen-nome', 'agen-telefone',
-                    'config-login', 'config-senha', 'config-senha-confirm', 'senha-config-input'];
-    campos.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.addEventListener('input', function() {
-          this.value = this.value.toUpperCase();
-        });
-        el.addEventListener('blur', function() {
-          this.value = this.value.toUpperCase();
-        });
-      }
-    });
-  }
-
-  // ==================== CONFIGURAÇÕES - MODAL SENHA ====================
+  // ==================== CONFIGURACOES - SENHA 5912 ====================
   const SENHA_CONFIG = '5912';
   let configAutorizado = false;
 
@@ -2333,125 +1991,120 @@ function fazerCadastro() {
     }
   }
 
-  document.getElementById('senha-config-input')?.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') verificarSenhaConfig();
-  });
-
-  // Resetar autorização ao sair da página de configurações
-  navItems.forEach(li => {
-    li.addEventListener('click', e => {
-      const pageId = li.getAttribute('data-page');
-      if (pageId !== 'configuracoes') {
-        configAutorizado = false;
-      }
+  const senhaConfigInput = document.getElementById('senha-config-input');
+  if (senhaConfigInput) {
+    senhaConfigInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') verificarSenhaConfig();
     });
-  });
+  }
 
-  // ==================== SALVAR ORÇAMENTO NA PLANILHA ====================
-  async function salvarOrcamentoNaPlanilha(origem) {
-    const paciente = document.getElementById('orc-paciente')?.value?.trim().toUpperCase() || '';
-    if (!paciente || orcSelecionados.length === 0) return false;
+  // ==================== RECOLETAS ====================
+  let recExamesSelecionados = [];
+  let recTipo = null;
+  let recLabExterno = null;
 
-    const examesNomes = orcSelecionados.map(ex => ex.nome).join(' | ');
-    const examesCodigos = orcSelecionados.map(ex => ex.codigo).join(' | ');
-    const totalBruto = orcSelecionados.reduce((sum, ex) => sum + parseFloat(ex.preco || 0), 0);
-    const totalPix = totalBruto * 0.60;
-    const totalCredito = totalBruto * 0.65;
-    const dataAtual = new Date().toLocaleDateString('pt-BR');
-    const mesAno = new Date().toLocaleDateString('pt-BR', {month: '2-digit', year: 'numeric'});
+  const recSearchInput = document.getElementById('rec-search');
+  const recAutocompleteList = document.getElementById('rec-autocomplete-list');
 
-    try {
-      // Verificar se já existe orçamento duplicado
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000);
-      const url = APPS_SCRIPT_URL + '?action=verificarDuplicado&paciente=' + encodeURIComponent(paciente) + '&exames=' + encodeURIComponent(examesNomes) + '&token=' + encodeURIComponent(CDA_TOKEN);
-
-      const resp = await fetch(url, { signal: controller.signal });
-      clearTimeout(timeout);
-      const json = await resp.json();
-
-      if (json.duplicado) {
-        console.log('Orçamento duplicado encontrado, não será salvo novamente.');
-        return true;
+  if (recSearchInput) {
+    recSearchInput.addEventListener('input', function() {
+      const valor = this.value.toLowerCase().trim();
+      if (valor.length < 2) { recAutocompleteList.classList.remove('show'); return; }
+      const filtrados = listaExames.filter(ex => {
+        const nome = (ex.nome || '').toLowerCase();
+        const codigo = (ex.codigo || '').toLowerCase();
+        const busca = (ex.busca || '').toLowerCase();
+        return nome.includes(valor) || codigo.includes(valor) || busca.includes(valor);
+      }).slice(0, 10);
+      if (filtrados.length === 0) {
+        recAutocompleteList.innerHTML = '<div class="autocomplete-item"><div class="autocomplete-item-nome">Nenhum exame encontrado</div></div>';
+      } else {
+        recAutocompleteList.innerHTML = filtrados.map(ex => {
+          const nome = ex.nome || 'Sem nome';
+          const codigo = ex.codigo || '---';
+          return '<div class="autocomplete-item" onclick="recAdicionarExame(' + ex.id + ')"><div class="autocomplete-item-nome">' + nome + '</div><div class="autocomplete-item-codigo">Código: ' + codigo + '</div></div>';
+        }).join('');
       }
+      recAutocompleteList.classList.add('show');
+    });
+  }
 
-      // Salvar novo orçamento
-      const salvarResp = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({
-          action: 'salvarOrcamento',
-          token: CDA_TOKEN,
-          paciente: paciente,
-          exames: examesNomes,
-          codigos: examesCodigos,
-          totalBruto: totalBruto,
-          totalPix: totalPix,
-          totalCredito: totalCredito,
-          quantidadeExames: orcSelecionados.length,
-          data: dataAtual,
-          mesAno: mesAno,
-          origem: origem || 'sistema'
-        })
-      });
+  function recAdicionarExame(id) {
+    const exame = listaExames.find(e => e.id === id);
+    if (!exame) return;
+    if (recExamesSelecionados.some(e => e.id === id)) { showToast('Exame já selecionado!', 'error'); return; }
+    recExamesSelecionados.push(exame);
+    recRenderExames();
+    if (recSearchInput) recSearchInput.value = '';
+    if (recAutocompleteList) recAutocompleteList.classList.remove('show');
+    showToast('Exame adicionado!');
+  }
 
-      const salvarJson = await salvarResp.json();
-      return salvarJson.ok;
-    } catch(err) {
-      console.error('Erro ao salvar orçamento:', err);
-      return false;
+  function recRemoverExame(index) {
+    recExamesSelecionados.splice(index, 1);
+    recRenderExames();
+    showToast('Exame removido');
+  }
+
+  function recRenderExames() {
+    const container = document.getElementById('rec-exames-selecionados');
+    if (recExamesSelecionados.length === 0) {
+      container.innerHTML = '<p class="text-sm text-slate-400 text-center py-2">Nenhum exame selecionado</p>';
+      return;
+    }
+    container.innerHTML = recExamesSelecionados.map((ex, index) => {
+      const nome = ex.nome || 'Sem nome';
+      const codigo = ex.codigo || '---';
+      return '<div class="exame-selecionado-item"><div class="exame-info"><div class="exame-nome">' + nome + '</div><div class="exame-codigo">' + codigo + '</div></div><button class="btn-remover-exame" onclick="recRemoverExame(' + index + ')" title="Remover"><i class="fa-solid fa-xmark"></i></button></div>';
+    }).join('');
+  }
+
+  function recSelecionarTipo(tipo) {
+    recTipo = tipo;
+    document.querySelectorAll('.recoleta-radio-label').forEach(el => el.classList.remove('ativo'));
+    document.getElementById('rec-label-' + tipo).classList.add('ativo');
+    document.querySelectorAll('.recoleta-radio-label input[type="radio"]').forEach(r => r.checked = false);
+    document.querySelector('#rec-label-' + tipo + ' input[type="radio"]').checked = true;
+    const externoOptions = document.getElementById('rec-externo-options');
+    if (tipo === 'externo') {
+      externoOptions.classList.add('show');
+    } else {
+      externoOptions.classList.remove('show');
+      recLabExterno = null;
+      document.querySelectorAll('.recoleta-externo-btn').forEach(btn => btn.classList.remove('ativo'));
     }
   }
 
-  // ==================== CONTAR ORÇAMENTOS DO MÊS ====================
-  async function contarOrcamentosDoMes() {
-    try {
-      const agora = new Date();
-      const mesAno = String(agora.getMonth() + 1).padStart(2, '0') + '/' + agora.getFullYear();
-
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000);
-      const url = APPS_SCRIPT_URL + '?action=contarOrcamentos&mesAno=' + encodeURIComponent(mesAno) + '&token=' + encodeURIComponent(CDA_TOKEN);
-
-      const resp = await fetch(url, { signal: controller.signal });
-      clearTimeout(timeout);
-      const json = await resp.json();
-
-      if (json.ok && typeof json.total === 'number') {
-        dadosMensais.orcamentos = json.total;
-        atualizarMesStats();
-      }
-    } catch(err) {
-      console.error('Erro ao contar orçamentos:', err);
-    }
+  function recSelecionarLabExterno(btn) {
+    document.querySelectorAll('.recoleta-externo-btn').forEach(b => b.classList.remove('ativo'));
+    btn.classList.add('ativo');
+    recLabExterno = btn.dataset.lab;
   }
 
-  // ==================== CADASTRAR USUÁRIO ====================
-  async function cadastrarUsuario() {
-    const login = document.getElementById('config-login').value.trim().toUpperCase();
-    const senha = document.getElementById('config-senha').value.trim().toUpperCase();
-    const senhaConfirm = document.getElementById('config-senha-confirm').value.trim().toUpperCase();
-    const errorEl = document.getElementById('config-error');
-    const successEl = document.getElementById('config-success');
+  function salvarRecoleta() {
+    const codigo = document.getElementById('rec-codigo').value.trim().toUpperCase();
+    const nome = document.getElementById('rec-nome').value.trim().toUpperCase();
+    const motivo = document.getElementById('rec-motivo').value.trim();
+    const obs = document.getElementById('rec-obs').value.trim();
+    const errorEl = document.getElementById('rec-error');
+    const successEl = document.getElementById('rec-success');
 
-    if (!login || !senha || !senhaConfirm) {
-      errorEl.innerText = 'PREENCHA TODOS OS CAMPOS';
+    if (!codigo || !nome || recExamesSelecionados.length === 0) {
+      errorEl.innerText = 'Preencha código, nome e selecione pelo menos um exame.';
       errorEl.style.display = 'block';
       successEl.style.display = 'none';
       setTimeout(() => errorEl.style.display = 'none', 3000);
       return;
     }
-
-    if (senha !== senhaConfirm) {
-      errorEl.innerText = 'AS SENHAS NÃO CONFEREM';
+    if (!recTipo) {
+      errorEl.innerText = 'Selecione o tipo de exame (Interno ou Externo).';
       errorEl.style.display = 'block';
       successEl.style.display = 'none';
       setTimeout(() => errorEl.style.display = 'none', 3000);
       return;
     }
-
-    if (senha.length < 4) {
-      errorEl.innerText = 'A SENHA DEVE TER NO MÍNIMO 4 CARACTERES';
+    if (recTipo === 'externo' && !recLabExterno) {
+      errorEl.innerText = 'Selecione o laboratório externo.';
       errorEl.style.display = 'block';
       successEl.style.display = 'none';
       setTimeout(() => errorEl.style.display = 'none', 3000);
@@ -2460,28 +2113,179 @@ function fazerCadastro() {
 
     errorEl.style.display = 'none';
 
+    const recoleta = {
+      id: Date.now(),
+      codigo: codigo,
+      nome: nome,
+      exames: recExamesSelecionados.map(e => ({ id: e.id, nome: e.nome, codigo: e.codigo })),
+      tipo: recTipo,
+      labExterno: recLabExterno,
+      motivo: motivo,
+      observacoes: obs,
+      data: new Date().toLocaleDateString('pt-BR')
+    };
+
+    let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
+    recoletas.push(recoleta);
+    localStorage.setItem('cda_recoletas', JSON.stringify(recoletas));
+
+    successEl.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Recoleta cadastrada com sucesso!';
+    successEl.style.display = 'block';
+
+    // Limpar formulário
+    document.getElementById('rec-codigo').value = '';
+    document.getElementById('rec-nome').value = '';
+    document.getElementById('rec-motivo').value = '';
+    document.getElementById('rec-obs').value = '';
+    recExamesSelecionados = [];
+    recRenderExames();
+    recTipo = null;
+    recLabExterno = null;
+    document.querySelectorAll('.recoleta-radio-label').forEach(el => el.classList.remove('ativo'));
+    document.querySelectorAll('.recoleta-radio-label input[type="radio"]').forEach(r => r.checked = false);
+    document.getElementById('rec-externo-options').classList.remove('show');
+    document.querySelectorAll('.recoleta-externo-btn').forEach(btn => btn.classList.remove('ativo'));
+
+    carregarRecoletas();
+    showToast('Recoleta cadastrada com sucesso!');
+    setTimeout(() => successEl.style.display = 'none', 3000);
+  }
+
+  function carregarRecoletas() {
+    const container = document.getElementById('rec-lista');
+    const recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
+    if (recoletas.length === 0) {
+      container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhuma recoleta cadastrada.</p>';
+      return;
+    }
+    container.innerHTML = recoletas.map((r, index) => {
+      const examesNomes = r.exames.map(e => e.nome).join(', ');
+      const tipoBadge = r.tipo === 'interno'
+        ? '<span class="recoleta-badge interno"><i class="fa-solid fa-house-medical"></i> Interno</span>'
+        : '<span class="recoleta-badge externo"><i class="fa-solid fa-truck-medical"></i> Externo</span>';
+      const labInfo = r.tipo === 'externo' && r.labExterno ? '<div class="recoleta-externo-lab"><i class="fa-solid fa-building mr-1"></i> ' + r.labExterno + '</div>' : '';
+      const motivoInfo = r.motivo ? '<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ' + r.motivo + '</div>' : '';
+      const obsInfo = r.observacoes ? '<div class="recoleta-obs"><i class="fa-solid fa-note-sticky mr-1"></i> ' + r.observacoes + '</div>' : '';
+      return '<div class="recoleta-card">' +
+        '<div class="recoleta-header">' +
+          '<div>' +
+            '<div class="recoleta-codigo">CÓDIGO: ' + r.codigo + '</div>' +
+            '<div class="recoleta-nome">' + r.nome + '</div>' +
+          '</div>' +
+          '<div>' + tipoBadge + '</div>' +
+        '</div>' +
+        labInfo +
+        '<div class="recoleta-exames"><i class="fa-solid fa-vial mr-1 text-cda-primary"></i> ' + examesNomes + '</div>' +
+        motivoInfo +
+        obsInfo +
+        '<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">' +
+          '<span class="text-xs text-slate-400">Cadastrado em: ' + r.data + '</span>' +
+          '<button class="btn-remover-exame" onclick="excluirRecoleta(' + index + ')" title="Excluir" style="width: 32px; height: 32px;"><i class="fa-solid fa-trash"></i></button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function excluirRecoleta(index) {
+    if (!confirm('Tem certeza que deseja excluir esta recoleta?')) return;
+    let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
+    recoletas.splice(index, 1);
+    localStorage.setItem('cda_recoletas', JSON.stringify(recoletas));
+    carregarRecoletas();
+    showToast('Recoleta excluída com sucesso!');
+  }
+
+  // ==================== SALVAR ORCAMENTO NA PLANILHA ====================
+  async function salvarOrcamentoNaPlanilha(origem) {
+    const paciente = document.getElementById('orc-paciente') ? document.getElementById('orc-paciente').value.trim().toUpperCase() : '';
+    if (!paciente || orcSelecionados.length === 0) return false;
+    const examesNomes = orcSelecionados.map(ex => ex.nome).join(' | ');
+    const examesCodigos = orcSelecionados.map(ex => ex.codigo).join(' | ');
+    const totalBruto = orcSelecionados.reduce((sum, ex) => sum + parseFloat(ex.preco || 0), 0);
+    const totalPix = totalBruto * 0.60;
+    const totalCredito = totalBruto * 0.65;
+    const dataAtual = new Date().toLocaleDateString('pt-BR');
+    const mesAno = new Date().toLocaleDateString('pt-BR', {month: '2-digit', year: 'numeric'});
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      const url = APPS_SCRIPT_URL + '?action=verificarDuplicado&paciente=' + encodeURIComponent(paciente) + '&exames=' + encodeURIComponent(examesNomes) + '&token=' + encodeURIComponent(CDA_TOKEN);
+      const resp = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeout);
+      const json = await resp.json();
+      if (json.duplicado) return true;
+      const salvarResp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'salvarOrcamento', token: CDA_TOKEN, paciente: paciente, exames: examesNomes,
+          codigos: examesCodigos, totalBruto: totalBruto, totalPix: totalPix, totalCredito: totalCredito,
+          quantidadeExames: orcSelecionados.length, data: dataAtual, mesAno: mesAno, origem: origem || 'sistema'
+        })
+      });
+      const salvarJson = await salvarResp.json();
+      return salvarJson.ok;
+    } catch(err) { return false; }
+  }
+
+  async function contarOrcamentosDoMes() {
+    try {
+      const agora = new Date();
+      const mesAno = String(agora.getMonth() + 1).padStart(2, '0') + '/' + agora.getFullYear();
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      const url = APPS_SCRIPT_URL + '?action=contarOrcamentos&mesAno=' + encodeURIComponent(mesAno) + '&token=' + encodeURIComponent(CDA_TOKEN);
+      const resp = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeout);
+      const json = await resp.json();
+      if (json.ok && typeof json.total === 'number') {
+        dadosMensais.orcamentos = json.total;
+        atualizarMesStats();
+      }
+    } catch(err) {}
+  }
+
+  async function cadastrarUsuario() {
+    const login = document.getElementById('config-login').value.trim().toUpperCase();
+    const senha = document.getElementById('config-senha').value.trim().toUpperCase();
+    const senhaConfirm = document.getElementById('config-senha-confirm').value.trim().toUpperCase();
+    const errorEl = document.getElementById('config-error');
+    const successEl = document.getElementById('config-success');
+    if (!login || !senha || !senhaConfirm) {
+      errorEl.innerText = 'PREENCHA TODOS OS CAMPOS';
+      errorEl.style.display = 'block';
+      successEl.style.display = 'none';
+      setTimeout(() => errorEl.style.display = 'none', 3000);
+      return;
+    }
+    if (senha !== senhaConfirm) {
+      errorEl.innerText = 'AS SENHAS NÃO CONFEREM';
+      errorEl.style.display = 'block';
+      successEl.style.display = 'none';
+      setTimeout(() => errorEl.style.display = 'none', 3000);
+      return;
+    }
+    if (senha.length < 4) {
+      errorEl.innerText = 'A SENHA DEVE TER NO MÍNIMO 4 CARACTERES';
+      errorEl.style.display = 'block';
+      successEl.style.display = 'none';
+      setTimeout(() => errorEl.style.display = 'none', 3000);
+      return;
+    }
+    errorEl.style.display = 'none';
     try {
       const btn = document.querySelector('button[onclick="cadastrarUsuario()"]');
       const originalText = btn.innerHTML;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> CADASTRANDO...';
       btn.disabled = true;
-
       const resp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({
-          action: 'cadastrarUsuario',
-          token: CDA_TOKEN,
-          login: login,
-          senha: senha
-        })
+        body: JSON.stringify({ action: 'cadastrarUsuario', token: CDA_TOKEN, login: login, senha: senha })
       });
-
       const json = await resp.json();
-
       btn.innerHTML = originalText;
       btn.disabled = false;
-
       if (json.ok) {
         successEl.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> USUÁRIO CADASTRADO COM SUCESSO!';
         successEl.style.display = 'block';
@@ -2498,27 +2302,22 @@ function fazerCadastro() {
         throw new Error(json.erro || 'Erro ao cadastrar');
       }
     } catch(err) {
-      console.error('Erro cadastro:', err);
       errorEl.innerText = 'ERRO AO CADASTRAR. TENTE NOVAMENTE.';
       errorEl.style.display = 'block';
       setTimeout(() => errorEl.style.display = 'none', 3000);
     }
   }
 
-  // ==================== CARREGAR USUÁRIOS ====================
   async function carregarUsuarios() {
     const container = document.getElementById('config-lista-usuarios');
     container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>CARREGANDO...</p>';
-
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 8000);
       const url = APPS_SCRIPT_URL + '?action=listarUsuarios&token=' + encodeURIComponent(CDA_TOKEN);
-
       const resp = await fetch(url, { signal: controller.signal });
       clearTimeout(timeout);
       const json = await resp.json();
-
       if (json.ok && Array.isArray(json.usuarios)) {
         if (json.usuarios.length === 0) {
           container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">NENHUM USUÁRIO CADASTRADO</p>';
@@ -2531,7 +2330,7 @@ function fazerCadastro() {
               '<div class="exame-codigo">Cadastrado em: ' + (u.data || '---') + '</div>' +
             '</div>' +
             '<div style="display: flex; gap: 8px;">' +
-              '<button class="btn-remover-exame" onclick="excluirUsuario(' + idx + ', ' + (u.login ? "\'" + u.login + "\'" : "\'\'") + ')" title="Excluir" style="width: 32px; height: 32px;">' +
+              '<button class="btn-remover-exame" onclick="excluirUsuario(' + idx + ', ' + (u.login ? "'" + u.login + "'" : "''") + ')" title="Excluir" style="width: 32px; height: 32px;">' +
                 '<i class="fa-solid fa-trash"></i>' +
               '</button>' +
             '</div>' +
@@ -2541,26 +2340,18 @@ function fazerCadastro() {
         container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">ERRO AO CARREGAR USUÁRIOS</p>';
       }
     } catch(err) {
-      console.error('Erro listar usuários:', err);
       container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">ERRO AO CARREGAR. TENTE NOVAMENTE.</p>';
     }
   }
 
-  // ==================== EXCLUIR USUÁRIO ====================
   async function excluirUsuario(index, login) {
     if (!confirm('TEM CERTEZA QUE DESEJA EXCLUIR O USUÁRIO "' + login + '"?')) return;
-
     try {
       const resp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({
-          action: 'excluirUsuario',
-          token: CDA_TOKEN,
-          login: login
-        })
+        body: JSON.stringify({ action: 'excluirUsuario', token: CDA_TOKEN, login: login })
       });
-
       const json = await resp.json();
       if (json.ok) {
         showToast('USUÁRIO EXCLUÍDO COM SUCESSO!');
@@ -2569,76 +2360,10 @@ function fazerCadastro() {
         throw new Error(json.erro || 'Erro ao excluir');
       }
     } catch(err) {
-      console.error('Erro excluir:', err);
       showToast('ERRO AO EXCLUIR USUÁRIO', 'error');
     }
   }
 </script>
 
-
-    <!-- MODAL CONFIRMAÇÃO DE AGENDAMENTO -->
-    <div id="modal-agen-confirmacao" class="fixed inset-0 z-[110] hidden items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
-        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-[32px] shadow-2xl overflow-hidden anim-in">
-            <div class="bg-gradient-to-br from-green-400 to-emerald-500 p-8 flex flex-col items-center gap-3">
-                <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center">
-                    <i class="fa-solid fa-calendar-check text-white text-4xl"></i>
-                </div>
-                <p class="text-white font-extrabold text-xl text-center">Agendamento Confirmado!</p>
-            </div>
-            <div class="p-6 space-y-3">
-                <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-3">
-                    <i class="fa-solid fa-user text-cda-primary w-5 text-center"></i>
-                    <div>
-                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wide">Paciente</p>
-                        <p id="modal-agen-nome" class="font-bold text-slate-800 dark:text-white text-sm"></p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-3">
-                    <i class="fa-regular fa-calendar text-cda-primary w-5 text-center"></i>
-                    <div>
-                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wide">Data e Horário</p>
-                        <p id="modal-agen-data" class="font-bold text-slate-800 dark:text-white text-sm"></p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-3">
-                    <i class="fa-solid fa-flask text-cda-primary w-5 text-center"></i>
-                    <div>
-                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wide">Exames</p>
-                        <p id="modal-agen-exames" class="font-bold text-slate-800 dark:text-white text-sm"></p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-3">
-                    <i class="fa-solid fa-credit-card text-cda-primary w-5 text-center"></i>
-                    <div>
-                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wide">Pagamento</p>
-                        <p id="modal-agen-pagamento" class="font-bold text-slate-800 dark:text-white text-sm"></p>
-                    </div>
-                </div>
-                <p class="text-xs text-slate-400 text-center pt-1">Um evento foi criado na agenda do laboratório. Até lá! 😊</p>
-            </div>
-            <div class="px-6 pb-6">
-                <button onclick="modalAgenOk()" class="w-full btn-cda-primary py-4 rounded-2xl font-extrabold text-base flex items-center justify-center gap-2 shadow-lg shadow-cda-primary/20">
-                    <i class="fa-solid fa-check"></i> OK, entendido!
-                </button>
-            </div>
-        </div>
-    </div>
-
-<!-- MODAL SENHA CONFIGURAÇÕES -->
-<div id="modal-senha-config" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 76, 92, 0.85); z-index: 99998; display: none; justify-content: center; align-items: center; backdrop-filter: blur(8px);">
-    <div style="background: #ecf0f3; border-radius: 24px; padding: 40px; width: 400px; max-width: 90vw; box-shadow: 10px 10px 30px rgba(0,0,0,0.3); text-align: center;">
-        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-            <i class="fa-solid fa-lock" style="color: white; font-size: 24px;"></i>
-        </div>
-        <h2 style="font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 700; color: #181818; margin-bottom: 8px;">Área Restrita</h2>
-        <p style="font-size: 13px; color: #a0a5a8; margin-bottom: 24px;">Digite a senha de administrador para acessar as configurações.</p>
-        <input type="password" id="senha-config-input" placeholder="Senha de acesso" style="width: 100%; height: 45px; padding-left: 20px; font-size: 14px; letter-spacing: 2px; border: none; outline: none; font-family: 'Montserrat', sans-serif; background-color: #ecf0f3; border-radius: 12px; box-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #f9f9f9; color: #181818; text-align: center; margin-bottom: 16px;">
-        <div id="senha-config-error" style="color: #ef4444; font-size: 0.8rem; margin-bottom: 12px; display: none;">Senha incorreta</div>
-        <div style="display: flex; gap: 10px;">
-            <button onclick="fecharModalSenha()" style="flex: 1; height: 45px; border-radius: 22px; font-weight: 600; font-size: 13px; background: #d1d9e6; color: #64748B; border: none; cursor: pointer; font-family: 'Montserrat', sans-serif;">Cancelar</button>
-            <button onclick="verificarSenhaConfig()" style="flex: 1; height: 45px; border-radius: 22px; font-weight: 700; font-size: 13px; background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%); color: #f9f9f9; border: none; cursor: pointer; font-family: 'Montserrat', sans-serif; box-shadow: 4px 4px 10px rgba(15,76,92,0.3);">Acessar</button>
-        </div>
-    </div>
-</div>
 </body>
 </html>
