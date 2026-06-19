@@ -365,6 +365,7 @@
     @media (max-width: 768px) { .home-grid { grid-template-columns: 1fr; } body.app-loaded { padding: 1rem 0 0 1rem; } .site-wrap { grid-template-columns: 1fr; } .site-nav { display: none; } }
   </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -931,14 +932,7 @@
   });
 
   function handleLoginClick() {
-    fazerLogin().catch(function(err) {
-      var errorEl = document.getElementById('login-error');
-      if (errorEl) {
-        errorEl.innerText = 'Erro inesperado. Tente novamente.';
-        errorEl.style.display = 'block';
-        errorEl.style.color = '#ef4444';
-      }
-    });
+    fazerLogin();
   }
 
   async function fazerLogin() {
@@ -982,9 +976,7 @@
         errorEl.style.color = '#ef4444';
         setTimeout(() => errorEl.style.display = 'none', 5000);
       } else {
-        errorEl.innerText = 'ERRO: ' + (json.erro || 'Acesso negado');
-        errorEl.style.color = '#ef4444';
-        setTimeout(() => errorEl.style.display = 'none', 5000);
+        throw new Error(json.erro || 'Acesso negado');
       }
     } catch(err) {
       if (err.name === 'AbortError') {
