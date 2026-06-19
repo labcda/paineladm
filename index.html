@@ -2167,7 +2167,6 @@
       listaExames = orcSelecionados.map(ex => ex.nome + ': ' + formatCurrency(ex.preco)).join('\n');
       descExames = '\n\nLista de Exames:\n' + listaExames + '\n\nTotal particular: ' + formatCurrency(totalBruto) + '\nPIX/Dinheiro/Débito (40% desc): ' + formatCurrency(totalPix) + '\nCartão de crédito (35% desc): ' + formatCurrency(totalCredito);
     }
-    const nascimento = document.getElementById('agen-nascimento') ? document.getElementById('agen-nascimento').value : '';
     let descricao = 'Paciente: ' + nome + '\nTelefone: ' + telefone;
     if (nascimento) descricao += '\nData de nascimento: ' + new Date(nascimento).toLocaleDateString('pt-BR');
     descricao += '\nForma de pagamento: ' + pagamento + '\nOrigem: Aplicativo CDA';
