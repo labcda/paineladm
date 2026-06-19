@@ -604,14 +604,14 @@
                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
                             <i class="fa-regular fa-user text-cda-primary mr-1"></i> Nome completo
                         </label>
-                        <input type="text" id="agen-nome" placeholder="Digite seu nome completo"
+                        <input type="text" id="agen-nome" placeholder="Digite seu nome completo" oninput="agenAtualizarResumo()"
                             class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
                             <i class="fa-solid fa-phone text-cda-primary mr-1"></i> Telefone / WhatsApp
                         </label>
-                        <input type="tel" id="agen-telefone" placeholder="(27) 99999-9999" inputmode="tel" autocomplete="tel"
+                        <input type="tel" id="agen-telefone" placeholder="(27) 99999-9999" oninput="agenAtualizarResumo()" inputmode="tel" autocomplete="tel"
                             class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
                     </div>
                 </div>
@@ -630,7 +630,7 @@
                         </label>
                         <input type="date" id="agen-data"
                             class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white"
-                            onchange="agenOnDataChange()">
+                            onchange="agenOnDataChange(); agenAtualizarResumo();">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-1">
