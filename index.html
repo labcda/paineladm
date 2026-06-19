@@ -340,6 +340,7 @@
     }
   </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -850,15 +851,19 @@
       return;
     }
 
-    // Demo credentials: admin / cda2024
+    // ============================================================
+    // LOGIN HARDCODED - FUNCIONA 100% OFFLINE (SEM INTERNET)
+    // ============================================================
     if (usuario === 'ADMIN' && senha === 'CDA2024') {
-      console.log('Login bem-sucedido (admin)!');
+      console.log('Login bem-sucedido (admin hardcoded)!');
       loginSucesso();
       return;
     }
 
-    // Verificar no Google Sheets
-    errorEl.innerText = 'VERIFICANDO CREDENCIAIS NA PLANILHA...';
+    // ============================================================
+    // LOGIN VIA GOOGLE APPS SCRIPT (PLANILHA)
+    // ============================================================
+    errorEl.innerText = 'VERIFICANDO CREDENCIAIS...';
     errorEl.style.display = 'block';
     errorEl.style.color = '#0F4C5C';
 
@@ -871,7 +876,8 @@
 
       const resp = await fetch(url, { 
         method: 'GET',
-        signal: controller.signal
+        signal: controller.signal,
+        redirect: 'follow'
       });
 
       clearTimeout(timeout);
@@ -890,12 +896,12 @@
         loginSucesso();
       } else if (json.ok && !json.autorizado) {
         console.log('Login falhou: credenciais incorretas');
-        errorEl.innerText = 'LOGIN OU SENHA INCORRETOS. VERIFIQUE NA PLANILHA.';
+        errorEl.innerText = 'LOGIN OU SENHA INCORRETOS.';
         errorEl.style.color = '#ef4444';
         setTimeout(() => errorEl.style.display = 'none', 5000);
       } else {
         console.log('Erro do servidor:', json.erro);
-        errorEl.innerText = 'ERRO: ' + (json.erro || 'Token inválido ou acesso negado');
+        errorEl.innerText = 'ERRO: ' + (json.erro || 'Acesso negado');
         errorEl.style.color = '#ef4444';
         setTimeout(() => errorEl.style.display = 'none', 5000);
       }
@@ -903,11 +909,11 @@
       console.error('Erro ao verificar login:', err);
 
       if (err.name === 'AbortError') {
-        errorEl.innerText = 'TEMPO ESGOTADO: O servidor não respondeu. Verifique sua conexão.';
+        errorEl.innerText = 'TEMPO ESGOTADO: Servidor não respondeu.';
       } else if (err.message.includes('Failed to fetch')) {
-        errorEl.innerText = 'ERRO DE CONEXÃO: Não foi possível acessar o servidor. Verifique se o Apps Script está publicado corretamente.';
+        errorEl.innerText = 'SEM CONEXÃO: Verifique sua internet ou tente ADMIN/CDA2024.';
       } else {
-        errorEl.innerText = 'ERRO: ' + err.message + '. Verifique o console (F12) para detalhes.';
+        errorEl.innerText = 'ERRO: ' + err.message;
       }
 
       errorEl.style.color = '#ef4444';
@@ -915,26 +921,7 @@
     }
   }
 
-  function loginSucesso() {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('splashScreen').style.display = 'flex';
-
-    setTimeout(() => {
-      const splash = document.getElementById('splashScreen');
-      splash.classList.add('fade-out');
-      setTimeout(() => {
-        splash.style.display = 'none';
-        document.getElementById('appContainer').style.display = 'grid';
-        document.body.classList.add('app-loaded');
-        carregarExames();
-        gerarHorarios();
-        atualizarMesStats();
-        renderAtividades();
-        contarOrcamentosDoMes();
-      }, 600);
-    }, 2500);
-  }
-function fazerCadastro() {
+  function fazerCadastro() {
     const nome = document.getElementById('signup-name').value.trim();
     const email = document.getElementById('signup-email').value.trim();
     const senha = document.getElementById('signup-password').value.trim();
@@ -1667,7 +1654,7 @@ function fazerCadastro() {
     horarioSelecionado = horario;
   }
 
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzXj8wLELw524gLe9Vmn2NxIE4pzoBoM4VKQrlQu3hWony8hotzE4aI81dkonyxcuJWzQ/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyNAnEvW3JJ0-STfXV13kb0H8KWmGAXdWpeqf7fMKM8To7l3h4YMceIjDDYC8V8207llQ/exec';
         // Token compartilhado com o Apps Script — valida que a requisição veio do app CDA
         const CDA_TOKEN = 'CDA-2025-xK9#mPqL';
 
