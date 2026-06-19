@@ -569,7 +569,7 @@
           <button class="neumorphic-btn primary neumorphic-btn-lg" onclick="baixarPDF()">
             <i class="fa-solid fa-file-pdf"></i> Baixar PDF
           </button>
-          <button class="neumorphic-btn neumorphic-btn-lg" onclick="agendarColeta()">
+          <button class="neumorphic-btn neumorphic-btn-lg" id="btn-agendar-coleta" onclick="agendarColetaComLoading(this)">
             <i class="fa-regular fa-calendar-check"></i> Agendar Coleta
           </button>
           <button class="neumorphic-btn neumorphic-btn-lg" onclick="novoOrcamento()">
@@ -594,31 +594,29 @@
             </div>
 
             <!-- ETAPA 1 — DADOS DO PACIENTE -->
-            <div class="card-cda p-5" id="agen-step-1">
+            <div class="card-cda p-5" <div class="card-cda p-5" id="agen-step-1">
                 <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
                     <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">1</span>
-                    Seus dados
+                    Dados do paciente
                 </p>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
-                            <i class="fa-regular fa-user text-cda-primary mr-1"></i> Nome completo
-                        </label>
-                        <input type="text" id="agen-nome" placeholder="Digite seu nome completo" oninput="agenAtualizarResumo()"
-                            class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                <div id="agen-resumo-paciente" class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 space-y-2">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-regular fa-user text-cda-primary w-4"></i>
+                        <span id="agen-resumo-paciente-nome" class="text-sm font-bold text-slate-700 dark:text-slate-200">Carregando...</span>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">
-                            <i class="fa-solid fa-phone text-cda-primary mr-1"></i> Telefone / WhatsApp
-                        </label>
-                        <input type="tel" id="agen-telefone" placeholder="(27) 99999-9999" oninput="agenAtualizarResumo()" inputmode="tel" autocomplete="tel"
-                            class="w-full bg-slate-50 dark:bg-slate-700 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary dark:text-white">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-vial text-cda-primary w-4"></i>
+                        <span id="agen-resumo-paciente-exames" class="text-sm text-slate-600 dark:text-slate-300">Carregando...</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-money-bill text-cda-primary w-4"></i>
+                        <span id="agen-resumo-paciente-valor" class="text-sm font-bold text-cda-primary">Carregando...</span>
                     </div>
                 </div>
-            </div>
-
-            <!-- ETAPA 2 — DATA E PERÍODO -->
-            <div class="card-cda p-5" id="agen-step-2">
+                <!-- Inputs hidden para manter compatibilidade -->
+                <input type="hidden" id="agen-nome" value="">
+                <input type="hidden" id="agen-telefone" value="">
+            </div>id="agen-step-2">
                 <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
                     <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">2</span>
                     Data e período
@@ -1634,7 +1632,23 @@ function fazerCadastro() {
   }
 
   // ==================== AGENDAR COLETA ====================
-  async function agendarColeta() {
+  async // ==================== AGENDAR COLETA COM ANIMAÇÃO ====================
+  async function agendarColetaComLoading(btn) {
+    // Animar botão
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Carregando...';
+    btn.disabled = true;
+    btn.style.opacity = '0.7';
+
+    // Chamar função original
+    await agendarColeta();
+
+    // Restaurar botão (caso volte para a tela)
+    btn.innerHTML = '<i class="fa-regular fa-calendar-check"></i> Agendar Coleta';
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  }
+
+  function agendarColeta() {
     // Validar se há exames selecionados
     if (orcSelecionados.length === 0) { 
       showToast('Selecione pelo menos um exame!', 'error'); 
@@ -1684,14 +1698,32 @@ function fazerCadastro() {
 
     // Preencher dados e forçar atualização do resumo após navegação
     setTimeout(function() {
+      // Preencher inputs hidden
       const agenNome = document.getElementById('agen-nome');
+      const agenTelefone = document.getElementById('agen-telefone');
       if (agenNome) {
         agenNome.value = paciente;
         agenNome.dispatchEvent(new Event('input'));
       }
-      agenAtualizarResumo();
-    }, 500);
 
+      // Preencher resumo visual do paciente
+      const nomeEl = document.getElementById('agen-resumo-paciente-nome');
+      const examesEl = document.getElementById('agen-resumo-paciente-exames');
+      const valorEl = document.getElementById('agen-resumo-paciente-valor');
+
+      if (nomeEl) nomeEl.textContent = paciente;
+      if (examesEl) {
+        const qtd = orcSelecionados.length;
+        const nomes = orcSelecionados.map(e => e.nome).join(', ');
+        examesEl.textContent = qtd + ' exame' + (qtd > 1 ? 's' : '') + ': ' + (nomes.length > 50 ? nomes.substring(0, 50) + '...' : nomes);
+      }
+      if (valorEl) {
+        const totalPix = totalBruto * 0.60;
+        valorEl.textContent = 'R$ ' + totalPix.toFixed(2).replace('.', ',') + ' (PIX/Débito)';
+      }
+
+      agenAtualizarResumo();
+    }, 300);
     showToast('Dados do orçamento transferidos para agendamento!');
   }
 
@@ -1982,7 +2014,8 @@ function fazerCadastro() {
               parcelaCredito = totalCredito / 10;
             }
 
-            const pronto = data && periodo && horario && nome && telefone && validarTelefoneBR(telefone) && temExames && totalBruto >= 150 && pagamento;
+            const temDadosOrcamento = temExames && totalBruto >= 150;
+            const pronto = data && periodo && horario && nome && temDadosOrcamento && pagamento;
 
             if (data && periodo && horario) {
                 if (pagamentoWrap) pagamentoWrap.classList.remove('hidden');
@@ -1990,7 +2023,7 @@ function fazerCadastro() {
                 pagamentoWrap.classList.add('hidden');
             }
 
-            if (data && periodo && horario && nome) {
+            if (data && periodo && horario && nome && temExames) {
                 const [y,m,d] = data.split('-').map(Number);
                 const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
                 document.getElementById('agen-resumo-data').textContent = `${dataExt} — ${periodo === 'manha' ? 'Manhã' : 'Tarde'}`;
