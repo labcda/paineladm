@@ -988,7 +988,7 @@
       } else if (err.message && err.message.includes('Failed to fetch')) {
         errorEl.innerText = 'SEM CONEXÃO: Verifique sua internet ou tente ADMIN/CDA2024.';
       } else {
-        errorEl.innerText = 'ERRO: ' + err.message;
+        errorEl.innerText = 'ERRO: ' + (err.message || 'Erro desconhecido');
       }
       errorEl.style.color = '#ef4444';
       setTimeout(() => errorEl.style.display = 'none', 8000);
@@ -1540,7 +1540,7 @@
     const ocupados = ['08:30', '10:00', '14:30'];
     grid.innerHTML = horarios.map(h => {
       const isOcupado = ocupados.includes(h);
-      return '<button class="horario-btn ' + (isOcupado ? 'ocupado' : '') + '" ' + (isOcupado ? 'disabled' : '') + ' onclick="selecionarHorario(this, \' + h + '\')">' + h + '</button>';
+      return `<button class="horario-btn ${isOcupado ? 'ocupado' : ''}" ${isOcupado ? 'disabled' : ''} onclick="selecionarHorario(this, '${h}')">${h}</button>`;
     }).join('');
   }
 
