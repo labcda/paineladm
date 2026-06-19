@@ -352,6 +352,19 @@
 
     .hidden { display: none !important; }
 
+    /* Upload area styles */
+    #agen-upload-area {
+      transition: all 0.3s ease;
+    }
+    #agen-upload-area:hover {
+      border-color: #49BCBE;
+      background: rgba(73,188,190,0.05);
+    }
+    #agen-upload-area.dragover {
+      border-color: #0F4C5C;
+      background: rgba(15,76,92,0.08);
+    }
+
     #login-usuario, #login-senha, #signup-name, #signup-email, #signup-password,
     #orc-paciente, #agen-nome, #agen-telefone,
     #config-login, #config-senha, #config-senha-confirm,
@@ -578,16 +591,62 @@
                 <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
                     <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">1</span> Dados do paciente
                 </p>
-                <div id="agen-resumo-paciente" class="bg-slate-50 rounded-2xl p-4 space-y-2">
-                    <div class="flex items-center gap-3"><i class="fa-regular fa-user text-cda-primary w-4"></i><span id="agen-resumo-paciente-nome" class="text-sm font-bold text-slate-700">Carregando...</span></div>
-                    <div class="flex items-center gap-3"><i class="fa-solid fa-vial text-cda-primary w-4"></i><span id="agen-resumo-paciente-exames" class="text-sm text-slate-600">Carregando...</span></div>
-                    <div class="flex items-center gap-3"><i class="fa-solid fa-money-bill text-cda-primary w-4"></i><span id="agen-resumo-paciente-valor" class="text-sm font-bold text-cda-primary">Carregando...</span></div>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1"><i class="fa-regular fa-user text-cda-primary mr-1"></i> Nome completo *</label>
+                        <input type="text" id="agen-nome" placeholder="Digite o nome do paciente..." class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary" oninput="agenAtualizarResumo()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1"><i class="fa-solid fa-phone text-cda-primary mr-1"></i> Telefone (com DDD) *</label>
+                        <input type="tel" id="agen-telefone" placeholder="(27) 99999-9999" class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary" oninput="agenAtualizarResumo()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1"><i class="fa-regular fa-calendar text-cda-primary mr-1"></i> Data de nascimento *</label>
+                        <input type="date" id="agen-nascimento" class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary" onchange="agenAtualizarResumo()">
+                    </div>
                 </div>
-                <input type="hidden" id="agen-nome" value=""><input type="hidden" id="agen-telefone" value="">
+            </div>
+            <div class="card-cda p-5" id="agen-step-1-5">
+                <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">2</span> Orçamento ou Pedido Médico
+                </p>
+                <div class="space-y-4">
+                    <!-- Resumo do orçamento (se existir) -->
+                    <div id="agen-resumo-orcamento-card" class="bg-slate-50 rounded-2xl p-4 hidden">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-file-invoice-dollar text-cda-primary mr-1"></i> Resumo do Orçamento</span>
+                            <button onclick="limparOrcamentoAgendamento()" class="text-xs text-red-500 hover:text-red-700 font-semibold"><i class="fa-solid fa-xmark mr-1"></i>Remover</button>
+                        </div>
+                        <div id="agen-resumo-orcamento-conteudo" class="text-sm text-slate-700"></div>
+                    </div>
+
+                    <!-- Upload de PDF -->
+                    <div id="agen-upload-area" class="border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center transition-all hover:border-cda-primary hover:bg-cda-light/30 cursor-pointer" onclick="document.getElementById('agen-pdf-upload').click()">
+                        <input type="file" id="agen-pdf-upload" accept=".pdf,image/*" class="hidden" onchange="agenHandlePDFUpload(this)">
+                        <div id="agen-upload-placeholder">
+                            <i class="fa-solid fa-cloud-arrow-up text-3xl text-cda-primary mb-3"></i>
+                            <p class="text-sm font-bold text-slate-700 mb-1">Clique para enviar PDF ou foto</p>
+                            <p class="text-xs text-slate-400">Arraste ou clique para selecionar<br>PDF, JPG ou PNG do pedido médico</p>
+                        </div>
+                        <div id="agen-upload-preview" class="hidden">
+                            <i class="fa-solid fa-file-pdf text-3xl text-red-500 mb-2"></i>
+                            <p id="agen-upload-filename" class="text-sm font-bold text-slate-700"></p>
+                            <p id="agen-upload-filesize" class="text-xs text-slate-400"></p>
+                            <button onclick="event.stopPropagation(); agenRemoverPDF()" class="mt-2 text-xs text-red-500 hover:text-red-700 font-semibold"><i class="fa-solid fa-trash mr-1"></i>Remover arquivo</button>
+                        </div>
+                    </div>
+
+                    <div id="agen-validacao-doc" class="hidden">
+                        <div class="flex items-start gap-3 bg-amber-50 rounded-2xl p-3">
+                            <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5 shrink-0"></i>
+                            <p class="text-xs text-amber-700 leading-relaxed">Você precisa ter um orçamento ou enviar um PDF/foto do pedido médico para agendar.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="card-cda p-5" id="agen-step-2">
                 <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
-                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">2</span> Data e período
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">3</span> Data e período
                 </p>
                 <div class="space-y-4">
                     <div>
@@ -609,7 +668,7 @@
             </div>
             <div class="card-cda p-5" id="agen-step-3">
                 <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
-                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">3</span> Horário disponível
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">4</span> Horário disponível
                 </p>
                 <div id="agen-horarios-placeholder" class="flex flex-col items-center py-6 text-center">
                     <div class="w-12 h-12 rounded-2xl bg-cda-light flex items-center justify-center mb-3"><i class="fa-regular fa-clock text-cda-primary text-xl"></i></div>
@@ -635,12 +694,18 @@
             </div>
             <div class="card-cda p-5" id="agen-step-4">
                 <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
-                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">4</span> Confirmar agendamento
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">5</span> Confirmar agendamento
                 </p>
                 <div id="agen-resumo" class="bg-slate-50 rounded-2xl p-4 mb-4 space-y-2 hidden">
                     <div class="flex items-center gap-3"><i class="fa-regular fa-calendar-check text-cda-primary w-4"></i><span id="agen-resumo-data" class="text-sm font-bold text-slate-700"></span></div>
                     <div class="flex items-center gap-3"><i class="fa-regular fa-clock text-cda-primary w-4"></i><span id="agen-resumo-hora" class="text-sm font-bold text-slate-700"></span></div>
                     <div class="flex items-center gap-3"><i class="fa-regular fa-user text-cda-primary w-4"></i><span id="agen-resumo-nome" class="text-sm text-slate-600"></span></div>
+                    <div class="flex items-center gap-3"><i class="fa-solid fa-phone text-cda-primary w-4"></i><span id="agen-resumo-telefone" class="text-sm text-slate-600"></span></div>
+                    <div class="flex items-center gap-3"><i class="fa-regular fa-calendar text-cda-primary w-4"></i><span id="agen-resumo-nascimento" class="text-sm text-slate-600"></span></div>
+                    <div id="agen-resumo-doc-wrap" class="hidden pt-2 border-t border-slate-200">
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1.5">Documento</p>
+                        <div id="agen-resumo-doc" class="text-xs text-slate-500"></div>
+                    </div>
                     <div id="agen-resumo-exames-wrap" class="hidden pt-2 border-t border-slate-200">
                         <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1.5">Exames solicitados</p>
                         <div id="agen-resumo-exames" class="text-xs text-slate-500 space-y-0.5"></div>
@@ -1559,6 +1624,128 @@
   const SLOTS_TARDE = ['14:30','15:10','15:50'];
   let agenState = { data: null, periodo: null, horario: null, pagamento: null };
 
+  // ========== FUNÇÕES DE UPLOAD PDF / ORÇAMENTO ==========
+  let agenPDFBase64 = null;
+  let agenPDFFilename = null;
+  let agenPDFType = null;
+
+  function agenHandlePDFUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    // Validar tipo de arquivo
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+    if (!allowedTypes.includes(file.type)) {
+      showToast('Apenas PDF, JPG ou PNG são permitidos.', 'error');
+      input.value = '';
+      return;
+    }
+
+    // Validar tamanho (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Arquivo muito grande. Máximo 5MB.', 'error');
+      input.value = '';
+      return;
+    }
+
+    agenPDFFilename = file.name;
+    agenPDFType = file.type;
+
+    // Converter para Base64
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      agenPDFBase64 = e.target.result.split(',')[1]; // Remove o prefixo data:*
+      agenAtualizarUploadUI();
+      agenAtualizarResumo();
+      showToast('Arquivo ' + file.name + ' carregado com sucesso!');
+    };
+    reader.onerror = function() {
+      showToast('Erro ao ler o arquivo.', 'error');
+      agenPDFBase64 = null;
+      agenPDFFilename = null;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function agenAtualizarUploadUI() {
+    const placeholder = document.getElementById('agen-upload-placeholder');
+    const preview = document.getElementById('agen-upload-preview');
+    const filename = document.getElementById('agen-upload-filename');
+    const filesize = document.getElementById('agen-upload-filesize');
+
+    if (agenPDFBase64 && agenPDFFilename) {
+      placeholder.classList.add('hidden');
+      preview.classList.remove('hidden');
+      filename.textContent = agenPDFFilename;
+      // Calcular tamanho aproximado
+      const sizeKB = Math.round((agenPDFBase64.length * 0.75) / 1024);
+      filesize.textContent = sizeKB < 1024 ? sizeKB + ' KB' : (sizeKB / 1024).toFixed(1) + ' MB';
+    } else {
+      placeholder.classList.remove('hidden');
+      preview.classList.add('hidden');
+      filename.textContent = '';
+      filesize.textContent = '';
+    }
+  }
+
+  function agenRemoverPDF() {
+    agenPDFBase64 = null;
+    agenPDFFilename = null;
+    agenPDFType = null;
+    const input = document.getElementById('agen-pdf-upload');
+    if (input) input.value = '';
+    agenAtualizarUploadUI();
+    agenAtualizarResumo();
+    showToast('Arquivo removido');
+  }
+
+  function limparOrcamentoAgendamento() {
+    orcSelecionados = [];
+    ultimoOrcamento = null;
+    localStorage.removeItem('cda_ultimo_orcamento');
+    agenAtualizarResumo();
+    showToast('Orçamento removido do agendamento');
+  }
+
+  function agenTemDocumento() {
+    // Verifica se tem orçamento OU PDF (XOR - um ou outro, não ambos)
+    const temOrcamento = (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) || 
+                         (ultimoOrcamento && ultimoOrcamento.exames && ultimoOrcamento.exames.length > 0);
+    const temPDF = agenPDFBase64 !== null;
+    return { temOrcamento, temPDF, valido: (temOrcamento || temPDF) && !(temOrcamento && temPDF) };
+  }
+
+  // ========== FUNÇÃO AUXILIAR PARA ENVIAR PDF AO GOOGLE APPS SCRIPT ==========
+  async function agenEnviarPDFAppsScript(dados) {
+    try {
+      const payload = {
+        action: 'salvarPDF',
+        token: CDA_TOKEN,
+        nome: dados.nome,
+        telefone: dados.telefone,
+        dataNascimento: dados.dataNascimento,
+        dataAgendamento: dados.data,
+        horario: dados.horario,
+        pagamento: dados.pagamento,
+        pdfBase64: agenPDFBase64,
+        pdfFilename: agenPDFFilename,
+        pdfType: agenPDFType
+      };
+
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(payload)
+      });
+
+      const json = await resp.json();
+      return json.ok;
+    } catch(err) {
+      console.error('Erro ao enviar PDF:', err);
+      return false;
+    }
+  }
+
   function agenInicializar() {
     const inp = document.getElementById('agen-data');
     if (!inp) return;
@@ -1575,10 +1762,30 @@
     if (pagamentoWrap) pagamentoWrap.classList.add('hidden');
     agenEsconderHorarios();
     agenAtualizarResumo();
-    const nome = localStorage.getItem('patient_name') || '';
-    const telefone = localStorage.getItem('patient_phone') || '';
-    if (nome) document.getElementById('agen-nome').value = nome;
-    if (telefone) document.getElementById('agen-telefone').value = telefone;
+    // Limpa PDF anterior
+    agenPDFBase64 = null;
+    agenPDFFilename = null;
+    agenPDFType = null;
+    const pdfInput = document.getElementById('agen-pdf-upload');
+    if (pdfInput) pdfInput.value = '';
+    agenAtualizarUploadUI();
+    // Limpa data de nascimento
+    const nascInput = document.getElementById('agen-nascimento');
+    if (nascInput) nascInput.value = '';
+    // Preenche com dados do orçamento se existirem, senão deixa em branco para edição
+    const nomeInput = document.getElementById('agen-nome');
+    const telefoneInput = document.getElementById('agen-telefone');
+    const savedOrcamento = localStorage.getItem('cda_ultimo_orcamento');
+    if (savedOrcamento) {
+      try {
+        const parsed = JSON.parse(savedOrcamento);
+        if (parsed.paciente && nomeInput) nomeInput.value = parsed.paciente;
+      } catch(e) {}
+    }
+    const savedNome = localStorage.getItem('patient_name');
+    const savedTelefone = localStorage.getItem('patient_phone');
+    if (savedNome && nomeInput && !nomeInput.value) nomeInput.value = savedNome;
+    if (savedTelefone && telefoneInput) telefoneInput.value = savedTelefone;
   }
 
   function agenIsDiaUtil(dataStr) {
@@ -1731,12 +1938,63 @@
     const { data, periodo, horario } = agenState;
     const nome = document.getElementById('agen-nome') ? document.getElementById('agen-nome').value.trim() : '';
     const telefone = document.getElementById('agen-telefone') ? document.getElementById('agen-telefone').value.trim() : '';
+    const nascimento = document.getElementById('agen-nascimento') ? document.getElementById('agen-nascimento').value : '';
     const resumo = document.getElementById('agen-resumo');
     const placeholder = document.getElementById('agen-resumo-placeholder');
     const btnSalvar = document.getElementById('agen-btn-salvar');
     const pagamentoWrap = document.getElementById('agen-pagamento-wrap');
     const pagamento = agenPagamentoSelecionado();
     agenState.pagamento = pagamento || null;
+
+    // Verificar documento (orçamento OU PDF, XOR)
+    const docInfo = agenTemDocumento();
+    const docValido = docInfo.valido;
+    const temOrcamento = docInfo.temOrcamento;
+    const temPDF = docInfo.temPDF;
+
+    // Atualizar UI do orçamento
+    const orcCard = document.getElementById('agen-resumo-orcamento-card');
+    const orcConteudo = document.getElementById('agen-resumo-orcamento-conteudo');
+    if (temOrcamento) {
+      let examesAtuais = [];
+      let totalBruto = 0;
+      if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
+        examesAtuais = orcSelecionados;
+        totalBruto = examesAtuais.reduce((s, e) => s + (Number(e.preco) || 0), 0);
+      } else if (ultimoOrcamento && ultimoOrcamento.exames) {
+        examesAtuais = ultimoOrcamento.exames;
+        totalBruto = ultimoOrcamento.total || 0;
+      } else {
+        try {
+          const saved = localStorage.getItem('cda_ultimo_orcamento');
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed.exames) {
+              examesAtuais = parsed.exames;
+              totalBruto = parsed.total || 0;
+            }
+          }
+        } catch(e) {}
+      }
+      const totalPix = totalBruto * 0.60;
+      const totalCredito = totalBruto * 0.65;
+      orcConteudo.innerHTML = '<div class="font-bold text-slate-800">' + examesAtuais.length + ' exame(s)</div>' +
+        '<div class="text-xs text-slate-500 mt-1">' + examesAtuais.map(e => e.nome).join(', ').substring(0, 80) + (examesAtuais.length > 2 ? '...' : '') + '</div>' +
+        '<div class="mt-2 text-sm font-bold text-cda-primary">PIX: ' + formatCurrency(totalPix) + ' / Crédito: ' + formatCurrency(totalCredito) + '</div>';
+      orcCard.classList.remove('hidden');
+    } else {
+      orcCard.classList.add('hidden');
+      orcConteudo.innerHTML = '';
+    }
+
+    // Mostrar validação de documento se necessário
+    const validacaoDoc = document.getElementById('agen-validacao-doc');
+    if (!docValido && (nome || telefone || nascimento || data || periodo)) {
+      validacaoDoc.classList.remove('hidden');
+    } else {
+      validacaoDoc.classList.add('hidden');
+    }
+
     let examesAtuais = [];
     let totalBruto = 0;
     let totalPix = 0;
@@ -1778,19 +2036,36 @@
       totalCredito = totalBruto * 0.65;
       parcelaCredito = totalCredito / 10;
     }
-    const temDadosOrcamento = temExames && totalBruto >= 150;
-    const pronto = data && periodo && horario && nome && temDadosOrcamento && pagamento;
+    // Validação: nome, telefone, nascimento, data, periodo, horario, pagamento E (orcamento XOR PDF)
+    const pronto = data && periodo && horario && nome && telefone && nascimento && pagamento && docValido;
     if (data && periodo && horario) {
       if (pagamentoWrap) pagamentoWrap.classList.remove('hidden');
     } else if (pagamentoWrap) {
       pagamentoWrap.classList.add('hidden');
     }
-    if (data && periodo && horario && nome && temExames) {
+    if (data && periodo && horario && nome && telefone && nascimento) {
       const [y,m,d] = data.split('-').map(Number);
       const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
       document.getElementById('agen-resumo-data').textContent = dataExt + ' — ' + (periodo === 'manha' ? 'Manhã' : 'Tarde');
       document.getElementById('agen-resumo-hora').textContent = 'Horário: ' + horario;
       document.getElementById('agen-resumo-nome').textContent = nome;
+      document.getElementById('agen-resumo-telefone').textContent = telefone;
+      const nascExt = new Date(nascimento).toLocaleDateString('pt-BR');
+      document.getElementById('agen-resumo-nascimento').textContent = 'Nascimento: ' + nascExt;
+
+      // Mostrar documento (PDF ou Orçamento)
+      const docWrap = document.getElementById('agen-resumo-doc-wrap');
+      const docInfo = agenTemDocumento();
+      if (docInfo.temPDF) {
+        docWrap.classList.remove('hidden');
+        document.getElementById('agen-resumo-doc').innerHTML = '<i class="fa-solid fa-file-pdf text-red-500 mr-1"></i> PDF: ' + (agenPDFFilename || 'Enviado');
+      } else if (docInfo.temOrcamento) {
+        docWrap.classList.remove('hidden');
+        document.getElementById('agen-resumo-doc').innerHTML = '<i class="fa-solid fa-file-invoice-dollar text-cda-primary mr-1"></i> Orçamento com exames';
+      } else {
+        docWrap.classList.add('hidden');
+      }
+
       const examesWrap = document.getElementById('agen-resumo-exames-wrap');
       if (temExames) {
         examesWrap.classList.remove('hidden');
@@ -1820,6 +2095,13 @@
       resumo.classList.add('hidden');
       placeholder.classList.remove('hidden');
     }
+
+    // Mostrar/ocultar área de pagamento baseado em dados preenchidos
+    if (data && periodo && horario && nome && telefone && nascimento) {
+      if (pagamentoWrap) pagamentoWrap.classList.remove('hidden');
+    } else if (pagamentoWrap) {
+      pagamentoWrap.classList.add('hidden');
+    }
     if (pronto) btnSalvar.classList.remove('opacity-50','pointer-events-none');
     else btnSalvar.classList.add('opacity-50','pointer-events-none');
   }
@@ -1828,19 +2110,34 @@
     const { data, periodo, horario } = agenState;
     const nome = document.getElementById('agen-nome') ? document.getElementById('agen-nome').value.trim() : '';
     const telefone = document.getElementById('agen-telefone') ? document.getElementById('agen-telefone').value.trim() : '';
+    const nascimento = document.getElementById('agen-nascimento') ? document.getElementById('agen-nascimento').value : '';
     const pagamento = agenPagamentoSelecionado();
     const btnSalvar = document.getElementById('agen-btn-salvar');
     const statusEl = document.getElementById('agen-status');
     const totalBruto = agenTotalSelecionado();
+
+    // 1. Validar nome, telefone, data de nascimento
     if (!nome) { showToast('Informe o nome do paciente.', 'error'); return; }
     if (!telefone) { showToast('Informe o telefone de contato.', 'error'); return; }
     if (!validarTelefoneBR(telefone)) { showToast('Informe um telefone válido com DDD.', 'error'); return; }
+    if (!nascimento) { showToast('Informe a data de nascimento.', 'error'); return; }
+
+    // 2. Validar data, período, horário
     if (!data) { showToast('Selecione a data.', 'error'); return; }
     if (!periodo) { showToast('Selecione o período.', 'error'); return; }
     if (!horario) { showToast('Selecione o horário.', 'error'); return; }
-    if (typeof orcSelecionados === 'undefined' || !orcSelecionados.length) { showToast('Adicione ao menos um exame à lista antes de agendar.', 'error'); return; }
-    if (totalBruto < 150) { showToast('Olá! Informamos que a coleta agendada está disponível para orçamentos a partir de R$ 150,00.', 'info', 6000); return; }
     if (!pagamento) { showToast('Selecione a forma de pagamento.', 'error'); return; }
+
+    // 3. Verificar documento (orçamento XOR PDF)
+    const docInfo = agenTemDocumento();
+    if (!docInfo.valido) {
+      if (docInfo.temOrcamento && docInfo.temPDF) {
+        showToast('Escolha apenas UM: orçamento OU PDF. Remova um dos dois.', 'error', 5000);
+      } else {
+        showToast('Você precisa ter um orçamento ou enviar um PDF/foto do pedido médico.', 'error', 5000);
+      }
+      return;
+    }
     btnSalvar.disabled = true;
     btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Verificando disponibilidade...';
     if (statusEl) statusEl.classList.add('hidden');
@@ -1868,21 +2165,48 @@
       const totalPix = totalBruto * 0.60;
       const totalCredito = totalBruto * 0.65;
       listaExames = orcSelecionados.map(ex => ex.nome + ': ' + formatCurrency(ex.preco)).join('\n');
-      descExames = '\n\nLista de Exames:\n' + listaExames + '\n\nTotal particular: ' + formatCurrency(totalBruto) + '\nPIX/Dinheiro/Débito (40% desc): ' + formatCurrency(totalPix) + '\nCartão de crédito (35% desc): ' + formatCurrency(totalCredito) + '\nForma de pagamento escolhida: ' + pagamento;
+      descExames = '\n\nLista de Exames:\n' + listaExames + '\n\nTotal particular: ' + formatCurrency(totalBruto) + '\nPIX/Dinheiro/Débito (40% desc): ' + formatCurrency(totalPix) + '\nCartão de crédito (35% desc): ' + formatCurrency(totalCredito);
     }
-    const descricao = 'Paciente: ' + nome + '\nTelefone: ' + telefone + '\nForma de pagamento: ' + pagamento + '\nOrigem: Aplicativo CDA' + descExames;
+    const nascimento = document.getElementById('agen-nascimento') ? document.getElementById('agen-nascimento').value : '';
+    let descricao = 'Paciente: ' + nome + '\nTelefone: ' + telefone;
+    if (nascimento) descricao += '\nData de nascimento: ' + new Date(nascimento).toLocaleDateString('pt-BR');
+    descricao += '\nForma de pagamento: ' + pagamento + '\nOrigem: Aplicativo CDA';
+    if (docInfo.temPDF) descricao += '\n\nPDF do pedido médico anexado: ' + (agenPDFFilename || 'arquivo');
+    descricao += descExames;
     try {
       const [y, m, d] = data.split('-').map(Number);
       const [hh, mm] = horario.split(':').map(Number);
       const startDateTime = data + 'T' + String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0') + ':00';
       const endHh = hh + 1;
       const endDateTime = data + 'T' + String(endHh).padStart(2,'0') + ':' + String(mm).padStart(2,'0') + ':00';
+
+      // 4. Se tem PDF, enviar PDF + dados do paciente
+      if (docInfo.temPDF) {
+        btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Enviando PDF...';
+        const pdfEnviado = await agenEnviarPDFAppsScript({
+          nome: nome,
+          telefone: telefone,
+          dataNascimento: nascimento,
+          data: data,
+          horario: horario,
+          pagamento: pagamento
+        });
+        if (!pdfEnviado) {
+          // Fallback: WhatsApp com PDF
+          agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento);
+          return;
+        }
+      }
+
+      // 5. Salvar no Google Agenda (com ou sem orçamento)
       const resp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
-          action: 'criar', token: CDA_TOKEN, data: data, horario: horario, nome: nome, telefone: telefone, pagamento: pagamento,
-          startTime: startDateTime, endTime: endDateTime, descricao: descricao
+          action: 'criar', token: CDA_TOKEN, data: data, horario: horario, nome: nome, telefone: telefone, 
+          nascimento: nascimento, pagamento: pagamento,
+          startTime: startDateTime, endTime: endDateTime, descricao: descricao,
+          temPDF: docInfo.temPDF, temOrcamento: docInfo.temOrcamento
         })
       });
       const json = await resp.json();
@@ -1917,9 +2241,18 @@
     if (telefone) localStorage.setItem('patient_phone', telefone);
     document.getElementById('modal-agen-nome').textContent = nome;
     document.getElementById('modal-agen-data').textContent = dataExt + ' às ' + horario;
-    const qtd = (typeof orcSelecionados !== 'undefined' && orcSelecionados.length)
-      ? orcSelecionados.length + ' exame' + (orcSelecionados.length > 1 ? 's' : '') + ' — PIX: ' + formatCurrency(totalPix) + ' / Crédito: ' + formatCurrency(totalCredito)
-      : '—';
+    // Mostrar exames se houver orçamento, ou PDF, ou mensagem informativa
+    let qtd = '—';
+    const docInfo = agenTemDocumento();
+    if (docInfo.temPDF) {
+      qtd = 'Pedido médico enviado (PDF): ' + (agenPDFFilename || 'arquivo');
+    } else if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
+      qtd = orcSelecionados.length + ' exame' + (orcSelecionados.length > 1 ? 's' : '') + ' — PIX: ' + formatCurrency(totalPix) + ' / Crédito: ' + formatCurrency(totalCredito);
+    } else if (totalBruto > 0) {
+      qtd = 'Orçamento anterior — PIX: ' + formatCurrency(totalPix) + ' / Crédito: ' + formatCurrency(totalCredito);
+    } else {
+      qtd = 'Agendamento direto (sem orçamento)';
+    }
     document.getElementById('modal-agen-exames').textContent = qtd;
     document.getElementById('modal-agen-pagamento').textContent = pagamento;
     const modal = document.getElementById('modal-agen-confirmacao');
@@ -1928,12 +2261,18 @@
   }
 
   function agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento) {
+    const nascimento = document.getElementById('agen-nascimento') ? document.getElementById('agen-nascimento').value : '';
     const [y,m,d] = data.split('-').map(Number);
     const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
-    const msg = 'Olá! Gostaria de agendar uma coleta pelo aplicativo.\n\n*Nome:* ' + nome + '\n*Telefone:* ' + telefone + '\n*Data:* ' + dataExt + '\n*Horário:* ' + horario + '\n*Forma de pagamento:* ' + (pagamento || 'Não informada') + descExames + '\n\n_Agendamento via Aplicativo CDA_';
+    let msg = 'Olá! Gostaria de agendar uma coleta pelo aplicativo.\n\n*Nome:* ' + nome + '\n*Telefone:* ' + telefone;
+    if (nascimento) msg += '\n*Data de nascimento:* ' + new Date(nascimento).toLocaleDateString('pt-BR');
+    msg += '\n*Data:* ' + dataExt + '\n*Horário:* ' + horario + '\n*Forma de pagamento:* ' + (pagamento || 'Não informada');
+    if (descExames) msg += descExames;
+    if (agenPDFFilename) msg += '\n\n*PDF anexado:* ' + agenPDFFilename;
+    msg += '\n\n_Agendamento via Aplicativo CDA_';
     window.open('https://wa.me/5527998980658?text=' + encodeURIComponent(msg), '_blank');
     const btnSalvar = document.getElementById('agen-btn-salvar');
-    btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+    btnSalvar.innerHTML = '<span class="text">Salvar Agendamento</span><span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594zM175 296.245l204.668-145.757c-176.114 185.79-166.916 176.011-167.684 177.045-1.141 1.535 1.985-4.448-36.984 72.882zm191.858 127.546l-120.296-89.276 217.511-229.462z"/></svg></span>';
     btnSalvar.disabled = false;
   }
 
