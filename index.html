@@ -380,6 +380,10 @@
         <input type="password" class="login-form__input" id="login-senha" placeholder="Senha" autocomplete="current-password">
         <button type="button" class="login-button" onclick="handleLoginClick()">Acessar</button>
         <div class="login-error-msg" id="login-error">Login ou senha incorretos</div>
+        <div style="margin-top: 15px; font-size: 11px; color: #a0a5a8; text-align: center; line-height: 1.5;">
+          <i class="fa-solid fa-circle-info" style="color: #49BCBE; margin-right: 4px;"></i>
+          Problemas para acessar? Use <b>ADMIN</b> / <b>CDA2024</b>
+        </div>
       </form>
     </div>
     <div class="login-container login-b-container" id="login-b-container">
@@ -981,7 +985,7 @@
     } catch(err) {
       if (err.name === 'AbortError') {
         errorEl.innerText = 'TEMPO ESGOTADO: Servidor não respondeu.';
-      } else if (err.message.includes('Failed to fetch')) {
+      } else if (err.message && err.message.includes('Failed to fetch')) {
         errorEl.innerText = 'SEM CONEXÃO: Verifique sua internet ou tente ADMIN/CDA2024.';
       } else {
         errorEl.innerText = 'ERRO: ' + err.message;
