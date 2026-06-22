@@ -709,33 +709,54 @@
 
       <!-- RECOLETAS -->
       <section id="page-recoletas" class="page space-y-5">
+        <!-- Cabeçalho -->
         <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
             <div class="relative z-10">
                 <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
                     <i class="fa-solid fa-vial"></i> Recoletas
                 </span>
                 <h2 class="text-2xl font-extrabold leading-tight mb-1">Controle de Recoletas</h2>
-                <p class="text-sm text-white/80 leading-relaxed">Cadastre e acompanhe todos os pacientes que precisam de recoleta.</p>
+                <p class="text-sm text-white/80 leading-relaxed">Cadastre e consulte pacientes que precisam de recoleta.</p>
             </div>
         </div>
 
-        <div class="neumorphic-card">
-            <h3 style="font-size: 1.2rem; font-weight: 700; color: #101620; margin-bottom: 20px;">
+        <!-- Abas -->
+        <div style="display:flex;gap:8px;background:#EBECF0;border-radius:16px;padding:6px;">
+            <button id="rec-aba-novo" onclick="recMostrarAba('novo')"
+                style="flex:1;padding:10px;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;background:linear-gradient(135deg,#0F4C5C,#49BCBE);color:white;box-shadow:2px 2px 8px rgba(15,76,92,0.3);">
+                <i class="fa-solid fa-user-plus mr-2"></i>Novo Registro
+            </button>
+            <button id="rec-aba-consulta" onclick="recMostrarAba('consulta')"
+                style="flex:1;padding:10px;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;background:transparent;color:#64748b;">
+                <i class="fa-solid fa-magnifying-glass mr-2"></i>Consultar Registros
+            </button>
+        </div>
+
+        <!-- ABA: NOVO REGISTRO -->
+        <div id="rec-painel-novo">
+          <div class="neumorphic-card">
+            <h3 style="font-size: 1.1rem; font-weight: 700; color: #101620; margin-bottom: 20px;">
                 <i class="fa-solid fa-user-plus mr-2" style="color: #0F4C5C;"></i> Nova Recoleta
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-barcode mr-1"></i> Código</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-barcode mr-1"></i> Código <span style="color:#ef4444">*</span>
+                    </label>
                     <input type="text" id="rec-codigo" placeholder="Código do paciente..." class="recoleta-form-field">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-user mr-1"></i> Nome do Paciente</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-user mr-1"></i> Nome do Paciente <span style="color:#ef4444">*</span>
+                    </label>
                     <input type="text" id="rec-nome" placeholder="Nome completo..." class="recoleta-form-field">
                 </div>
             </div>
 
             <div class="mb-4">
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-magnifying-glass mr-1"></i> Exames para recoleta</label>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                    <i class="fa-solid fa-vial mr-1"></i> Exames para recoleta <span style="color:#ef4444">*</span>
+                </label>
                 <div class="autocomplete-container">
                     <input type="text" id="rec-search" placeholder="Digite o nome ou código do exame..." autocomplete="off" class="recoleta-form-field" style="padding-right: 40px;">
                     <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><i class="fa-solid fa-search"></i></div>
@@ -745,7 +766,9 @@
             </div>
 
             <div class="mb-4">
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-hospital mr-1"></i> Tipo de exame</label>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                    <i class="fa-solid fa-hospital mr-1"></i> Tipo de exame <span style="color:#ef4444">*</span>
+                </label>
                 <div class="recoleta-radio-group">
                     <label class="recoleta-radio-label" id="rec-label-interno" onclick="recSelecionarTipo('interno')">
                         <input type="radio" name="rec-tipo" value="interno" style="display:none;">
@@ -765,32 +788,78 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Motivo da recoleta</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i> Motivo da recoleta <span style="color:#ef4444">*</span>
+                    </label>
                     <input type="text" id="rec-motivo" placeholder="Ex: hemólise, volume insuficiente..." class="recoleta-form-field">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-note-sticky mr-1"></i> Observações</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-note-sticky mr-1"></i> Observações <span style="color:#64748b;font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span>
+                    </label>
                     <input type="text" id="rec-obs" placeholder="Observações adicionais..." class="recoleta-form-field">
                 </div>
             </div>
 
+            <p style="font-size:11px;color:#94a3b8;margin-bottom:12px;"><span style="color:#ef4444">*</span> Campos obrigatórios</p>
             <div id="rec-error" class="login-error-msg" style="margin-bottom: 12px; display: none;"></div>
             <div id="rec-success" style="color: #0F4C5C; font-size: 0.85rem; margin-bottom: 12px; text-align: center; display: none; font-weight: 600;">
                 <i class="fa-solid fa-circle-check mr-1"></i> Recoleta cadastrada com sucesso!
             </div>
+            <div id="rec-salvando" style="color: #37A7AA; font-size: 0.85rem; margin-bottom: 12px; text-align: center; display: none; font-weight: 600;">
+                <i class="fa-solid fa-spinner fa-spin mr-1"></i> Salvando na planilha...
+            </div>
             <button class="neumorphic-btn primary neumorphic-btn-lg" onclick="salvarRecoleta()" style="width: 100%;">
                 <i class="fa-solid fa-plus"></i> Cadastrar Recoleta
             </button>
-        </div>
+          </div>
 
-        <div class="neumorphic-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 style="font-size: 1.2rem; font-weight: 700; color: #101620;"><i class="fa-solid fa-list-check mr-2" style="color: #0F4C5C;"></i> Pacientes com Recoleta</h3>
+          <!-- Lista de pacientes com recoleta (visível na aba Novo Registro) -->
+          <div class="neumorphic-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 1.1rem; font-weight: 700; color: #101620;">
+                    <i class="fa-solid fa-list-check mr-2" style="color: #0F4C5C;"></i> Pacientes com Recoleta
+                </h3>
                 <button class="btn-limpar" onclick="carregarRecoletas()"><i class="fa-solid fa-rotate-right"></i> Atualizar</button>
             </div>
             <div id="rec-lista" class="space-y-3">
                 <p class="text-sm text-slate-500 text-center py-4">Nenhuma recoleta cadastrada.</p>
             </div>
+          </div>
+        </div>
+
+        <!-- ABA: CONSULTAR REGISTROS -->
+        <div id="rec-painel-consulta" style="display:none;">
+          <div class="neumorphic-card">
+            <h3 style="font-size: 1.1rem; font-weight: 700; color: #101620; margin-bottom: 16px;">
+                <i class="fa-solid fa-magnifying-glass mr-2" style="color: #0F4C5C;"></i> Consultar Registros
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-barcode mr-1"></i> Filtrar por Código
+                    </label>
+                    <input type="text" id="rec-filtro-codigo" placeholder="Digite o código..." class="recoleta-form-field" oninput="recFiltrar()">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-user mr-1"></i> Filtrar por Nome
+                    </label>
+                    <input type="text" id="rec-filtro-nome" placeholder="Digite o nome..." class="recoleta-form-field" oninput="recFiltrar()">
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:16px;">
+                <button onclick="recFiltrar()" style="flex:1;padding:10px;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#0F4C5C,#49BCBE);color:white;box-shadow:2px 2px 8px rgba(15,76,92,0.2);">
+                    <i class="fa-solid fa-search mr-1"></i> Buscar
+                </button>
+                <button onclick="recLimparFiltros()" style="padding:10px 16px;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;background:#f1f5f9;color:#64748b;">
+                    <i class="fa-solid fa-xmark mr-1"></i> Limpar
+                </button>
+            </div>
+            <div id="rec-consulta-lista" class="space-y-3">
+                <p class="text-sm text-slate-500 text-center py-4">Use os filtros acima para consultar registros.</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -2006,6 +2075,9 @@
             // Limpa orçamento e agendamento
             orcSelecionados = [];
             orcRenderSelecionados();
+            // Limpa campos do orçamento
+            const orcPaciente = document.getElementById('orc-paciente');
+            if (orcPaciente) orcPaciente.value = '';
             agenInicializar();
 
             const btnSalvar = document.getElementById('agen-btn-salvar');
@@ -2018,6 +2090,8 @@
             }
 
   document.getElementById('agen-data').min = new Date().toISOString().split('T')[0];
+            // Volta para a tela home
+            navigateToPage('home');
         }
 
   // ==================== CONFIGURACOES - SENHA 5912 ====================
@@ -2070,6 +2144,35 @@
   let recTipo = null;
   let recLabExterno = null;
 
+  // --- Abas ---
+  function recMostrarAba(aba) {
+    const btnNovo = document.getElementById('rec-aba-novo');
+    const btnConsulta = document.getElementById('rec-aba-consulta');
+    const painelNovo = document.getElementById('rec-painel-novo');
+    const painelConsulta = document.getElementById('rec-painel-consulta');
+    if (aba === 'novo') {
+      painelNovo.style.display = '';
+      painelConsulta.style.display = 'none';
+      btnNovo.style.background = 'linear-gradient(135deg,#0F4C5C,#49BCBE)';
+      btnNovo.style.color = 'white';
+      btnNovo.style.boxShadow = '2px 2px 8px rgba(15,76,92,0.3)';
+      btnConsulta.style.background = 'transparent';
+      btnConsulta.style.color = '#64748b';
+      btnConsulta.style.boxShadow = 'none';
+    } else {
+      painelNovo.style.display = 'none';
+      painelConsulta.style.display = '';
+      btnConsulta.style.background = 'linear-gradient(135deg,#0F4C5C,#49BCBE)';
+      btnConsulta.style.color = 'white';
+      btnConsulta.style.boxShadow = '2px 2px 8px rgba(15,76,92,0.3)';
+      btnNovo.style.background = 'transparent';
+      btnNovo.style.color = '#64748b';
+      btnNovo.style.boxShadow = 'none';
+      recFiltrar();
+    }
+  }
+
+  // --- Autocomplete de exames ---
   const recSearchInput = document.getElementById('rec-search');
   const recAutocompleteList = document.getElementById('rec-autocomplete-list');
 
@@ -2078,125 +2181,150 @@
       const valor = this.value.toLowerCase().trim();
       if (valor.length < 2) { recAutocompleteList.classList.remove('show'); return; }
       const filtrados = listaExames.filter(ex => {
-        const nome = (ex.nome || '').toLowerCase();
-        const codigo = (ex.codigo || '').toLowerCase();
-        const busca = (ex.busca || '').toLowerCase();
-        return nome.includes(valor) || codigo.includes(valor) || busca.includes(valor);
-      }).slice(0, 10);
-      if (filtrados.length === 0) {
-        recAutocompleteList.innerHTML = '<div class="autocomplete-item"><div class="autocomplete-item-nome">Nenhum exame encontrado</div></div>';
-      } else {
-        recAutocompleteList.innerHTML = filtrados.map(ex => {
-          const nome = ex.nome || 'Sem nome';
-          const codigo = ex.codigo || '---';
-          return '<div class="autocomplete-item" onclick="recAdicionarExame(' + ex.id + ')"><div class="autocomplete-item-nome">' + nome + '</div><div class="autocomplete-item-codigo">Código: ' + codigo + '</div></div>';
-        }).join('');
-      }
+        return ex.nome.toLowerCase().includes(valor) || (ex.codigo && ex.codigo.toLowerCase().includes(valor));
+      }).slice(0, 8);
+      if (filtrados.length === 0) { recAutocompleteList.classList.remove('show'); return; }
+      recAutocompleteList.innerHTML = filtrados.map(ex =>
+        `<div class="autocomplete-item" onclick="recAdicionarExame(${ex.id},'${ex.nome.replace(/'/g,"\'")}','${(ex.codigo||'').replace(/'/g,"\'")}')">
+          <span class="font-semibold">${ex.nome}</span>
+          ${ex.codigo ? `<span class="text-slate-400 text-xs ml-2">${ex.codigo}</span>` : ''}
+        </div>`
+      ).join('');
       recAutocompleteList.classList.add('show');
+    });
+    document.addEventListener('click', function(e) {
+      if (!recSearchInput.contains(e.target)) recAutocompleteList.classList.remove('show');
     });
   }
 
-  function recAdicionarExame(id) {
-    const exame = listaExames.find(e => e.id === id);
-    if (!exame) return;
+  function recAdicionarExame(id, nome, codigo) {
     if (recExamesSelecionados.some(e => e.id === id)) { showToast('Exame já selecionado!', 'error'); return; }
-    recExamesSelecionados.push(exame);
+    recExamesSelecionados.push({ id, nome, codigo });
     recRenderExames();
-    if (recSearchInput) recSearchInput.value = '';
-    if (recAutocompleteList) recAutocompleteList.classList.remove('show');
-    showToast('Exame adicionado!');
+    recSearchInput.value = '';
+    recAutocompleteList.classList.remove('show');
   }
 
   function recRemoverExame(index) {
     recExamesSelecionados.splice(index, 1);
     recRenderExames();
-    showToast('Exame removido');
   }
 
   function recRenderExames() {
     const container = document.getElementById('rec-exames-selecionados');
     if (recExamesSelecionados.length === 0) {
-      container.innerHTML = '<p class="text-sm text-slate-400 text-center py-2">Nenhum exame selecionado</p>';
+      container.innerHTML = '';
       return;
     }
-    container.innerHTML = recExamesSelecionados.map((ex, index) => {
-      const nome = ex.nome || 'Sem nome';
-      const codigo = ex.codigo || '---';
-      return '<div class="exame-selecionado-item"><div class="exame-info"><div class="exame-nome">' + nome + '</div><div class="exame-codigo">' + codigo + '</div></div><button class="btn-remover-exame" onclick="recRemoverExame(' + index + ')" title="Remover"><i class="fa-solid fa-xmark"></i></button></div>';
-    }).join('');
+    container.innerHTML = recExamesSelecionados.map((ex, index) =>
+      `<div class="flex items-center justify-between bg-cda-light rounded-xl px-3 py-2">
+        <span class="text-sm font-semibold text-cda-text">${ex.nome}${ex.codigo ? ' <span class="text-slate-400 font-normal text-xs">'+ex.codigo+'</span>' : ''}</span>
+        <button onclick="recRemoverExame(${index})" class="btn-remover-exame" style="width:26px;height:26px;"><i class="fa-solid fa-xmark"></i></button>
+      </div>`
+    ).join('');
   }
 
   function recSelecionarTipo(tipo) {
     recTipo = tipo;
-    document.querySelectorAll('.recoleta-radio-label').forEach(el => el.classList.remove('ativo'));
-    document.getElementById('rec-label-' + tipo).classList.add('ativo');
-    document.querySelectorAll('.recoleta-radio-label input[type="radio"]').forEach(r => r.checked = false);
-    document.querySelector('#rec-label-' + tipo + ' input[type="radio"]').checked = true;
-    const externoOptions = document.getElementById('rec-externo-options');
-    if (tipo === 'externo') {
-      externoOptions.classList.add('show');
-    } else {
-      externoOptions.classList.remove('show');
-      recLabExterno = null;
-      document.querySelectorAll('.recoleta-externo-btn').forEach(btn => btn.classList.remove('ativo'));
-    }
+    recLabExterno = null;
+    document.getElementById('rec-label-interno').classList.toggle('ativo', tipo === 'interno');
+    document.getElementById('rec-label-externo').classList.toggle('ativo', tipo === 'externo');
+    document.querySelectorAll('.recoleta-externo-btn').forEach(b => b.classList.remove('ativo'));
+    const ext = document.getElementById('rec-externo-options');
+    if (tipo === 'externo') ext.classList.add('show'); else ext.classList.remove('show');
   }
 
   function recSelecionarLabExterno(btn) {
+    recLabExterno = btn.dataset.lab;
     document.querySelectorAll('.recoleta-externo-btn').forEach(b => b.classList.remove('ativo'));
     btn.classList.add('ativo');
-    recLabExterno = btn.dataset.lab;
   }
 
-  function salvarRecoleta() {
-    const codigo = document.getElementById('rec-codigo').value.trim().toUpperCase();
-    const nome = document.getElementById('rec-nome').value.trim().toUpperCase();
-    const motivo = document.getElementById('rec-motivo').value.trim();
-    const obs = document.getElementById('rec-obs').value.trim();
-    const errorEl = document.getElementById('rec-error');
+  async function salvarRecoleta() {
+    const codigo  = document.getElementById('rec-codigo').value.trim().toUpperCase();
+    const nome    = document.getElementById('rec-nome').value.trim().toUpperCase();
+    const motivo  = document.getElementById('rec-motivo').value.trim();
+    const obs     = document.getElementById('rec-obs').value.trim();
+    const errorEl   = document.getElementById('rec-error');
     const successEl = document.getElementById('rec-success');
+    const salvandoEl = document.getElementById('rec-salvando');
 
-    if (!codigo || !nome || recExamesSelecionados.length === 0) {
-      errorEl.innerText = 'Preencha código, nome e selecione pelo menos um exame.';
-      errorEl.style.display = 'block';
-      successEl.style.display = 'none';
-      setTimeout(() => errorEl.style.display = 'none', 3000);
-      return;
+    // Validações obrigatórias
+    if (!codigo) {
+      errorEl.innerText = 'O campo Código é obrigatório.'; errorEl.style.display = 'block';
+      setTimeout(() => errorEl.style.display = 'none', 3000); return;
+    }
+    if (!nome) {
+      errorEl.innerText = 'O campo Nome é obrigatório.'; errorEl.style.display = 'block';
+      setTimeout(() => errorEl.style.display = 'none', 3000); return;
+    }
+    if (recExamesSelecionados.length === 0) {
+      errorEl.innerText = 'Selecione pelo menos um exame.'; errorEl.style.display = 'block';
+      setTimeout(() => errorEl.style.display = 'none', 3000); return;
     }
     if (!recTipo) {
-      errorEl.innerText = 'Selecione o tipo de exame (Interno ou Externo).';
-      errorEl.style.display = 'block';
-      successEl.style.display = 'none';
-      setTimeout(() => errorEl.style.display = 'none', 3000);
-      return;
+      errorEl.innerText = 'Selecione o tipo (Interno ou Externo).'; errorEl.style.display = 'block';
+      setTimeout(() => errorEl.style.display = 'none', 3000); return;
     }
     if (recTipo === 'externo' && !recLabExterno) {
-      errorEl.innerText = 'Selecione o laboratório externo.';
-      errorEl.style.display = 'block';
-      successEl.style.display = 'none';
-      setTimeout(() => errorEl.style.display = 'none', 3000);
-      return;
+      errorEl.innerText = 'Selecione o laboratório externo.'; errorEl.style.display = 'block';
+      setTimeout(() => errorEl.style.display = 'none', 3000); return;
+    }
+    if (!motivo) {
+      errorEl.innerText = 'O campo Motivo da recoleta é obrigatório.'; errorEl.style.display = 'block';
+      setTimeout(() => errorEl.style.display = 'none', 3000); return;
     }
 
     errorEl.style.display = 'none';
+    salvandoEl.style.display = 'block';
+
+    const examesNomes = recExamesSelecionados.map(e => e.nome).join(' | ');
+    const tipoCompleto = recTipo === 'externo' && recLabExterno ? `Externo - ${recLabExterno}` : recTipo === 'interno' ? 'Interno' : recTipo;
 
     const recoleta = {
-      id: Date.now(),
-      codigo: codigo,
-      nome: nome,
+      id: Date.now(), codigo, nome,
       exames: recExamesSelecionados.map(e => ({ id: e.id, nome: e.nome, codigo: e.codigo })),
-      tipo: recTipo,
-      labExterno: recLabExterno,
-      motivo: motivo,
-      observacoes: obs,
+      tipo: tipoCompleto, motivo, observacoes: obs,
       data: new Date().toLocaleDateString('pt-BR')
     };
 
+    // Salvar no Google Sheets via Apps Script
+    let salvouPlanilha = false;
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 12000);
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'salvarRecoleta',
+          token: CDA_TOKEN,
+          codigo, nome,
+          exames: examesNomes,
+          tipo: tipoCompleto,
+          motivo,
+          observacoes: obs
+        })
+      });
+      clearTimeout(timeout);
+      const json = await resp.json();
+      salvouPlanilha = json.ok === true;
+      if (!salvouPlanilha) console.warn('[CDA] Planilha retornou erro:', json);
+    } catch(err) {
+      console.warn('[CDA] Erro ao salvar na planilha:', err);
+    }
+
+    // Salvar no localStorage também (para exibição local imediata)
     let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
     recoletas.push(recoleta);
     localStorage.setItem('cda_recoletas', JSON.stringify(recoletas));
 
-    successEl.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Recoleta cadastrada com sucesso!';
+    salvandoEl.style.display = 'none';
+    if (salvouPlanilha) {
+      successEl.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Recoleta cadastrada e salva na planilha!';
+    } else {
+      successEl.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Recoleta cadastrada! (salva localmente — verifique a conexão)';
+    }
     successEl.style.display = 'block';
 
     // Limpar formulário
@@ -2209,13 +2337,12 @@
     recTipo = null;
     recLabExterno = null;
     document.querySelectorAll('.recoleta-radio-label').forEach(el => el.classList.remove('ativo'));
-    document.querySelectorAll('.recoleta-radio-label input[type="radio"]').forEach(r => r.checked = false);
     document.getElementById('rec-externo-options').classList.remove('show');
     document.querySelectorAll('.recoleta-externo-btn').forEach(btn => btn.classList.remove('ativo'));
 
     carregarRecoletas();
     showToast('Recoleta cadastrada com sucesso!');
-    setTimeout(() => successEl.style.display = 'none', 3000);
+    setTimeout(() => successEl.style.display = 'none', 4000);
   }
 
   function carregarRecoletas() {
@@ -2225,32 +2352,36 @@
       container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhuma recoleta cadastrada.</p>';
       return;
     }
-    container.innerHTML = recoletas.map((r, index) => {
-      const examesNomes = r.exames.map(e => e.nome).join(', ');
-      const tipoBadge = r.tipo === 'interno'
-        ? '<span class="recoleta-badge interno"><i class="fa-solid fa-house-medical"></i> Interno</span>'
-        : '<span class="recoleta-badge externo"><i class="fa-solid fa-truck-medical"></i> Externo</span>';
-      const labInfo = r.tipo === 'externo' && r.labExterno ? '<div class="recoleta-externo-lab"><i class="fa-solid fa-building mr-1"></i> ' + r.labExterno + '</div>' : '';
-      const motivoInfo = r.motivo ? '<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ' + r.motivo + '</div>' : '';
-      const obsInfo = r.observacoes ? '<div class="recoleta-obs"><i class="fa-solid fa-note-sticky mr-1"></i> ' + r.observacoes + '</div>' : '';
-      return '<div class="recoleta-card">' +
-        '<div class="recoleta-header">' +
-          '<div>' +
-            '<div class="recoleta-codigo">CÓDIGO: ' + r.codigo + '</div>' +
-            '<div class="recoleta-nome">' + r.nome + '</div>' +
-          '</div>' +
-          '<div>' + tipoBadge + '</div>' +
-        '</div>' +
-        labInfo +
-        '<div class="recoleta-exames"><i class="fa-solid fa-vial mr-1 text-cda-primary"></i> ' + examesNomes + '</div>' +
-        motivoInfo +
-        obsInfo +
-        '<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">' +
-          '<span class="text-xs text-slate-400">Cadastrado em: ' + r.data + '</span>' +
-          '<button class="btn-remover-exame" onclick="excluirRecoleta(' + index + ')" title="Excluir" style="width: 32px; height: 32px;"><i class="fa-solid fa-trash"></i></button>' +
-        '</div>' +
-      '</div>';
-    }).join('');
+    container.innerHTML = recoletas.map((r, index) => recCardHTML(r, index)).join('');
+  }
+
+  function recCardHTML(r, index) {
+    const examesNomes = Array.isArray(r.exames) ? r.exames.map(e => e.nome).join(', ') : (r.exames || '');
+    const isExterno = (r.tipo || '').toLowerCase().includes('externo');
+    const tipoBadge = isExterno
+      ? '<span class="recoleta-badge externo"><i class="fa-solid fa-truck-medical"></i> Externo</span>'
+      : '<span class="recoleta-badge interno"><i class="fa-solid fa-house-medical"></i> Interno</span>';
+    const labInfo = isExterno && r.labExterno ? `<div class="recoleta-externo-lab"><i class="fa-solid fa-building mr-1"></i> ${r.labExterno}</div>` :
+                    isExterno && r.tipo && r.tipo.includes(' - ') ? `<div class="recoleta-externo-lab"><i class="fa-solid fa-building mr-1"></i> ${r.tipo.split(' - ')[1]}</div>` : '';
+    const motivoInfo = r.motivo ? `<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ${r.motivo}</div>` : '';
+    const obsInfo = r.observacoes ? `<div class="recoleta-obs"><i class="fa-solid fa-note-sticky mr-1"></i> ${r.observacoes}</div>` : '';
+    const deleteBtn = typeof index === 'number' ? `<button class="btn-remover-exame" onclick="excluirRecoleta(${index})" title="Excluir" style="width:32px;height:32px;"><i class="fa-solid fa-trash"></i></button>` : '';
+    return `<div class="recoleta-card">
+      <div class="recoleta-header">
+        <div>
+          <div class="recoleta-codigo">CÓDIGO: ${r.codigo}</div>
+          <div class="recoleta-nome">${r.nome}</div>
+        </div>
+        <div>${tipoBadge}</div>
+      </div>
+      ${labInfo}
+      <div class="recoleta-exames"><i class="fa-solid fa-vial mr-1 text-cda-primary"></i> ${examesNomes}</div>
+      ${motivoInfo}${obsInfo}
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+        <span class="text-xs text-slate-400">Cadastrado em: ${r.data || ''}</span>
+        ${deleteBtn}
+      </div>
+    </div>`;
   }
 
   function excluirRecoleta(index) {
@@ -2259,10 +2390,48 @@
     recoletas.splice(index, 1);
     localStorage.setItem('cda_recoletas', JSON.stringify(recoletas));
     carregarRecoletas();
-    showToast('Recoleta excluída com sucesso!');
+    showToast('Recoleta excluída.');
   }
 
-  // ==================== SALVAR ORCAMENTO NA PLANILHA ====================
+  // --- Consultar Registros ---
+  function recFiltrar() {
+    const filtroCodigo = (document.getElementById('rec-filtro-codigo')?.value || '').trim().toUpperCase();
+    const filtroNome   = (document.getElementById('rec-filtro-nome')?.value   || '').trim().toUpperCase();
+    const container    = document.getElementById('rec-consulta-lista');
+    const recoletas    = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
+
+    if (!filtroCodigo && !filtroNome) {
+      // Mostrar todas se não há filtro
+      if (recoletas.length === 0) {
+        container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhum registro cadastrado.</p>';
+      } else {
+        container.innerHTML = recoletas.map((r, i) => recCardHTML(r, null)).join('');
+      }
+      return;
+    }
+
+    const resultado = recoletas.filter(r => {
+      const matchCodigo = filtroCodigo ? (r.codigo || '').toUpperCase().includes(filtroCodigo) : true;
+      const matchNome   = filtroNome   ? (r.nome   || '').toUpperCase().includes(filtroNome)   : true;
+      return matchCodigo && matchNome;
+    });
+
+    if (resultado.length === 0) {
+      container.innerHTML = '<div class="flex flex-col items-center py-6 text-center"><i class="fa-solid fa-circle-xmark text-slate-300 text-3xl mb-2"></i><p class="text-sm text-slate-500">Nenhum registro encontrado.</p></div>';
+    } else {
+      container.innerHTML = resultado.map((r) => recCardHTML(r, null)).join('');
+    }
+  }
+
+  function recLimparFiltros() {
+    const fc = document.getElementById('rec-filtro-codigo');
+    const fn = document.getElementById('rec-filtro-nome');
+    if (fc) fc.value = '';
+    if (fn) fn.value = '';
+    document.getElementById('rec-consulta-lista').innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Use os filtros acima para consultar registros.</p>';
+  }
+
+    // ==================== SALVAR ORCAMENTO NA PLANILHA ====================
   async function salvarOrcamentoNaPlanilha(origem) {
     const paciente = document.getElementById('orc-paciente') ? document.getElementById('orc-paciente').value.trim().toUpperCase() : '';
     if (!paciente || orcSelecionados.length === 0) return false;
