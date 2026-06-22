@@ -889,7 +889,10 @@
 <script>
 
   // ==================== CONFIGURAÇÕES GLOBAIS ====================
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzXj8wLELw524gLe9Vmn2NxIE4pzoBoM4VKQrlQu3hWony8hotzE4aI81dkonyxcuJWzQ/exec';
+  // Script principal: login, usuários, orçamentos
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyNAnEvW3JJ0-STfXV13kb0H8KWmGAXdWpeqf7fMKM8To7l3h4YMceIjDDYC8V8207llQ/exec';
+  // Script de agendamento: listar horários e criar eventos no Google Agenda
+  const APPS_SCRIPT_AGENDA_URL = 'https://script.google.com/macros/s/AKfycbzXj8wLELw524gLe9Vmn2NxIE4pzoBoM4VKQrlQu3hWony8hotzE4aI81dkonyxcuJWzQ/exec';
   const CDA_TOKEN = 'CDA-2025-xK9#mPqL';
 
   // ==================== LOGIN TOGGLE ANIMATION ====================
@@ -1687,7 +1690,7 @@
             try {
                 const controller = new AbortController();
                 const timeout = setTimeout(() => controller.abort(), 10000);
-                const url = `${APPS_SCRIPT_URL}?action=listar&data=${data}&token=${encodeURIComponent(CDA_TOKEN)}`;
+                const url = `${APPS_SCRIPT_AGENDA_URL}?action=listar&data=${data}&token=${encodeURIComponent(CDA_TOKEN)}`;
                 console.log('[CDA] Consultando agenda:', url);
                 const resp = await fetch(url, {
                     method: 'GET',
@@ -1851,7 +1854,21 @@
             if (!periodo)  { showToast('Selecione o período.', 'error'); return; }
             if (!horario)  { showToast('Selecione o horário.', 'error'); return; }
             if (typeof orcSelecionados === 'undefined' || !orcSelecionados.length) { showToast('Adicione ao menos um exame à lista antes de agendar.', 'error'); return; }
-            if (totalBruto < 150) { showToast('Olá! Informamos que a coleta agendada está disponível para orçamentos a partir de R$ 150,00.', 'info', 6000); return; }
+            if (totalBruto < 150 && !agenSalvar._confirmouValorBaixo) {
+                agenSalvar._confirmouValorBaixo = true;
+                const btnSalvarAviso = document.getElementById('agen-btn-salvar');
+                const textoOriginal = btnSalvarAviso.innerHTML;
+                btnSalvarAviso.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2" style="color:#f59e0b"></i><span class="text">Valor abaixo de R$150 — Confirmar mesmo assim?</span>';
+                btnSalvarAviso.style.background = 'linear-gradient(135deg, #b45309 0%, #d97706 60%, #f59e0b 100%)';
+                showToast('Valor abaixo de R$ 150,00. Clique novamente para confirmar o agendamento mesmo assim.', 'info', 6000);
+                setTimeout(() => {
+                    agenSalvar._confirmouValorBaixo = false;
+                    btnSalvarAviso.innerHTML = textoOriginal;
+                    btnSalvarAviso.style.background = '';
+                }, 7000);
+                return;
+            }
+            agenSalvar._confirmouValorBaixo = false;
             if (!pagamento) { showToast('Selecione a forma de pagamento.', 'error'); return; }
 
             btnSalvar.disabled = true;
@@ -1862,7 +1879,7 @@
             try {
                 const controller = new AbortController();
                 const timeout = setTimeout(() => controller.abort(), 6000);
-                const checkResp = await fetch(`${APPS_SCRIPT_URL}?action=listar&data=${data}&token=${CDA_TOKEN}`, { signal: controller.signal });
+                const checkResp = await fetch(`${APPS_SCRIPT_AGENDA_URL}?action=listar&data=${data}&token=${CDA_TOKEN}`, { signal: controller.signal });
                 clearTimeout(timeout);
                 const checkJson = await checkResp.json();
                 const ocupadosCheck = Array.isArray(checkJson.ocupados)
@@ -1903,7 +1920,7 @@
                 const endHh = hh + 1;
                 const endDateTime = `${data}T${String(endHh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`;
 
-                const resp = await fetch(APPS_SCRIPT_URL, {
+                const resp = await fetch(APPS_SCRIPT_AGENDA_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({
