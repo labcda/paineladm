@@ -914,6 +914,10 @@
     bContainer.classList.toggle('is-z200');
   }
 
+  function _getItem(key) {
+    try { return localStorage.getItem(key); } catch(e) { return null; }
+  }
+
   function loginSucesso() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('splashScreen').style.display = 'flex';
@@ -925,7 +929,7 @@
         document.getElementById('appContainer').style.display = 'grid';
         document.body.classList.add('app-loaded');
         carregarExames();
-        gerarHorarios();
+        agenInicializar();
         atualizarMesStats();
         renderAtividades();
         contarOrcamentosDoMes();
@@ -1910,6 +1914,25 @@
                 console.error('Erro agendamento:', err);
                 agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento);
             }
+        }
+
+        function agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento) {
+            const btnSalvar = document.getElementById('agen-btn-salvar');
+            if (btnSalvar) {
+                btnSalvar.disabled = false;
+                btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+            }
+            const [y, m, d] = data.split('-').map(Number);
+            const dataExt = new Date(y, m - 1, d).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+            const mensagem = `Olá! Gostaria de confirmar um agendamento de coleta:\n\n` +
+                `Paciente: ${nome}\n` +
+                `Telefone: ${telefone}\n` +
+                `Data: ${dataExt}\n` +
+                `Horário: ${horario}\n` +
+                `Forma de pagamento: ${pagamento || '—'}` +
+                (descExames || '');
+            showToast('Não foi possível salvar automaticamente. Abrindo WhatsApp para confirmar manualmente.', 'error', 6000);
+            window.open('https://wa.me/5527998980658?text=' + encodeURIComponent(mensagem), '_blank');
         }
 
         function agenSucesso(nome, data, horario) {
