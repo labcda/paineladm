@@ -1698,8 +1698,11 @@
                 const texto = await resp.text();
                 console.log('[CDA] Resposta bruta:', texto);
                 const json = JSON.parse(texto);
-                ocupados = Array.isArray(json.ocupados) ? json.ocupados : [];
-                console.log('[CDA] Ocupados:', ocupados);
+                // Normaliza: remove espaços extras e garante formato HH:MM
+                ocupados = Array.isArray(json.ocupados)
+                    ? json.ocupados.map(h => String(h).trim())
+                    : [];
+                console.log('[CDA] Ocupados (normalizado):', ocupados);
                 agendaOk = true;
             } catch(err) {
                 console.warn('[CDA] Agenda indisponível:', err);
@@ -1708,12 +1711,19 @@
 
             document.getElementById('agen-horarios-loading')?.classList.add('hidden');
 
-            // Se a agenda falhou, mostra todos os horários disponíveis localmente com aviso
+            // Se a agenda falhou, mostra aviso mas continua exibindo slots locais
             if (!agendaOk) {
                 const erroEl = document.getElementById('agen-horarios-erro');
                 if (erroEl) erroEl.classList.remove('hidden');
-                // Continua com ocupados vazio (mostra todos os slots filtrados por hora)
             }
+
+            // Normaliza horário para HH:MM (cobre "07:30", "7:30", "07:30:00")
+            function normalizarHora(h) {
+                const partes = String(h).trim().split(':');
+                if (partes.length < 2) return h;
+                return String(parseInt(partes[0])).padStart(2,'0') + ':' + partes[1].padStart(2,'0');
+            }
+            const ocupadosNorm = ocupados.map(normalizarHora);
 
             // Se for hoje, filtrar horários que já passaram (com 30min de margem)
             const agora = new Date();
@@ -1722,7 +1732,7 @@
             const minutosAgora = agora.getHours() * 60 + agora.getMinutes() + 30;
 
             const disponiveis = slots.filter(h => {
-                if (ocupados.includes(h)) return false;
+                if (ocupadosNorm.includes(h)) return false;
                 if (isHoje) {
                     const [hh, mm] = h.split(':').map(Number);
                     return (hh * 60 + mm) > minutosAgora;
@@ -1737,7 +1747,7 @@
 
             const grid = document.getElementById('agen-horarios-grid');
             grid.innerHTML = disponiveis.map(h => {
-                const isOcupado = ocupados.includes(h);
+                const isOcupado = ocupadosNorm.includes(h);
                 return `<button type="button" class="agen-horario-btn${isOcupado ? ' ocupado' : ''}" data-hora="${h}" 
                     ${isOcupado ? 'disabled title="Horário já reservado"' : `onclick="agenSelecionarHorario('${h}')"`}
                     >${h}${isOcupado ? '<br><span style="font-size:9px;opacity:0.7">Ocupado</span>' : ''}</button>`;
@@ -1782,7 +1792,7 @@
             agenState.pagamento = pagamento || null;
             const totalBruto = agenTotalSelecionado();
             const temExames = typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0;
-            const pronto = data && periodo && horario && nome && telefone && validarTelefoneBR(telefone) && temExames && totalBruto >= 150 && pagamento;
+            const pronto = data && periodo && horario && nome && telefone && validarTelefoneBR(telefone) && pagamento;
 
             if (data && periodo && horario) {
                 if (pagamentoWrap) pagamentoWrap.classList.remove('hidden');
@@ -1855,8 +1865,13 @@
                 const checkResp = await fetch(`${APPS_SCRIPT_URL}?action=listar&data=${data}&token=${CDA_TOKEN}`, { signal: controller.signal });
                 clearTimeout(timeout);
                 const checkJson = await checkResp.json();
-                const ocupados = Array.isArray(checkJson.ocupados) ? checkJson.ocupados : [];
-                if (ocupados.includes(horario)) {
+                const ocupadosCheck = Array.isArray(checkJson.ocupados)
+                    ? checkJson.ocupados.map(h => {
+                        const p = String(h).trim().split(':');
+                        return p.length >= 2 ? String(parseInt(p[0])).padStart(2,'0') + ':' + p[1].padStart(2,'0') : String(h).trim();
+                      })
+                    : [];
+                if (ocupadosCheck.includes(horario)) {
                     showToast(`O horário ${horario} acabou de ser reservado. Por favor, escolha outro horário.`, 'error', 5000);
                     btnSalvar.disabled = false;
                     btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
