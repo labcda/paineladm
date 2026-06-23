@@ -2412,14 +2412,40 @@ function computarOrcamento() {
     setTimeout(() => successEl.style.display = 'none', 4000);
   }
 
-  function carregarRecoletas() {
+  async function carregarRecoletas() {
     const container = document.getElementById('rec-lista');
-    const recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
-    if (recoletas.length === 0) {
-      container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhuma recoleta cadastrada.</p>';
-      return;
+    container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Carregando do servidor...</p>';
+
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      const url = APPS_SCRIPT_URL + '?action=consultarRecoletas&token=' + encodeURIComponent(CDA_TOKEN);
+      const resp = await fetch(url, { signal: controller.signal, redirect: 'follow' });
+      clearTimeout(timeout);
+      const json = await resp.json();
+
+      if (json.ok && Array.isArray(json.recoletas)) {
+        if (json.recoletas.length === 0) {
+          container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhuma recoleta cadastrada no servidor.</p>';
+          return;
+        }
+        // Salva no localStorage como cache
+        localStorage.setItem('cda_recoletas', JSON.stringify(json.recoletas));
+        container.innerHTML = json.recoletas.map((r, index) => recCardHTML(r, index)).join('');
+      } else {
+        throw new Error(json.erro || 'Erro ao carregar recoletas');
+      }
+    } catch(err) {
+      console.error('[CDA] Erro ao carregar recoletas do servidor:', err);
+      // Fallback: tenta carregar do localStorage
+      const recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
+      if (recoletas.length === 0) {
+        container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Não foi possível carregar do servidor. Nenhuma recoleta em cache.</p>';
+      } else {
+        container.innerHTML = '<p class="text-xs text-amber-600 text-center py-2 mb-2"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Mostrando dados em cache (offline)</p>' + 
+          recoletas.map((r, index) => recCardHTML(r, index)).join('');
+      }
     }
-    container.innerHTML = recoletas.map((r, index) => recCardHTML(r, index)).join('');
   }
 
   function recCardHTML(r, index) {
@@ -2451,9 +2477,41 @@ function computarOrcamento() {
     </div>`;
   }
 
-  function excluirRecoleta(index) {
+  async function excluirRecoleta(index) {
     if (!confirm('Tem certeza que deseja excluir esta recoleta?')) return;
+
+    // Primeiro tenta excluir do servidor
     let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
+    const rec = recoletas[index];
+
+    if (rec && rec.codigo) {
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 8000);
+        const resp = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          redirect: 'follow',
+          body: JSON.stringify({
+            action: 'excluirRecoleta',
+            token: CDA_TOKEN,
+            codigo: rec.codigo,
+            nome: rec.nome || ''
+          })
+        });
+        clearTimeout(timeout);
+        const json = await resp.json();
+        if (json.ok) {
+          console.log('[CDA] Recoleta excluída do servidor:', rec.codigo);
+        } else {
+          console.warn('[CDA] Servidor retornou erro ao excluir:', json.erro);
+        }
+      } catch(err) {
+        console.warn('[CDA] Falha ao excluir do servidor:', err);
+      }
+    }
+
+    // Sempre exclui do localStorage
     recoletas.splice(index, 1);
     localStorage.setItem('cda_recoletas', JSON.stringify(recoletas));
     carregarRecoletas();
@@ -2461,32 +2519,61 @@ function computarOrcamento() {
   }
 
   // --- Consultar Registros ---
-  function recFiltrar() {
+  async function recFiltrar() {
     const filtroCodigo = (document.getElementById('rec-filtro-codigo')?.value || '').trim().toUpperCase();
     const filtroNome   = (document.getElementById('rec-filtro-nome')?.value   || '').trim().toUpperCase();
     const container    = document.getElementById('rec-consulta-lista');
-    const recoletas    = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
 
-    if (!filtroCodigo && !filtroNome) {
-      // Mostrar todas se não há filtro
-      if (recoletas.length === 0) {
-        container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhum registro cadastrado.</p>';
+    container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Consultando servidor...</p>';
+
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      const url = APPS_SCRIPT_URL + '?action=consultarRecoletas' + 
+        (filtroCodigo ? '&codigo=' + encodeURIComponent(filtroCodigo) : '') +
+        (filtroNome ? '&nome=' + encodeURIComponent(filtroNome) : '') +
+        '&token=' + encodeURIComponent(CDA_TOKEN);
+      const resp = await fetch(url, { signal: controller.signal, redirect: 'follow' });
+      clearTimeout(timeout);
+      const json = await resp.json();
+
+      if (json.ok && Array.isArray(json.recoletas)) {
+        const resultado = json.recoletas;
+
+        if (resultado.length === 0) {
+          container.innerHTML = '<div class="flex flex-col items-center py-6 text-center"><i class="fa-solid fa-circle-xmark text-slate-300 text-3xl mb-2"></i><p class="text-sm text-slate-500">Nenhum registro encontrado no servidor.</p></div>';
+        } else {
+          container.innerHTML = resultado.map((r) => recCardHTML(r, null)).join('');
+        }
+        console.log('[CDA] Consulta de recoletas:', resultado.length, 'resultados');
       } else {
-        container.innerHTML = recoletas.map((r, i) => recCardHTML(r, null)).join('');
+        throw new Error(json.erro || 'Erro na consulta');
       }
-      return;
-    }
+    } catch(err) {
+      console.warn('[CDA] Falha na consulta do servidor, usando localStorage:', err);
+      // Fallback para localStorage
+      const recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
 
-    const resultado = recoletas.filter(r => {
-      const matchCodigo = filtroCodigo ? (r.codigo || '').toUpperCase().includes(filtroCodigo) : true;
-      const matchNome   = filtroNome   ? (r.nome   || '').toUpperCase().includes(filtroNome)   : true;
-      return matchCodigo && matchNome;
-    });
+      if (!filtroCodigo && !filtroNome) {
+        if (recoletas.length === 0) {
+          container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhum registro cadastrado. (offline)</p>';
+        } else {
+          container.innerHTML = recoletas.map((r, i) => recCardHTML(r, null)).join('');
+        }
+        return;
+      }
 
-    if (resultado.length === 0) {
-      container.innerHTML = '<div class="flex flex-col items-center py-6 text-center"><i class="fa-solid fa-circle-xmark text-slate-300 text-3xl mb-2"></i><p class="text-sm text-slate-500">Nenhum registro encontrado.</p></div>';
-    } else {
-      container.innerHTML = resultado.map((r) => recCardHTML(r, null)).join('');
+      const resultado = recoletas.filter(r => {
+        const matchCodigo = filtroCodigo ? (r.codigo || '').toUpperCase().includes(filtroCodigo) : true;
+        const matchNome   = filtroNome   ? (r.nome   || '').toUpperCase().includes(filtroNome)   : true;
+        return matchCodigo && matchNome;
+      });
+
+      if (resultado.length === 0) {
+        container.innerHTML = '<div class="flex flex-col items-center py-6 text-center"><i class="fa-solid fa-circle-xmark text-slate-300 text-3xl mb-2"></i><p class="text-sm text-slate-500">Nenhum registro encontrado. (offline)</p></div>';
+      } else {
+        container.innerHTML = resultado.map((r) => recCardHTML(r, null)).join('');
+      }
     }
   }
 
@@ -2495,7 +2582,8 @@ function computarOrcamento() {
     const fn = document.getElementById('rec-filtro-nome');
     if (fc) fc.value = '';
     if (fn) fn.value = '';
-    document.getElementById('rec-consulta-lista').innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Use os filtros acima para consultar registros.</p>';
+    const container = document.getElementById('rec-consulta-lista');
+    container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Use os filtros acima ou clique em Buscar para carregar todos os registros.</p>';
   }
 
     // ==================== SALVAR ORCAMENTO NA PLANILHA ====================
