@@ -2494,10 +2494,14 @@
   }
 
   function abrirModalRecDetalhes(index) {
+    console.log('[CDA DEBUG] abrirModalRecDetalhes chamado com index:', index);
     let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
+    console.log('[CDA DEBUG] Total recoletas no localStorage:', recoletas.length);
     const pendentes = recoletas.filter(r => (r.status || 'PENDENTE') !== 'CONCLUIDO');
+    console.log('[CDA DEBUG] Pendentes:', pendentes.length);
     const r = pendentes[index];
-    if (!r) return;
+    console.log('[CDA DEBUG] Registro encontrado:', r ? 'SIM' : 'NAO', r);
+    if (!r) { console.log('[CDA DEBUG] Registro nao encontrado, saindo'); return; }
     recDetalhesIndex = index;
     recDetalhesStatus = r.status || 'PENDENTE';
     recComunicacaoValor = null;
@@ -2542,7 +2546,9 @@
     document.getElementById('modal-rec-secao-conclusao').style.display = 'none';
     document.getElementById('modal-rec-btn-concluir').style.display = 'flex';
 
+    console.log('[CDA DEBUG] Abrindo modal...');
     document.getElementById('modal-rec-detalhes').classList.add('ativo');
+    console.log('[CDA DEBUG] Modal aberto!');
   }
 
   function fecharModalRecDetalhes() {
