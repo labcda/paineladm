@@ -2752,11 +2752,18 @@
 
   // ===== EVENT DELEGATION PARA CARDS DE RECOLETA =====
   document.addEventListener('click', function(e) {
+    console.log('[CDA DEBUG] Click em:', e.target.tagName, e.target.className);
     const card = e.target.closest('.recoleta-card');
-    if (card && card.dataset.recIndex !== undefined) {
-      const index = parseInt(card.dataset.recIndex, 10);
-      if (!isNaN(index)) {
-        abrirModalRecDetalhes(index);
+    if (card) {
+      console.log('[CDA DEBUG] Card encontrado, dataset:', card.dataset);
+      if (card.dataset.recIndex !== undefined) {
+        const index = parseInt(card.dataset.recIndex, 10);
+        console.log('[CDA DEBUG] Index:', index);
+        if (!isNaN(index)) {
+          abrirModalRecDetalhes(index);
+        }
+      } else {
+        console.log('[CDA DEBUG] Card sem data-rec-index');
       }
     }
   });
