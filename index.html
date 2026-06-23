@@ -463,8 +463,15 @@
 
   <main>
     <header>
-      <div class="breadcrumbs"><a href="#">Home</a> / <span id="breadcrumb-active">Dashboard</span></div>
-      <h1 class="title" id="page-title">Painel de Controle</h1>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div class="breadcrumbs"><a href="#">Home</a> / <span id="breadcrumb-active">Dashboard</span></div>
+          <h1 class="title" id="page-title">Painel de Controle</h1>
+        </div>
+        <div id="user-badge" style="display:none;align-items:center;gap:6px;background:linear-gradient(135deg,#0F4C5C,#49BCBE);color:white;padding:6px 14px;border-radius:20px;font-size:0.75rem;font-weight:700;box-shadow:0 2px 8px rgba(15,76,92,0.2);">
+          <i class="fa-solid fa-user-circle"></i> <span id="user-badge-text"></span>
+        </div>
+      </div>
     </header>
 
     <div class="content-area">
@@ -965,6 +972,49 @@
   const APPS_SCRIPT_AGENDA_URL = 'https://script.google.com/macros/s/AKfycbzXj8wLELw524gLe9Vmn2NxIE4pzoBoM4VKQrlQu3hWony8hotzE4aI81dkonyxcuJWzQ/exec';
   const CDA_TOKEN = 'CDA-2025-xK9#mPqL';
 
+// ==================== RASTREIO DE USUÁRIO ====================
+let USUARIO_LOGADO = null; // { login: 'ADMIN', nome: 'Administrador' }
+
+function setUsuarioLogado(login) {
+    USUARIO_LOGADO = { login: login, timestamp: new Date().toISOString() };
+    try {
+        localStorage.setItem('cda_usuario_logado', JSON.stringify(USUARIO_LOGADO));
+    } catch(e) {}
+    atualizarBadgeUsuario();
+}
+
+function getUsuarioLogado() {
+    if (USUARIO_LOGADO) return USUARIO_LOGADO;
+    try {
+        const saved = localStorage.getItem('cda_usuario_logado');
+        if (saved) {
+            USUARIO_LOGADO = JSON.parse(saved);
+            return USUARIO_LOGADO;
+        }
+    } catch(e) {}
+    return null;
+}
+
+function limparUsuarioLogado() {
+    USUARIO_LOGADO = null;
+    try {
+        localStorage.removeItem('cda_usuario_logado');
+    } catch(e) {}
+    atualizarBadgeUsuario();
+}
+
+function atualizarBadgeUsuario() {
+    const badge = document.getElementById('user-badge');
+    if (!badge) return;
+    const user = getUsuarioLogado();
+    if (user && user.login) {
+        badge.innerHTML = `<i class="fa-solid fa-user-circle mr-2"></i> ${user.login}`;
+        badge.style.display = 'inline-flex';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
   // ==================== LOGIN TOGGLE ANIMATION ====================
   let switchCtn, switchC1, switchC2, switchCircle, aContainer, bContainer;
 
@@ -995,7 +1045,10 @@
     try { return localStorage.getItem(key); } catch(e) { return null; }
   }
 
-  function loginSucesso() {
+  function loginSucesso(login) {
+    // Salva o usuário logado para rastreio
+    setUsuarioLogado(login || 'ADMIN');
+
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('splashScreen').style.display = 'flex';
     setTimeout(() => {
@@ -1011,6 +1064,7 @@
         renderAtividades();
         contarOrcamentosDoMes();
         carregarRecoletas();
+        atualizarBadgeUsuario(); // Atualiza badge do usuário logado
       }, 600);
     }, 2500);
   }
@@ -1076,7 +1130,7 @@
       return;
     }
     if (usuario === 'ADMIN' && senha === 'CDA2024') {
-      loginSucesso();
+      loginSucesso('ADMIN');
       return;
     }
     errorEl.innerText = 'VERIFICANDO CREDENCIAIS...';
@@ -1091,7 +1145,7 @@
       if (!resp.ok) throw new Error('Erro HTTP: ' + resp.status);
       const json = await resp.json();
       if (json.ok && json.autorizado) {
-        loginSucesso();
+        loginSucesso(usuario);
       } else if (json.ok && !json.autorizado) {
         errorEl.innerText = 'LOGIN OU SENHA INCORRETOS.';
         errorEl.style.color = '#ef4444';
@@ -1133,7 +1187,14 @@
     document.getElementById('stat-exames').innerText = dadosMensais.exames >= 1000 ? (dadosMensais.exames/1000).toFixed(1) + 'K' : dadosMensais.exames;
   }
 
-  function computarOrcamento() {
+  
+// ==================== FUNÇÃO AUXILIAR RASTREIO ====================
+function usuarioLogado() {
+    const user = getUsuarioLogado();
+    return user && user.login ? user.login : 'DESCONHECIDO';
+}
+
+function computarOrcamento() {
     dadosMensais.orcamentos++;
     atualizarMesStats();
     const agora = new Date();
@@ -2448,6 +2509,7 @@
     const totalCredito = totalBruto * 0.65;
     const dataAtual = new Date().toLocaleDateString('pt-BR');
     const mesAno = new Date().toLocaleDateString('pt-BR', {month: '2-digit', year: 'numeric'});
+    const usuario = usuarioLogado();
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 8000);
@@ -2459,10 +2521,12 @@
       const salvarResp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
+        redirect: 'follow',
         body: JSON.stringify({
           action: 'salvarOrcamento', token: CDA_TOKEN, paciente: paciente, exames: examesNomes,
           codigos: examesCodigos, totalBruto: totalBruto, totalPix: totalPix, totalCredito: totalCredito,
-          quantidadeExames: orcSelecionados.length, data: dataAtual, mesAno: mesAno, origem: origem || 'sistema'
+          quantidadeExames: orcSelecionados.length, data: dataAtual, mesAno: mesAno, origem: origem || 'sistema',
+          usuario: usuario
         })
       });
       const salvarJson = await salvarResp.json();
