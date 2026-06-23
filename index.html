@@ -495,6 +495,7 @@
   </style>
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -1002,6 +1003,20 @@
                         <i class="fa-solid fa-user mr-1"></i> Filtrar por Nome
                     </label>
                     <input type="text" id="rec-filtro-nome" placeholder="Digite o nome..." class="recoleta-form-field" oninput="recFiltrar()">
+                </div>
+            </div>
+            <!-- FILTRO DE STATUS -->
+            <div style="margin-bottom: 16px;">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                    <i class="fa-solid fa-filter mr-1"></i> Status da Recoleta
+                </label>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" id="rec-filtro-status-afazer" class="rec-filtro-status-btn ativo" onclick="recFiltroStatus('afazer')">
+                        <i class="fa-solid fa-clock"></i> A Fazer
+                    </button>
+                    <button type="button" id="rec-filtro-status-feita" class="rec-filtro-status-btn" onclick="recFiltroStatus('feita')">
+                        <i class="fa-solid fa-check-circle"></i> Feita
+                    </button>
                 </div>
             </div>
             <div style="display:flex;gap:8px;margin-bottom:16px;">
@@ -2300,12 +2315,22 @@
 
     const examesNomes = recExamesSelecionados.map(e => e.nome).join(' | ');
     const tipoCompleto = recTipo === 'externo' && recLabExterno ? 'Externo - ' + recLabExterno : recTipo === 'interno' ? 'Interno' : recTipo;
+    const usuario = usuarioLogado();
+    const dataAtual = new Date().toLocaleDateString('pt-BR');
 
     const recoleta = {
       id: Date.now(), codigo: codigo, nome: nome,
       exames: recExamesSelecionados.map(e => ({ id: e.id, nome: e.nome, codigo: e.codigo })),
       tipo: tipoCompleto, motivo: motivo, observacoes: obs,
-      data: new Date().toLocaleDateString('pt-BR')
+      data: dataAtual,
+      usuario: usuario,
+      status: 'PENDENTE',
+      dataComunicacao: '',
+      quemComunicou: '',
+      quemRecebeu: '',
+      conseguiuComunicar: '',
+      dataVeio: '',
+      usuarioConclusao: ''
     };
 
     let salvouPlanilha = false;
@@ -2323,7 +2348,15 @@
           exames: examesNomes,
           tipo: tipoCompleto,
           motivo: motivo,
-          observacoes: obs
+          observacoes: obs,
+          usuario: usuario,
+          status: 'PENDENTE',
+          dataComunicacao: '',
+          quemComunicou: '',
+          quemRecebeu: '',
+          conseguiuComunicar: '',
+          dataVeio: '',
+          usuarioConclusao: ''
         })
       });
       clearTimeout(timeout);
@@ -2371,24 +2404,27 @@
       clearTimeout(timeout);
       const json = await resp.json();
       if (json.ok && Array.isArray(json.recoletas)) {
-        if (json.recoletas.length === 0) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhuma recoleta cadastrada no servidor.</p>'; return; }
+        // Filtrar apenas recoletas PENDENTES (não concluídas)
+        const pendentes = json.recoletas.filter(r => (r.status || 'PENDENTE') !== 'CONCLUIDO');
+        if (pendentes.length === 0) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhuma recoleta pendente cadastrada.</p>'; return; }
         localStorage.setItem('cda_recoletas', JSON.stringify(json.recoletas));
-        container.innerHTML = json.recoletas.map((r, index) => recCardHTML(r, index)).join('');
+        container.innerHTML = pendentes.map((r, index) => recCardHTML(r, index)).join('');
       } else { throw new Error(json.erro || 'Erro ao carregar recoletas'); }
     } catch(err) {
       console.error('[CDA] Erro ao carregar recoletas do servidor:', err);
       const recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
-      if (recoletas.length === 0) {
-        container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Não foi possível carregar do servidor. Nenhuma recoleta em cache.</p>';
+      const pendentes = recoletas.filter(r => (r.status || 'PENDENTE') !== 'CONCLUIDO');
+      if (pendentes.length === 0) {
+        container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Não foi possível carregar do servidor. Nenhuma recoleta pendente em cache.</p>';
       } else {
         container.innerHTML = '<p class="text-xs text-amber-600 text-center py-2 mb-2"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Mostrando dados em cache (offline)</p>' + 
-          recoletas.map((r, index) => recCardHTML(r, index)).join('');
+          pendentes.map((r, index) => recCardHTML(r, index)).join('');
       }
     }
   }
 
   function recCardHTML(r, index) {
-    const examesNomes = Array.isArray(r.exames) ? r.exames.map(e => e.nome).join(', ') : (r.exames || '');
+    const examesNomes = Array.isArray(r.exames) ? r.exames.map(e => e.nome || e).join(', ') : (r.exames || '');
     const isExterno = (r.tipo || '').toLowerCase().includes('externo');
     const tipoBadge = isExterno
       ? '<span class="recoleta-badge externo"><i class="fa-solid fa-truck-medical"></i> Externo</span>'
@@ -2397,21 +2433,25 @@
                     isExterno && r.tipo && r.tipo.includes(' - ') ? '<div class="recoleta-externo-lab"><i class="fa-solid fa-building mr-1"></i> ' + r.tipo.split(' - ')[1] + '</div>' : '';
     const motivoInfo = r.motivo ? '<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ' + r.motivo + '</div>' : '';
     const obsInfo = r.observacoes ? '<div class="recoleta-obs"><i class="fa-solid fa-note-sticky mr-1"></i> ' + r.observacoes + '</div>' : '';
-    const deleteBtn = typeof index === 'number' ? '<button class="btn-remover-exame" onclick="excluirRecoleta(' + index + ')" title="Excluir" style="width:32px;height:32px;"><i class="fa-solid fa-trash"></i></button>' : '';
-    return '<div class="recoleta-card">' +
+    const usuarioInfo = r.usuario ? '<div style="font-size:10px;color:#94a3b8;margin-top:4px;"><i class="fa-solid fa-user mr-1"></i> Criado por: ' + r.usuario + '</div>' : '';
+    const statusBadge = r.status === 'COMUNICADO' 
+      ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;background:#dbeafe;color:#1e40af;margin-left:6px;"><i class="fa-solid fa-phone"></i> Comunicado</span>'
+      : '';
+    const onclick = typeof index === 'number' ? 'onclick="abrirModalRecDetalhes(' + index + ')"' : '';
+    return '<div class="recoleta-card" ' + onclick + '>' +
       '<div class="recoleta-header">' +
         '<div>' +
-          '<div class="recoleta-codigo">CÓDIGO: ' + r.codigo + '</div>' +
+          '<div class="recoleta-codigo">CÓDIGO: ' + r.codigo + statusBadge + '</div>' +
           '<div class="recoleta-nome">' + r.nome + '</div>' +
         '</div>' +
         '<div>' + tipoBadge + '</div>' +
       '</div>' +
       labInfo +
       '<div class="recoleta-exames"><i class="fa-solid fa-vial mr-1 text-cda-primary"></i> ' + examesNomes + '</div>' +
-      motivoInfo + obsInfo +
+      motivoInfo + obsInfo + usuarioInfo +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">' +
         '<span class="text-xs text-slate-400">Cadastrado em: ' + (r.data || '') + '</span>' +
-        deleteBtn +
+        (typeof index === 'number' ? '<button class="btn-remover-exame" onclick="event.stopPropagation(); excluirRecoleta(' + index + ')" title="Excluir" style="width:32px;height:32px;"><i class="fa-solid fa-trash"></i></button>' : '') +
       '</div>' +
     '</div>';
   }
@@ -2442,17 +2482,200 @@
     showToast('Recoleta excluída.');
   }
 
+  // ===== VARIÁVEIS PARA MODAL DE DETALHES =====
+  let recDetalhesIndex = null;
+  let recDetalhesStatus = null;
+  let recComunicacaoValor = null;
+  let recFiltroStatusAtual = 'afazer';
+
+  function recFiltroStatus(status) {
+    recFiltroStatusAtual = status;
+    document.getElementById('rec-filtro-status-afazer').classList.toggle('ativo', status === 'afazer');
+    document.getElementById('rec-filtro-status-feita').classList.toggle('ativo', status === 'feita');
+    recFiltrar();
+  }
+
+  function abrirModalRecDetalhes(index) {
+    let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
+    const pendentes = recoletas.filter(r => (r.status || 'PENDENTE') !== 'CONCLUIDO');
+    const r = pendentes[index];
+    if (!r) return;
+    recDetalhesIndex = index;
+    recDetalhesStatus = r.status || 'PENDENTE';
+    recComunicacaoValor = null;
+
+    // Preencher informações básicas
+    document.getElementById('modal-rec-subtitulo').innerHTML = 'Código: ' + (r.codigo || '---') + ' | Paciente: ' + (r.nome || '---');
+    document.getElementById('modal-rec-usuario').textContent = r.usuario || '---';
+    document.getElementById('modal-rec-data-cadastro').textContent = r.data || '---';
+    document.getElementById('modal-rec-exames').textContent = Array.isArray(r.exames) ? r.exames.map(e => e.nome || e).join(', ') : (r.exames || '---');
+    document.getElementById('modal-rec-tipo').textContent = r.tipo || '---';
+    document.getElementById('modal-rec-motivo').textContent = r.motivo || '---';
+
+    // Status badge
+    const statusEl = document.getElementById('modal-rec-status-atual');
+    if (r.status === 'COMUNICADO') {
+      statusEl.className = 'modal-rec-status-badge comunicado';
+      statusEl.innerHTML = '<i class="fa-solid fa-phone"></i> Comunicado';
+    } else {
+      statusEl.className = 'modal-rec-status-badge pendente';
+      statusEl.innerHTML = '<i class="fa-solid fa-clock"></i> Pendente';
+    }
+
+    // Seção de comunicação
+    const secComunicacao = document.getElementById('modal-rec-secao-comunicacao');
+    const comExistente = document.getElementById('modal-rec-comunicacao-existente');
+    const comForm = document.getElementById('modal-rec-comunicacao-form');
+
+    if (r.dataComunicacao && r.dataComunicacao.trim() !== '') {
+      comExistente.style.display = 'block';
+      comForm.style.display = 'none';
+      document.getElementById('modal-rec-data-comunicacao').textContent = r.dataComunicacao || '---';
+      document.getElementById('modal-rec-quem-comunicou').textContent = r.quemComunicou || '---';
+      document.getElementById('modal-rec-quem-recebeu').textContent = r.quemRecebeu || '---';
+      const conseguiuMap = { 'SIM': 'Sim', 'NAO': 'Não', 'NAO_ATENDEU': 'Não atendeu' };
+      document.getElementById('modal-rec-conseguiu').textContent = conseguiuMap[r.conseguiuComunicar] || '---';
+    } else {
+      comExistente.style.display = 'none';
+      comForm.style.display = 'block';
+      document.getElementById('modal-rec-input-data-comunicacao').value = new Date().toISOString().split('T')[0];
+      document.getElementById('modal-rec-input-quem-comunicou').value = usuarioLogado();
+      document.getElementById('modal-rec-input-quem-recebeu').value = '';
+      document.querySelectorAll('.modal-rec-checkbox-label').forEach(el => el.classList.remove('ativo'));
+      recComunicacaoValor = null;
+    }
+
+    // Seção de conclusão (sempre escondida no modal de pendentes)
+    document.getElementById('modal-rec-secao-conclusao').style.display = 'none';
+    document.getElementById('modal-rec-btn-concluir').style.display = 'flex';
+
+    document.getElementById('modal-rec-detalhes').classList.add('ativo');
+  }
+
+  function fecharModalRecDetalhes() {
+    document.getElementById('modal-rec-detalhes').classList.remove('ativo');
+    recDetalhesIndex = null;
+    recDetalhesStatus = null;
+    recComunicacaoValor = null;
+  }
+
+  function recSelecionarComunicacao(valor) {
+    recComunicacaoValor = valor;
+    document.getElementById('modal-rec-label-sim').classList.toggle('ativo', valor === 'SIM');
+    document.getElementById('modal-rec-label-nao').classList.toggle('ativo', valor === 'NAO');
+    document.getElementById('modal-rec-label-naoatendeu').classList.toggle('ativo', valor === 'NAO_ATENDEU');
+  }
+
+  async function salvarComunicacaoRecoleta() {
+    const dataComunicacao = document.getElementById('modal-rec-input-data-comunicacao').value;
+    const quemComunicou = document.getElementById('modal-rec-input-quem-comunicou').value.trim().toUpperCase();
+    const quemRecebeu = document.getElementById('modal-rec-input-quem-recebeu').value.trim().toUpperCase();
+
+    if (!dataComunicacao) { showToast('Informe a data da comunicação.', 'error'); return; }
+    if (!quemComunicou) { showToast('Informe quem comunicou.', 'error'); return; }
+    if (!quemRecebeu) { showToast('Informe quem recebeu o comunicado.', 'error'); return; }
+    if (!recComunicacaoValor) { showToast('Selecione se conseguiu comunicar.', 'error'); return; }
+
+    let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
+    const pendentes = recoletas.filter(r => (r.status || 'PENDENTE') !== 'CONCLUIDO');
+    const r = pendentes[recDetalhesIndex];
+    if (!r) return;
+
+    // Encontrar o índice real no array completo
+    const idxReal = recoletas.findIndex(item => item.id === r.id || (item.codigo === r.codigo && item.nome === r.nome));
+    if (idxReal === -1) return;
+
+    recoletas[idxReal].dataComunicacao = dataComunicacao;
+    recoletas[idxReal].quemComunicou = quemComunicou;
+    recoletas[idxReal].quemRecebeu = quemRecebeu;
+    recoletas[idxReal].conseguiuComunicar = recComunicacaoValor;
+    recoletas[idxReal].status = 'COMUNICADO';
+
+    localStorage.setItem('cda_recoletas', JSON.stringify(recoletas));
+
+    // Sincronizar com servidor
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'atualizarRecoleta',
+          token: CDA_TOKEN,
+          codigo: r.codigo,
+          nome: r.nome,
+          dataComunicacao: dataComunicacao,
+          quemComunicou: quemComunicou,
+          quemRecebeu: quemRecebeu,
+          conseguiuComunicar: recComunicacaoValor,
+          status: 'COMUNICADO'
+        })
+      });
+      const json = await resp.json();
+      if (json.ok) console.log('[CDA] Comunicação salva no servidor');
+    } catch(err) { console.warn('[CDA] Falha ao sincronizar comunicação:', err); }
+
+    showToast('Comunicação registrada com sucesso!');
+    fecharModalRecDetalhes();
+    carregarRecoletas();
+  }
+
+  async function concluirRecoleta() {
+    if (!confirm('Confirmar que o paciente veio fazer a recoleta? O registro será arquivado.')) return;
+
+    let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
+    const pendentes = recoletas.filter(r => (r.status || 'PENDENTE') !== 'CONCLUIDO');
+    const r = pendentes[recDetalhesIndex];
+    if (!r) return;
+
+    const idxReal = recoletas.findIndex(item => item.id === r.id || (item.codigo === r.codigo && item.nome === r.nome));
+    if (idxReal === -1) return;
+
+    const dataVeio = new Date().toLocaleDateString('pt-BR');
+    const usuarioConc = usuarioLogado();
+
+    recoletas[idxReal].status = 'CONCLUIDO';
+    recoletas[idxReal].dataVeio = dataVeio;
+    recoletas[idxReal].usuarioConclusao = usuarioConc;
+
+    localStorage.setItem('cda_recoletas', JSON.stringify(recoletas));
+
+    // Sincronizar com servidor
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'atualizarRecoleta',
+          token: CDA_TOKEN,
+          codigo: r.codigo,
+          nome: r.nome,
+          status: 'CONCLUIDO',
+          dataVeio: dataVeio,
+          usuarioConclusao: usuarioConc
+        })
+      });
+      const json = await resp.json();
+      if (json.ok) console.log('[CDA] Recoleta concluída no servidor');
+    } catch(err) { console.warn('[CDA] Falha ao sincronizar conclusão:', err); }
+
+    showToast('Recoleta concluída! Registro arquivado.');
+    fecharModalRecDetalhes();
+    carregarRecoletas();
+  }
+
   async function recFiltrar() {
     const filtroCodigo = (document.getElementById('rec-filtro-codigo') ? document.getElementById('rec-filtro-codigo').value : '').trim().toUpperCase();
     const filtroNome = (document.getElementById('rec-filtro-nome') ? document.getElementById('rec-filtro-nome').value : '').trim().toUpperCase();
     const container = document.getElementById('rec-consulta-lista');
     container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Consultando servidor...</p>';
+
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
-      const url = APPS_SCRIPT_URL + '?action=consultarRecoletas' + 
+      let url = APPS_SCRIPT_URL + '?action=consultarRecoletas' + 
         (filtroCodigo ? '&codigo=' + encodeURIComponent(filtroCodigo) : '') +
         (filtroNome ? '&nome=' + encodeURIComponent(filtroNome) : '') +
+        '&status=' + (recFiltroStatusAtual === 'feita' ? 'CONCLUIDO' : 'PENDENTE,COMUNICADO') +
         '&token=' + encodeURIComponent(CDA_TOKEN);
       const resp = await fetch(url, { signal: controller.signal, redirect: 'follow' });
       clearTimeout(timeout);
@@ -2461,26 +2684,68 @@
         const resultado = json.recoletas;
         if (resultado.length === 0) {
           container.innerHTML = '<div class="flex flex-col items-center py-6 text-center"><i class="fa-solid fa-circle-xmark text-slate-300 text-3xl mb-2"></i><p class="text-sm text-slate-500">Nenhum registro encontrado no servidor.</p></div>';
-        } else { container.innerHTML = resultado.map((r) => recCardHTML(r, null)).join(''); }
+        } else { container.innerHTML = resultado.map((r) => recCardHTMLConsulta(r)).join(''); }
         console.log('[CDA] Consulta de recoletas:', resultado.length, 'resultados');
       } else { throw new Error(json.erro || 'Erro na consulta'); }
     } catch(err) {
       console.warn('[CDA] Falha na consulta do servidor, usando localStorage:', err);
       const recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
+      let resultado = recoletas;
+      if (recFiltroStatusAtual === 'afazer') {
+        resultado = resultado.filter(r => (r.status || 'PENDENTE') !== 'CONCLUIDO');
+      } else {
+        resultado = resultado.filter(r => (r.status || 'PENDENTE') === 'CONCLUIDO');
+      }
       if (!filtroCodigo && !filtroNome) {
-        if (recoletas.length === 0) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhum registro cadastrado. (offline)</p>'; }
-        else { container.innerHTML = recoletas.map((r, i) => recCardHTML(r, null)).join(''); }
+        if (resultado.length === 0) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhum registro encontrado. (offline)</p>'; }
+        else { container.innerHTML = resultado.map((r) => recCardHTMLConsulta(r)).join(''); }
         return;
       }
-      const resultado = recoletas.filter(r => {
+      resultado = resultado.filter(r => {
         const matchCodigo = filtroCodigo ? (r.codigo || '').toUpperCase().includes(filtroCodigo) : true;
         const matchNome = filtroNome ? (r.nome || '').toUpperCase().includes(filtroNome) : true;
         return matchCodigo && matchNome;
       });
       if (resultado.length === 0) {
         container.innerHTML = '<div class="flex flex-col items-center py-6 text-center"><i class="fa-solid fa-circle-xmark text-slate-300 text-3xl mb-2"></i><p class="text-sm text-slate-500">Nenhum registro encontrado. (offline)</p></div>';
-      } else { container.innerHTML = resultado.map((r) => recCardHTML(r, null)).join(''); }
+      } else { container.innerHTML = resultado.map((r) => recCardHTMLConsulta(r)).join(''); }
     }
+  }
+
+  function recCardHTMLConsulta(r) {
+    const examesNomes = Array.isArray(r.exames) ? r.exames.map(e => e.nome || e).join(', ') : (r.exames || '');
+    const isExterno = (r.tipo || '').toLowerCase().includes('externo');
+    const tipoBadge = isExterno
+      ? '<span class="recoleta-badge externo"><i class="fa-solid fa-truck-medical"></i> Externo</span>'
+      : '<span class="recoleta-badge interno"><i class="fa-solid fa-house-medical"></i> Interno</span>';
+    const isConcluido = (r.status || 'PENDENTE') === 'CONCLUIDO';
+    const statusBadge = isConcluido
+      ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;background:#d1fae5;color:#065f46;margin-left:6px;"><i class="fa-solid fa-check-circle"></i> Concluído</span>'
+      : (r.status === 'COMUNICADO' 
+        ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;background:#dbeafe;color:#1e40af;margin-left:6px;"><i class="fa-solid fa-phone"></i> Comunicado</span>'
+        : '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;background:#fef3c7;color:#92400e;margin-left:6px;"><i class="fa-solid fa-clock"></i> Pendente</span>');
+    const labInfo = isExterno && r.tipo && r.tipo.includes(' - ') ? '<div class="recoleta-externo-lab"><i class="fa-solid fa-building mr-1"></i> ' + r.tipo.split(' - ')[1] + '</div>' : '';
+    const motivoInfo = r.motivo ? '<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ' + r.motivo + '</div>' : '';
+    const obsInfo = r.observacoes ? '<div class="recoleta-obs"><i class="fa-solid fa-note-sticky mr-1"></i> ' + r.observacoes + '</div>' : '';
+    const usuarioInfo = r.usuario ? '<div style="font-size:10px;color:#94a3b8;margin-top:4px;"><i class="fa-solid fa-user mr-1"></i> Criado por: ' + r.usuario + '</div>' : '';
+    const conclusaoInfo = isConcluido ? '<div style="font-size:10px;color:#059669;margin-top:4px;"><i class="fa-solid fa-check-circle mr-1"></i> Concluído em: ' + (r.dataVeio || '---') + ' por ' + (r.usuarioConclusao || '---') + '</div>' : '';
+    const comunicacaoInfo = (!isConcluido && r.dataComunicacao) ? '<div style="font-size:10px;color:#1e40af;margin-top:4px;"><i class="fa-solid fa-phone mr-1"></i> Comunicado em: ' + r.dataComunicacao + ' por ' + (r.quemComunicou || '---') + '</div>' : '';
+
+    return '<div class="recoleta-card">' +
+      '<div class="recoleta-header">' +
+        '<div>' +
+          '<div class="recoleta-codigo">CÓDIGO: ' + r.codigo + statusBadge + '</div>' +
+          '<div class="recoleta-nome">' + r.nome + '</div>' +
+        '</div>' +
+        '<div>' + tipoBadge + '</div>' +
+      '</div>' +
+      labInfo +
+      '<div class="recoleta-exames"><i class="fa-solid fa-vial mr-1 text-cda-primary"></i> ' + examesNomes + '</div>' +
+      motivoInfo + obsInfo + usuarioInfo + comunicacaoInfo + conclusaoInfo +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">' +
+        '<span class="text-xs text-slate-400">Cadastrado em: ' + (r.data || '') + '</span>' +
+      '</div>' +
+    '</div>';
   }
 
   function recLimparFiltros() {
@@ -2488,6 +2753,9 @@
     const fn = document.getElementById('rec-filtro-nome');
     if (fc) fc.value = '';
     if (fn) fn.value = '';
+    recFiltroStatusAtual = 'afazer';
+    document.getElementById('rec-filtro-status-afazer').classList.add('ativo');
+    document.getElementById('rec-filtro-status-feita').classList.remove('ativo');
     const container = document.getElementById('rec-consulta-lista');
     container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Use os filtros acima ou clique em Buscar para carregar todos os registros.</p>';
   }
@@ -2624,7 +2892,166 @@
       else { throw new Error(json.erro || 'Erro ao excluir'); }
     } catch(err) { showToast('ERRO AO EXCLUIR USUÁRIO', 'error'); }
   }
+async function carregarUsuarios() {
+    const container = document.getElementById('config-lista-usuarios');
+    container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>CARREGANDO...</p>';
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      const url = APPS_SCRIPT_URL + '?action=listarUsuarios&token=' + encodeURIComponent(CDA_TOKEN);
+      const resp = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeout);
+      const json = await resp.json();
+      if (json.ok && Array.isArray(json.usuarios)) {
+        if (json.usuarios.length === 0) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">NENHUM USUÁRIO CADASTRADO</p>'; return; }
+        container.innerHTML = json.usuarios.map((u, idx) => {
+          return '<div class="exame-selecionado-item" style="padding: 12px 16px;">' +
+            '<div class="exame-info">' +
+              '<div class="exame-nome" style="font-size: 0.9rem;"><i class="fa-solid fa-user mr-2" style="color: #0F4C5C;"></i>' + (u.login || '---') + '</div>' +
+              '<div class="exame-codigo">Cadastrado em: ' + (u.data || '---') + '</div>' +
+            '</div>' +
+            '<div style="display: flex; gap: 8px;">' +
+              '<button class="btn-remover-exame" onclick="excluirUsuario(' + idx + ', ' + (u.login ? "'" + u.login + "'" : "''") + ')" title="Excluir" style="width: 32px; height: 32px;">' +
+                '<i class="fa-solid fa-trash"></i>' +
+              '</button>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      } else { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">ERRO AO CARREGAR USUÁRIOS</p>'; }
+    } catch(err) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">ERRO AO CARREGAR. TENTE NOVAMENTE.</p>'; }
+  }
+
+  async function excluirUsuario(index, login) {
+    if (!confirm('TEM CERTEZA QUE DESEJA EXCLUIR O USUÁRIO "' + login + '"?')) return;
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'excluirUsuario', token: CDA_TOKEN, login: login })
+      });
+      const json = await resp.json();
+      if (json.ok) { showToast('USUÁRIO EXCLUÍDO COM SUCESSO!'); carregarUsuarios(); }
+      else { throw new Error(json.erro || 'Erro ao excluir'); }
+    } catch(err) { showToast('ERRO AO EXCLUIR USUÁRIO', 'error'); }
+  }
 </script>
+
+
+<!-- ==================== MODAL DETALHES RECOLETA ==================== -->
+<div id="modal-rec-detalhes" class="modal-rec-detalhes-overlay">
+    <div class="modal-rec-detalhes">
+        <div class="modal-rec-header">
+            <h3><i class="fa-solid fa-vial mr-2"></i> Detalhes da Recoleta</h3>
+            <p class="sub" id="modal-rec-subtitulo">Código: --- | Paciente: ---</p>
+        </div>
+        <div class="modal-rec-body">
+            <!-- Status atual -->
+            <div class="modal-rec-secao">
+                <h4><i class="fa-solid fa-circle-info mr-1"></i> Status Atual</h4>
+                <div id="modal-rec-status-atual" class="modal-rec-status-badge pendente">
+                    <i class="fa-solid fa-clock"></i> Pendente
+                </div>
+            </div>
+
+            <!-- Informações do cadastro -->
+            <div class="modal-rec-secao">
+                <h4><i class="fa-solid fa-clipboard-list mr-1"></i> Informações do Cadastro</h4>
+                <div class="modal-rec-info-row">
+                    <span class="modal-rec-info-label">Criado por:</span>
+                    <span class="modal-rec-info-value" id="modal-rec-usuario">---</span>
+                </div>
+                <div class="modal-rec-info-row">
+                    <span class="modal-rec-info-label">Data do cadastro:</span>
+                    <span class="modal-rec-info-value" id="modal-rec-data-cadastro">---</span>
+                </div>
+                <div class="modal-rec-info-row">
+                    <span class="modal-rec-info-label">Exames:</span>
+                    <span class="modal-rec-info-value" id="modal-rec-exames">---</span>
+                </div>
+                <div class="modal-rec-info-row">
+                    <span class="modal-rec-info-label">Tipo:</span>
+                    <span class="modal-rec-info-value" id="modal-rec-tipo">---</span>
+                </div>
+                <div class="modal-rec-info-row">
+                    <span class="modal-rec-info-label">Motivo:</span>
+                    <span class="modal-rec-info-value" id="modal-rec-motivo">---</span>
+                </div>
+            </div>
+
+            <!-- Seção de Comunicação -->
+            <div id="modal-rec-secao-comunicacao" class="modal-rec-secao">
+                <h4><i class="fa-solid fa-phone mr-1"></i> Comunicação com o Paciente</h4>
+                <div id="modal-rec-comunicacao-existente" style="display:none;">
+                    <div class="modal-rec-info-row">
+                        <span class="modal-rec-info-label">Data da comunicação:</span>
+                        <span class="modal-rec-info-value" id="modal-rec-data-comunicacao">---</span>
+                    </div>
+                    <div class="modal-rec-info-row">
+                        <span class="modal-rec-info-label">Quem comunicou:</span>
+                        <span class="modal-rec-info-value" id="modal-rec-quem-comunicou">---</span>
+                    </div>
+                    <div class="modal-rec-info-row">
+                        <span class="modal-rec-info-label">Quem recebeu:</span>
+                        <span class="modal-rec-info-value" id="modal-rec-quem-recebeu">---</span>
+                    </div>
+                    <div class="modal-rec-info-row">
+                        <span class="modal-rec-info-label">Conseguiu comunicar:</span>
+                        <span class="modal-rec-info-value" id="modal-rec-conseguiu">---</span>
+                    </div>
+                </div>
+                <div id="modal-rec-comunicacao-form">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Data da comunicação</label>
+                    <input type="date" id="modal-rec-input-data-comunicacao" class="modal-rec-field">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Quem comunicou</label>
+                    <input type="text" id="modal-rec-input-quem-comunicou" placeholder="Nome de quem ligou..." class="modal-rec-field">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Quem recebeu o comunicado</label>
+                    <input type="text" id="modal-rec-input-quem-recebeu" placeholder="Nome de quem atendeu..." class="modal-rec-field">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Conseguiu comunicar?</label>
+                    <div class="modal-rec-checkbox-group">
+                        <label class="modal-rec-checkbox-label" id="modal-rec-label-sim" onclick="recSelecionarComunicacao('SIM')">
+                            <input type="radio" name="rec-comunicacao" value="SIM" style="display:none;">
+                            <i class="fa-solid fa-check"></i> Sim
+                        </label>
+                        <label class="modal-rec-checkbox-label" id="modal-rec-label-nao" onclick="recSelecionarComunicacao('NAO')">
+                            <input type="radio" name="rec-comunicacao" value="NAO" style="display:none;">
+                            <i class="fa-solid fa-xmark"></i> Não
+                        </label>
+                        <label class="modal-rec-checkbox-label" id="modal-rec-label-naoatendeu" onclick="recSelecionarComunicacao('NAO_ATENDEU')">
+                            <input type="radio" name="rec-comunicacao" value="NAO_ATENDEU" style="display:none;">
+                            <i class="fa-solid fa-phone-slash"></i> Não atendeu
+                        </label>
+                    </div>
+                    <button class="modal-rec-btn primary" onclick="salvarComunicacaoRecoleta()" style="width:100%; margin-top:8px;">
+                        <i class="fa-solid fa-save mr-1"></i> Salvar Comunicação
+                    </button>
+                </div>
+            </div>
+
+            <!-- Seção de Conclusão -->
+            <div id="modal-rec-secao-conclusao" class="modal-rec-secao" style="display:none;">
+                <h4><i class="fa-solid fa-flag-checkered mr-1"></i> Conclusão</h4>
+                <div class="modal-rec-info-row">
+                    <span class="modal-rec-info-label">Data que veio:</span>
+                    <span class="modal-rec-info-value" id="modal-rec-data-veio">---</span>
+                </div>
+                <div class="modal-rec-info-row">
+                    <span class="modal-rec-info-label">Registrado por:</span>
+                    <span class="modal-rec-info-value" id="modal-rec-usuario-conclusao">---</span>
+                </div>
+            </div>
+
+            <!-- Botões de ação -->
+            <div style="display: flex; gap: 8px; margin-top: 24px;">
+                <button class="modal-rec-btn neutral" onclick="fecharModalRecDetalhes()" style="flex:1;">
+                    <i class="fa-solid fa-xmark mr-1"></i> Fechar
+                </button>
+                <button id="modal-rec-btn-concluir" class="modal-rec-btn success" onclick="concluirRecoleta()" style="flex:2;">
+                    <i class="fa-solid fa-check-circle mr-1"></i> Paciente Veio / Concluir
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
