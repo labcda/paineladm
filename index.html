@@ -2437,8 +2437,8 @@
     const statusBadge = r.status === 'COMUNICADO' 
       ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;background:#dbeafe;color:#1e40af;margin-left:6px;"><i class="fa-solid fa-phone"></i> Comunicado</span>'
       : '';
-    const onclick = typeof index === 'number' ? 'onclick="abrirModalRecDetalhes(' + index + ')"' : '';
-    return '<div class="recoleta-card" ' + onclick + '>' +
+    const dataAttr = typeof index === 'number' ? 'data-rec-index="' + index + '"' : '';
+    return '<div class="recoleta-card" ' + dataAttr + '>' +
       '<div class="recoleta-header">' +
         '<div>' +
           '<div class="recoleta-codigo">CÓDIGO: ' + r.codigo + statusBadge + '</div>' +
@@ -2495,12 +2495,13 @@
     recFiltrar();
   }
 
-  function abrirModalRecDetalhes(index) {
+  function abrirModalRecDetalhes(recId) {
     let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
     const pendentes = recoletas.filter(r => (r.status || 'PENDENTE') !== 'CONCLUIDO');
-    const r = pendentes[index];
-    if (!r) return;
-    recDetalhesIndex = index;
+    // Encontrar pelo ID (Date.now()) ou pelo codigo+nome
+    const r = pendentes.find(item => (item.id && item.id == recId) || ((item.codigo + '_' + item.nome) === recId));
+    if (!r) { console.error('Recoleta nao encontrada para ID:', recId); return; }
+    recDetalhesIndex = recId;
     recDetalhesStatus = r.status || 'PENDENTE';
     recComunicacaoValor = null;
 
@@ -2577,13 +2578,10 @@
     if (!recComunicacaoValor) { showToast('Selecione se conseguiu comunicar.', 'error'); return; }
 
     let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
-    const pendentes = recoletas.filter(r => (r.status || 'PENDENTE') !== 'CONCLUIDO');
-    const r = pendentes[recDetalhesIndex];
-    if (!r) return;
-
-    // Encontrar o índice real no array completo
-    const idxReal = recoletas.findIndex(item => item.id === r.id || (item.codigo === r.codigo && item.nome === r.nome));
-    if (idxReal === -1) return;
+    // Encontrar pelo ID guardado em recDetalhesIndex
+    const idxReal = recoletas.findIndex(item => (item.id && item.id == recDetalhesIndex) || ((item.codigo + '_' + item.nome) === recDetalhesIndex));
+    if (idxReal === -1) { console.error('Recoleta nao encontrada para salvar comunicacao, ID:', recDetalhesIndex); return; }
+    const r = recoletas[idxReal];
 
     recoletas[idxReal].dataComunicacao = dataComunicacao;
     recoletas[idxReal].quemComunicou = quemComunicou;
@@ -2623,12 +2621,10 @@
     if (!confirm('Confirmar que o paciente veio fazer a recoleta? O registro será arquivado.')) return;
 
     let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
-    const pendentes = recoletas.filter(r => (r.status || 'PENDENTE') !== 'CONCLUIDO');
-    const r = pendentes[recDetalhesIndex];
-    if (!r) return;
-
-    const idxReal = recoletas.findIndex(item => item.id === r.id || (item.codigo === r.codigo && item.nome === r.nome));
-    if (idxReal === -1) return;
+    // Encontrar pelo ID guardado em recDetalhesIndex
+    const idxReal = recoletas.findIndex(item => (item.id && item.id == recDetalhesIndex) || ((item.codigo + '_' + item.nome) === recDetalhesIndex));
+    if (idxReal === -1) { console.error('Recoleta nao encontrada para concluir, ID:', recDetalhesIndex); return; }
+    const r = recoletas[idxReal];
 
     const dataVeio = new Date().toLocaleDateString('pt-BR');
     const usuarioConc = usuarioLogado();
@@ -2934,6 +2930,24 @@ async function carregarUsuarios() {
       else { throw new Error(json.erro || 'Erro ao excluir'); }
     } catch(err) { showToast('ERRO AO EXCLUIR USUÁRIO', 'error'); }
   }
+
+
+  // ===== EVENT DELEGATION PARA CARDS DE RECOLETA =====
+  document.addEventListener('DOMContentLoaded', function() {
+    const recLista = document.getElementById('rec-lista');
+    if (recLista) {
+      recLista.addEventListener('click', function(e) {
+        const card = e.target.closest('.recoleta-card');
+        if (card && card.dataset.recIndex !== undefined) {
+          const index = parseInt(card.dataset.recIndex, 10);
+          if (!isNaN(index)) {
+            abrirModalRecDetalhes(index);
+          }
+        }
+      });
+    }
+  });
+
 </script>
 
 
