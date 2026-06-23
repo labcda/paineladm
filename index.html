@@ -2227,7 +2227,7 @@
       }).slice(0, 8);
       if (filtrados.length === 0) { recAutocompleteList.classList.remove('show'); return; }
       recAutocompleteList.innerHTML = filtrados.map(ex =>
-        '<div class="autocomplete-item" onclick="recAdicionarExame(' + ex.id + ','' + ex.nome.replace(/'/g,"\'") + '','' + (ex.codigo||'').replace(/'/g,"\'") + '')">' +
+        '<div class="autocomplete-item" onclick="recAdicionarExame(' + ex.id + ',\'' + ex.nome.replace(/'/g,"\'") + '\',\'' + (ex.codigo||'').replace(/'/g,"\'") + '\')">' +
           '<span class="font-semibold">' + ex.nome + '</span>' +
           (ex.codigo ? '<span class="text-slate-400 text-xs ml-2">' + ex.codigo + '</span>' : '') +
         '</div>'
