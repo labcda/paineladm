@@ -369,6 +369,7 @@
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -2296,6 +2297,7 @@
       const resp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
+        redirect: 'follow',
         body: JSON.stringify({
           action: 'salvarRecoleta',
           token: CDA_TOKEN,
@@ -2308,6 +2310,10 @@
       });
       clearTimeout(timeout);
       const json = await resp.json();
+      console.log('[CDA] Resposta do servidor (salvarRecoleta):', json);
+      if (!json.ok) {
+        console.error('[CDA] Erro do servidor:', json.erro || 'Erro desconhecido');
+      }
       salvouPlanilha = json.ok === true;
       if (!salvouPlanilha) console.warn('[CDA] Planilha retornou erro:', json);
     } catch(err) {
