@@ -23,7 +23,20 @@
         }
       }
     }
-  </script>
+  
+
+  // ===== EVENT DELEGATION PARA CARDS DE RECOLETA =====
+  document.addEventListener('click', function(e) {
+    const card = e.target.closest('.recoleta-card');
+    if (card && card.dataset.recIndex !== undefined) {
+      const index = parseInt(card.dataset.recIndex, 10);
+      if (!isNaN(index)) {
+        abrirModalRecDetalhes(index);
+      }
+    }
+  });
+
+</script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -2932,26 +2945,7 @@ async function carregarUsuarios() {
   }
 
 
-  // ===== EVENT DELEGATION PARA CARDS DE RECOLETA =====
-  document.addEventListener('DOMContentLoaded', function() {
-    const recLista = document.getElementById('rec-lista');
-    if (recLista) {
-      recLista.addEventListener('click', function(e) {
-        const card = e.target.closest('.recoleta-card');
-        if (card && card.dataset.recIndex !== undefined) {
-          const index = parseInt(card.dataset.recIndex, 10);
-          if (!isNaN(index)) {
-            abrirModalRecDetalhes(index);
-          }
-        }
-      });
-    }
-  });
-
-</script>
-
-
-<!-- ==================== MODAL DETALHES RECOLETA ==================== -->
+  <!-- ==================== MODAL DETALHES RECOLETA ==================== -->
 <div id="modal-rec-detalhes" class="modal-rec-detalhes-overlay">
     <div class="modal-rec-detalhes">
         <div class="modal-rec-header">
