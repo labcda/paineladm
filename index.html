@@ -250,7 +250,6 @@
     .ia-area h4 { font-size: 0.9rem; font-weight: 700; color: #0F4C5C; margin-bottom: 4px; }
     .ia-area p { font-size: 0.75rem; color: #8c939e; }
 
-    /* ===== CORRECAO BOTOES MANHA/TARDE ===== */
     .agen-periodo-btn {
       display: flex; flex-direction: column; align-items: center; gap: 6px;
       padding: 16px; border-radius: 16px; border: 2px solid #e2e8f0;
@@ -288,7 +287,6 @@
     .send:disabled { opacity: 0.5; cursor: not-allowed; }
     .send:disabled .icon svg { transform: none !important; }
 
-    /* ===== RECOLETAS ===== */
     .recoleta-card {
       background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.04);
@@ -352,7 +350,137 @@
 
     .hidden { display: none !important; }
 
-    
+    /* ===== ESTILOS PARA UPLOAD DE PDF ===== */
+    .pdf-upload-area {
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      background: #f8fafc;
+    }
+    .pdf-upload-area:hover {
+      border-color: #49BCBE;
+      background: #E8F8F8;
+    }
+    .pdf-upload-area.dragover {
+      border-color: #0F4C5C;
+      background: #E8F8F8;
+      transform: scale(1.02);
+    }
+    .pdf-upload-area i {
+      font-size: 2.5rem;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+    .pdf-upload-area:hover i {
+      color: #0F4C5C;
+    }
+    .pdf-upload-area h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 4px;
+    }
+    .pdf-upload-area p {
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+    .pdf-upload-area .pdf-file-name {
+      font-size: 0.8rem;
+      color: #0F4C5C;
+      font-weight: 600;
+      margin-top: 8px;
+      word-break: break-all;
+    }
+    .pdf-upload-area .pdf-remove-btn {
+      margin-top: 8px;
+      font-size: 0.7rem;
+      color: #ef4444;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-weight: 600;
+    }
+    .pdf-upload-area .pdf-remove-btn:hover {
+      text-decoration: underline;
+    }
+    .pdf-upload-area .pdf-preview-icon {
+      font-size: 3rem;
+      color: #ef4444;
+      margin-bottom: 8px;
+    }
+    .pdf-upload-progress {
+      width: 100%;
+      height: 4px;
+      background: #e2e8f0;
+      border-radius: 2px;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+    .pdf-upload-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #0F4C5C, #49BCBE);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+    .pdf-upload-status {
+      font-size: 0.75rem;
+      color: #0F4C5C;
+      margin-top: 6px;
+      font-weight: 600;
+    }
+
+    .pdf-anexado-card {
+      background: linear-gradient(135deg, #E8F8F8 0%, #f0fdf4 100%);
+      border: 1px solid #49BCBE;
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .pdf-anexado-card i {
+      font-size: 1.5rem;
+      color: #ef4444;
+    }
+    .pdf-anexado-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .pdf-anexado-info .titulo {
+      font-weight: 700;
+      color: #101620;
+      font-size: 0.85rem;
+    }
+    .pdf-anexado-info .subtitulo {
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .pdf-anexado-remove {
+      background: #fee2e2;
+      color: #ef4444;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      font-size: 0.7rem;
+      flex-shrink: 0;
+    }
+    .pdf-anexado-remove:hover {
+      background: #ef4444;
+      color: white;
+    }
+
     #login-usuario, #login-senha, #signup-name, #signup-email, #signup-password,
     #orc-paciente, #agen-nome, #agen-telefone,
     #config-login, #config-senha, #config-senha-confirm,
@@ -365,10 +493,6 @@
     @media (max-width: 1024px) { .home-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 768px) { .home-grid { grid-template-columns: 1fr; } body.app-loaded { padding: 1rem 0 0 1rem; } .site-wrap { grid-template-columns: 1fr; } .site-nav { display: none; } }
   </style>
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
 <base target="_blank">
 </head>
 <body>
@@ -604,12 +728,14 @@
                     </div>
                 </div>
             </div>
+
+            <!-- PASSO 2: ORÇAMENTO OU PEDIDO MÉDICO -->
             <div class="card-cda p-5" id="agen-step-1-5">
                 <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
                     <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">2</span> Orçamento ou Pedido Médico
                 </p>
                 <div class="space-y-4">
-                    <!-- Resumo do orçamento (se existir) -->
+                    <!-- Resumo do orçamento (se existir - veio da página Orçamento) -->
                     <div id="agen-resumo-orcamento-card" class="bg-slate-50 rounded-2xl p-4 hidden">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-xs font-bold text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-file-invoice-dollar text-cda-primary mr-1"></i> Resumo do Orçamento</span>
@@ -618,9 +744,43 @@
                         <div id="agen-resumo-orcamento-conteudo" class="text-sm text-slate-700"></div>
                     </div>
 
-                    
-
-                    
+                    <!-- Área de upload de PDF (visível quando NÃO vem da página Orçamento) -->
+                    <div id="agen-pdf-upload-area" class="hidden">
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">
+                            <i class="fa-solid fa-file-pdf text-cda-primary mr-1"></i> Anexar PDF do Orçamento ou Pedido Médico
+                        </p>
+                        <div id="pdf-drop-zone" class="pdf-upload-area" onclick="document.getElementById('pdf-file-input').click()">
+                            <input type="file" id="pdf-file-input" accept=".pdf" class="hidden" onchange="agenHandlePDFSelect(this)">
+                            <div id="pdf-upload-default">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <h4>Clique ou arraste o PDF aqui</h4>
+                                <p>Formato aceito: PDF (máx. 5MB)</p>
+                            </div>
+                            <div id="pdf-upload-preview" class="hidden">
+                                <i class="fa-solid fa-file-pdf pdf-preview-icon"></i>
+                                <div class="pdf-file-name" id="pdf-file-name"></div>
+                                <button class="pdf-remove-btn" onclick="event.stopPropagation(); agenRemoverPDF()">
+                                    <i class="fa-solid fa-trash-can mr-1"></i>Remover arquivo
+                                </button>
+                            </div>
+                            <div class="pdf-upload-progress hidden" id="pdf-upload-progress">
+                                <div class="pdf-upload-progress-bar" id="pdf-upload-progress-bar"></div>
+                            </div>
+                            <div class="pdf-upload-status hidden" id="pdf-upload-status"></div>
+                        </div>
+                        <div id="agen-pdf-anexado-info" class="hidden mt-3">
+                            <div class="pdf-anexado-card">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <div class="pdf-anexado-info">
+                                    <div class="titulo" id="pdf-anexado-nome">orçamento.pdf</div>
+                                    <div class="subtitulo" id="pdf-anexado-status">Pronto para enviar ao Google Agenda</div>
+                                </div>
+                                <button class="pdf-anexado-remove" onclick="agenRemoverPDF()" title="Remover PDF">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="card-cda p-5" id="agen-step-2">
@@ -709,7 +869,7 @@
                 </div>
                 <button onclick="agenSalvar()" id="agen-btn-salvar" class="send opacity-50 pointer-events-none" style="width: 100%; justify-content: center;">
                     <span class="text">Salvar Agendamento</span>
-                    <span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594zM175 296.245l204.668-145.757c-176.114 185.79-166.916 176.011-167.684 177.045-1.141 1.535 1.985-4.448-36.984 72.882zm191.858 127.546l-120.296-89.276 217.511-229.462z"/></svg></span>
+                    <span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594z"/></svg></span>
                 </button>
                 <p id="agen-status" class="text-xs text-center mt-3 hidden"></p>
             </div>
@@ -717,7 +877,6 @@
 
       <!-- RECOLETAS -->
       <section id="page-recoletas" class="page space-y-5">
-        <!-- Cabeçalho -->
         <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
             <div class="relative z-10">
                 <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
@@ -727,8 +886,6 @@
                 <p class="text-sm text-white/80 leading-relaxed">Cadastre e consulte pacientes que precisam de recoleta.</p>
             </div>
         </div>
-
-        <!-- Abas -->
         <div style="display:flex;gap:8px;background:#EBECF0;border-radius:16px;padding:6px;">
             <button id="rec-aba-novo" onclick="recMostrarAba('novo')"
                 style="flex:1;padding:10px;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;background:linear-gradient(135deg,#0F4C5C,#49BCBE);color:white;box-shadow:2px 2px 8px rgba(15,76,92,0.3);">
@@ -739,8 +896,6 @@
                 <i class="fa-solid fa-magnifying-glass mr-2"></i>Consultar Registros
             </button>
         </div>
-
-        <!-- ABA: NOVO REGISTRO -->
         <div id="rec-painel-novo">
           <div class="neumorphic-card">
             <h3 style="font-size: 1.1rem; font-weight: 700; color: #101620; margin-bottom: 20px;">
@@ -760,7 +915,6 @@
                     <input type="text" id="rec-nome" placeholder="Nome completo..." class="recoleta-form-field">
                 </div>
             </div>
-
             <div class="mb-4">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                     <i class="fa-solid fa-vial mr-1"></i> Exames para recoleta <span style="color:#ef4444">*</span>
@@ -772,7 +926,6 @@
                 </div>
                 <div id="rec-exames-selecionados" class="mt-3 space-y-2"></div>
             </div>
-
             <div class="mb-4">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                     <i class="fa-solid fa-hospital mr-1"></i> Tipo de exame <span style="color:#ef4444">*</span>
@@ -793,7 +946,6 @@
                     <button type="button" class="recoleta-externo-btn" data-lab="Álvaro Apoio" onclick="recSelecionarLabExterno(this)">Álvaro Apoio</button>
                 </div>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
@@ -808,7 +960,6 @@
                     <input type="text" id="rec-obs" placeholder="Observações adicionais..." class="recoleta-form-field">
                 </div>
             </div>
-
             <p style="font-size:11px;color:#94a3b8;margin-bottom:12px;"><span style="color:#ef4444">*</span> Campos obrigatórios</p>
             <div id="rec-error" class="login-error-msg" style="margin-bottom: 12px; display: none;"></div>
             <div id="rec-success" style="color: #0F4C5C; font-size: 0.85rem; margin-bottom: 12px; text-align: center; display: none; font-weight: 600;">
@@ -821,8 +972,6 @@
                 <i class="fa-solid fa-plus"></i> Cadastrar Recoleta
             </button>
           </div>
-
-          <!-- Lista de pacientes com recoleta (visível na aba Novo Registro) -->
           <div class="neumorphic-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                 <h3 style="font-size: 1.1rem; font-weight: 700; color: #101620;">
@@ -835,8 +984,6 @@
             </div>
           </div>
         </div>
-
-        <!-- ABA: CONSULTAR REGISTROS -->
         <div id="rec-painel-consulta" style="display:none;">
           <div class="neumorphic-card">
             <h3 style="font-size: 1.1rem; font-weight: 700; color: #101620; margin-bottom: 16px;">
@@ -966,54 +1113,48 @@
 <script>
 
   // ==================== CONFIGURAÇÕES GLOBAIS ====================
-  // Script principal: login, usuários, orçamentos
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyNAnEvW3JJ0-STfXV13kb0H8KWmGAXdWpeqf7fMKM8To7l3h4YMceIjDDYC8V8207llQ/exec';
-  // Script de agendamento: listar horários e criar eventos no Google Agenda
   const APPS_SCRIPT_AGENDA_URL = 'https://script.google.com/macros/s/AKfycbzXj8wLELw524gLe9Vmn2NxIE4pzoBoM4VKQrlQu3hWony8hotzE4aI81dkonyxcuJWzQ/exec';
   const CDA_TOKEN = 'CDA-2025-xK9#mPqL';
 
-// ==================== RASTREIO DE USUÁRIO ====================
-let USUARIO_LOGADO = null; // { login: 'ADMIN', nome: 'Administrador' }
+  // ==================== RASTREIO DE USUÁRIO ====================
+  let USUARIO_LOGADO = null;
 
-function setUsuarioLogado(login) {
-    USUARIO_LOGADO = { login: login, timestamp: new Date().toISOString() };
-    try {
-        localStorage.setItem('cda_usuario_logado', JSON.stringify(USUARIO_LOGADO));
-    } catch(e) {}
-    atualizarBadgeUsuario();
-}
+  function setUsuarioLogado(login) {
+      USUARIO_LOGADO = { login: login, timestamp: new Date().toISOString() };
+      try { localStorage.setItem('cda_usuario_logado', JSON.stringify(USUARIO_LOGADO)); } catch(e) {}
+      atualizarBadgeUsuario();
+  }
 
-function getUsuarioLogado() {
-    if (USUARIO_LOGADO) return USUARIO_LOGADO;
-    try {
-        const saved = localStorage.getItem('cda_usuario_logado');
-        if (saved) {
-            USUARIO_LOGADO = JSON.parse(saved);
-            return USUARIO_LOGADO;
-        }
-    } catch(e) {}
-    return null;
-}
+  function getUsuarioLogado() {
+      if (USUARIO_LOGADO) return USUARIO_LOGADO;
+      try {
+          const saved = localStorage.getItem('cda_usuario_logado');
+          if (saved) { USUARIO_LOGADO = JSON.parse(saved); return USUARIO_LOGADO; }
+      } catch(e) {}
+      return null;
+  }
 
-function limparUsuarioLogado() {
-    USUARIO_LOGADO = null;
-    try {
-        localStorage.removeItem('cda_usuario_logado');
-    } catch(e) {}
-    atualizarBadgeUsuario();
-}
+  function limparUsuarioLogado() {
+      USUARIO_LOGADO = null;
+      try { localStorage.removeItem('cda_usuario_logado'); } catch(e) {}
+      atualizarBadgeUsuario();
+  }
 
-function atualizarBadgeUsuario() {
-    const badge = document.getElementById('user-badge');
-    if (!badge) return;
-    const user = getUsuarioLogado();
-    if (user && user.login) {
-        badge.innerHTML = `<i class="fa-solid fa-user-circle mr-2"></i> ${user.login}`;
-        badge.style.display = 'inline-flex';
-    } else {
-        badge.style.display = 'none';
-    }
-}
+  function atualizarBadgeUsuario() {
+      const badge = document.getElementById('user-badge');
+      if (!badge) return;
+      const user = getUsuarioLogado();
+      if (user && user.login) {
+          badge.innerHTML = '<i class="fa-solid fa-user-circle mr-2"></i> ' + user.login;
+          badge.style.display = 'inline-flex';
+      } else { badge.style.display = 'none'; }
+  }
+
+  function usuarioLogado() {
+      const user = getUsuarioLogado();
+      return user && user.login ? user.login : 'DESCONHECIDO';
+  }
 
   // ==================== LOGIN TOGGLE ANIMATION ====================
   let switchCtn, switchC1, switchC2, switchCircle, aContainer, bContainer;
@@ -1046,9 +1187,7 @@ function atualizarBadgeUsuario() {
   }
 
   function loginSucesso(login) {
-    // Salva o usuário logado para rastreio
     setUsuarioLogado(login || 'ADMIN');
-
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('splashScreen').style.display = 'flex';
     setTimeout(() => {
@@ -1064,7 +1203,7 @@ function atualizarBadgeUsuario() {
         renderAtividades();
         contarOrcamentosDoMes();
         carregarRecoletas();
-        atualizarBadgeUsuario(); // Atualiza badge do usuário logado
+        atualizarBadgeUsuario();
       }, 600);
     }, 2500);
   }
@@ -1106,9 +1245,7 @@ function atualizarBadgeUsuario() {
     }
   });
 
-  function handleLoginClick() {
-    fazerLogin();
-  }
+  function handleLoginClick() { fazerLogin(); }
 
   async function fazerLogin() {
     const usuarioEl = document.getElementById('login-usuario');
@@ -1116,26 +1253,18 @@ function atualizarBadgeUsuario() {
     const errorEl = document.getElementById('login-error');
     if (!usuarioEl || !senhaEl) {
       errorEl.innerText = 'Erro interno do sistema. Recarregue a página.';
-      errorEl.style.display = 'block';
-      errorEl.style.color = '#ef4444';
-      return;
+      errorEl.style.display = 'block'; errorEl.style.color = '#ef4444'; return;
     }
     const usuario = usuarioEl.value.trim().toUpperCase();
     const senha = senhaEl.value.trim().toUpperCase();
     if (!usuario || !senha) {
       errorEl.innerText = 'PREENCHA O LOGIN E A SENHA';
-      errorEl.style.display = 'block';
-      errorEl.style.color = '#ef4444';
-      setTimeout(() => errorEl.style.display = 'none', 3000);
-      return;
+      errorEl.style.display = 'block'; errorEl.style.color = '#ef4444';
+      setTimeout(() => errorEl.style.display = 'none', 3000); return;
     }
-    if (usuario === 'ADMIN' && senha === 'CDA2024') {
-      loginSucesso('ADMIN');
-      return;
-    }
+    if (usuario === 'ADMIN' && senha === 'CDA2024') { loginSucesso('ADMIN'); return; }
     errorEl.innerText = 'VERIFICANDO CREDENCIAIS...';
-    errorEl.style.display = 'block';
-    errorEl.style.color = '#0F4C5C';
+    errorEl.style.display = 'block'; errorEl.style.color = '#0F4C5C';
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
@@ -1144,23 +1273,16 @@ function atualizarBadgeUsuario() {
       clearTimeout(timeout);
       if (!resp.ok) throw new Error('Erro HTTP: ' + resp.status);
       const json = await resp.json();
-      if (json.ok && json.autorizado) {
-        loginSucesso(usuario);
-      } else if (json.ok && !json.autorizado) {
+      if (json.ok && json.autorizado) { loginSucesso(usuario); }
+      else if (json.ok && !json.autorizado) {
         errorEl.innerText = 'LOGIN OU SENHA INCORRETOS.';
         errorEl.style.color = '#ef4444';
         setTimeout(() => errorEl.style.display = 'none', 5000);
-      } else {
-        throw new Error(json.erro || 'Acesso negado');
-      }
+      } else { throw new Error(json.erro || 'Acesso negado'); }
     } catch(err) {
-      if (err.name === 'AbortError') {
-        errorEl.innerText = 'TEMPO ESGOTADO: Servidor não respondeu.';
-      } else if (err.message && err.message.includes('Failed to fetch')) {
-        errorEl.innerText = 'SEM CONEXÃO: Verifique sua internet ou tente ADMIN/CDA2024.';
-      } else {
-        errorEl.innerText = 'ERRO: ' + (err.message || 'Erro desconhecido');
-      }
+      if (err.name === 'AbortError') { errorEl.innerText = 'TEMPO ESGOTADO: Servidor não respondeu.'; }
+      else if (err.message && err.message.includes('Failed to fetch')) { errorEl.innerText = 'SEM CONEXÃO: Verifique sua internet ou tente ADMIN/CDA2024.'; }
+      else { errorEl.innerText = 'ERRO: ' + (err.message || 'Erro desconhecido'); }
       errorEl.style.color = '#ef4444';
       setTimeout(() => errorEl.style.display = 'none', 8000);
     }
@@ -1187,14 +1309,7 @@ function atualizarBadgeUsuario() {
     document.getElementById('stat-exames').innerText = dadosMensais.exames >= 1000 ? (dadosMensais.exames/1000).toFixed(1) + 'K' : dadosMensais.exames;
   }
 
-  
-// ==================== FUNÇÃO AUXILIAR RASTREIO ====================
-function usuarioLogado() {
-    const user = getUsuarioLogado();
-    return user && user.login ? user.login : 'DESCONHECIDO';
-}
-
-function computarOrcamento() {
+  function computarOrcamento() {
     dadosMensais.orcamentos++;
     atualizarMesStats();
     const agora = new Date();
@@ -1249,13 +1364,8 @@ function computarOrcamento() {
     const t = document.getElementById('cda-toast');
     const icon = document.getElementById('cda-toast-icon');
     document.getElementById('cda-toast-msg').innerText = msg;
-    if (tipo === 'error') {
-      icon.className = 'fa-solid fa-circle-xmark';
-      t.style.background = '#ef4444';
-    } else {
-      icon.className = 'fa-solid fa-circle-check';
-      t.style.background = '#0F4C5C';
-    }
+    if (tipo === 'error') { icon.className = 'fa-solid fa-circle-xmark'; t.style.background = '#ef4444'; }
+    else { icon.className = 'fa-solid fa-circle-check'; t.style.background = '#0F4C5C'; }
     t.className = 'toast-show';
     setTimeout(() => t.classList.remove('toast-show'), 3000);
   }
@@ -1269,11 +1379,9 @@ function computarOrcamento() {
       const response = await fetch('./exames.json');
       if (!response.ok) throw new Error('Arquivo não encontrado');
       const data = await response.json();
-      if (Array.isArray(data)) {
-        listaExames = data;
-      } else if (data.exames && Array.isArray(data.exames)) {
-        listaExames = data.exames;
-      } else {
+      if (Array.isArray(data)) { listaExames = data; }
+      else if (data.exames && Array.isArray(data.exames)) { listaExames = data.exames; }
+      else {
         const firstArray = Object.values(data).find(v => Array.isArray(v));
         if (firstArray) listaExames = firstArray;
       }
@@ -1402,759 +1510,634 @@ function computarOrcamento() {
     parcelasCc.innerText = '10x de ' + formatarMoeda(parcelaCc);
   }
 
-  function gerarPDF() {
-    if (orcSelecionados.length === 0) { showToast('Selecione pelo menos um exame!', 'error'); return null; }
-    const paciente = document.getElementById('orc-paciente').value.trim() || 'Paciente';
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const pageW = 210;
-    const margin = 20;
-    let y = 15;
+  // ==================== VARIÁVEIS GLOBAIS PARA PDF UPLOAD ====================
+  let agenPDFAnexado = null;
+  let agenVemDoOrcamento = false;
 
-    doc.setTextColor(80, 80, 80);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.text('LABORAT', margin, y);
-    doc.setFontSize(7);
-    doc.text('ÓRIO', margin + 22, y);
-    doc.setFillColor(34, 139, 34);
-    doc.setDrawColor(34, 139, 34);
-    doc.setLineWidth(1.5);
-    doc.line(margin + 50, y - 5, margin + 50, y + 5);
-    doc.line(margin + 45, y, margin + 55, y);
-    doc.setTextColor(80, 80, 80);
-    doc.setFontSize(28);
-    doc.setFont('helvetica', 'bold');
-    doc.text('CDA', margin + 58, y + 2);
-    y += 18;
-
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    doc.text('PACIENTE', margin, y);
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(26);
-    doc.setFont('helvetica', 'bold');
-    doc.text(paciente.toUpperCase(), margin, y + 10);
-    y += 20;
-
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    doc.text('EXAME', margin, y);
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    let examesTexto = '';
-    orcSelecionados.forEach((ex, idx) => { examesTexto += (idx + 1) + '. ' + ex.nome + ' '; });
-    const splitExames = doc.splitTextToSize(examesTexto, pageW - margin * 2);
-    doc.text(splitExames, margin, y + 6);
-    y += 6 + (splitExames.length * 5);
-
-    doc.setTextColor(100, 100, 100);
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Laboratorio CDA', margin, y);
-    doc.setTextColor(34, 139, 34);
-    doc.text('Diagnostico de Confianca', margin + 28, y);
-    y += 5;
-    doc.setTextColor(100, 100, 100);
-    doc.text('Afonso Claudio,ES .(27)99898-0658', margin, y);
-    y += 12;
-
-    const dataAtual = new Date();
-    const meses = ['janeiro', 'fevereiro', 'marco', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
-    const dataFormatada = dataAtual.getDate() + ' de ' + meses[dataAtual.getMonth()] + ' de ' + dataAtual.getFullYear();
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    doc.text('DATA', margin, y);
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text(dataFormatada, margin, y + 6);
-    y += 14;
-
-    let total = 0;
-    orcSelecionados.forEach(ex => { total += parseFloat(ex.preco || 0); });
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    doc.text('TOTAL ESTIMADO (tabela particular)', margin, y);
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(28);
-    doc.setFont('helvetica', 'bold');
-    doc.text('R$ ' + total.toFixed(2).replace('.', ','), margin, y + 12);
-    y += 22;
-
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Descontos Especiais CDA', margin, y);
-    y += 6;
-    doc.setTextColor(100, 100, 100);
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Pacientes com convenio ou Cartao Fidelidade', margin, y);
-    y += 10;
-
-    const boxH = 16;
-    const precoPix = total * 0.60;
-    const precoCc = total * 0.65;
-    const parcelaCc = precoCc / 10;
-
-    doc.setFillColor(232, 248, 248);
-    doc.setDrawColor(200, 230, 230);
-    doc.rect(margin, y, pageW - margin * 2, boxH, 'FD');
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Pix, dinheiro ou debito', margin + 5, y + 5);
-    doc.setTextColor(100, 100, 100);
-    doc.setFontSize(6);
-    doc.setFont('helvetica', 'normal');
-    doc.text('(a vista)', margin + 5, y + 9);
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    doc.text('40% OFF', pageW - margin - 22, y + 5);
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text('R$ ' + precoPix.toFixed(2).replace('.', ','), pageW - margin - 22, y + 10);
-    y += boxH + 4;
-
-    doc.setFillColor(232, 248, 248);
-    doc.setDrawColor(200, 230, 230);
-    doc.rect(margin, y, pageW - margin * 2, boxH, 'FD');
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Cartao de credito', margin + 5, y + 5);
-    doc.setTextColor(100, 100, 100);
-    doc.setFontSize(6);
-    doc.setFont('helvetica', 'normal');
-    doc.text('(parcelado em ate 10x)', margin + 5, y + 9);
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    doc.text('35% OFF', pageW - margin - 22, y + 5);
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text('10x R$ ' + parcelaCc.toFixed(2).replace('.', ','), pageW - margin - 22, y + 10);
-    y += boxH + 8;
-
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Cobrimos qualquer orcamento! Apresente uma proposta e faremos a diferenca.', margin, y);
-    y += 8;
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Agende e ganhe mimos especiais!', margin, y);
-    y += 5;
-    doc.setTextColor(100, 100, 100);
-    doc.setFontSize(6);
-    doc.setFont('helvetica', 'normal');
-    doc.text('v Atendimento sem fila   v Sala VIP com TV e ar-condicionado', margin, y);
-    y += 3.5;
-    doc.text('v Cafe expresso   v Biscoitinho Club Social', margin, y);
-    y += 8;
-
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.text('ORCAMENTO', margin, y);
-    y += 6;
-
-    const tableData = orcSelecionados.map(ex => {
-      return [ex.nome || 'Sem nome', 'R$ ' + parseFloat(ex.preco || 0).toFixed(2).replace('.', ',')];
+  // ==================== FUNÇÕES DE UPLOAD DE PDF ====================
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
     });
-
-    doc.autoTable({
-      startY: y,
-      head: [['Exame', 'Valor']],
-      body: tableData,
-      theme: 'plain',
-      headStyles: { fillColor: [15, 76, 92], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 7, cellPadding: 2 },
-      bodyStyles: { fontSize: 7, textColor: [15, 76, 92], cellPadding: 2 },
-      styles: { lineColor: [200, 200, 200], lineWidth: 0.1 },
-      columnStyles: { 0: { cellWidth: 130 }, 1: { cellWidth: 40, halign: 'right' } },
-      margin: { left: margin, right: margin }
-    });
-
-    y = doc.lastAutoTable.finalY + 4;
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.text('VALOR', margin, y);
-    doc.text('R$ ' + total.toFixed(2).replace('.', ','), pageW - margin - 35, y);
-    y += 6;
-    doc.setTextColor(15, 76, 92);
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'bold');
-    doc.text('40% OFF -> R$ ' + precoPix.toFixed(2).replace('.', ','), margin, y);
-    y += 4;
-    doc.text('35% OFF -> 10x R$ ' + parcelaCc.toFixed(2).replace('.', ','), margin, y);
-
-    const footerY = 285;
-    doc.setDrawColor(15, 76, 92);
-    doc.setLineWidth(0.3);
-    doc.line(margin, footerY - 4, pageW - margin, footerY - 4);
-    doc.setTextColor(100, 100, 100);
-    doc.setFontSize(6);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Laboratorio CDA . Afonso Claudio, ES . (27) 99898-0658', margin, footerY);
-    doc.text('*Valores estimados da tabela particular. Sujeitos a confirmacao. Convenios sob consulta.', margin, footerY + 3);
-
-    return doc;
   }
 
-  function baixarPDF() {
-    const doc = gerarPDF();
-    if (!doc) return;
-    computarOrcamento();
-    salvarOrcamentoNaPlanilha('pdf').then(ok => { if (ok) console.log('PDF registrado'); });
-    const dataAtual = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
-    doc.save('orcamento-cda-' + dataAtual + '.pdf');
-    showToast('PDF baixado com sucesso!');
-  }
-
-  async function compartilharOrcamento() {
-    if (orcSelecionados.length === 0) { showToast('Selecione pelo menos um exame!', 'error'); return; }
-    const doc = gerarPDF();
-    if (!doc) return;
-    const pdfBlob = doc.output('blob');
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    ultimoOrcamento = {
-      exames: [...orcSelecionados],
-      total: orcSelecionados.reduce((sum, ex) => sum + parseFloat(ex.preco || 0), 0),
-      data: new Date().toLocaleDateString('pt-BR')
-    };
-    const texto = encodeURIComponent('Olá, segue em anexo o seu orçamento! Qualquer dúvida me chame aqui!');
-    await salvarOrcamentoNaPlanilha('compartilhado');
-    if (navigator.share && navigator.canShare) {
-      try {
-        const file = new File([pdfBlob], 'orcamento-cda.pdf', { type: 'application/pdf' });
-        if (navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], title: 'Orçamento CDA', text: 'Olá, segue em anexo o seu orçamento! Qualquer dúvida me chame aqui!' });
-          computarOrcamento();
-          showToast('Compartilhado com sucesso!');
-          return;
-        }
-      } catch (err) { console.log('Share API não disponível'); }
-    }
-    const link = document.createElement('a');
-    link.href = pdfUrl;
-    link.download = 'orcamento-cda.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    setTimeout(() => { window.open('https://web.whatsapp.com/send?text=' + texto, '_blank'); }, 500);
-    computarOrcamento();
-    showToast('PDF baixado! WhatsApp Web aberto para compartilhar.');
-  }
-
-  async function agendarColetaComLoading(btn) {
-    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Carregando...';
-    btn.disabled = true;
-    btn.style.opacity = '0.7';
-    await agendarColeta();
-    btn.innerHTML = '<i class="fa-regular fa-calendar-check"></i> Agendar Coleta';
-    btn.disabled = false;
-    btn.style.opacity = '1';
-  }
-
-  async function agendarColeta() {
-    if (orcSelecionados.length === 0) { showToast('Selecione pelo menos um exame!', 'error'); return; }
-    const paciente = document.getElementById('orc-paciente').value.trim().toUpperCase();
-    if (!paciente) {
-      showToast('Digite o nome do paciente!', 'error');
-      document.getElementById('orc-paciente').focus();
-      return;
-    }
-    const palavras = paciente.split(/\s+/).filter(p => p.length > 0);
-    if (palavras.length < 2) {
-      showToast('Digite o nome completo (nome e sobrenome)!', 'error');
-      document.getElementById('orc-paciente').focus();
-      return;
-    }
-    const totalBruto = orcSelecionados.reduce((sum, ex) => sum + parseFloat(ex.preco || 0), 0);
-    const totalPix = totalBruto * 0.60;
-    const totalCredito = totalBruto * 0.65;
-    const parcelaCredito = totalCredito / 10;
-    ultimoOrcamento = {
-      exames: JSON.parse(JSON.stringify(orcSelecionados)),
-      total: totalBruto, totalPix: totalPix, totalCredito: totalCredito, parcelaCredito: parcelaCredito,
-      data: new Date().toLocaleDateString('pt-BR'), paciente: paciente
-    };
-    localStorage.setItem('cda_ultimo_orcamento', JSON.stringify(ultimoOrcamento));
-    await salvarOrcamentoNaPlanilha('agendamento');
-    computarOrcamento();
-    navigateToPage('agendamento');
-    setTimeout(function() {
-      const agenNome = document.getElementById('agen-nome');
-      if (agenNome) { agenNome.value = paciente; agenNome.dispatchEvent(new Event('input')); }
-      const nomeEl = document.getElementById('agen-resumo-paciente-nome');
-      const examesEl = document.getElementById('agen-resumo-paciente-exames');
-      const valorEl = document.getElementById('agen-resumo-paciente-valor');
-      if (nomeEl) nomeEl.textContent = paciente;
-      if (examesEl) {
-        const qtd = orcSelecionados.length;
-        const nomes = orcSelecionados.map(e => e.nome).join(', ');
-        examesEl.textContent = qtd + ' exame' + (qtd > 1 ? 's' : '') + ': ' + (nomes.length > 50 ? nomes.substring(0, 50) + '...' : nomes);
+  async function uploadPDFToDrive(base64Data, filename, mimeType) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000);
+      const url = APPS_SCRIPT_AGENDA_URL + '?action=uploadPDF&token=' + encodeURIComponent(CDA_TOKEN) + 
+                  '&filename=' + encodeURIComponent(filename) + '&mimeType=' + encodeURIComponent(mimeType);
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ base64: base64Data }),
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+      if (!resp.ok) throw new Error('Erro HTTP: ' + resp.status);
+      const json = await resp.json();
+      if (json.ok) {
+        return { ok: true, fileId: json.fileId, fileUrl: json.fileUrl, webViewLink: json.webViewLink };
+      } else {
+        throw new Error(json.erro || 'Erro desconhecido no upload');
       }
-      if (valorEl) valorEl.textContent = 'R$ ' + totalPix.toFixed(2).replace('.', ',') + ' (PIX/Débito)';
-      agenAtualizarResumo();
-    }, 300);
-    showToast('Dados do orçamento transferidos para agendamento!');
+    } catch(err) {
+      console.error('[CDA] Erro no upload do PDF:', err);
+      return { ok: false, erro: err.message };
+    }
   }
 
+  async function agenHandlePDFSelect(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.type !== 'application/pdf') {
+      showToast('Por favor, selecione apenas arquivos PDF.', 'error');
+      input.value = '';
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('O arquivo é muito grande. Máximo 5MB.', 'error');
+      input.value = '';
+      return;
+    }
+    const defaultDiv = document.getElementById('pdf-upload-default');
+    const previewDiv = document.getElementById('pdf-upload-preview');
+    const fileNameEl = document.getElementById('pdf-file-name');
+    const progressBar = document.getElementById('pdf-upload-progress-bar');
+    const progressDiv = document.getElementById('pdf-upload-progress');
+    const statusDiv = document.getElementById('pdf-upload-status');
+    defaultDiv.classList.add('hidden');
+    previewDiv.classList.remove('hidden');
+    fileNameEl.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+    progressDiv.classList.remove('hidden');
+    statusDiv.classList.remove('hidden');
+    statusDiv.textContent = 'Convertendo para base64...';
+    progressBar.style.width = '30%';
+    try {
+      const base64 = await fileToBase64(file);
+      agenPDFAnexado = {
+        file: file,
+        base64: base64,
+        nome: file.name,
+        tamanho: file.size
+      };
+      progressBar.style.width = '60%';
+      statusDiv.textContent = 'Enviando para o Google Drive...';
+      const uploadResult = await uploadPDFToDrive(base64, file.name, file.type);
+      if (uploadResult.ok) {
+        agenPDFAnexado.driveUrl = uploadResult.webViewLink || uploadResult.fileUrl;
+        agenPDFAnexado.driveId = uploadResult.fileId;
+        progressBar.style.width = '100%';
+        statusDiv.textContent = 'PDF anexado com sucesso!';
+        statusDiv.style.color = '#0F4C5C';
+        document.getElementById('agen-pdf-anexado-info').classList.remove('hidden');
+        document.getElementById('pdf-anexado-nome').textContent = file.name;
+        document.getElementById('pdf-anexado-status').textContent = 'Salvo no Google Drive ✓';
+        showToast('PDF anexado com sucesso!');
+        agenAtualizarResumo();
+      } else {
+        throw new Error(uploadResult.erro || 'Falha no upload');
+      }
+    } catch(err) {
+      console.error('[CDA] Erro ao processar PDF:', err);
+      showToast('Erro ao anexar PDF: ' + err.message, 'error');
+      agenRemoverPDF();
+    }
+  }
 
+  function agenRemoverPDF() {
+    agenPDFAnexado = null;
+    const input = document.getElementById('pdf-file-input');
+    if (input) input.value = '';
+    document.getElementById('pdf-upload-default').classList.remove('hidden');
+    document.getElementById('pdf-upload-preview').classList.add('hidden');
+    document.getElementById('pdf-upload-progress').classList.add('hidden');
+    document.getElementById('pdf-upload-status').classList.add('hidden');
+    document.getElementById('agen-pdf-anexado-info').classList.add('hidden');
+    showToast('PDF removido');
+    agenAtualizarResumo();
+  }
+
+  function setupPDFDragDrop() {
+    const dropZone = document.getElementById('pdf-drop-zone');
+    if (!dropZone) return;
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+    });
+    dropZone.addEventListener('drop', (e) => {
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        const input = document.getElementById('pdf-file-input');
+        const dt = new DataTransfer();
+        dt.items.add(files[0]);
+        input.files = dt.files;
+        agenHandlePDFSelect(input);
+      }
+    }, false);
+  }
+
+  // ==================== AGENDAMENTO - VISIBILIDADE CONDICIONAL ====================
+  function agenVerificarOrigem() {
+    const temOrcamento = (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) || 
+                         (ultimoOrcamento && ultimoOrcamento.exames && ultimoOrcamento.exames.length > 0);
+    agenVemDoOrcamento = temOrcamento;
+    const resumoCard = document.getElementById('agen-resumo-orcamento-card');
+    const uploadArea = document.getElementById('agen-pdf-upload-area');
+    if (temOrcamento) {
+      if (resumoCard) resumoCard.classList.remove('hidden');
+      if (uploadArea) uploadArea.classList.add('hidden');
+      agenPreencherResumoOrcamento();
+    } else {
+      if (resumoCard) resumoCard.classList.add('hidden');
+      if (uploadArea) {
+        uploadArea.classList.remove('hidden');
+        setupPDFDragDrop();
+      }
+    }
+  }
+
+  function agenPreencherResumoOrcamento() {
+    const conteudo = document.getElementById('agen-resumo-orcamento-conteudo');
+    if (!conteudo) return;
+    let exames = [];
+    let total = 0;
+    if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
+      exames = orcSelecionados;
+      total = exames.reduce((s, e) => s + (Number(e.preco) || 0), 0);
+    } else if (ultimoOrcamento && ultimoOrcamento.exames) {
+      exames = ultimoOrcamento.exames;
+      total = ultimoOrcamento.total || 0;
+    }
+    if (exames.length === 0) return;
+    const totalPix = total * 0.60;
+    const totalCredito = total * 0.65;
+    conteudo.innerHTML = '<div class="space-y-2">' +
+      exames.map(ex => '<div class="flex justify-between items-center text-sm"><span>' + ex.nome + '</span><span class="font-bold">' + formatCurrency(ex.preco) + '</span></div>').join('') +
+      '<div class="border-t border-slate-200 pt-2 mt-2">' +
+      '<div class="flex justify-between items-center text-sm font-bold text-cda-primary"><span>Total (PIX/Débito 40% OFF):</span><span>' + formatCurrency(totalPix) + '</span></div>' +
+      '<div class="flex justify-between items-center text-xs text-slate-500 mt-1"><span>Cartão de crédito (35% OFF):</span><span>' + formatCurrency(totalCredito) + '</span></div>' +
+      '</div></div>';
+  }
 
   const FERIADOS_NACIONAIS = ['01-01','04-21','05-01','09-07','10-12','11-02','11-15','11-20','12-25'];
   const SLOTS_MANHA = ['07:30','08:10','08:50','09:30','10:10','10:50'];
   const SLOTS_TARDE = ['14:30','15:10','15:50'];
   let agenState = { data: null, periodo: null, horario: null, pagamento: null };
 
-
-
-
-
   function limparOrcamentoAgendamento() {
     orcSelecionados = [];
     ultimoOrcamento = null;
     localStorage.removeItem('cda_ultimo_orcamento');
+    agenVerificarOrigem();
     agenAtualizarResumo();
     showToast('Orçamento removido do agendamento');
   }
 
   function agenTemDocumento() {
-    // Verifica se tem orçamento
     const temOrcamento = (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) || 
                          (ultimoOrcamento && ultimoOrcamento.exames && ultimoOrcamento.exames.length > 0);
-    return { temOrcamento, temPDF: false, valido: temOrcamento };
+    const temPDF = agenPDFAnexado !== null;
+    return { temOrcamento, temPDF, valido: temOrcamento || temPDF };
   }
 
-  // ========== FUNÇÃO AUXILIAR PARA ENVIAR PDF AO GOOGLE APPS SCRIPT ==========
-
   function agenInicializar() {
-            const inp = document.getElementById('agen-data');
-            if (!inp) return;
-            const hoje = new Date();
-            inp.min = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
-            inp.value = '';
-            agenState = { data: null, periodo: null, horario: null, pagamento: null };
-            ['manha','tarde'].forEach(p => document.getElementById(`agen-btn-${p}`)?.classList.remove('ativo'));
-            document.querySelectorAll('input[name="agen-pagamento"]').forEach(r => { r.checked = false; });
-            const pagamentoWrap = document.getElementById('agen-pagamento-wrap');
-            if (pagamentoWrap) pagamentoWrap.classList.add('hidden');
-            agenEsconderHorarios();
-            agenAtualizarResumo();
-            const nome = _getItem('patient_name');
-            const telefone = _getItem('patient_phone');
-            if (nome) document.getElementById('agen-nome').value = nome;
-            if (telefone) document.getElementById('agen-telefone').value = telefone;
-        }
+    const inp = document.getElementById('agen-data');
+    if (!inp) return;
+    const hoje = new Date();
+    inp.min = hoje.getFullYear() + '-' + String(hoje.getMonth()+1).padStart(2,'0') + '-' + String(hoje.getDate()).padStart(2,'0');
+    inp.value = '';
+    agenState = { data: null, periodo: null, horario: null, pagamento: null };
+    ['manha','tarde'].forEach(p => {
+      const btn = document.getElementById('agen-btn-' + p);
+      if (btn) btn.classList.remove('ativo');
+    });
+    document.querySelectorAll('input[name="agen-pagamento"]').forEach(r => { r.checked = false; });
+    const pagamentoWrap = document.getElementById('agen-pagamento-wrap');
+    if (pagamentoWrap) pagamentoWrap.classList.add('hidden');
+    agenEsconderHorarios();
+    agenAtualizarResumo();
+    agenVerificarOrigem();
+    const nome = _getItem('patient_name');
+    const telefone = _getItem('patient_phone');
+    if (nome) document.getElementById('agen-nome').value = nome;
+    if (telefone) document.getElementById('agen-telefone').value = telefone;
+  }
 
-        function agenIsDiaUtil(dataStr) {
-            const [y,m,d] = dataStr.split('-').map(Number);
-            const dia = new Date(y, m-1, d).getDay();
-            if (dia === 0 || dia === 6) return false;
-            const mmdd = `${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-            return !FERIADOS_NACIONAIS.includes(mmdd);
-        }
+  function agenIsDiaUtil(dataStr) {
+    const [y,m,d] = dataStr.split('-').map(Number);
+    const dia = new Date(y, m-1, d).getDay();
+    if (dia === 0 || dia === 6) return false;
+    const mmdd = String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    return !FERIADOS_NACIONAIS.includes(mmdd);
+  }
 
-        function agenOnDataChange() {
-            const inp = document.getElementById('agen-data');
-            if (!inp.value) return;
-            if (!agenIsDiaUtil(inp.value)) {
-                showToast('Esta data não está disponível (fim de semana ou feriado).', 'error');
-                inp.value = '';
-                agenState.data = null;
-                return;
-            }
-            agenState.data = inp.value;
-            agenState.horario = null;
-            ['manha','tarde'].forEach(p => document.getElementById(`agen-btn-${p}`)?.classList.remove('ativo'));
-            agenEsconderHorarios();
-            agenAtualizarResumo();
-            if (agenState.periodo) agenBuscarHorarios();
-        }
+  function agenOnDataChange() {
+    const inp = document.getElementById('agen-data');
+    if (!inp.value) return;
+    if (!agenIsDiaUtil(inp.value)) {
+      showToast('Esta data não está disponível (fim de semana ou feriado).', 'error');
+      inp.value = '';
+      agenState.data = null;
+      return;
+    }
+    agenState.data = inp.value;
+    agenState.horario = null;
+    ['manha','tarde'].forEach(p => {
+      const btn = document.getElementById('agen-btn-' + p);
+      if (btn) btn.classList.remove('ativo');
+    });
+    agenEsconderHorarios();
+    agenAtualizarResumo();
+    if (agenState.periodo) agenBuscarHorarios();
+  }
 
-        function agenSelecionarPeriodo(periodo) {
-            agenState.periodo = periodo;
-            agenState.horario = null;
-            ['manha','tarde'].forEach(p => {
-                document.getElementById(`agen-btn-${p}`)?.classList.toggle('ativo', p === periodo);
-            });
-            agenAtualizarResumo();
-            if (agenState.data) agenBuscarHorarios();
-            else showToast('Selecione a data primeiro.', 'info', 2000);
-        }
+  function agenSelecionarPeriodo(periodo) {
+    agenState.periodo = periodo;
+    agenState.horario = null;
+    ['manha','tarde'].forEach(p => {
+      const btn = document.getElementById('agen-btn-' + p);
+      if (btn) btn.classList.toggle('ativo', p === periodo);
+    });
+    agenAtualizarResumo();
+    if (agenState.data) agenBuscarHorarios();
+    else showToast('Selecione a data primeiro.', 'info', 2000);
+  }
 
-        function agenEsconderHorarios() {
-            ['agen-horarios-placeholder','agen-horarios-loading','agen-horarios-grid','agen-horarios-vazio','agen-horarios-erro']
-                .forEach(id => document.getElementById(id)?.classList.add('hidden'));
-            document.getElementById('agen-horarios-placeholder')?.classList.remove('hidden');
-        }
+  function agenEsconderHorarios() {
+    ['agen-horarios-placeholder','agen-horarios-loading','agen-horarios-grid','agen-horarios-vazio','agen-horarios-erro'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('hidden');
+    });
+    const ph = document.getElementById('agen-horarios-placeholder');
+    if (ph) ph.classList.remove('hidden');
+  }
 
-        async function agenBuscarHorarios() {
-            const { data, periodo } = agenState;
-            if (!data || !periodo) return;
-            const slots = periodo === 'manha' ? SLOTS_MANHA : SLOTS_TARDE;
+  async function agenBuscarHorarios() {
+    const data = agenState.data;
+    const periodo = agenState.periodo;
+    if (!data || !periodo) return;
+    const slots = periodo === 'manha' ? SLOTS_MANHA : SLOTS_TARDE;
+    ['agen-horarios-placeholder','agen-horarios-grid','agen-horarios-vazio','agen-horarios-erro'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('hidden');
+    });
+    const loading = document.getElementById('agen-horarios-loading');
+    if (loading) loading.classList.remove('hidden');
+    agenState.horario = null;
+    document.querySelectorAll('.agen-horario-btn').forEach(btn => btn.classList.remove('ativo'));
+    agenAtualizarResumo();
+    let ocupados = [];
+    let agendaOk = false;
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      const url = APPS_SCRIPT_AGENDA_URL + '?action=listar&data=' + data + '&token=' + encodeURIComponent(CDA_TOKEN);
+      console.log('[CDA] Consultando agenda:', url);
+      const resp = await fetch(url, { method: 'GET', redirect: 'follow', signal: controller.signal });
+      clearTimeout(timeout);
+      const texto = await resp.text();
+      console.log('[CDA] Resposta bruta:', texto);
+      const json = JSON.parse(texto);
+      ocupados = Array.isArray(json.ocupados) ? json.ocupados.map(h => String(h).trim()) : [];
+      console.log('[CDA] Ocupados (normalizado):', ocupados);
+      agendaOk = true;
+    } catch(err) {
+      console.warn('[CDA] Agenda indisponível:', err);
+      agendaOk = false;
+    }
+    if (loading) loading.classList.add('hidden');
+    if (!agendaOk) {
+      const erroEl = document.getElementById('agen-horarios-erro');
+      if (erroEl) erroEl.classList.remove('hidden');
+    }
+    function normalizarHora(h) {
+      const partes = String(h).trim().split(':');
+      if (partes.length < 2) return h;
+      return String(parseInt(partes[0])).padStart(2,'0') + ':' + partes[1].padStart(2,'0');
+    }
+    const ocupadosNorm = ocupados.map(normalizarHora);
+    const agora = new Date();
+    const [selY, selM, selD] = data.split('-').map(Number);
+    const isHoje = agora.getFullYear() === selY && (agora.getMonth()+1) === selM && agora.getDate() === selD;
+    const minutosAgora = agora.getHours() * 60 + agora.getMinutes() + 30;
+    const disponiveis = slots.filter(h => {
+      if (ocupadosNorm.includes(h)) return false;
+      if (isHoje) {
+        const [hh, mm] = h.split(':').map(Number);
+        return (hh * 60 + mm) > minutosAgora;
+      }
+      return true;
+    });
+    if (!disponiveis.length) {
+      const vazio = document.getElementById('agen-horarios-vazio');
+      if (vazio) vazio.classList.remove('hidden');
+      return;
+    }
+    const grid = document.getElementById('agen-horarios-grid');
+    grid.innerHTML = disponiveis.map(h => {
+      const isOcupado = ocupadosNorm.includes(h);
+      return '<button type="button" class="agen-horario-btn' + (isOcupado ? ' ocupado' : '') + '" data-hora="' + h + '" ' + 
+        (isOcupado ? 'disabled title="Horário já reservado"' : 'onclick="agenSelecionarHorario('' + h + '')"') +
+        '>' + h + (isOcupado ? '<br><span style="font-size:9px;opacity:0.7">Ocupado</span>' : '') + '</button>';
+    }).join('');
+    grid.classList.remove('hidden');
+  }
 
-            // Esconde tudo e mostra loading
-            ['agen-horarios-placeholder','agen-horarios-grid','agen-horarios-vazio','agen-horarios-erro']
-                .forEach(id => document.getElementById(id)?.classList.add('hidden'));
-            document.getElementById('agen-horarios-loading')?.classList.remove('hidden');
+  function agenSelecionarHorario(hora) {
+    agenState.horario = hora;
+    document.querySelectorAll('.agen-horario-btn').forEach(btn => {
+      btn.classList.toggle('ativo', btn.dataset.hora === hora);
+    });
+    agenAtualizarResumo();
+    showToast('Horário ' + hora + ' selecionado', 'success', 1500);
+  }
 
-            // Limpa horário selecionado ao buscar novamente
-            agenState.horario = null;
-            document.querySelectorAll('.agen-horario-btn').forEach(btn => btn.classList.remove('ativo'));
-            agenAtualizarResumo();
+  function validarTelefoneBR(valor) {
+    const digitos = String(valor || '').replace(/\D/g, '');
+    if (digitos.length === 10) return /^[1-9]{2}[2-9][0-9]{7}$/.test(digitos);
+    if (digitos.length === 11) return /^[1-9]{2}9[0-9]{8}$/.test(digitos);
+    return false;
+  }
 
-            let ocupados = [];
-            let agendaOk = false;
-            try {
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 10000);
-                const url = `${APPS_SCRIPT_AGENDA_URL}?action=listar&data=${data}&token=${encodeURIComponent(CDA_TOKEN)}`;
-                console.log('[CDA] Consultando agenda:', url);
-                const resp = await fetch(url, {
-                    method: 'GET',
-                    redirect: 'follow',
-                    signal: controller.signal
-                });
-                clearTimeout(timeout);
-                const texto = await resp.text();
-                console.log('[CDA] Resposta bruta:', texto);
-                const json = JSON.parse(texto);
-                // Normaliza: remove espaços extras e garante formato HH:MM
-                ocupados = Array.isArray(json.ocupados)
-                    ? json.ocupados.map(h => String(h).trim())
-                    : [];
-                console.log('[CDA] Ocupados (normalizado):', ocupados);
-                agendaOk = true;
-            } catch(err) {
-                console.warn('[CDA] Agenda indisponível:', err);
-                agendaOk = false;
-            }
+  function agenTotalSelecionado() {
+    if (typeof orcSelecionados === 'undefined' || !Array.isArray(orcSelecionados)) return 0;
+    return orcSelecionados.reduce((s,e) => s + (Number(e.preco) || 0), 0);
+  }
 
-            document.getElementById('agen-horarios-loading')?.classList.add('hidden');
+  function agenPagamentoSelecionado() {
+    const checked = document.querySelector('input[name="agen-pagamento"]:checked');
+    return checked ? checked.value : '';
+  }
 
-            // Se a agenda falhou, mostra aviso mas continua exibindo slots locais
-            if (!agendaOk) {
-                const erroEl = document.getElementById('agen-horarios-erro');
-                if (erroEl) erroEl.classList.remove('hidden');
-            }
+  function agenAtualizarResumo() {
+    const data = agenState.data;
+    const periodo = agenState.periodo;
+    const horario = agenState.horario;
+    const nome = document.getElementById('agen-nome') ? document.getElementById('agen-nome').value.trim() : '';
+    const telefone = document.getElementById('agen-telefone') ? document.getElementById('agen-telefone').value.trim() : '';
+    const resumo = document.getElementById('agen-resumo');
+    const placeholder = document.getElementById('agen-resumo-placeholder');
+    const btnSalvar = document.getElementById('agen-btn-salvar');
+    const pagamentoWrap = document.getElementById('agen-pagamento-wrap');
+    const pagamento = agenPagamentoSelecionado();
+    agenState.pagamento = pagamento || null;
+    const totalBruto = agenTotalSelecionado();
+    const temExames = typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0;
+    const temPDF = agenPDFAnexado !== null;
+    const pronto = data && periodo && horario && nome && telefone && validarTelefoneBR(telefone) && pagamento && (temExames || temPDF);
 
-            // Normaliza horário para HH:MM (cobre "07:30", "7:30", "07:30:00")
-            function normalizarHora(h) {
-                const partes = String(h).trim().split(':');
-                if (partes.length < 2) return h;
-                return String(parseInt(partes[0])).padStart(2,'0') + ':' + partes[1].padStart(2,'0');
-            }
-            const ocupadosNorm = ocupados.map(normalizarHora);
+    if (data && periodo && horario) {
+      if (pagamentoWrap) pagamentoWrap.classList.remove('hidden');
+    } else if (pagamentoWrap) { pagamentoWrap.classList.add('hidden'); }
 
-            // Se for hoje, filtrar horários que já passaram (com 30min de margem)
-            const agora = new Date();
-            const [selY, selM, selD] = data.split('-').map(Number);
-            const isHoje = agora.getFullYear() === selY && (agora.getMonth()+1) === selM && agora.getDate() === selD;
-            const minutosAgora = agora.getHours() * 60 + agora.getMinutes() + 30;
+    if (data && periodo && horario && nome) {
+      const [y,m,d] = data.split('-').map(Number);
+      const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+      document.getElementById('agen-resumo-data').textContent = dataExt + ' — ' + (periodo === 'manha' ? 'Manhã' : 'Tarde');
+      document.getElementById('agen-resumo-hora').textContent = 'Horário: ' + horario;
+      document.getElementById('agen-resumo-nome').textContent = nome;
 
-            const disponiveis = slots.filter(h => {
-                if (ocupadosNorm.includes(h)) return false;
-                if (isHoje) {
-                    const [hh, mm] = h.split(':').map(Number);
-                    return (hh * 60 + mm) > minutosAgora;
-                }
-                return true;
-            });
+      const examesWrap = document.getElementById('agen-resumo-exames-wrap');
+      if (temExames) {
+        examesWrap.classList.remove('hidden');
+        const totalPix = totalBruto * 0.60;
+        const totalCredito = totalBruto * 0.65;
+        const pagamentoLinha = pagamento ? '<div class="text-slate-600 dark:text-slate-300 font-bold mt-1">Pagamento escolhido: ' + pagamento + '</div>' : '';
+        document.getElementById('agen-resumo-exames').innerHTML = orcSelecionados
+          .map(ex => '<div class="flex justify-between gap-3"><span>' + ex.nome + '</span><span class="font-bold whitespace-nowrap">' + formatCurrency(ex.preco) + '</span></div>').join('');
+        document.getElementById('agen-resumo-total').innerHTML =
+          '<div class="text-slate-500 dark:text-slate-400 line-through text-xs">Particular: ' + formatCurrency(totalBruto) + '</div>' +
+          '<div class="text-cda-primary font-extrabold">PIX/Dinheiro/Débito: ' + formatCurrency(totalPix) + '</div>' +
+          '<div class="text-slate-600 dark:text-slate-300 font-bold">Cartão de crédito: ' + formatCurrency(totalCredito) + '</div>' +
+          pagamentoLinha;
+      } else {
+        examesWrap.classList.add('hidden');
+      }
 
-            if (!disponiveis.length) {
-                document.getElementById('agen-horarios-vazio')?.classList.remove('hidden');
-                return;
-            }
+      const docWrap = document.getElementById('agen-resumo-doc-wrap');
+      const docEl = document.getElementById('agen-resumo-doc');
+      if (temPDF && agenPDFAnexado) {
+        docWrap.classList.remove('hidden');
+        docEl.innerHTML = '<i class="fa-solid fa-file-pdf text-red-500 mr-1"></i> ' + agenPDFAnexado.nome + ' <span class="text-xs text-slate-400">(PDF anexado)</span>';
+      } else {
+        docWrap.classList.add('hidden');
+      }
 
-            const grid = document.getElementById('agen-horarios-grid');
-            grid.innerHTML = disponiveis.map(h => {
-                const isOcupado = ocupadosNorm.includes(h);
-                return `<button type="button" class="agen-horario-btn${isOcupado ? ' ocupado' : ''}" data-hora="${h}" 
-                    ${isOcupado ? 'disabled title="Horário já reservado"' : `onclick="agenSelecionarHorario('${h}')"`}
-                    >${h}${isOcupado ? '<br><span style="font-size:9px;opacity:0.7">Ocupado</span>' : ''}</button>`;
-            }).join('');
-            grid.classList.remove('hidden');
-        }
+      resumo.classList.remove('hidden');
+      placeholder.classList.add('hidden');
+    } else {
+      resumo.classList.add('hidden');
+      placeholder.classList.remove('hidden');
+    }
 
-        function agenSelecionarHorario(hora) {
-            agenState.horario = hora;
-            document.querySelectorAll('.agen-horario-btn').forEach(btn => {
-                btn.classList.toggle('ativo', btn.dataset.hora === hora);
-            });
-            agenAtualizarResumo();
-            showToast(`Horário ${hora} selecionado`, 'success', 1500);
-        }
+    if (pronto) btnSalvar.classList.remove('opacity-50','pointer-events-none');
+    else btnSalvar.classList.add('opacity-50','pointer-events-none');
+  }
 
-        function validarTelefoneBR(valor) {
-            const digitos = String(valor || '').replace(/\D/g, '');
-            if (digitos.length === 10) return /^[1-9]{2}[2-9][0-9]{7}$/.test(digitos);
-            if (digitos.length === 11) return /^[1-9]{2}9[0-9]{8}$/.test(digitos);
-            return false;
-        }
+  async function agenSalvar() {
+    const data = agenState.data;
+    const periodo = agenState.periodo;
+    const horario = agenState.horario;
+    const nome = document.getElementById('agen-nome') ? document.getElementById('agen-nome').value.trim() : '';
+    const telefone = document.getElementById('agen-telefone') ? document.getElementById('agen-telefone').value.trim() : '';
+    const pagamento = agenPagamentoSelecionado();
+    const btnSalvar = document.getElementById('agen-btn-salvar');
+    const statusEl = document.getElementById('agen-status');
+    const totalBruto = agenTotalSelecionado();
+    const temExames = typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0;
+    const temPDF = agenPDFAnexado !== null;
 
-        function agenTotalSelecionado() {
-            if (typeof orcSelecionados === 'undefined' || !Array.isArray(orcSelecionados)) return 0;
-            return orcSelecionados.reduce((s,e) => s + (Number(e.preco) || 0), 0);
-        }
+    if (!nome) { showToast('Informe o nome do paciente.', 'error'); return; }
+    if (!telefone) { showToast('Informe o telefone de contato.', 'error'); return; }
+    if (!validarTelefoneBR(telefone)) { showToast('Informe um telefone válido com DDD.', 'error'); return; }
+    if (!data) { showToast('Selecione a data.', 'error'); return; }
+    if (!periodo) { showToast('Selecione o período.', 'error'); return; }
+    if (!horario) { showToast('Selecione o horário.', 'error'); return; }
+    if (!temExames && !temPDF) { showToast('Adicione exames ou anexe um PDF do orçamento/pedido médico.', 'error'); return; }
+    if (!pagamento) { showToast('Selecione a forma de pagamento.', 'error'); return; }
 
-        function agenPagamentoSelecionado() {
-            return document.querySelector('input[name="agen-pagamento"]:checked')?.value || '';
-        }
+    if (temExames && totalBruto < 150 && !agenSalvar._confirmouValorBaixo) {
+      agenSalvar._confirmouValorBaixo = true;
+      const btnSalvarAviso = document.getElementById('agen-btn-salvar');
+      const textoOriginal = btnSalvarAviso.innerHTML;
+      btnSalvarAviso.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2" style="color:#f59e0b"></i><span class="text">Valor abaixo de R$150 — Confirmar mesmo assim?</span>';
+      btnSalvarAviso.style.background = 'linear-gradient(135deg, #b45309 0%, #d97706 60%, #f59e0b 100%)';
+      showToast('Valor abaixo de R$ 150,00. Clique novamente para confirmar o agendamento mesmo assim.', 'info', 6000);
+      setTimeout(() => {
+        agenSalvar._confirmouValorBaixo = false;
+        btnSalvarAviso.innerHTML = textoOriginal;
+        btnSalvarAviso.style.background = '';
+      }, 7000);
+      return;
+    }
+    agenSalvar._confirmouValorBaixo = false;
 
-        function agenAtualizarResumo() {
-            const { data, periodo, horario } = agenState;
-            const nome = document.getElementById('agen-nome')?.value?.trim() || '';
-            const telefone = document.getElementById('agen-telefone')?.value?.trim() || '';
-            const resumo = document.getElementById('agen-resumo');
-            const placeholder = document.getElementById('agen-resumo-placeholder');
-            const btnSalvar = document.getElementById('agen-btn-salvar');
-            const pagamentoWrap = document.getElementById('agen-pagamento-wrap');
-            const pagamento = agenPagamentoSelecionado();
-            agenState.pagamento = pagamento || null;
-            const totalBruto = agenTotalSelecionado();
-            const temExames = typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0;
-            const pronto = data && periodo && horario && nome && telefone && validarTelefoneBR(telefone) && pagamento;
+    btnSalvar.disabled = true;
+    btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Verificando disponibilidade...';
+    if (statusEl) statusEl.classList.add('hidden');
 
-            if (data && periodo && horario) {
-                if (pagamentoWrap) pagamentoWrap.classList.remove('hidden');
-            } else if (pagamentoWrap) {
-                pagamentoWrap.classList.add('hidden');
-            }
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 6000);
+      const checkResp = await fetch(APPS_SCRIPT_AGENDA_URL + '?action=listar&data=' + data + '&token=' + CDA_TOKEN, { signal: controller.signal });
+      clearTimeout(timeout);
+      const checkJson = await checkResp.json();
+      const ocupadosCheck = Array.isArray(checkJson.ocupados)
+        ? checkJson.ocupados.map(h => {
+            const p = String(h).trim().split(':');
+            return p.length >= 2 ? String(parseInt(p[0])).padStart(2,'0') + ':' + p[1].padStart(2,'0') : String(h).trim();
+          })
+        : [];
+      if (ocupadosCheck.includes(horario)) {
+        showToast('O horário ' + horario + ' acabou de ser reservado. Por favor, escolha outro horário.', 'error', 5000);
+        btnSalvar.disabled = false;
+        btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+        agenState.horario = null;
+        agenAtualizarResumo();
+        agenBuscarHorarios();
+        return;
+      }
+    } catch(err) {
+      console.warn('Verificação prévia falhou, tentando salvar:', err);
+    }
 
-            if (data && periodo && horario && nome) {
-                const [y,m,d] = data.split('-').map(Number);
-                const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-                document.getElementById('agen-resumo-data').textContent = `${dataExt} — ${periodo === 'manha' ? 'Manhã' : 'Tarde'}`;
-                document.getElementById('agen-resumo-hora').textContent = `Horário: ${horario}`;
-                document.getElementById('agen-resumo-nome').textContent = nome;
+    btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Salvando...';
 
-                const examesWrap = document.getElementById('agen-resumo-exames-wrap');
-                if (temExames) {
-                    examesWrap.classList.remove('hidden');
-                    const totalPix = totalBruto * 0.60;
-                    const totalCredito = totalBruto * 0.65;
-                    const pagamentoLinha = pagamento ? `<div class="text-slate-600 dark:text-slate-300 font-bold mt-1">Pagamento escolhido: ${pagamento}</div>` : '';
-                    document.getElementById('agen-resumo-exames').innerHTML = orcSelecionados
-                        .map(ex => `<div class="flex justify-between gap-3"><span>${ex.nome}</span><span class="font-bold whitespace-nowrap">${formatCurrency(ex.preco)}</span></div>`).join('');
-                    document.getElementById('agen-resumo-total').innerHTML =
-                        `<div class="text-slate-500 dark:text-slate-400 line-through text-xs">Particular: ${formatCurrency(totalBruto)}</div>
-                         <div class="text-cda-primary font-extrabold">PIX/Dinheiro/Débito: ${formatCurrency(totalPix)}</div>
-                         <div class="text-slate-600 dark:text-slate-300 font-bold">Cartão de crédito: ${formatCurrency(totalCredito)}</div>
-                         ${pagamentoLinha}`;
-                } else {
-                    examesWrap.classList.add('hidden');
-                }
+    let descExames = '';
+    if (temExames) {
+      const totalPix = totalBruto * 0.60;
+      const totalCredito = totalBruto * 0.65;
+      const linhas = orcSelecionados.map(ex => ex.nome + ': ' + formatCurrency(ex.preco)).join('\n');
+      descExames = '\n\nLista de Exames:\n' + linhas + '\n\nTotal particular: ' + formatCurrency(totalBruto) + '\nPIX/Dinheiro/Débito (40% desc): ' + formatCurrency(totalPix) + '\nCartão de crédito (35% desc): ' + formatCurrency(totalCredito) + '\nForma de pagamento escolhida: ' + pagamento;
+    }
 
-                resumo.classList.remove('hidden');
-                placeholder.classList.add('hidden');
-            } else {
-                resumo.classList.add('hidden');
-                placeholder.classList.remove('hidden');
-            }
+    let pdfInfo = '';
+    if (temPDF && agenPDFAnexado) {
+      pdfInfo = '\n\nPDF Anexado: ' + agenPDFAnexado.nome + '\nLink: ' + (agenPDFAnexado.driveUrl || 'Não disponível');
+    }
 
-            if (pronto) btnSalvar.classList.remove('opacity-50','pointer-events-none');
-            else btnSalvar.classList.add('opacity-50','pointer-events-none');
-        }
+    try {
+      const [hh, mm] = horario.split(':').map(Number);
+      const startDateTime = data + 'T' + String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0') + ':00';
+      const endHh = hh + 1;
+      const endDateTime = data + 'T' + String(endHh).padStart(2,'0') + ':' + String(mm).padStart(2,'0') + ':00';
 
-        async function agenSalvar() {
-            const { data, periodo, horario } = agenState;
-            const nome     = document.getElementById('agen-nome')?.value?.trim();
-            const telefone = document.getElementById('agen-telefone')?.value?.trim();
-            const pagamento = agenPagamentoSelecionado();
-            const btnSalvar = document.getElementById('agen-btn-salvar');
-            const statusEl  = document.getElementById('agen-status');
-            const totalBruto = agenTotalSelecionado();
+      const resp = await fetch(APPS_SCRIPT_AGENDA_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'criar', token: CDA_TOKEN, data: data, horario: horario, nome: nome, telefone: telefone, pagamento: pagamento,
+          startTime: startDateTime,
+          endTime: endDateTime,
+          descricao: 'Paciente: ' + nome + '\nTelefone: ' + telefone + '\nForma de pagamento: ' + pagamento + '\nOrigem: Aplicativo CDA' + descExames + pdfInfo,
+          pdfDriveId: agenPDFAnexado ? agenPDFAnexado.driveId : null,
+          pdfDriveUrl: agenPDFAnexado ? agenPDFAnexado.driveUrl : null
+        })
+      });
+      const json = await resp.json();
+      if (json.ocupado) {
+        showToast('O horário ' + horario + ' acabou de ser reservado. Por favor, escolha outro.', 'error', 5000);
+        btnSalvar.disabled = false;
+        btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+        agenState.horario = null;
+        agenAtualizarResumo();
+        agenBuscarHorarios();
+        return;
+      }
+      if (!json.ok) throw new Error(json.erro || 'Erro ao salvar');
+      btnSalvar.disabled = false;
+      btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+      agenSucesso(nome, data, horario);
+    } catch(err) {
+      console.error('Erro agendamento:', err);
+      agenFallbackWhatsApp(nome, telefone, data, horario, descExames + pdfInfo, pagamento);
+    }
+  }
 
-            if (!nome)     { showToast('Informe o nome do paciente.', 'error'); return; }
-            if (!telefone) { showToast('Informe o telefone de contato.', 'error'); return; }
-            if (!validarTelefoneBR(telefone)) { showToast('Informe um telefone válido com DDD.', 'error'); return; }
-            if (!data)     { showToast('Selecione a data.', 'error'); return; }
-            if (!periodo)  { showToast('Selecione o período.', 'error'); return; }
-            if (!horario)  { showToast('Selecione o horário.', 'error'); return; }
-            if (typeof orcSelecionados === 'undefined' || !orcSelecionados.length) { showToast('Adicione ao menos um exame à lista antes de agendar.', 'error'); return; }
-            if (totalBruto < 150 && !agenSalvar._confirmouValorBaixo) {
-                agenSalvar._confirmouValorBaixo = true;
-                const btnSalvarAviso = document.getElementById('agen-btn-salvar');
-                const textoOriginal = btnSalvarAviso.innerHTML;
-                btnSalvarAviso.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2" style="color:#f59e0b"></i><span class="text">Valor abaixo de R$150 — Confirmar mesmo assim?</span>';
-                btnSalvarAviso.style.background = 'linear-gradient(135deg, #b45309 0%, #d97706 60%, #f59e0b 100%)';
-                showToast('Valor abaixo de R$ 150,00. Clique novamente para confirmar o agendamento mesmo assim.', 'info', 6000);
-                setTimeout(() => {
-                    agenSalvar._confirmouValorBaixo = false;
-                    btnSalvarAviso.innerHTML = textoOriginal;
-                    btnSalvarAviso.style.background = '';
-                }, 7000);
-                return;
-            }
-            agenSalvar._confirmouValorBaixo = false;
-            if (!pagamento) { showToast('Selecione a forma de pagamento.', 'error'); return; }
+  function agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento) {
+    const btnSalvar = document.getElementById('agen-btn-salvar');
+    if (btnSalvar) {
+      btnSalvar.disabled = false;
+      btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+    }
+    const [y, m, d] = data.split('-').map(Number);
+    const dataExt = new Date(y, m - 1, d).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+    let mensagem = 'Olá! Gostaria de confirmar um agendamento de coleta:\n\n' +
+      'Paciente: ' + nome + '\n' +
+      'Telefone: ' + telefone + '\n' +
+      'Data: ' + dataExt + '\n' +
+      'Horário: ' + horario + '\n' +
+      'Forma de pagamento: ' + (pagamento || '—');
+    if (agenPDFAnexado && agenPDFAnexado.driveUrl) {
+      mensagem += '\n\nPDF do orçamento/pedido: ' + agenPDFAnexado.driveUrl;
+    }
+    mensagem += (descExames || '');
+    showToast('Não foi possível salvar automaticamente. Abrindo WhatsApp para confirmar manualmente.', 'error', 6000);
+    window.open('https://wa.me/5527998980658?text=' + encodeURIComponent(mensagem), '_blank');
+  }
 
-            btnSalvar.disabled = true;
-            btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Verificando disponibilidade...';
-            statusEl.classList.add('hidden');
+  function agenSucesso(nome, data, horario) {
+    const [y,m,d] = data.split('-').map(Number);
+    const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+    const pagamento = agenPagamentoSelecionado() || '—';
+    const totalBruto = agenTotalSelecionado();
+    const totalPix = totalBruto * 0.60;
+    const totalCredito = totalBruto * 0.65;
 
-            // Double-check: verifica se o horário ainda está disponível
-            try {
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 6000);
-                const checkResp = await fetch(`${APPS_SCRIPT_AGENDA_URL}?action=listar&data=${data}&token=${CDA_TOKEN}`, { signal: controller.signal });
-                clearTimeout(timeout);
-                const checkJson = await checkResp.json();
-                const ocupadosCheck = Array.isArray(checkJson.ocupados)
-                    ? checkJson.ocupados.map(h => {
-                        const p = String(h).trim().split(':');
-                        return p.length >= 2 ? String(parseInt(p[0])).padStart(2,'0') + ':' + p[1].padStart(2,'0') : String(h).trim();
-                      })
-                    : [];
-                if (ocupadosCheck.includes(horario)) {
-                    showToast(`O horário ${horario} acabou de ser reservado. Por favor, escolha outro horário.`, 'error', 5000);
-                    btnSalvar.disabled = false;
-                    btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
-                    // Rebusca horários para atualizar
-                    agenState.horario = null;
-                    agenAtualizarResumo();
-                    agenBuscarHorarios();
-                    return;
-                }
-            } catch(err) {
-                // Se não conseguir verificar, continua e tenta salvar (o servidor rejeitará se ocupado)
-                console.warn('Verificação prévia falhou, tentando salvar:', err);
-            }
+    if (nome) localStorage.setItem('patient_name', nome);
+    const telefone = document.getElementById('agen-telefone') ? document.getElementById('agen-telefone').value.trim() : '';
+    if (telefone) localStorage.setItem('patient_phone', telefone);
 
-            btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Salvando...';
+    document.getElementById('modal-agen-nome').textContent = nome;
+    document.getElementById('modal-agen-data').textContent = dataExt + ' às ' + horario;
 
-            let descExames = '';
-            if (typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0) {
-                const totalPix = totalBruto * 0.60;
-                const totalCredito = totalBruto * 0.65;
-                const linhas = orcSelecionados.map(ex => `${ex.nome}: ${formatCurrency(ex.preco)}`).join('\n');
-                descExames = `\n\nLista de Exames:\n${linhas}\n\nTotal particular: ${formatCurrency(totalBruto)}\nPIX/Dinheiro/Débito (40% desc): ${formatCurrency(totalPix)}\nCartão de crédito (35% desc): ${formatCurrency(totalCredito)}\nForma de pagamento escolhida: ${pagamento}`;
-            }
+    const qtd = (typeof orcSelecionados !== 'undefined' && orcSelecionados.length)
+      ? orcSelecionados.length + ' exame' + (orcSelecionados.length > 1 ? 's' : '') + ' — PIX: ' + formatCurrency(totalPix) + ' / Crédito: ' + formatCurrency(totalCredito)
+      : (agenPDFAnexado ? 'PDF do orçamento/pedido anexado' : '—');
+    document.getElementById('modal-agen-exames').textContent = qtd;
+    document.getElementById('modal-agen-pagamento').textContent = pagamento;
 
-            try {
-                // Monta horários ISO para o Google Calendar usar corretamente
-                const [hh, mm] = horario.split(':').map(Number);
-                const startDateTime = `${data}T${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`;
-                const endHh = hh + 1;
-                const endDateTime = `${data}T${String(endHh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00`;
+    const modal = document.getElementById('modal-agen-confirmacao');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
 
-                const resp = await fetch(APPS_SCRIPT_AGENDA_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify({
-                        action: 'criar', token: CDA_TOKEN, data, horario, nome, telefone, pagamento,
-                        startTime: startDateTime,
-                        endTime: endDateTime,
-                        descricao: `Paciente: ${nome}\nTelefone: ${telefone}\nForma de pagamento: ${pagamento}\nOrigem: Aplicativo CDA${descExames}`
-                    })
-                });
-                const json = await resp.json();
-                if (json.ocupado) {
-                    showToast(`O horário ${horario} acabou de ser reservado. Por favor, escolha outro.`, 'error', 5000);
-                    btnSalvar.disabled = false;
-                    btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
-                    agenState.horario = null;
-                    agenAtualizarResumo();
-                    agenBuscarHorarios();
-                    return;
-                }
-                if (!json.ok) throw new Error(json.erro || 'Erro ao salvar');
-                btnSalvar.disabled = false;
-                btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
-                agenSucesso(nome, data, horario);
-            } catch(err) {
-                console.error('Erro agendamento:', err);
-                agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento);
-            }
-        }
-
-        function agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento) {
-            const btnSalvar = document.getElementById('agen-btn-salvar');
-            if (btnSalvar) {
-                btnSalvar.disabled = false;
-                btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
-            }
-            const [y, m, d] = data.split('-').map(Number);
-            const dataExt = new Date(y, m - 1, d).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
-            const mensagem = `Olá! Gostaria de confirmar um agendamento de coleta:\n\n` +
-                `Paciente: ${nome}\n` +
-                `Telefone: ${telefone}\n` +
-                `Data: ${dataExt}\n` +
-                `Horário: ${horario}\n` +
-                `Forma de pagamento: ${pagamento || '—'}` +
-                (descExames || '');
-            showToast('Não foi possível salvar automaticamente. Abrindo WhatsApp para confirmar manualmente.', 'error', 6000);
-            window.open('https://wa.me/5527998980658?text=' + encodeURIComponent(mensagem), '_blank');
-        }
-
-        function agenSucesso(nome, data, horario) {
-            const [y,m,d] = data.split('-').map(Number);
-            const dataExt = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
-            const pagamento = agenPagamentoSelecionado() || '—';
-            const totalBruto = agenTotalSelecionado();
-            const totalPix = totalBruto * 0.60;
-            const totalCredito = totalBruto * 0.65;
-
-            if (nome) localStorage.setItem('patient_name', nome);
-            const telefone = document.getElementById('agen-telefone')?.value?.trim();
-            if (telefone) localStorage.setItem('patient_phone', telefone);
-
-            // Preenche dados do modal
-            document.getElementById('modal-agen-nome').textContent = nome;
-            document.getElementById('modal-agen-data').textContent = `${dataExt} às ${horario}`;
-
-            const qtd = (typeof orcSelecionados !== 'undefined' && orcSelecionados.length)
-                ? `${orcSelecionados.length} exame${orcSelecionados.length > 1 ? 's' : ''} — PIX: ${formatCurrency(totalPix)} / Crédito: ${formatCurrency(totalCredito)}`
-                : '—';
-            document.getElementById('modal-agen-exames').textContent = qtd;
-            document.getElementById('modal-agen-pagamento').textContent = pagamento;
-
-            // Exibe o modal
-            const modal = document.getElementById('modal-agen-confirmacao');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function modalAgenOk() {
-            // Fecha modal
-            const modal = document.getElementById('modal-agen-confirmacao');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-
-            // Limpa orçamento e agendamento
-            orcSelecionados = [];
-            orcRenderSelecionados();
-            // Limpa campos do orçamento
-            const orcPaciente = document.getElementById('orc-paciente');
-            if (orcPaciente) orcPaciente.value = '';
-            agenInicializar();
-
-            const btnSalvar = document.getElementById('agen-btn-salvar');
-            const statusEl  = document.getElementById('agen-status');
-            if (statusEl) statusEl.classList.add('hidden');
-            if (btnSalvar) {
-                btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
-                btnSalvar.disabled = false;
-                btnSalvar.classList.remove('opacity-50','pointer-events-none');
-            }
-
-  document.getElementById('agen-data').min = new Date().toISOString().split('T')[0];
-            // Volta para a tela home
-            navigateToPage('home');
-        }
+  function modalAgenOk() {
+    const modal = document.getElementById('modal-agen-confirmacao');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    orcSelecionados = [];
+    orcRenderSelecionados();
+    const orcPaciente = document.getElementById('orc-paciente');
+    if (orcPaciente) orcPaciente.value = '';
+    agenInicializar();
+    const btnSalvar = document.getElementById('agen-btn-salvar');
+    const statusEl = document.getElementById('agen-status');
+    if (statusEl) statusEl.classList.add('hidden');
+    if (btnSalvar) {
+      btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+      btnSalvar.disabled = false;
+      btnSalvar.classList.remove('opacity-50','pointer-events-none');
+    }
+    document.getElementById('agen-data').min = new Date().toISOString().split('T')[0];
+    navigateToPage('home');
+  }
 
   // ==================== CONFIGURACOES - SENHA 5912 ====================
   const SENHA_CONFIG = '5912';
@@ -2167,9 +2150,7 @@ function computarOrcamento() {
       document.getElementById('senha-config-input').value = '';
       document.getElementById('senha-config-error').style.display = 'none';
       setTimeout(() => document.getElementById('senha-config-input').focus(), 100);
-    } else {
-      navigateToPage('configuracoes');
-    }
+    } else { navigateToPage('configuracoes'); }
   }
 
   function fecharModalSenha() {
@@ -2206,7 +2187,6 @@ function computarOrcamento() {
   let recTipo = null;
   let recLabExterno = null;
 
-  // --- Abas ---
   function recMostrarAba(aba) {
     const btnNovo = document.getElementById('rec-aba-novo');
     const btnConsulta = document.getElementById('rec-aba-consulta');
@@ -2234,7 +2214,6 @@ function computarOrcamento() {
     }
   }
 
-  // --- Autocomplete de exames ---
   const recSearchInput = document.getElementById('rec-search');
   const recAutocompleteList = document.getElementById('rec-autocomplete-list');
 
@@ -2247,10 +2226,10 @@ function computarOrcamento() {
       }).slice(0, 8);
       if (filtrados.length === 0) { recAutocompleteList.classList.remove('show'); return; }
       recAutocompleteList.innerHTML = filtrados.map(ex =>
-        `<div class="autocomplete-item" onclick="recAdicionarExame(${ex.id},'${ex.nome.replace(/'/g,"\'")}','${(ex.codigo||'').replace(/'/g,"\'")}')">
-          <span class="font-semibold">${ex.nome}</span>
-          ${ex.codigo ? `<span class="text-slate-400 text-xs ml-2">${ex.codigo}</span>` : ''}
-        </div>`
+        '<div class="autocomplete-item" onclick="recAdicionarExame(' + ex.id + ','' + ex.nome.replace(/'/g,"\'") + '','' + (ex.codigo||'').replace(/'/g,"\'") + '')">' +
+          '<span class="font-semibold">' + ex.nome + '</span>' +
+          (ex.codigo ? '<span class="text-slate-400 text-xs ml-2">' + ex.codigo + '</span>' : '') +
+        '</div>'
       ).join('');
       recAutocompleteList.classList.add('show');
     });
@@ -2261,7 +2240,7 @@ function computarOrcamento() {
 
   function recAdicionarExame(id, nome, codigo) {
     if (recExamesSelecionados.some(e => e.id === id)) { showToast('Exame já selecionado!', 'error'); return; }
-    recExamesSelecionados.push({ id, nome, codigo });
+    recExamesSelecionados.push({ id: id, nome: nome, codigo: codigo });
     recRenderExames();
     recSearchInput.value = '';
     recAutocompleteList.classList.remove('show');
@@ -2274,15 +2253,12 @@ function computarOrcamento() {
 
   function recRenderExames() {
     const container = document.getElementById('rec-exames-selecionados');
-    if (recExamesSelecionados.length === 0) {
-      container.innerHTML = '';
-      return;
-    }
+    if (recExamesSelecionados.length === 0) { container.innerHTML = ''; return; }
     container.innerHTML = recExamesSelecionados.map((ex, index) =>
-      `<div class="flex items-center justify-between bg-cda-light rounded-xl px-3 py-2">
-        <span class="text-sm font-semibold text-cda-text">${ex.nome}${ex.codigo ? ' <span class="text-slate-400 font-normal text-xs">'+ex.codigo+'</span>' : ''}</span>
-        <button onclick="recRemoverExame(${index})" class="btn-remover-exame" style="width:26px;height:26px;"><i class="fa-solid fa-xmark"></i></button>
-      </div>`
+      '<div class="flex items-center justify-between bg-cda-light rounded-xl px-3 py-2">' +
+        '<span class="text-sm font-semibold text-cda-text">' + ex.nome + (ex.codigo ? ' <span class="text-slate-400 font-normal text-xs">' + ex.codigo + '</span>' : '') + '</span>' +
+        '<button onclick="recRemoverExame(' + index + ')" class="btn-remover-exame" style="width:26px;height:26px;"><i class="fa-solid fa-xmark"></i></button>' +
+      '</div>'
     ).join('');
   }
 
@@ -2303,54 +2279,34 @@ function computarOrcamento() {
   }
 
   async function salvarRecoleta() {
-    const codigo  = document.getElementById('rec-codigo').value.trim().toUpperCase();
-    const nome    = document.getElementById('rec-nome').value.trim().toUpperCase();
-    const motivo  = document.getElementById('rec-motivo').value.trim();
-    const obs     = document.getElementById('rec-obs').value.trim();
-    const errorEl   = document.getElementById('rec-error');
+    const codigo = document.getElementById('rec-codigo').value.trim().toUpperCase();
+    const nome = document.getElementById('rec-nome').value.trim().toUpperCase();
+    const motivo = document.getElementById('rec-motivo').value.trim();
+    const obs = document.getElementById('rec-obs').value.trim();
+    const errorEl = document.getElementById('rec-error');
     const successEl = document.getElementById('rec-success');
     const salvandoEl = document.getElementById('rec-salvando');
 
-    // Validações obrigatórias
-    if (!codigo) {
-      errorEl.innerText = 'O campo Código é obrigatório.'; errorEl.style.display = 'block';
-      setTimeout(() => errorEl.style.display = 'none', 3000); return;
-    }
-    if (!nome) {
-      errorEl.innerText = 'O campo Nome é obrigatório.'; errorEl.style.display = 'block';
-      setTimeout(() => errorEl.style.display = 'none', 3000); return;
-    }
-    if (recExamesSelecionados.length === 0) {
-      errorEl.innerText = 'Selecione pelo menos um exame.'; errorEl.style.display = 'block';
-      setTimeout(() => errorEl.style.display = 'none', 3000); return;
-    }
-    if (!recTipo) {
-      errorEl.innerText = 'Selecione o tipo (Interno ou Externo).'; errorEl.style.display = 'block';
-      setTimeout(() => errorEl.style.display = 'none', 3000); return;
-    }
-    if (recTipo === 'externo' && !recLabExterno) {
-      errorEl.innerText = 'Selecione o laboratório externo.'; errorEl.style.display = 'block';
-      setTimeout(() => errorEl.style.display = 'none', 3000); return;
-    }
-    if (!motivo) {
-      errorEl.innerText = 'O campo Motivo da recoleta é obrigatório.'; errorEl.style.display = 'block';
-      setTimeout(() => errorEl.style.display = 'none', 3000); return;
-    }
+    if (!codigo) { errorEl.innerText = 'O campo Código é obrigatório.'; errorEl.style.display = 'block'; setTimeout(() => errorEl.style.display = 'none', 3000); return; }
+    if (!nome) { errorEl.innerText = 'O campo Nome é obrigatório.'; errorEl.style.display = 'block'; setTimeout(() => errorEl.style.display = 'none', 3000); return; }
+    if (recExamesSelecionados.length === 0) { errorEl.innerText = 'Selecione pelo menos um exame.'; errorEl.style.display = 'block'; setTimeout(() => errorEl.style.display = 'none', 3000); return; }
+    if (!recTipo) { errorEl.innerText = 'Selecione o tipo (Interno ou Externo).'; errorEl.style.display = 'block'; setTimeout(() => errorEl.style.display = 'none', 3000); return; }
+    if (recTipo === 'externo' && !recLabExterno) { errorEl.innerText = 'Selecione o laboratório externo.'; errorEl.style.display = 'block'; setTimeout(() => errorEl.style.display = 'none', 3000); return; }
+    if (!motivo) { errorEl.innerText = 'O campo Motivo da recoleta é obrigatório.'; errorEl.style.display = 'block'; setTimeout(() => errorEl.style.display = 'none', 3000); return; }
 
     errorEl.style.display = 'none';
     salvandoEl.style.display = 'block';
 
     const examesNomes = recExamesSelecionados.map(e => e.nome).join(' | ');
-    const tipoCompleto = recTipo === 'externo' && recLabExterno ? `Externo - ${recLabExterno}` : recTipo === 'interno' ? 'Interno' : recTipo;
+    const tipoCompleto = recTipo === 'externo' && recLabExterno ? 'Externo - ' + recLabExterno : recTipo === 'interno' ? 'Interno' : recTipo;
 
     const recoleta = {
-      id: Date.now(), codigo, nome,
+      id: Date.now(), codigo: codigo, nome: nome,
       exames: recExamesSelecionados.map(e => ({ id: e.id, nome: e.nome, codigo: e.codigo })),
-      tipo: tipoCompleto, motivo, observacoes: obs,
+      tipo: tipoCompleto, motivo: motivo, observacoes: obs,
       data: new Date().toLocaleDateString('pt-BR')
     };
 
-    // Salvar no Google Sheets via Apps Script
     let salvouPlanilha = false;
     try {
       const controller = new AbortController();
@@ -2362,39 +2318,30 @@ function computarOrcamento() {
         body: JSON.stringify({
           action: 'salvarRecoleta',
           token: CDA_TOKEN,
-          codigo, nome,
+          codigo: codigo, nome: nome,
           exames: examesNomes,
           tipo: tipoCompleto,
-          motivo,
+          motivo: motivo,
           observacoes: obs
         })
       });
       clearTimeout(timeout);
       const json = await resp.json();
       console.log('[CDA] Resposta do servidor (salvarRecoleta):', json);
-      if (!json.ok) {
-        console.error('[CDA] Erro do servidor:', json.erro || 'Erro desconhecido');
-      }
+      if (!json.ok) console.error('[CDA] Erro do servidor:', json.erro || 'Erro desconhecido');
       salvouPlanilha = json.ok === true;
       if (!salvouPlanilha) console.warn('[CDA] Planilha retornou erro:', json);
-    } catch(err) {
-      console.warn('[CDA] Erro ao salvar na planilha:', err);
-    }
+    } catch(err) { console.warn('[CDA] Erro ao salvar na planilha:', err); }
 
-    // Salvar no localStorage também (para exibição local imediata)
     let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
     recoletas.push(recoleta);
     localStorage.setItem('cda_recoletas', JSON.stringify(recoletas));
 
     salvandoEl.style.display = 'none';
-    if (salvouPlanilha) {
-      successEl.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Recoleta cadastrada e salva na planilha!';
-    } else {
-      successEl.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Recoleta cadastrada! (salva localmente — verifique a conexão)';
-    }
+    if (salvouPlanilha) { successEl.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Recoleta cadastrada e salva na planilha!'; }
+    else { successEl.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Recoleta cadastrada! (salva localmente — verifique a conexão)'; }
     successEl.style.display = 'block';
 
-    // Limpar formulário
     document.getElementById('rec-codigo').value = '';
     document.getElementById('rec-nome').value = '';
     document.getElementById('rec-motivo').value = '';
@@ -2415,7 +2362,6 @@ function computarOrcamento() {
   async function carregarRecoletas() {
     const container = document.getElementById('rec-lista');
     container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Carregando do servidor...</p>';
-
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
@@ -2423,21 +2369,13 @@ function computarOrcamento() {
       const resp = await fetch(url, { signal: controller.signal, redirect: 'follow' });
       clearTimeout(timeout);
       const json = await resp.json();
-
       if (json.ok && Array.isArray(json.recoletas)) {
-        if (json.recoletas.length === 0) {
-          container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhuma recoleta cadastrada no servidor.</p>';
-          return;
-        }
-        // Salva no localStorage como cache
+        if (json.recoletas.length === 0) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhuma recoleta cadastrada no servidor.</p>'; return; }
         localStorage.setItem('cda_recoletas', JSON.stringify(json.recoletas));
         container.innerHTML = json.recoletas.map((r, index) => recCardHTML(r, index)).join('');
-      } else {
-        throw new Error(json.erro || 'Erro ao carregar recoletas');
-      }
+      } else { throw new Error(json.erro || 'Erro ao carregar recoletas'); }
     } catch(err) {
       console.error('[CDA] Erro ao carregar recoletas do servidor:', err);
-      // Fallback: tenta carregar do localStorage
       const recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
       if (recoletas.length === 0) {
         container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Não foi possível carregar do servidor. Nenhuma recoleta em cache.</p>';
@@ -2454,36 +2392,33 @@ function computarOrcamento() {
     const tipoBadge = isExterno
       ? '<span class="recoleta-badge externo"><i class="fa-solid fa-truck-medical"></i> Externo</span>'
       : '<span class="recoleta-badge interno"><i class="fa-solid fa-house-medical"></i> Interno</span>';
-    const labInfo = isExterno && r.labExterno ? `<div class="recoleta-externo-lab"><i class="fa-solid fa-building mr-1"></i> ${r.labExterno}</div>` :
-                    isExterno && r.tipo && r.tipo.includes(' - ') ? `<div class="recoleta-externo-lab"><i class="fa-solid fa-building mr-1"></i> ${r.tipo.split(' - ')[1]}</div>` : '';
-    const motivoInfo = r.motivo ? `<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ${r.motivo}</div>` : '';
-    const obsInfo = r.observacoes ? `<div class="recoleta-obs"><i class="fa-solid fa-note-sticky mr-1"></i> ${r.observacoes}</div>` : '';
-    const deleteBtn = typeof index === 'number' ? `<button class="btn-remover-exame" onclick="excluirRecoleta(${index})" title="Excluir" style="width:32px;height:32px;"><i class="fa-solid fa-trash"></i></button>` : '';
-    return `<div class="recoleta-card">
-      <div class="recoleta-header">
-        <div>
-          <div class="recoleta-codigo">CÓDIGO: ${r.codigo}</div>
-          <div class="recoleta-nome">${r.nome}</div>
-        </div>
-        <div>${tipoBadge}</div>
-      </div>
-      ${labInfo}
-      <div class="recoleta-exames"><i class="fa-solid fa-vial mr-1 text-cda-primary"></i> ${examesNomes}</div>
-      ${motivoInfo}${obsInfo}
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
-        <span class="text-xs text-slate-400">Cadastrado em: ${r.data || ''}</span>
-        ${deleteBtn}
-      </div>
-    </div>`;
+    const labInfo = isExterno && r.labExterno ? '<div class="recoleta-externo-lab"><i class="fa-solid fa-building mr-1"></i> ' + r.labExterno + '</div>' :
+                    isExterno && r.tipo && r.tipo.includes(' - ') ? '<div class="recoleta-externo-lab"><i class="fa-solid fa-building mr-1"></i> ' + r.tipo.split(' - ')[1] + '</div>' : '';
+    const motivoInfo = r.motivo ? '<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ' + r.motivo + '</div>' : '';
+    const obsInfo = r.observacoes ? '<div class="recoleta-obs"><i class="fa-solid fa-note-sticky mr-1"></i> ' + r.observacoes + '</div>' : '';
+    const deleteBtn = typeof index === 'number' ? '<button class="btn-remover-exame" onclick="excluirRecoleta(' + index + ')" title="Excluir" style="width:32px;height:32px;"><i class="fa-solid fa-trash"></i></button>' : '';
+    return '<div class="recoleta-card">' +
+      '<div class="recoleta-header">' +
+        '<div>' +
+          '<div class="recoleta-codigo">CÓDIGO: ' + r.codigo + '</div>' +
+          '<div class="recoleta-nome">' + r.nome + '</div>' +
+        '</div>' +
+        '<div>' + tipoBadge + '</div>' +
+      '</div>' +
+      labInfo +
+      '<div class="recoleta-exames"><i class="fa-solid fa-vial mr-1 text-cda-primary"></i> ' + examesNomes + '</div>' +
+      motivoInfo + obsInfo +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">' +
+        '<span class="text-xs text-slate-400">Cadastrado em: ' + (r.data || '') + '</span>' +
+        deleteBtn +
+      '</div>' +
+    '</div>';
   }
 
   async function excluirRecoleta(index) {
     if (!confirm('Tem certeza que deseja excluir esta recoleta?')) return;
-
-    // Primeiro tenta excluir do servidor
     let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
     const rec = recoletas[index];
-
     if (rec && rec.codigo) {
       try {
         const controller = new AbortController();
@@ -2492,40 +2427,25 @@ function computarOrcamento() {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain' },
           redirect: 'follow',
-          body: JSON.stringify({
-            action: 'excluirRecoleta',
-            token: CDA_TOKEN,
-            codigo: rec.codigo,
-            nome: rec.nome || ''
-          })
+          body: JSON.stringify({ action: 'excluirRecoleta', token: CDA_TOKEN, codigo: rec.codigo, nome: rec.nome || '' })
         });
         clearTimeout(timeout);
         const json = await resp.json();
-        if (json.ok) {
-          console.log('[CDA] Recoleta excluída do servidor:', rec.codigo);
-        } else {
-          console.warn('[CDA] Servidor retornou erro ao excluir:', json.erro);
-        }
-      } catch(err) {
-        console.warn('[CDA] Falha ao excluir do servidor:', err);
-      }
+        if (json.ok) { console.log('[CDA] Recoleta excluída do servidor:', rec.codigo); }
+        else { console.warn('[CDA] Servidor retornou erro ao excluir:', json.erro); }
+      } catch(err) { console.warn('[CDA] Falha ao excluir do servidor:', err); }
     }
-
-    // Sempre exclui do localStorage
     recoletas.splice(index, 1);
     localStorage.setItem('cda_recoletas', JSON.stringify(recoletas));
     carregarRecoletas();
     showToast('Recoleta excluída.');
   }
 
-  // --- Consultar Registros ---
   async function recFiltrar() {
-    const filtroCodigo = (document.getElementById('rec-filtro-codigo')?.value || '').trim().toUpperCase();
-    const filtroNome   = (document.getElementById('rec-filtro-nome')?.value   || '').trim().toUpperCase();
-    const container    = document.getElementById('rec-consulta-lista');
-
+    const filtroCodigo = (document.getElementById('rec-filtro-codigo') ? document.getElementById('rec-filtro-codigo').value : '').trim().toUpperCase();
+    const filtroNome = (document.getElementById('rec-filtro-nome') ? document.getElementById('rec-filtro-nome').value : '').trim().toUpperCase();
+    const container = document.getElementById('rec-consulta-lista');
     container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Consultando servidor...</p>';
-
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
@@ -2536,44 +2456,29 @@ function computarOrcamento() {
       const resp = await fetch(url, { signal: controller.signal, redirect: 'follow' });
       clearTimeout(timeout);
       const json = await resp.json();
-
       if (json.ok && Array.isArray(json.recoletas)) {
         const resultado = json.recoletas;
-
         if (resultado.length === 0) {
           container.innerHTML = '<div class="flex flex-col items-center py-6 text-center"><i class="fa-solid fa-circle-xmark text-slate-300 text-3xl mb-2"></i><p class="text-sm text-slate-500">Nenhum registro encontrado no servidor.</p></div>';
-        } else {
-          container.innerHTML = resultado.map((r) => recCardHTML(r, null)).join('');
-        }
+        } else { container.innerHTML = resultado.map((r) => recCardHTML(r, null)).join(''); }
         console.log('[CDA] Consulta de recoletas:', resultado.length, 'resultados');
-      } else {
-        throw new Error(json.erro || 'Erro na consulta');
-      }
+      } else { throw new Error(json.erro || 'Erro na consulta'); }
     } catch(err) {
       console.warn('[CDA] Falha na consulta do servidor, usando localStorage:', err);
-      // Fallback para localStorage
       const recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
-
       if (!filtroCodigo && !filtroNome) {
-        if (recoletas.length === 0) {
-          container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhum registro cadastrado. (offline)</p>';
-        } else {
-          container.innerHTML = recoletas.map((r, i) => recCardHTML(r, null)).join('');
-        }
+        if (recoletas.length === 0) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhum registro cadastrado. (offline)</p>'; }
+        else { container.innerHTML = recoletas.map((r, i) => recCardHTML(r, null)).join(''); }
         return;
       }
-
       const resultado = recoletas.filter(r => {
         const matchCodigo = filtroCodigo ? (r.codigo || '').toUpperCase().includes(filtroCodigo) : true;
-        const matchNome   = filtroNome   ? (r.nome   || '').toUpperCase().includes(filtroNome)   : true;
+        const matchNome = filtroNome ? (r.nome || '').toUpperCase().includes(filtroNome) : true;
         return matchCodigo && matchNome;
       });
-
       if (resultado.length === 0) {
         container.innerHTML = '<div class="flex flex-col items-center py-6 text-center"><i class="fa-solid fa-circle-xmark text-slate-300 text-3xl mb-2"></i><p class="text-sm text-slate-500">Nenhum registro encontrado. (offline)</p></div>';
-      } else {
-        container.innerHTML = resultado.map((r) => recCardHTML(r, null)).join('');
-      }
+      } else { container.innerHTML = resultado.map((r) => recCardHTML(r, null)).join(''); }
     }
   }
 
@@ -2586,7 +2491,6 @@ function computarOrcamento() {
     container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Use os filtros acima ou clique em Buscar para carregar todos os registros.</p>';
   }
 
-    // ==================== SALVAR ORCAMENTO NA PLANILHA ====================
   async function salvarOrcamentoNaPlanilha(origem) {
     const paciente = document.getElementById('orc-paciente') ? document.getElementById('orc-paciente').value.trim().toUpperCase() : '';
     if (!paciente || orcSelecionados.length === 0) return false;
@@ -2646,26 +2550,11 @@ function computarOrcamento() {
     const errorEl = document.getElementById('config-error');
     const successEl = document.getElementById('config-success');
     if (!login || !senha || !senhaConfirm) {
-      errorEl.innerText = 'PREENCHA TODOS OS CAMPOS';
-      errorEl.style.display = 'block';
-      successEl.style.display = 'none';
-      setTimeout(() => errorEl.style.display = 'none', 3000);
-      return;
+      errorEl.innerText = 'PREENCHA TODOS OS CAMPOS'; errorEl.style.display = 'block'; successEl.style.display = 'none';
+      setTimeout(() => errorEl.style.display = 'none', 3000); return;
     }
-    if (senha !== senhaConfirm) {
-      errorEl.innerText = 'AS SENHAS NÃO CONFEREM';
-      errorEl.style.display = 'block';
-      successEl.style.display = 'none';
-      setTimeout(() => errorEl.style.display = 'none', 3000);
-      return;
-    }
-    if (senha.length < 4) {
-      errorEl.innerText = 'A SENHA DEVE TER NO MÍNIMO 4 CARACTERES';
-      errorEl.style.display = 'block';
-      successEl.style.display = 'none';
-      setTimeout(() => errorEl.style.display = 'none', 3000);
-      return;
-    }
+    if (senha !== senhaConfirm) { errorEl.innerText = 'AS SENHAS NÃO CONFEREM'; errorEl.style.display = 'block'; successEl.style.display = 'none'; setTimeout(() => errorEl.style.display = 'none', 3000); return; }
+    if (senha.length < 4) { errorEl.innerText = 'A SENHA DEVE TER NO MÍNIMO 4 CARACTERES'; errorEl.style.display = 'block'; successEl.style.display = 'none'; setTimeout(() => errorEl.style.display = 'none', 3000); return; }
     errorEl.style.display = 'none';
     try {
       const btn = document.querySelector('button[onclick="cadastrarUsuario()"]');
@@ -2678,8 +2567,7 @@ function computarOrcamento() {
         body: JSON.stringify({ action: 'cadastrarUsuario', token: CDA_TOKEN, login: login, senha: senha })
       });
       const json = await resp.json();
-      btn.innerHTML = originalText;
-      btn.disabled = false;
+      btn.innerHTML = originalText; btn.disabled = false;
       if (json.ok) {
         successEl.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> USUÁRIO CADASTRADO COM SUCESSO!';
         successEl.style.display = 'block';
@@ -2688,18 +2576,9 @@ function computarOrcamento() {
         document.getElementById('config-senha-confirm').value = '';
         carregarUsuarios();
         setTimeout(() => successEl.style.display = 'none', 3000);
-      } else if (json.existe) {
-        errorEl.innerText = 'ESTE LOGIN JÁ ESTÁ CADASTRADO';
-        errorEl.style.display = 'block';
-        setTimeout(() => errorEl.style.display = 'none', 3000);
-      } else {
-        throw new Error(json.erro || 'Erro ao cadastrar');
-      }
-    } catch(err) {
-      errorEl.innerText = 'ERRO AO CADASTRAR. TENTE NOVAMENTE.';
-      errorEl.style.display = 'block';
-      setTimeout(() => errorEl.style.display = 'none', 3000);
-    }
+      } else if (json.existe) { errorEl.innerText = 'ESTE LOGIN JÁ ESTÁ CADASTRADO'; errorEl.style.display = 'block'; setTimeout(() => errorEl.style.display = 'none', 3000); }
+      else { throw new Error(json.erro || 'Erro ao cadastrar'); }
+    } catch(err) { errorEl.innerText = 'ERRO AO CADASTRAR. TENTE NOVAMENTE.'; errorEl.style.display = 'block'; setTimeout(() => errorEl.style.display = 'none', 3000); }
   }
 
   async function carregarUsuarios() {
@@ -2713,10 +2592,7 @@ function computarOrcamento() {
       clearTimeout(timeout);
       const json = await resp.json();
       if (json.ok && Array.isArray(json.usuarios)) {
-        if (json.usuarios.length === 0) {
-          container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">NENHUM USUÁRIO CADASTRADO</p>';
-          return;
-        }
+        if (json.usuarios.length === 0) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">NENHUM USUÁRIO CADASTRADO</p>'; return; }
         container.innerHTML = json.usuarios.map((u, idx) => {
           return '<div class="exame-selecionado-item" style="padding: 12px 16px;">' +
             '<div class="exame-info">' +
@@ -2730,12 +2606,8 @@ function computarOrcamento() {
             '</div>' +
           '</div>';
         }).join('');
-      } else {
-        container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">ERRO AO CARREGAR USUÁRIOS</p>';
-      }
-    } catch(err) {
-      container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">ERRO AO CARREGAR. TENTE NOVAMENTE.</p>';
-    }
+      } else { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">ERRO AO CARREGAR USUÁRIOS</p>'; }
+    } catch(err) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">ERRO AO CARREGAR. TENTE NOVAMENTE.</p>'; }
   }
 
   async function excluirUsuario(index, login) {
@@ -2747,15 +2619,9 @@ function computarOrcamento() {
         body: JSON.stringify({ action: 'excluirUsuario', token: CDA_TOKEN, login: login })
       });
       const json = await resp.json();
-      if (json.ok) {
-        showToast('USUÁRIO EXCLUÍDO COM SUCESSO!');
-        carregarUsuarios();
-      } else {
-        throw new Error(json.erro || 'Erro ao excluir');
-      }
-    } catch(err) {
-      showToast('ERRO AO EXCLUIR USUÁRIO', 'error');
-    }
+      if (json.ok) { showToast('USUÁRIO EXCLUÍDO COM SUCESSO!'); carregarUsuarios(); }
+      else { throw new Error(json.erro || 'Erro ao excluir'); }
+    } catch(err) { showToast('ERRO AO EXCLUIR USUÁRIO', 'error'); }
   }
 </script>
 
