@@ -1818,7 +1818,7 @@
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      showToast('O arquivo é muito grande. Máximo 5MB.', 'error');
+      showToast('O arquivo e muito grande. Maximo 5MB.', 'error');
       input.value = '';
       return;
     }
@@ -1835,30 +1835,49 @@
     statusDiv.classList.remove('hidden');
     statusDiv.style.color = '#0F4C5C';
     statusDiv.textContent = 'Lendo arquivo...';
-    progressBar.style.width = '50%';
+    progressBar.style.width = '30%';
     try {
       const base64 = await fileToBase64(file);
-      agenPDFAnexado = {
-        file: file,
-        base64: base64,
-        nome: file.name,
-        tamanho: file.size
-      };
-      progressBar.style.width = '100%';
-      statusDiv.textContent = 'PDF pronto para envio!';
-      statusDiv.style.color = '#0F4C5C';
-      document.getElementById('agen-pdf-anexado-info').classList.remove('hidden');
-      document.getElementById('pdf-anexado-nome').textContent = file.name;
-      document.getElementById('pdf-anexado-status').textContent = 'Será enviado junto com o agendamento ✓';
-      showToast('PDF anexado! Será enviado ao salvar o agendamento.');
+      progressBar.style.width = '50%';
+      statusDiv.textContent = 'Enviando para o Google Drive...';
+      // Upload to Drive FIRST, before saving the appointment
+      let base64Data = base64;
+      if (base64Data.indexOf(',') !== -1) {
+        base64Data = base64Data.split(',')[1];
+      }
+      const uploadResp = await fetch(APPS_SCRIPT_AGENDA_URL + '?action=uploadPDF&token=' + encodeURIComponent(CDA_TOKEN) + '&filename=' + encodeURIComponent(file.name) + '&mimeType=' + encodeURIComponent(file.type), {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ base64: base64Data })
+      });
+      const uploadJson = await uploadResp.json();
+      if (uploadJson.ok) {
+        agenPDFAnexado = {
+          file: file,
+          base64: base64,
+          nome: file.name,
+          tamanho: file.size,
+          driveId: uploadJson.fileId,
+          driveUrl: uploadJson.webViewLink || uploadJson.fileUrl
+        };
+        progressBar.style.width = '100%';
+        statusDiv.textContent = 'PDF salvo no Google Drive!';
+        statusDiv.style.color = '#0F4C5C';
+        document.getElementById('agen-pdf-anexado-info').classList.remove('hidden');
+        document.getElementById('pdf-anexado-nome').textContent = file.name;
+        document.getElementById('pdf-anexado-status').textContent = 'Salvo no Drive ✓';
+        showToast('PDF anexado com sucesso!');
+      } else {
+        throw new Error(uploadJson.erro || 'Falha no upload');
+      }
       agenAtualizarResumo();
     } catch(err) {
-      console.error('[CDA] Erro ao ler PDF:', err);
+      console.error('[CDA] Erro ao enviar PDF:', err);
       progressBar.style.width = '100%';
       progressBar.style.background = '#ef4444';
-      statusDiv.textContent = 'Erro ao ler: ' + err.message;
+      statusDiv.textContent = 'Erro: ' + err.message;
       statusDiv.style.color = '#ef4444';
-      showToast('Erro ao ler PDF: ' + err.message, 'error');
+      showToast('Erro ao enviar PDF: ' + err.message, 'error');
       agenPDFAnexado = null;
     }
   }
@@ -2282,6 +2301,9 @@ function agenRemoverPDF() {
     let pdfInfo = '';
     if (temPDF && agenPDFAnexado) {
       pdfInfo = '\n\nPDF Anexado: ' + agenPDFAnexado.nome;
+      if (agenPDFAnexado.driveUrl) {
+        pdfInfo += '\nLink: ' + agenPDFAnexado.driveUrl;
+      }
     }
 
     try {
@@ -2297,10 +2319,12 @@ function agenRemoverPDF() {
           action: 'criar', token: CDA_TOKEN, data: data, horario: horario, nome: nome, telefone: telefone, pagamento: pagamento,
           startTime: startDateTime,
           endTime: endDateTime,
-          descricao: 'Paciente: ' + nome + '\nTelefone: ' + telefone + '\nForma de pagamento: ' + pagamento + '\nOrigem: Aplicativo CDA' + descExames + pdfInfo,
-          pdfBase64: agenPDFAnexado ? agenPDFAnexado.base64 : null,
-          pdfNome: agenPDFAnexado ? agenPDFAnexado.nome : null,
-          pdfMimeType: agenPDFAnexado && agenPDFAnexado.file ? agenPDFAnexado.file.type : null
+          descricao: 'Paciente: ' + nome + '
+Telefone: ' + telefone + '
+Forma de pagamento: ' + pagamento + '
+Origem: Aplicativo CDA' + descExames + pdfInfo,
+          pdfDriveId: agenPDFAnexado ? agenPDFAnexado.driveId : '',
+          pdfDriveUrl: agenPDFAnexado ? agenPDFAnexado.driveUrl : ''
         })
       });
       const json = await resp.json();
