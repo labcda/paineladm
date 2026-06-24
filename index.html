@@ -1844,10 +1844,16 @@
       if (base64Data.indexOf(',') !== -1) {
         base64Data = base64Data.split(',')[1];
       }
-      const uploadResp = await fetch(APPS_SCRIPT_AGENDA_URL + '?action=uploadPDF&token=' + encodeURIComponent(CDA_TOKEN) + '&filename=' + encodeURIComponent(file.name) + '&mimeType=' + encodeURIComponent(file.type), {
+      const uploadResp = await fetch(APPS_SCRIPT_AGENDA_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ base64: base64Data })
+        body: JSON.stringify({
+          action: 'uploadPDF',
+          token: CDA_TOKEN,
+          base64: base64Data,
+          filename: file.name,
+          mimeType: file.type
+        })
       });
       const uploadJson = await uploadResp.json();
       if (uploadJson.ok) {
@@ -2299,10 +2305,7 @@ function agenRemoverPDF() {
 
     let pdfInfo = '';
     if (temPDF && agenPDFAnexado) {
-      pdfInfo = '\n\nPDF Anexado: ' + agenPDFAnexado.nome;
-      if (agenPDFAnexado.driveUrl) {
-        pdfInfo += '\nLink: ' + agenPDFAnexado.driveUrl;
-      }
+      pdfInfo = '\n\nPDF Anexado: ' + agenPDFAnexado.nome + '\nLink: ' + (agenPDFAnexado.driveUrl || 'Não disponível');
     }
 
     try {
