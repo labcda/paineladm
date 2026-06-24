@@ -1840,7 +1840,6 @@
       const base64 = await fileToBase64(file);
       progressBar.style.width = '50%';
       statusDiv.textContent = 'Enviando para o Google Drive...';
-      // Upload to Drive FIRST, before saving the appointment
       let base64Data = base64;
       if (base64Data.indexOf(',') !== -1) {
         base64Data = base64Data.split(',')[1];
@@ -2319,15 +2318,11 @@ function agenRemoverPDF() {
           action: 'criar', token: CDA_TOKEN, data: data, horario: horario, nome: nome, telefone: telefone, pagamento: pagamento,
           startTime: startDateTime,
           endTime: endDateTime,
-          descricao: 'Paciente: ' + nome + '
-Telefone: ' + telefone + '
-Forma de pagamento: ' + pagamento + '
-Origem: Aplicativo CDA' + descExames + pdfInfo,
+          descricao: 'Paciente: ' + nome + '\nTelefone: ' + telefone + '\nForma de pagamento: ' + pagamento + '\nOrigem: Aplicativo CDA' + descExames + pdfInfo,
           pdfDriveId: agenPDFAnexado ? agenPDFAnexado.driveId : '',
           pdfDriveUrl: agenPDFAnexado ? agenPDFAnexado.driveUrl : ''
         })
-      });
-      const json = await resp.json();
+      });const json = await resp.json();
       if (json.ocupado) {
         showToast('O horário ' + horario + ' acabou de ser reservado. Por favor, escolha outro.', 'error', 5000);
         btnSalvar.disabled = false;
@@ -2346,7 +2341,8 @@ Origem: Aplicativo CDA' + descExames + pdfInfo,
       agenFallbackWhatsApp(nome, telefone, data, horario, descExames + pdfInfo, pagamento);
     }
   }
-function agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento) {
+
+  function agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento) {
     const btnSalvar = document.getElementById('agen-btn-salvar');
     if (btnSalvar) {
       btnSalvar.disabled = false;
