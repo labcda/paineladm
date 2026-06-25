@@ -567,9 +567,163 @@
     .modal-rec-btn.success { background: linear-gradient(135deg,#059669,#10b981); color: white; }
     .modal-rec-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 
+
+    /* ===== ESTILOS DO MÓDULO BOLETOS ===== */
+    .bol-status-badge {
+      display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px;
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .bol-status-pendente { background: #fef3c7; color: #92400e; }
+    .bol-status-recebido { background: #dbeafe; color: #1e40af; }
+    .bol-status-conferido { background: #d1fae5; color: #065f46; }
+    .bol-status-finalizado { background: #e8f8f8; color: #0F4C5C; }
+
+    .bol-card {
+      background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.04);
+      transition: all 0.2s ease;
+    }
+    .bol-card:hover { transform: translateX(4px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .bol-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .bol-card-codigo { font-size: 0.7rem; color: #8c939e; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .bol-card-fornecedor { font-size: 1rem; font-weight: 700; color: #101620; }
+    .bol-card-valor { font-size: 1.1rem; font-weight: 800; color: #0F4C5C; }
+    .bol-card-info { font-size: 0.75rem; color: #64748b; line-height: 1.5; margin-top: 6px; }
+    .bol-card-dividido { font-size: 0.75rem; color: #8c939e; margin-top: 4px; font-style: italic; }
+    .bol-card-actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+
+    .bol-aba-btn {
+      flex:1; padding:10px; border:none; border-radius:12px; font-size:13px; font-weight:700;
+      cursor:pointer; transition:all 0.2s;
+    }
+    .bol-aba-btn.ativo {
+      background:linear-gradient(135deg,#0F4C5C,#49BCBE); color:white;
+      box-shadow:2px 2px 8px rgba(15,76,92,0.3);
+    }
+    .bol-aba-btn:not(.ativo) { background:transparent; color:#64748b; }
+
+    .bol-form-field {
+      background: white; border: 1px solid #e2e8f0; border-radius: 12px;
+      padding: 12px 14px; font-size: 0.9rem; color: #101620; width: 100%;
+      transition: all 0.2s; outline: none; font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .bol-form-field:focus { border-color: #49BCBE; box-shadow: 0 0 0 3px rgba(73,188,190,0.15); }
+    .bol-form-field::placeholder { color: #a0a5a8; }
+    .bol-form-field:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
+
+    .bol-checkbox-label {
+      display: flex; align-items: center; gap: 8px; padding: 10px 16px;
+      border-radius: 12px; border: 2px solid #e2e8f0; background: #f8fafc;
+      cursor: pointer; transition: all 0.2s; font-size: 0.85rem; font-weight: 600; color: #475569;
+    }
+    .bol-checkbox-label:hover { border-color: #49BCBE; background: #E8F8F8; }
+    .bol-checkbox-label.ativo {
+      background: linear-gradient(135deg, #0F4C5C 0%, #37A7AA 60%, #49BCBE 100%);
+      color: white; border-color: #0F4C5C;
+    }
+    .bol-checkbox-label input[type="checkbox"] { accent-color: #0F4C5C; }
+    .bol-checkbox-label.ativo input[type="checkbox"] { accent-color: white; }
+
+    .bol-upload-area {
+      border: 2px dashed #cbd5e1; border-radius: 16px; padding: 24px;
+      text-align: center; transition: all 0.3s ease; cursor: pointer; background: #f8fafc;
+    }
+    .bol-upload-area:hover { border-color: #49BCBE; background: #E8F8F8; }
+    .bol-upload-area.dragover { border-color: #0F4C5C; background: #E8F8F8; transform: scale(1.02); }
+    .bol-upload-area i { font-size: 2.5rem; color: #94a3b8; margin-bottom: 8px; }
+    .bol-upload-area:hover i { color: #0F4C5C; }
+    .bol-upload-area h4 { font-size: 0.9rem; font-weight: 700; color: #475569; margin-bottom: 4px; }
+    .bol-upload-area p { font-size: 0.75rem; color: #94a3b8; }
+    .bol-upload-area .bol-file-name { font-size: 0.8rem; color: #0F4C5C; font-weight: 600; margin-top: 8px; word-break: break-all; }
+    .bol-upload-area .bol-remove-btn { margin-top: 8px; font-size: 0.7rem; color: #ef4444; cursor: pointer; background: none; border: none; font-weight: 600; }
+    .bol-upload-area .bol-remove-btn:hover { text-decoration: underline; }
+    .bol-upload-area .bol-preview-icon { font-size: 3rem; color: #ef4444; margin-bottom: 8px; }
+    .bol-upload-progress { width: 100%; height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 12px; overflow: hidden; }
+    .bol-upload-progress-bar { height: 100%; background: linear-gradient(90deg, #0F4C5C, #49BCBE); border-radius: 2px; transition: width 0.3s ease; width: 0%; }
+    .bol-upload-status { font-size: 0.75rem; color: #0F4C5C; margin-top: 6px; font-weight: 600; }
+
+    .bol-anexado-card {
+      background: linear-gradient(135deg, #E8F8F8 0%, #f0fdf4 100%);
+      border: 1px solid #49BCBE; border-radius: 14px; padding: 14px 16px;
+      display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
+    }
+    .bol-anexado-card i { font-size: 1.5rem; color: #ef4444; }
+    .bol-anexado-info { flex: 1; min-width: 0; }
+    .bol-anexado-info .titulo { font-weight: 700; color: #101620; font-size: 0.85rem; }
+    .bol-anexado-info .subtitulo { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
+    .bol-anexado-remove { background: #fee2e2; color: #ef4444; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 0.7rem; flex-shrink: 0; }
+    .bol-anexado-remove:hover { background: #ef4444; color: white; }
+
+    .bol-etapa-indicator {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+    }
+    .bol-etapa-step {
+      display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 700;
+    }
+    .bol-etapa-step .bol-etapa-num {
+      width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 800;
+    }
+    .bol-etapa-step.completo .bol-etapa-num { background: #0F4C5C; color: white; }
+    .bol-etapa-step.atual .bol-etapa-num { background: linear-gradient(135deg,#0F4C5C,#49BCBE); color: white; }
+    .bol-etapa-step.pendente .bol-etapa-num { background: #e2e8f0; color: #94a3b8; }
+    .bol-etapa-step.completo { color: #0F4C5C; }
+    .bol-etapa-step.atual { color: #0F4C5C; }
+    .bol-etapa-step.pendente { color: #94a3b8; }
+    .bol-etapa-sep { color: #cbd5e1; font-size: 0.7rem; }
+
+    .bol-dividido-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .bol-dividido-btn {
+      padding: 8px 14px; border-radius: 10px; border: 2px solid #e2e8f0;
+      background: white; cursor: pointer; font-size: 0.8rem; font-weight: 600;
+      color: #475569; transition: all 0.2s;
+    }
+    .bol-dividido-btn:hover { border-color: #49BCBE; background: #E8F8F8; }
+    .bol-dividido-btn.ativo { background: #0F4C5C; color: white; border-color: #0F4C5C; }
+
+    .bol-filtro-chip { padding: 7px 16px; border-radius: 20px; border: 2px solid #e2e8f0; background: #f8fafc; color: #64748b; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+    .bol-filtro-chip:hover { border-color: #49BCBE; background: #E8F8F8; color: #0F4C5C; }
+    .bol-filtro-chip.ativo { background: linear-gradient(135deg,#0F4C5C,#49BCBE); color: white; border-color: #0F4C5C; }
+
+    .bol-responsavel-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: linear-gradient(135deg, #0F4C5C, #49BCBE);
+      color: white; padding: 3px 10px; border-radius: 12px;
+      font-size: 0.7rem; font-weight: 700;
+    }
+
+    .bol-espelho-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #E8F8F8; color: #0F4C5C; padding: 6px 12px;
+      border-radius: 10px; font-size: 0.78rem; font-weight: 700;
+      text-decoration: none; transition: all 0.2s; border: 1px solid #49BCBE;
+    }
+    .bol-espelho-link:hover { background: #0F4C5C; color: white; }
+
+    .bol-modal-overlay { position: fixed; inset: 0; z-index: 99990; background: rgba(15,76,92,0.7); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; padding: 16px; }
+    .bol-modal-overlay.ativo { display: flex; }
+    .bol-modal-box { background: #f8fafc; width: 100%; max-width: 600px; max-height: 90vh; border-radius: 24px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+    .bol-modal-header { background: linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%); padding: 20px 24px 16px; color: white; }
+    .bol-modal-header h3 { font-size: 1rem; font-weight: 800; }
+    .bol-modal-header .sub { font-size: 0.75rem; opacity: 0.85; margin-top: 4px; }
+    .bol-modal-body { flex: 1; overflow-y: auto; padding: 20px; }
+    .bol-modal-secao { background: white; border-radius: 16px; padding: 14px 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .bol-modal-secao h4 { font-size: 0.78rem; font-weight: 800; color: #0F4C5C; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+    .bol-modal-info-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 8px; }
+    .bol-modal-info-label { font-size: 0.75rem; color: #8c939e; font-weight: 600; flex-shrink: 0; }
+    .bol-modal-info-value { font-size: 0.8rem; color: #101620; font-weight: 700; text-align: right; }
+    .bol-modal-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border-radius: 14px; border: none; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .bol-modal-btn.primary { background: linear-gradient(135deg,#0F4C5C,#49BCBE); color: white; }
+    .bol-modal-btn.neutral { background: #f1f5f9; color: #64748b; }
+    .bol-modal-btn.success { background: linear-gradient(135deg,#059669,#10b981); color: white; }
+    .bol-modal-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+
+    .bol-valor-input { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.1rem; font-weight: 700; color: #0F4C5C; }
+
     @media (max-width: 1024px) { .home-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 768px) { .home-grid { grid-template-columns: 1fr; } body.app-loaded { padding: 1rem 0 0 1rem; } .site-wrap { grid-template-columns: 1fr; } .site-nav { display: none; } }
   </style>
+<base target="_blank">
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
@@ -647,6 +801,7 @@
       <li data-page="agendamento"><a href="#"><i class="fa-regular fa-calendar-check mr-2"></i> Agendamento</a></li>
       <li data-page="recoletas"><a href="#"><i class="fa-solid fa-vial mr-2"></i> Recoletas</a></li>
       <li data-page="relatorios"><a href="#"><i class="fa-solid fa-chart-line mr-2"></i> Relatórios</a></li>
+      <li data-page="boletos"><a href="#"><i class="fa-solid fa-file-invoice-dollar mr-2"></i> Boletos</a></li>
       <li data-page="configuracoes" id="nav-configuracoes"><a href="#" onclick="abrirConfiguracoes(event)"><i class="fa-solid fa-gear mr-2"></i> Configurações</a></li>
     </ul>
     <div class="note">
@@ -1152,6 +1307,211 @@
             </div>
         </div>
       </section>
+      
+      <!-- BOLETOS -->
+      <section id="page-boletos" class="page space-y-5">
+        <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
+            <div class="relative z-10">
+                <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
+                    <i class="fa-solid fa-file-invoice-dollar"></i> Boletos
+                </span>
+                <h2 class="text-2xl font-extrabold leading-tight mb-1">Controle de Boletos</h2>
+                <p class="text-sm text-white/80 leading-relaxed">Gerencie pedidos, recebimentos e conferência de boletos de fornecedores.</p>
+            </div>
+        </div>
+
+        <!-- Abas -->
+        <div style="display:flex;gap:8px;background:#EBECF0;border-radius:16px;padding:6px;">
+            <button id="bol-aba-novo" onclick="bolMostrarAba('novo')" class="bol-aba-btn ativo">
+                <i class="fa-solid fa-plus mr-2"></i>Novo Pedido
+            </button>
+            <button id="bol-aba-lista" onclick="bolMostrarAba('lista')" class="bol-aba-btn">
+                <i class="fa-solid fa-list mr-2"></i>Lista de Pedidos
+            </button>
+        </div>
+
+        <!-- PAINEL: NOVO PEDIDO (Parte 1) -->
+        <div id="bol-painel-novo">
+          <div class="neumorphic-card">
+            <div class="bol-etapa-indicator">
+                <div class="bol-etapa-step completo">
+                    <span class="bol-etapa-num"><i class="fa-solid fa-1"></i></span>
+                    <span>Pedido</span>
+                </div>
+                <span class="bol-etapa-sep"><i class="fa-solid fa-chevron-right"></i></span>
+                <div class="bol-etapa-step pendente">
+                    <span class="bol-etapa-num"><i class="fa-solid fa-2"></i></span>
+                    <span>Recebimento</span>
+                </div>
+                <span class="bol-etapa-sep"><i class="fa-solid fa-chevron-right"></i></span>
+                <div class="bol-etapa-step pendente">
+                    <span class="bol-etapa-num"><i class="fa-solid fa-3"></i></span>
+                    <span>Financeiro</span>
+                </div>
+            </div>
+
+            <h3 style="font-size: 1.1rem; font-weight: 700; color: #101620; margin-bottom: 20px;">
+                <i class="fa-solid fa-cart-plus mr-2" style="color: #0F4C5C;"></i> Novo Pedido de Compra
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-building mr-1"></i> Nome do Fornecedor <span style="color:#ef4444">*</span>
+                    </label>
+                    <input type="text" id="bol-fornecedor" placeholder="Nome do fornecedor..." class="bol-form-field">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                        <i class="fa-regular fa-calendar mr-1"></i> Data do Pedido
+                    </label>
+                    <input type="text" id="bol-data-pedido" class="bol-form-field" disabled>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-user mr-1"></i> Quem Fez o Pedido
+                    </label>
+                    <input type="text" id="bol-quem-pedido" class="bol-form-field" disabled>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-money-bill-wave mr-1"></i> Valor Total (R$) <span style="color:#ef4444">*</span>
+                    </label>
+                    <input type="text" id="bol-valor" placeholder="0,00" class="bol-form-field bol-valor-input" oninput="bolFormatarValor(this)">
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                    <i class="fa-solid fa-file-pdf mr-1"></i> Espelho do Pedido (PDF) <span style="color:#ef4444">*</span>
+                </label>
+                <div id="bol-drop-zone" class="bol-upload-area" onclick="document.getElementById('bol-file-input').click()">
+                    <input type="file" id="bol-file-input" accept=".pdf" class="hidden" onchange="bolHandlePDFSelect(this)">
+                    <div id="bol-upload-default">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <h4>Clique ou arraste o PDF do espelho aqui</h4>
+                        <p>Formato aceito: PDF (máx. 10MB)</p>
+                    </div>
+                    <div id="bol-upload-preview" class="hidden">
+                        <i class="fa-solid fa-file-pdf bol-preview-icon"></i>
+                        <div class="bol-file-name" id="bol-file-name"></div>
+                        <button class="bol-remove-btn" onclick="event.stopPropagation(); bolRemoverPDF()">
+                            <i class="fa-solid fa-trash-can mr-1"></i>Remover arquivo
+                        </button>
+                    </div>
+                    <div class="bol-upload-progress hidden" id="bol-upload-progress">
+                        <div class="bol-upload-progress-bar" id="bol-upload-progress-bar"></div>
+                    </div>
+                    <div class="bol-upload-status hidden" id="bol-upload-status"></div>
+                </div>
+                <div id="bol-pdf-anexado-info" class="hidden mt-3">
+                    <div class="bol-anexado-card">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <div class="bol-anexado-info">
+                            <div class="titulo" id="bol-pdf-anexado-nome">espelho.pdf</div>
+                            <div class="subtitulo" id="bol-pdf-anexado-status">Pronto para enviar ao Google Drive</div>
+                        </div>
+                        <button class="bol-anexado-remove" onclick="bolRemoverPDF()" title="Remover PDF">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                    <i class="fa-solid fa-divide mr-1"></i> Pagamento Dividido?
+                </label>
+                <div class="bol-dividido-group">
+                    <button type="button" class="bol-dividido-btn" id="bol-div-nao" onclick="bolSelecionarDividido('nao')">Não</button>
+                    <button type="button" class="bol-dividido-btn" id="bol-div-2" onclick="bolSelecionarDividido('2')">2x</button>
+                    <button type="button" class="bol-dividido-btn" id="bol-div-3" onclick="bolSelecionarDividido('3')">3x</button>
+                    <button type="button" class="bol-dividido-btn" id="bol-div-4" onclick="bolSelecionarDividido('4')">4x</button>
+                    <button type="button" class="bol-dividido-btn" id="bol-div-5" onclick="bolSelecionarDividido('5')">5x</button>
+                    <button type="button" class="bol-dividido-btn" id="bol-div-6" onclick="bolSelecionarDividido('6')">6x</button>
+                    <button type="button" class="bol-dividido-btn" id="bol-div-outro" onclick="bolSelecionarDividido('outro')">Outro</button>
+                </div>
+                <div id="bol-div-outro-input" class="hidden mt-2">
+                    <input type="number" id="bol-div-outro-valor" placeholder="Quantas parcelas?" class="bol-form-field" min="1" max="24" onchange="bolAtualizarParcelas()">
+                </div>
+            </div>
+
+            <div id="bol-parcelas-preview" class="hidden mb-4">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                    <i class="fa-solid fa-list-ol mr-1"></i> Parcelas
+                </label>
+                <div id="bol-parcelas-lista" class="space-y-2"></div>
+            </div>
+
+            <p style="font-size:11px;color:#94a3b8;margin-bottom:12px;"><span style="color:#ef4444">*</span> Campos obrigatórios</p>
+            <div id="bol-error" class="login-error-msg" style="margin-bottom: 12px; display: none;"></div>
+            <div id="bol-success" style="color: #0F4C5C; font-size: 0.85rem; margin-bottom: 12px; text-align: center; display: none; font-weight: 600;">
+                <i class="fa-solid fa-circle-check mr-1"></i> Pedido cadastrado com sucesso!
+            </div>
+            <div id="bol-salvando" style="color: #37A7AA; font-size: 0.85rem; margin-bottom: 12px; text-align: center; display: none; font-weight: 600;">
+                <i class="fa-solid fa-spinner fa-spin mr-1"></i> Salvando pedido...
+            </div>
+            <button class="neumorphic-btn primary neumorphic-btn-lg" onclick="bolSalvarPedido()" style="width: 100%;">
+                <i class="fa-solid fa-plus"></i> Cadastrar Pedido
+            </button>
+          </div>
+        </div>
+
+        <!-- PAINEL: LISTA DE PEDIDOS -->
+        <div id="bol-painel-lista" style="display:none;">
+          <div class="neumorphic-card">
+            <h3 style="font-size: 1.1rem; font-weight: 700; color: #101620; margin-bottom: 16px;">
+                <i class="fa-solid fa-list-check mr-2" style="color: #0F4C5C;"></i> Pedidos Cadastrados
+            </h3>
+
+            <!-- Filtros -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-building mr-1"></i> Fornecedor
+                    </label>
+                    <input type="text" id="bol-filtro-fornecedor" placeholder="Filtrar por fornecedor..." class="bol-form-field" oninput="bolFiltrarLista()">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-filter mr-1"></i> Status
+                    </label>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                        <button type="button" class="bol-filtro-chip ativo" id="bol-filtro-todos" onclick="bolFiltroStatus('todos')">Todos</button>
+                        <button type="button" class="bol-filtro-chip" id="bol-filtro-pendente" onclick="bolFiltroStatus('pendente')">Pedido Feito</button>
+                        <button type="button" class="bol-filtro-chip" id="bol-filtro-recebido" onclick="bolFiltroStatus('recebido')">Mercadoria Recebida</button>
+                        <button type="button" class="bol-filtro-chip" id="bol-filtro-conferido" onclick="bolFiltroStatus('conferido')">Boletos Conferidos</button>
+                        <button type="button" class="bol-filtro-chip" id="bol-filtro-finalizado" onclick="bolFiltroStatus('finalizado')">Finalizado</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                        <i class="fa-regular fa-calendar mr-1"></i> Mês/Ano
+                    </label>
+                    <input type="month" id="bol-filtro-mes" class="bol-form-field" onchange="bolFiltrarLista()">
+                </div>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-bottom:16px;">
+                <button onclick="bolFiltrarLista()" style="flex:1;padding:10px;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#0F4C5C,#49BCBE);color:white;box-shadow:2px 2px 8px rgba(15,76,92,0.2);">
+                    <i class="fa-solid fa-search mr-1"></i> Buscar
+                </button>
+                <button onclick="bolLimparFiltros()" style="padding:10px 16px;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;background:#f1f5f9;color:#64748b;">
+                    <i class="fa-solid fa-xmark mr-1"></i> Limpar
+                </button>
+            </div>
+
+            <div id="bol-lista-pedidos" class="space-y-3">
+                <p class="text-sm text-slate-500 text-center py-4">Carregando pedidos...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
       <section id="page-configuracoes" class="page space-y-5">
         <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
             <div class="relative z-10">
@@ -3653,6 +4013,617 @@ async function carregarUsuarios() {
       });
     }
   });
+
+
+
+  // ==================== MÓDULO BOLETOS ====================
+  const BOLETOS_FOLDER_ID = '1AT2pQJhV-5oM5xGoKFkUJdb_EJfcJbc7'; // Pasta do Google Drive para espelhos
+  let bolDadosAtuais = [];
+  let bolFiltroStatusAtual = 'todos';
+  let bolPDFSelecionado = null;
+  let bolDividido = 'nao';
+  let bolParcelas = 1;
+
+  // Inicializar campos automáticos ao abrir a aba
+  function bolInicializarForm() {
+    const hoje = new Date();
+    document.getElementById('bol-data-pedido').value = hoje.toLocaleDateString('pt-BR');
+    const user = getUsuarioLogado();
+    document.getElementById('bol-quem-pedido').value = user ? user.login : 'DESCONHECIDO';
+    bolLimparForm();
+  }
+
+  function bolLimparForm() {
+    document.getElementById('bol-fornecedor').value = '';
+    document.getElementById('bol-valor').value = '';
+    bolPDFSelecionado = null;
+    bolDividido = 'nao';
+    bolParcelas = 1;
+    bolSelecionarDividido('nao');
+    bolRemoverPDF();
+    document.getElementById('bol-error').style.display = 'none';
+    document.getElementById('bol-success').style.display = 'none';
+    document.getElementById('bol-parcelas-preview').classList.add('hidden');
+    document.getElementById('bol-div-outro-input').classList.add('hidden');
+    document.getElementById('bol-div-outro-valor').value = '';
+  }
+
+  function bolMostrarAba(aba) {
+    document.getElementById('bol-aba-novo').classList.toggle('ativo', aba === 'novo');
+    document.getElementById('bol-aba-lista').classList.toggle('ativo', aba === 'lista');
+    document.getElementById('bol-painel-novo').style.display = aba === 'novo' ? 'block' : 'none';
+    document.getElementById('bol-painel-lista').style.display = aba === 'lista' ? 'block' : 'none';
+    if (aba === 'novo') bolInicializarForm();
+    if (aba === 'lista') bolCarregarPedidos();
+  }
+
+  // Formatar valor em reais
+  function bolFormatarValor(input) {
+    let valor = input.value.replace(/\D/g, '');
+    valor = (parseInt(valor) / 100).toFixed(2);
+    if (isNaN(valor)) valor = '0.00';
+    input.value = 'R$ ' + valor.replace('.', ',');
+    bolAtualizarParcelas();
+  }
+
+  function bolParseValor(str) {
+    if (!str) return 0;
+    return parseFloat(str.replace('R$ ', '').replace('.', '').replace(',', '.')) || 0;
+  }
+
+  // Seleção de dividido
+  function bolSelecionarDividido(opcao) {
+    bolDividido = opcao;
+    document.querySelectorAll('.bol-dividido-btn').forEach(btn => btn.classList.remove('ativo'));
+    document.getElementById('bol-div-' + opcao).classList.add('ativo');
+
+    if (opcao === 'nao') {
+      bolParcelas = 1;
+      document.getElementById('bol-div-outro-input').classList.add('hidden');
+      document.getElementById('bol-parcelas-preview').classList.add('hidden');
+    } else if (opcao === 'outro') {
+      document.getElementById('bol-div-outro-input').classList.remove('hidden');
+      document.getElementById('bol-parcelas-preview').classList.add('hidden');
+    } else {
+      bolParcelas = parseInt(opcao);
+      document.getElementById('bol-div-outro-input').classList.add('hidden');
+      bolAtualizarParcelas();
+    }
+  }
+
+  function bolAtualizarParcelas() {
+    if (bolDividido === 'nao') return;
+    if (bolDividido === 'outro') {
+      const val = parseInt(document.getElementById('bol-div-outro-valor').value);
+      if (val && val > 0) bolParcelas = val;
+      else return;
+    }
+
+    const valorTotal = bolParseValor(document.getElementById('bol-valor').value);
+    if (valorTotal <= 0) return;
+
+    const valorParcela = (valorTotal / bolParcelas).toFixed(2);
+    const container = document.getElementById('bol-parcelas-lista');
+    container.innerHTML = '';
+
+    for (let i = 1; i <= bolParcelas; i++) {
+      container.innerHTML += `
+        <div style="display:flex;align-items:center;gap:10px;background:#f8fafc;padding:8px 12px;border-radius:10px;">
+          <span style="font-weight:700;color:#0F4C5C;font-size:0.85rem;">${i}ª Parcela</span>
+          <span style="font-weight:600;color:#101620;font-size:0.9rem;">R$ ${valorParcela.replace('.', ',')}</span>
+        </div>
+      `;
+    }
+    document.getElementById('bol-parcelas-preview').classList.remove('hidden');
+  }
+
+  // Upload de PDF do espelho
+  function bolHandlePDFSelect(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.type !== 'application/pdf') {
+      showToast('Por favor, selecione um arquivo PDF.');
+      input.value = '';
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      showToast('O arquivo deve ter no máximo 10MB.');
+      input.value = '';
+      return;
+    }
+    bolPDFSelecionado = file;
+    document.getElementById('bol-upload-default').classList.add('hidden');
+    document.getElementById('bol-upload-preview').classList.remove('hidden');
+    document.getElementById('bol-file-name').textContent = file.name;
+    document.getElementById('bol-pdf-anexado-info').classList.remove('hidden');
+    document.getElementById('bol-pdf-anexado-nome').textContent = file.name;
+    document.getElementById('bol-pdf-anexado-status').textContent = 'Pronto para enviar';
+    showToast('PDF selecionado: ' + file.name);
+  }
+
+  function bolRemoverPDF() {
+    bolPDFSelecionado = null;
+    document.getElementById('bol-file-input').value = '';
+    document.getElementById('bol-upload-default').classList.remove('hidden');
+    document.getElementById('bol-upload-preview').classList.add('hidden');
+    document.getElementById('bol-pdf-anexado-info').classList.add('hidden');
+    document.getElementById('bol-upload-progress').classList.add('hidden');
+    document.getElementById('bol-upload-status').classList.add('hidden');
+  }
+
+  // Drag and drop
+  document.addEventListener('DOMContentLoaded', function() {
+    const dropZone = document.getElementById('bol-drop-zone');
+    if (dropZone) {
+      dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          const input = document.getElementById('bol-file-input');
+          const dt = new DataTransfer();
+          dt.items.add(files[0]);
+          input.files = dt.files;
+          bolHandlePDFSelect(input);
+        }
+      });
+    }
+  });
+
+  // Upload para Google Drive via Apps Script
+  async function bolUploadPDFToDrive(file, fornecedor) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(file);
+      reader.onload = async (f) => {
+        try {
+          const bytes = [...new Int8Array(f.target.result)];
+          const fileName = 'ESP_' + fornecedor.replace(/\s+/g, '_').toUpperCase() + '_' + new Date().getTime() + '.pdf';
+
+          const qs = new URLSearchParams({
+            filename: fileName,
+            mimeType: file.type,
+            folderId: BOLETOS_FOLDER_ID,
+            token: CDA_TOKEN
+          });
+
+          const resp = await fetch(APPS_SCRIPT_URL + '?' + qs.toString(), {
+            method: 'POST',
+            body: JSON.stringify(bytes),
+            redirect: 'follow'
+          });
+
+          if (!resp.ok) throw new Error('Erro no upload: ' + resp.status);
+          const json = await resp.json();
+          resolve(json);
+        } catch (err) { reject(err); }
+      };
+      reader.onerror = (err) => reject(err);
+    });
+  }
+
+  // PARTE 1: Salvar novo pedido
+  async function bolSalvarPedido() {
+    const fornecedor = document.getElementById('bol-fornecedor').value.trim();
+    const valorStr = document.getElementById('bol-valor').value;
+    const errorEl = document.getElementById('bol-error');
+    const successEl = document.getElementById('bol-success');
+    const salvandoEl = document.getElementById('bol-salvando');
+
+    if (!fornecedor) { errorEl.innerText = 'Informe o nome do fornecedor.'; errorEl.style.display = 'block'; return; }
+    if (!valorStr || bolParseValor(valorStr) <= 0) { errorEl.innerText = 'Informe o valor total.'; errorEl.style.display = 'block'; return; }
+    if (!bolPDFSelecionado) { errorEl.innerText = 'Anexe o espelho do pedido em PDF.'; errorEl.style.display = 'block'; return; }
+
+    errorEl.style.display = 'none';
+    salvandoEl.style.display = 'block';
+    successEl.style.display = 'none';
+
+    try {
+      // Upload do PDF
+      document.getElementById('bol-upload-progress').classList.remove('hidden');
+      document.getElementById('bol-upload-progress-bar').style.width = '30%';
+      document.getElementById('bol-upload-status').classList.remove('hidden');
+      document.getElementById('bol-upload-status').textContent = 'Enviando espelho para o Drive...';
+
+      const uploadResult = await bolUploadPDFToDrive(bolPDFSelecionado, fornecedor);
+      document.getElementById('bol-upload-progress-bar').style.width = '70%';
+
+      const pedido = {
+        action: 'salvarBoleto',
+        token: CDA_TOKEN,
+        fornecedor: fornecedor.toUpperCase(),
+        dataPedido: new Date().toISOString(),
+        quemPedido: getUsuarioLogado()?.login || 'DESCONHECIDO',
+        valorTotal: bolParseValor(valorStr),
+        espelhoUrl: uploadResult.fileUrl || uploadResult.url || '',
+        espelhoId: uploadResult.fileId || '',
+        dividido: bolDividido !== 'nao' ? 'SIM' : 'NÃO',
+        parcelas: bolDividido !== 'nao' ? bolParcelas : 1,
+        status: 'pendente'
+      };
+
+      document.getElementById('bol-upload-status').textContent = 'Salvando na planilha...';
+
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(pedido),
+        redirect: 'follow',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      document.getElementById('bol-upload-progress-bar').style.width = '100%';
+      const json = await resp.json();
+
+      if (json.ok) {
+        salvandoEl.style.display = 'none';
+        successEl.style.display = 'block';
+        showToast('Pedido cadastrado com sucesso!');
+        setTimeout(() => { bolLimparForm(); bolMostrarAba('lista'); }, 1500);
+      } else {
+        throw new Error(json.erro || 'Erro ao salvar');
+      }
+    } catch (err) {
+      salvandoEl.style.display = 'none';
+      errorEl.innerText = 'Erro: ' + (err.message || 'Falha ao salvar pedido');
+      errorEl.style.display = 'block';
+      console.error(err);
+    }
+  }
+
+  // PARTE 2: Receber mercadoria e boletos
+  async function bolAbrirModalRecebimento(id) {
+    const pedido = bolDadosAtuais.find(p => p.id === id);
+    if (!pedido) return;
+
+    const modal = document.createElement('div');
+    modal.id = 'bol-modal-recebimento';
+    modal.className = 'bol-modal-overlay ativo';
+    modal.innerHTML = `
+      <div class="bol-modal-box">
+        <div class="bol-modal-header">
+          <h3><i class="fa-solid fa-truck-fast mr-2"></i> Recebimento de Mercadoria</h3>
+          <p class="sub">${pedido.fornecedor} — R$ ${parseFloat(pedido.valorTotal).toFixed(2).replace('.', ',')}</p>
+        </div>
+        <div class="bol-modal-body">
+          <div class="bol-modal-secao">
+            <h4><i class="fa-solid fa-info-circle mr-1"></i> Dados do Pedido</h4>
+            <div class="bol-modal-info-row"><span class="bol-modal-info-label">Fornecedor:</span><span class="bol-modal-info-value">${pedido.fornecedor}</span></div>
+            <div class="bol-modal-info-row"><span class="bol-modal-info-label">Data do Pedido:</span><span class="bol-modal-info-value">${new Date(pedido.dataPedido).toLocaleDateString('pt-BR')}</span></div>
+            <div class="bol-modal-info-row"><span class="bol-modal-info-label">Quem Pediu:</span><span class="bol-modal-info-value">${pedido.quemPedido}</span></div>
+            <div class="bol-modal-info-row"><span class="bol-modal-info-label">Valor Total:</span><span class="bol-modal-info-value">R$ ${parseFloat(pedido.valorTotal).toFixed(2).replace('.', ',')}</span></div>
+            ${pedido.dividido === 'SIM' ? `<div class="bol-modal-info-row"><span class="bol-modal-info-label">Parcelas:</span><span class="bol-modal-info-value">${pedido.parcelas}x</span></div>` : ''}
+          </div>
+
+          <div class="bol-modal-secao">
+            <h4><i class="fa-solid fa-file-pdf mr-1"></i> Espelho do Pedido</h4>
+            <a href="${pedido.espelhoUrl}" target="_blank" class="bol-espelho-link">
+              <i class="fa-solid fa-eye"></i> Visualizar Espelho no Drive
+            </a>
+          </div>
+
+          <div class="bol-modal-secao">
+            <h4><i class="fa-solid fa-clipboard-check mr-1"></i> Dados do Recebimento</h4>
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Data de Recebimento</label>
+              <input type="text" id="bol-rec-data" class="bol-form-field" value="${new Date().toLocaleDateString('pt-BR')}" disabled>
+            </div>
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Quem Recebeu</label>
+              <input type="text" id="bol-rec-quem" class="bol-form-field" value="${getUsuarioLogado()?.login || 'DESCONHECIDO'}" disabled>
+            </div>
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Os boletos chegaram junto?</label>
+              <div class="bol-checkbox-label" id="bol-rec-boletos-label" onclick="bolToggleCheckbox('bol-rec-boletos')">
+                <input type="checkbox" id="bol-rec-boletos">
+                <span>Sim, os boletos chegaram com a mercadoria</span>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Conferência da Mercadoria</label>
+              <div class="bol-checkbox-label" id="bol-rec-conferencia-label" onclick="bolToggleCheckbox('bol-rec-conferencia')">
+                <input type="checkbox" id="bol-rec-conferencia">
+                <span>Conferi e está tudo certo com a mercadoria</span>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Para quem entregou os boletos?</label>
+              <input type="text" id="bol-rec-entregue" placeholder="Nome da pessoa que recebeu os boletos..." class="bol-form-field">
+            </div>
+          </div>
+        </div>
+        <div style="padding:16px 20px;border-top:1px solid #e2e8f0;display:flex;gap:10px;">
+          <button onclick="bolFecharModalRecebimento()" class="bol-modal-btn neutral" style="flex:1;">Cancelar</button>
+          <button onclick="bolSalvarRecebimento('${id}')" class="bol-modal-btn primary" style="flex:2;">
+            <i class="fa-solid fa-check"></i> Confirmar Recebimento
+          </button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+
+  function bolFecharModalRecebimento() {
+    const modal = document.getElementById('bol-modal-recebimento');
+    if (modal) modal.remove();
+  }
+
+  function bolToggleCheckbox(id) {
+    const cb = document.getElementById(id);
+    const label = document.getElementById(id + '-label');
+    if (cb && label) {
+      cb.checked = !cb.checked;
+      label.classList.toggle('ativo', cb.checked);
+    }
+  }
+
+  async function bolSalvarRecebimento(id) {
+    const boletosChegaram = document.getElementById('bol-rec-boletos').checked;
+    const conferenciaOK = document.getElementById('bol-rec-conferencia').checked;
+    const entreguePara = document.getElementById('bol-rec-entregue').value.trim();
+
+    if (!conferenciaOK) { showToast('Marque que conferiu a mercadoria.'); return; }
+    if (boletosChegaram && !entreguePara) { showToast('Informe para quem entregou os boletos.'); return; }
+
+    try {
+      const dados = {
+        action: 'atualizarRecebimento',
+        token: CDA_TOKEN,
+        id: id,
+        dataRecebimento: new Date().toISOString(),
+        quemRecebeu: getUsuarioLogado()?.login || 'DESCONHECIDO',
+        boletosChegaram: boletosChegaram ? 'SIM' : 'NÃO',
+        conferenciaOK: 'SIM',
+        entreguePara: entreguePara || '',
+        status: boletosChegaram ? 'recebido' : 'recebido'
+      };
+
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(dados),
+        redirect: 'follow',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const json = await resp.json();
+      if (json.ok) {
+        showToast('Recebimento registrado com sucesso!');
+        bolFecharModalRecebimento();
+        bolCarregarPedidos();
+      } else {
+        throw new Error(json.erro || 'Erro ao atualizar');
+      }
+    } catch (err) {
+      showToast('Erro: ' + (err.message || 'Falha ao salvar recebimento'));
+      console.error(err);
+    }
+  }
+
+  // PARTE 3: Conferência Financeira
+  async function bolAbrirModalFinanceiro(id) {
+    const pedido = bolDadosAtuais.find(p => p.id === id);
+    if (!pedido) return;
+
+    const modal = document.createElement('div');
+    modal.id = 'bol-modal-financeiro';
+    modal.className = 'bol-modal-overlay ativo';
+    modal.innerHTML = `
+      <div class="bol-modal-box">
+        <div class="bol-modal-header">
+          <h3><i class="fa-solid fa-money-check-dollar mr-2"></i> Conferência Financeira</h3>
+          <p class="sub">${pedido.fornecedor} — R$ ${parseFloat(pedido.valorTotal).toFixed(2).replace('.', ',')}</p>
+        </div>
+        <div class="bol-modal-body">
+          <div class="bol-modal-secao">
+            <h4><i class="fa-solid fa-info-circle mr-1"></i> Resumo do Pedido</h4>
+            <div class="bol-modal-info-row"><span class="bol-modal-info-label">Fornecedor:</span><span class="bol-modal-info-value">${pedido.fornecedor}</span></div>
+            <div class="bol-modal-info-row"><span class="bol-modal-info-label">Data do Pedido:</span><span class="bol-modal-info-value">${new Date(pedido.dataPedido).toLocaleDateString('pt-BR')}</span></div>
+            <div class="bol-modal-info-row"><span class="bol-modal-info-label">Quem Pediu:</span><span class="bol-modal-info-value">${pedido.quemPedido}</span></div>
+            <div class="bol-modal-info-row"><span class="bol-modal-info-label">Valor Total:</span><span class="bol-modal-info-value">R$ ${parseFloat(pedido.valorTotal).toFixed(2).replace('.', ',')}</span></div>
+            ${pedido.dividido === 'SIM' ? `<div class="bol-modal-info-row"><span class="bol-modal-info-label">Parcelas:</span><span class="bol-modal-info-value">${pedido.parcelas}x</span></div>` : ''}
+          </div>
+
+          <div class="bol-modal-secao">
+            <h4><i class="fa-solid fa-truck-fast mr-1"></i> Dados do Recebimento</h4>
+            <div class="bol-modal-info-row"><span class="bol-modal-info-label">Data Recebimento:</span><span class="bol-modal-info-value">${pedido.dataRecebimento ? new Date(pedido.dataRecebimento).toLocaleDateString('pt-BR') : '-'}</span></div>
+            <div class="bol-modal-info-row"><span class="bol-modal-info-label">Quem Recebeu:</span><span class="bol-modal-info-value">${pedido.quemRecebeu || '-'}</span></div>
+            <div class="bol-modal-info-row"><span class="bol-modal-info-label">Boletos Chegaram:</span><span class="bol-modal-info-value">${pedido.boletosChegaram || '-'}</span></div>
+            <div class="bol-modal-info-row"><span class="bol-modal-info-label">Conferência:</span><span class="bol-modal-info-value">${pedido.conferenciaOK || '-'}</span></div>
+            <div class="bol-modal-info-row"><span class="bol-modal-info-label">Entregue Para:</span><span class="bol-modal-info-value">${pedido.entreguePara || '-'}</span></div>
+          </div>
+
+          <div class="bol-modal-secao">
+            <h4><i class="fa-solid fa-file-pdf mr-1"></i> Espelho do Pedido</h4>
+            <a href="${pedido.espelhoUrl}" target="_blank" class="bol-espelho-link">
+              <i class="fa-solid fa-eye"></i> Visualizar Espelho no Drive
+            </a>
+          </div>
+
+          <div class="bol-modal-secao">
+            <h4><i class="fa-solid fa-money-check mr-1"></i> Conferência dos Boletos</h4>
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Data da Conferência</label>
+              <input type="text" class="bol-form-field" value="${new Date().toLocaleDateString('pt-BR')}" disabled>
+            </div>
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Quem Conferiu</label>
+              <input type="text" class="bol-form-field" value="${getUsuarioLogado()?.login || 'DESCONHECIDO'}" disabled>
+            </div>
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Recebi os boletos</label>
+              <div class="bol-checkbox-label" id="bol-fin-recebi-label" onclick="bolToggleCheckbox('bol-fin-recebi')">
+                <input type="checkbox" id="bol-fin-recebi">
+                <span>Confirmo que recebi os boletos</span>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Conferi e está tudo certo</label>
+              <div class="bol-checkbox-label" id="bol-fin-conferi-label" onclick="bolToggleCheckbox('bol-fin-conferi')">
+                <input type="checkbox" id="bol-fin-conferi">
+                <span>Confirmo que conferi os boletos e estão corretos</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:16px 20px;border-top:1px solid #e2e8f0;display:flex;gap:10px;">
+          <button onclick="bolFecharModalFinanceiro()" class="bol-modal-btn neutral" style="flex:1;">Cancelar</button>
+          <button onclick="bolSalvarFinanceiro('${id}')" class="bol-modal-btn success" style="flex:2;">
+            <i class="fa-solid fa-check-double"></i> Finalizar Conferência
+          </button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+
+  function bolFecharModalFinanceiro() {
+    const modal = document.getElementById('bol-modal-financeiro');
+    if (modal) modal.remove();
+  }
+
+  async function bolSalvarFinanceiro(id) {
+    const recebi = document.getElementById('bol-fin-recebi').checked;
+    const conferi = document.getElementById('bol-fin-conferi').checked;
+
+    if (!recebi) { showToast('Marque que recebeu os boletos.'); return; }
+    if (!conferi) { showToast('Marque que conferiu os boletos.'); return; }
+
+    try {
+      const dados = {
+        action: 'atualizarFinanceiro',
+        token: CDA_TOKEN,
+        id: id,
+        dataConferencia: new Date().toISOString(),
+        quemConferiu: getUsuarioLogado()?.login || 'DESCONHECIDO',
+        recebiBoletos: 'SIM',
+        conferiBoletos: 'SIM',
+        status: 'finalizado'
+      };
+
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(dados),
+        redirect: 'follow',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const json = await resp.json();
+      if (json.ok) {
+        showToast('Conferência financeira finalizada!');
+        bolFecharModalFinanceiro();
+        bolCarregarPedidos();
+      } else {
+        throw new Error(json.erro || 'Erro ao atualizar');
+      }
+    } catch (err) {
+      showToast('Erro: ' + (err.message || 'Falha ao salvar conferência'));
+      console.error(err);
+    }
+  }
+
+  // Listagem e filtros
+  async function bolCarregarPedidos() {
+    const lista = document.getElementById('bol-lista-pedidos');
+    lista.innerHTML = '<p class="text-sm text-slate-500 text-center py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Carregando pedidos...</p>';
+
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL + '?action=listarBoletos&token=' + encodeURIComponent(CDA_TOKEN), {
+        redirect: 'follow'
+      });
+      const json = await resp.json();
+
+      if (json.ok && json.dados) {
+        bolDadosAtuais = json.dados;
+        bolFiltrarLista();
+      } else {
+        bolDadosAtuais = [];
+        lista.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhum pedido encontrado.</p>';
+      }
+    } catch (err) {
+      console.error(err);
+      lista.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Erro ao carregar pedidos. Tente novamente.</p>';
+    }
+  }
+
+  function bolFiltroStatus(status) {
+    bolFiltroStatusAtual = status;
+    document.querySelectorAll('.bol-filtro-chip').forEach(c => c.classList.remove('ativo'));
+    document.getElementById('bol-filtro-' + status).classList.add('ativo');
+    bolFiltrarLista();
+  }
+
+  function bolFiltrarLista() {
+    const fornecedorFiltro = (document.getElementById('bol-filtro-fornecedor').value || '').toUpperCase();
+    const mesFiltro = document.getElementById('bol-filtro-mes').value;
+
+    let filtrados = bolDadosAtuais.filter(p => {
+      if (fornecedorFiltro && !p.fornecedor.toUpperCase().includes(fornecedorFiltro)) return false;
+      if (bolFiltroStatusAtual !== 'todos' && p.status !== bolFiltroStatusAtual) return false;
+      if (mesFiltro) {
+        const dataPedido = new Date(p.dataPedido);
+        const mesPedido = dataPedido.getFullYear() + '-' + String(dataPedido.getMonth()+1).padStart(2,'0');
+        if (mesPedido !== mesFiltro) return false;
+      }
+      return true;
+    });
+
+    const lista = document.getElementById('bol-lista-pedidos');
+    if (filtrados.length === 0) {
+      lista.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhum pedido encontrado com os filtros selecionados.</p>';
+      return;
+    }
+
+    lista.innerHTML = filtrados.map(p => bolRenderCard(p)).join('');
+  }
+
+  function bolRenderCard(p) {
+    const statusConfig = {
+      pendente:   { classe: 'bol-status-pendente',   texto: 'Pedido Feito',         icone: 'fa-clock' },
+      recebido:   { classe: 'bol-status-recebido',   texto: 'Mercadoria Recebida',  icone: 'fa-truck-fast' },
+      conferido:  { classe: 'bol-status-conferido',  texto: 'Boletos Conferidos',   icone: 'fa-check-circle' },
+      finalizado: { classe: 'bol-status-finalizado', texto: 'Finalizado',           icone: 'fa-check-double' }
+    };
+    const cfg = statusConfig[p.status] || statusConfig.pendente;
+
+    let acoes = '';
+    if (p.status === 'pendente') {
+      acoes = `<button onclick="bolAbrirModalRecebimento('${p.id}')" class="bol-modal-btn primary" style="padding:8px 14px;font-size:0.75rem;"><i class="fa-solid fa-truck-fast mr-1"></i> Receber Mercadoria</button>`;
+    } else if (p.status === 'recebido' || p.status === 'conferido') {
+      acoes = `<button onclick="bolAbrirModalFinanceiro('${p.id}')" class="bol-modal-btn success" style="padding:8px 14px;font-size:0.75rem;"><i class="fa-solid fa-money-check-dollar mr-1"></i> Conferir Boletos</button>`;
+    }
+
+    return `
+      <div class="bol-card">
+        <div class="bol-card-header">
+          <div>
+            <div class="bol-card-codigo">PEDIDO #${p.id?.slice(-6) || '---'}</div>
+            <div class="bol-card-fornecedor">${p.fornecedor}</div>
+          </div>
+          <span class="bol-status-badge ${cfg.classe}"><i class="fa-solid ${cfg.icone} mr-1"></i> ${cfg.texto}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span class="bol-card-valor">R$ ${parseFloat(p.valorTotal).toFixed(2).replace('.', ',')}</span>
+          ${p.dividido === 'SIM' ? `<span class="bol-card-dividido"><i class="fa-solid fa-divide mr-1"></i>${p.parcelas}x parcelas</span>` : ''}
+        </div>
+        <div class="bol-card-info">
+          <i class="fa-regular fa-calendar mr-1"></i> Pedido: ${new Date(p.dataPedido).toLocaleDateString('pt-BR')} por <span class="bol-responsavel-badge">${p.quemPedido}</span>
+          ${p.dataRecebimento ? `<br><i class="fa-solid fa-truck-fast mr-1"></i> Recebido: ${new Date(p.dataRecebimento).toLocaleDateString('pt-BR')} por <span class="bol-responsavel-badge">${p.quemRecebeu}</span>` : ''}
+          ${p.dataConferencia ? `<br><i class="fa-solid fa-money-check mr-1"></i> Conferido: ${new Date(p.dataConferencia).toLocaleDateString('pt-BR')} por <span class="bol-responsavel-badge">${p.quemConferiu}</span>` : ''}
+        </div>
+        <div class="bol-card-actions">
+          <a href="${p.espelhoUrl}" target="_blank" class="bol-espelho-link"><i class="fa-solid fa-eye"></i> Ver Espelho</a>
+          ${acoes}
+        </div>
+      </div>
+    `;
+  }
+
+  function bolLimparFiltros() {
+    document.getElementById('bol-filtro-fornecedor').value = '';
+    document.getElementById('bol-filtro-mes').value = '';
+    bolFiltroStatus('todos');
+  }
 
 </script>
 
