@@ -1883,7 +1883,7 @@
     if (elAgen) elAgen.innerText = mesAnoExtenso;
   }
 
-  function computarOrcamento() {
+  function computarOrcamento(acao) {
     // Incrementa localmente e adiciona na lista de atividades
     dadosMensais.orcamentos++;
     document.getElementById('stat-orcamentos').innerText = dadosMensais.orcamentos;
@@ -1900,7 +1900,66 @@
     if (atividadesRecentes.length > 8) atividadesRecentes.pop();
     renderAtividades();
     // Salvar na planilha
-    salvarOrcamentoNaPlanilha('orcamento').then(ok => { if (ok) console.log('[CDA] Orçamento registrado na planilha'); });
+    salvarOrcamentoNaPlanilha(acao || 'BAIXADO').then(ok => { if (ok) console.log('[CDA] Orçamento registrado na planilha - acao:', acao); });
+  }
+
+  async function salvarOrcamentoNaPlanilha(acao) {
+    try {
+      const paciente = document.getElementById('orc-paciente')?.value.trim() || 'SEM NOME';
+      const examesNomes   = orcSelecionados.map(e => e.nome || '').join(' | ');
+      const examesCodigos = orcSelecionados.map(e => e.codigo || '').join(' | ');
+      const total       = orcSelecionados.reduce((s, e) => s + parseFloat(e.preco || 0), 0);
+      const totalPix    = total * 0.60;
+      const totalCred   = total * 0.65;
+      const agora       = new Date();
+      const hora        = agora.getHours().toString().padStart(2,'0') + ':' + agora.getMinutes().toString().padStart(2,'0');
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action:           'salvarOrcamento',
+          token:            CDA_TOKEN,
+          data:             agora.toLocaleDateString('pt-BR'),
+          hora:             hora,
+          paciente:         paciente.toUpperCase(),
+          exames:           examesNomes,
+          codigos:          examesCodigos,
+          quantidadeExames: orcSelecionados.length,
+          totalBruto:       total,
+          totalPix:         totalPix,
+          totalCredito:     totalCred,
+          acao:             acao || 'BAIXADO',
+          origem:           acao || 'BAIXADO',
+          usuario:          usuarioLogado()
+        }),
+        redirect: 'follow'
+      });
+      const json = await resp.json();
+      return json.ok;
+    } catch(err) {
+      console.error('[CDA] Erro ao salvar orçamento na planilha:', err);
+      return false;
+    }
+  }
+
+  async function salvarAgendamentoDash(dados) {
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action:  'salvarAgendamentoDash',
+          token:   CDA_TOKEN,
+          ...dados
+        }),
+        redirect: 'follow'
+      });
+      const json = await resp.json();
+      return json.ok;
+    } catch(err) {
+      console.error('[CDA] Erro ao salvar agendamento dash:', err);
+      return false;
+    }
   }
 
   function renderAtividades() {
@@ -2096,6 +2155,7 @@
     msg += '\n\n📞 Agende agora: (27) 99898-0658\n_Laboratório CDA – Diagnóstico de Confiança_';
     setTimeout(() => { window.open('https://web.whatsapp.com/send?text=' + encodeURIComponent(msg), '_blank'); }, 800);
     showToast('PDF baixado! WhatsApp abrirá em segundos...');
+    computarOrcamento('COMPARTILHADO');
   }
 
   // ==================== GERAR PDF (função central) ====================
@@ -2304,7 +2364,7 @@
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
     showToast('PDF gerado com sucesso!');
-    computarOrcamento();
+    computarOrcamento('BAIXADO');
   }
 
   // ==================== AGENDAR COLETA COM LOADING ====================
@@ -2323,6 +2383,7 @@
       // Preenche o nome no agendamento se disponível
       const agenNomeInput = document.getElementById('agen-nome');
       if (agenNomeInput && paciente) agenNomeInput.value = paciente;
+      computarOrcamento('AGENDAMENTO');
       navigateToPage('agendamento');
       showToast('Dados do orçamento carregados no agendamento!');
     }, 600);
@@ -3059,6 +3120,24 @@ function agenRemoverPDF() {
     });
     if (atividadesRecentes.length > 8) atividadesRecentes.pop();
     renderAtividades();
+
+    // Registrar na aba AGENDAMENTO-DASH
+    const _telefoneAgen = document.getElementById('agen-telefone')?.value.trim() || '';
+    const _nascAgen     = document.getElementById('agen-nascimento')?.value || '';
+    const _examesAgen   = (typeof orcSelecionados !== 'undefined' && orcSelecionados.length)
+      ? orcSelecionados.map(e => e.nome).join(' | ')
+      : (agenPDFAnexado ? agenPDFAnexado.nome : '');
+    salvarAgendamentoDash({
+      data:        new Date(data + 'T12:00:00').toLocaleDateString('pt-BR'),
+      hora:        horario,
+      nome:        nome,
+      telefone:    _telefoneAgen,
+      nascimento:  _nascAgen ? new Date(_nascAgen + 'T12:00:00').toLocaleDateString('pt-BR') : '',
+      exames:      _examesAgen,
+      pagamento:   pagamento,
+      usuario:     usuarioLogado(),
+      origem:      'PAINEL'
+    });
 
     document.getElementById('modal-agen-nome').textContent = nome;
     document.getElementById('modal-agen-data').textContent = dataExt + ' às ' + horario;
