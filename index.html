@@ -1718,8 +1718,8 @@
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(200, 240, 240);
-    doc.text('Diagnóstico de Confiança', margin + 38, 29);
-    doc.text('Afonso Cláudio, ES  •  (27) 99898-0658', margin + 38, 35);
+    doc.text('Diagnostico de Confianca', margin + 38, 29);
+    doc.text('Afonso Claudio, ES  -  (27) 99898-0658', margin + 38, 35);
 
     // Badge ORÇAMENTO
     doc.setFont('helvetica', 'bold');
@@ -1791,10 +1791,10 @@
     // Descontos
     y += 18;
     doc.setFillColor(232, 248, 248);
-    doc.roundedRect(margin, y, W - margin * 2, 46, 4, 4, 'F');
+    doc.roundedRect(margin, y, W - margin * 2, 58, 4, 4, 'F');
     doc.setDrawColor(73, 188, 190);
     doc.setLineWidth(0.4);
-    doc.roundedRect(margin, y, W - margin * 2, 46, 4, 4, 'S');
+    doc.roundedRect(margin, y, W - margin * 2, 58, 4, 4, 'S');
 
     y += 8;
     doc.setFont('helvetica', 'bold');
@@ -1805,60 +1805,60 @@
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(100, 116, 139);
-    doc.text('Pacientes com convênio ou Cartão Fidelidade CDA têm direito a:', margin + 5, y);
+    doc.text('Pacientes com convenio ou Cartao Fidelidade CDA tem direito a:', margin + 5, y);
 
-    y += 8;
+    y += 9;
     doc.setFillColor(255,255,255);
     doc.roundedRect(margin + 4, y - 4, W - margin * 2 - 8, 10, 3, 3, 'F');
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
     doc.setTextColor(55, 65, 81);
-    doc.text('Pix, dinheiro ou débito (à vista)', margin + 7, y + 3);
+    doc.text('Pix, dinheiro ou debito (a vista)', margin + 7, y + 3);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(15, 76, 92);
-    doc.text('40% OFF  →  ' + formatarMoeda(totalPix), W - margin - 5, y + 3, { align: 'right' });
+    doc.text('40% OFF -> ' + formatarMoeda(totalPix), W - margin - 5, y + 3, { align: 'right' });
 
-    y += 12;
+    y += 13;
     doc.setFillColor(255,255,255);
     doc.roundedRect(margin + 4, y - 4, W - margin * 2 - 8, 10, 3, 3, 'F');
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(55, 65, 81);
-    doc.text('Cartão de crédito (parcelado em até 10x)', margin + 7, y + 3);
+    doc.text('Cartao de credito (parcelado em ate 10x)', margin + 7, y + 3);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(15, 76, 92);
-    doc.text('35% OFF  →  10x ' + formatarMoeda(parcelaCc), W - margin - 5, y + 3, { align: 'right' });
+    doc.text('35% OFF -> 10x ' + formatarMoeda(parcelaCc), W - margin - 5, y + 3, { align: 'right' });
 
-    y += 13;
+    y += 14;
     doc.setFont('helvetica', 'italic');
     doc.setFontSize(8);
     doc.setTextColor(73, 188, 190);
-    doc.text('Cobrimos qualquer orçamento! Apresente uma proposta e faremos questão de superar.', W / 2, y, { align: 'center' });
+    doc.text('Cobrimos qualquer orcamento! Apresente uma proposta e faremos questao de superar.', W / 2, y, { align: 'center' });
 
     // Benefícios
-    y += 12;
+    y += 13;
     doc.setFillColor(232, 248, 248);
-    doc.roundedRect(margin, y, W - margin * 2, 28, 4, 4, 'F');
+    doc.roundedRect(margin, y, W - margin * 2, 30, 4, 4, 'F');
     y += 7;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(9);
     doc.setTextColor(15, 76, 92);
     doc.text('Agende e ganhe mimos especiais!', W / 2, y, { align: 'center' });
-    y += 7;
+    y += 8;
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(55, 65, 81);
-    doc.text('✓ Atendimento sem fila', margin + 8, y);
-    doc.text('✓ Sala VIP com TV e ar-condicionado', W / 2 + 4, y);
-    y += 6;
-    doc.text('✓ Café expresso', margin + 8, y);
-    doc.text('✓ Biscoitinho Club Social', W / 2 + 4, y);
+    doc.text('v Atendimento sem fila', margin + 8, y);
+    doc.text('v Sala VIP com TV e ar-condicionado', W / 2 + 4, y);
+    y += 7;
+    doc.text('v Cafe expresso', margin + 8, y);
+    doc.text('v Biscoitinho Club Social', W / 2 + 4, y);
 
     // Rodapé
     const rodapeY = 287;
     doc.setDrawColor(200, 220, 225); doc.setLineWidth(0.3); doc.line(margin, rodapeY, W - margin, rodapeY);
     doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(150, 160, 170);
-    doc.text('Laboratório CDA  •  Afonso Cláudio, ES  •  (27) 99898-0658', W / 2, rodapeY + 5, { align: 'center' });
-    doc.text('* Valores estimados da tabela particular. Sujeitos a confirmação. Convênios sob consulta.', W / 2, rodapeY + 9, { align: 'center' });
+    doc.text('Laboratorio CDA  -  Afonso Claudio, ES  -  (27) 99898-0658', W / 2, rodapeY + 5, { align: 'center' });
+    doc.text('* Valores estimados da tabela particular. Sujeitos a confirmacao. Convenios sob consulta.', W / 2, rodapeY + 9, { align: 'center' });
 
     return doc.output('blob');
   }
