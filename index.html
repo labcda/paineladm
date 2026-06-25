@@ -672,24 +672,18 @@
 
       <!-- HOME -->
       <section id="page-home" class="page active">
-        <div class="home-grid">
-          <div class="stat-card">
+        <div class="home-grid" style="grid-template-columns: repeat(2, 1fr);">
+          <div class="stat-card" style="cursor:pointer;" onclick="carregarEstatisticas()" title="Clique para atualizar">
             <div class="stat-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-            <div class="stat-value" id="stat-orcamentos">0</div>
+            <div class="stat-value" id="stat-orcamentos"><i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;color:#49BCBE;"></i></div>
             <div class="stat-label">Orçamentos no Mês</div>
-            <div class="stat-mes" id="stat-mes-orcamentos">Junho 2026</div>
+            <div class="stat-mes" id="stat-mes-orcamentos">carregando...</div>
           </div>
-          <div class="stat-card">
+          <div class="stat-card" style="cursor:pointer;" onclick="carregarEstatisticas()" title="Clique para atualizar">
             <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
-            <div class="stat-value" id="stat-agendamentos">128</div>
-            <div class="stat-label">Agendamentos</div>
-            <div class="stat-mes" id="stat-mes-agendamentos">Junho 2026</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon"><i class="fa-solid fa-vial"></i></div>
-            <div class="stat-value" id="stat-exames">1.2K</div>
-            <div class="stat-label">Exames Processados</div>
-            <div class="stat-mes" id="stat-mes-exames">Junho 2026</div>
+            <div class="stat-value" id="stat-agendamentos"><i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;color:#49BCBE;"></i></div>
+            <div class="stat-label">Agendamentos no Mês</div>
+            <div class="stat-mes" id="stat-mes-agendamentos">carregando...</div>
           </div>
         </div>
         <div class="neumorphic-card">
@@ -1362,9 +1356,8 @@
         document.body.classList.add('app-loaded');
         carregarExames();
         agenInicializar();
-        atualizarMesStats();
+        carregarEstatisticas();
         renderAtividades();
-        contarOrcamentosDoMes();
         carregarRecoletas();
         atualizarBadgeUsuario();
       }, 600);
@@ -1451,44 +1444,113 @@
     }
   }
 
-  let dadosMensais = { orcamentos: 0, agendamentos: 128, exames: 1247 };
-  let atividadesRecentes = [
-    { tipo: 'orcamento', titulo: 'Orçamento #1024 gerado para Maria Silva', tempo: 'há 2 minutos', cor: '#0F4C5C', bg: 'rgba(15,76,92,0.1)' },
-    { tipo: 'agendamento', titulo: 'Agendamento #567 confirmado - João Santos', tempo: 'há 15 minutos', cor: '#37A7AA', bg: 'rgba(55,167,170,0.1)' },
-    { tipo: 'exame', titulo: '45 exames processados no lote #892', tempo: 'há 1 hora', cor: '#49BCBE', bg: 'rgba(73,188,190,0.1)' },
-    { tipo: 'orcamento', titulo: 'Orçamento #1023 compartilhado via WhatsApp', tempo: 'há 2 horas', cor: '#0F4C5C', bg: 'rgba(15,76,92,0.1)' },
-    { tipo: 'agendamento', titulo: 'Agendamento #566 cancelado - Ana Paula', tempo: 'há 3 horas', cor: '#ef4444', bg: 'rgba(239,68,68,0.1)' }
-  ];
+  // ==================== ESTATÍSTICAS DA HOME (dados reais) ====================
+  let dadosMensais = { orcamentos: 0, agendamentos: 0 };
+  let atividadesRecentes = [];
+
+  function getMesAnoAtual() {
+    const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    const agora  = new Date();
+    return {
+      mesAnoExtenso: meses[agora.getMonth()] + ' ' + agora.getFullYear(),
+      mesAno: String(agora.getMonth()+1).padStart(2,'0') + '/' + agora.getFullYear(), // MM/YYYY p/ planilha
+      mesISO: agora.getFullYear() + '-' + String(agora.getMonth()+1).padStart(2,'0')  // YYYY-MM p/ agendamentos
+    };
+  }
+
+  async function carregarEstatisticas() {
+    const { mesAnoExtenso, mesAno, mesISO } = getMesAnoAtual();
+
+    // Mostrar spinner
+    document.getElementById('stat-orcamentos').innerHTML   = '<i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;color:#49BCBE;"></i>';
+    document.getElementById('stat-agendamentos').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;color:#49BCBE;"></i>';
+    document.getElementById('stat-mes-orcamentos').innerText   = mesAnoExtenso;
+    document.getElementById('stat-mes-agendamentos').innerText = mesAnoExtenso;
+
+    // Buscar orçamentos e agendamentos em paralelo
+    const [resOrc, resAgen] = await Promise.allSettled([
+      fetch(APPS_SCRIPT_URL + '?action=contarOrcamentos&mesAno=' + encodeURIComponent(mesAno) + '&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json()),
+      fetch(APPS_SCRIPT_URL + '?action=contarAgendamentos&mes=' + encodeURIComponent(mesISO) + '&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json())
+    ]);
+
+    // Orçamentos
+    let totalOrc = 0;
+    if (resOrc.status === 'fulfilled' && resOrc.value.ok) {
+      totalOrc = resOrc.value.total || 0;
+    } else {
+      console.warn('[CDA] Erro ao buscar orçamentos:', resOrc);
+    }
+    dadosMensais.orcamentos = totalOrc;
+    document.getElementById('stat-orcamentos').innerText = totalOrc;
+
+    // Agendamentos
+    let totalAgen = 0;
+    if (resAgen.status === 'fulfilled' && resAgen.value.ok) {
+      totalAgen = resAgen.value.total || 0;
+    } else {
+      console.warn('[CDA] Erro ao buscar agendamentos:', resAgen);
+    }
+    dadosMensais.agendamentos = totalAgen;
+    document.getElementById('stat-agendamentos').innerText = totalAgen;
+
+    // Carregar atividades recentes do servidor
+    carregarAtividadesRecentes();
+  }
+
+  async function carregarAtividadesRecentes() {
+    try {
+      const { mesAno, mesISO } = getMesAnoAtual();
+      const url = APPS_SCRIPT_URL + '?action=listarAtividades&token=' + encodeURIComponent(CDA_TOKEN);
+      const resp = await fetch(url, { redirect: 'follow' });
+      const json = await resp.json();
+      if (json.ok && Array.isArray(json.atividades) && json.atividades.length > 0) {
+        atividadesRecentes = json.atividades;
+        renderAtividades();
+        return;
+      }
+    } catch(e) { console.warn('[CDA] Atividades do servidor indisponíveis:', e); }
+    // Fallback: lista vazia limpa
+    atividadesRecentes = [];
+    renderAtividades();
+  }
 
   function atualizarMesStats() {
-    const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-    const agora = new Date();
-    const mesAno = meses[agora.getMonth()] + ' ' + agora.getFullYear();
-    document.getElementById('stat-mes-orcamentos').innerText = mesAno;
-    document.getElementById('stat-mes-agendamentos').innerText = mesAno;
-    document.getElementById('stat-mes-exames').innerText = mesAno;
-    document.getElementById('stat-orcamentos').innerText = dadosMensais.orcamentos;
-    document.getElementById('stat-agendamentos').innerText = dadosMensais.agendamentos;
-    document.getElementById('stat-exames').innerText = dadosMensais.exames >= 1000 ? (dadosMensais.exames/1000).toFixed(1) + 'K' : dadosMensais.exames;
+    // Mantida por compatibilidade — agora só atualiza o rótulo do mês
+    const { mesAnoExtenso } = getMesAnoAtual();
+    const elOrc  = document.getElementById('stat-mes-orcamentos');
+    const elAgen = document.getElementById('stat-mes-agendamentos');
+    if (elOrc)  elOrc.innerText  = mesAnoExtenso;
+    if (elAgen) elAgen.innerText = mesAnoExtenso;
   }
 
   function computarOrcamento() {
+    // Incrementa localmente e adiciona na lista de atividades
     dadosMensais.orcamentos++;
-    atualizarMesStats();
+    document.getElementById('stat-orcamentos').innerText = dadosMensais.orcamentos;
     const agora = new Date();
-    const hora = agora.getHours().toString().padStart(2,'0') + ':' + agora.getMinutes().toString().padStart(2,'0');
+    const hora  = agora.getHours().toString().padStart(2,'0') + ':' + agora.getMinutes().toString().padStart(2,'0');
+    const paciente = document.getElementById('orc-paciente') ? document.getElementById('orc-paciente').value.trim() : '';
     atividadesRecentes.unshift({
-      tipo: 'orcamento', titulo: 'Orçamento #' + (1000 + dadosMensais.orcamentos) + ' gerado às ' + hora,
-      tempo: 'agora', cor: '#0F4C5C', bg: 'rgba(15,76,92,0.1)'
+      tipo: 'orcamento',
+      titulo: 'Orçamento gerado' + (paciente ? ' — ' + paciente : '') + ' às ' + hora,
+      tempo: 'agora',
+      cor: '#0F4C5C',
+      bg: 'rgba(15,76,92,0.1)'
     });
-    if (atividadesRecentes.length > 5) atividadesRecentes.pop();
+    if (atividadesRecentes.length > 8) atividadesRecentes.pop();
     renderAtividades();
-    salvarOrcamentoNaPlanilha('orcamento').then(ok => { if (ok) console.log('Orçamento registrado'); });
+    // Salvar na planilha
+    salvarOrcamentoNaPlanilha('orcamento').then(ok => { if (ok) console.log('[CDA] Orçamento registrado na planilha'); });
   }
 
   function renderAtividades() {
     const container = document.getElementById('atividades-recentes');
-    const icones = { orcamento: 'fa-file-invoice-dollar', agendamento: 'fa-calendar-check', exame: 'fa-flask-vial' };
+    if (!container) return;
+    if (atividadesRecentes.length === 0) {
+      container.innerHTML = '<div class="flex flex-col items-center py-6 text-center"><i class="fa-solid fa-clock-rotate-left text-slate-300 text-2xl mb-2"></i><p class="text-sm text-slate-400">Nenhuma atividade recente ainda.</p></div>';
+      return;
+    }
+    const icones = { orcamento: 'fa-file-invoice-dollar', agendamento: 'fa-calendar-check', recoleta: 'fa-vial' };
     container.innerHTML = atividadesRecentes.map(at => {
       const icone = icones[at.tipo] || 'fa-circle-check';
       return '<div class="atividade-item" style="background: ' + at.bg + ';"><i class="fa-solid ' + icone + ' atividade-icon" style="color: ' + at.cor + ';"></i><div class="atividade-info"><p class="atividade-titulo">' + at.titulo + '</p><p class="atividade-tempo">' + at.tempo + '</p></div></div>';
@@ -2615,6 +2677,24 @@ function agenRemoverPDF() {
     if (nome) localStorage.setItem('patient_name', nome);
     const telefone = document.getElementById('agen-telefone') ? document.getElementById('agen-telefone').value.trim() : '';
     if (telefone) localStorage.setItem('patient_phone', telefone);
+
+    // Incrementar contador de agendamentos na home
+    dadosMensais.agendamentos++;
+    const elAgen = document.getElementById('stat-agendamentos');
+    if (elAgen) elAgen.innerText = dadosMensais.agendamentos;
+
+    // Adicionar às atividades recentes
+    const agora = new Date();
+    const hora  = agora.getHours().toString().padStart(2,'0') + ':' + agora.getMinutes().toString().padStart(2,'0');
+    atividadesRecentes.unshift({
+      tipo: 'agendamento',
+      titulo: 'Agendamento confirmado — ' + nome + ' em ' + dataExt + ' às ' + horario,
+      tempo: 'agora — ' + hora,
+      cor: '#37A7AA',
+      bg: 'rgba(55,167,170,0.1)'
+    });
+    if (atividadesRecentes.length > 8) atividadesRecentes.pop();
+    renderAtividades();
 
     document.getElementById('modal-agen-nome').textContent = nome;
     document.getElementById('modal-agen-data').textContent = dataExt + ' às ' + horario;
