@@ -2000,78 +2000,49 @@
     const file = input.files[0];
     if (!file) return;
     if (file.type !== 'application/pdf') {
-      showToast('Por favor, selecione apenas arquivos PDF.', 'error');
+      showToast('Selecione apenas arquivos PDF.', 'error');
       input.value = '';
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      showToast('O arquivo e muito grande. Maximo 5MB.', 'error');
+      showToast('Arquivo muito grande. Maximo 5MB.', 'error');
       input.value = '';
       return;
     }
-    const defaultDiv = document.getElementById('pdf-upload-default');
-    const previewDiv = document.getElementById('pdf-upload-preview');
-    const fileNameEl = document.getElementById('pdf-file-name');
-    const progressBar = document.getElementById('pdf-upload-progress-bar');
+    const defaultDiv  = document.getElementById('pdf-upload-default');
+    const previewDiv  = document.getElementById('pdf-upload-preview');
+    const fileNameEl  = document.getElementById('pdf-file-name');
     const progressDiv = document.getElementById('pdf-upload-progress');
-    const statusDiv = document.getElementById('pdf-upload-status');
+    const statusDiv   = document.getElementById('pdf-upload-status');
+
     defaultDiv.classList.add('hidden');
     previewDiv.classList.remove('hidden');
     fileNameEl.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
-    progressDiv.classList.remove('hidden');
+    progressDiv.classList.add('hidden');
     statusDiv.classList.remove('hidden');
     statusDiv.style.color = '#0F4C5C';
-    statusDiv.textContent = 'Lendo arquivo...';
-    progressBar.style.width = '30%';
+    statusDiv.textContent = 'PDF pronto — sera enviado ao salvar o agendamento.';
+
     try {
       const base64 = await fileToBase64(file);
-      progressBar.style.width = '50%';
-      statusDiv.textContent = 'Enviando para o Google Drive...';
-      let base64Data = base64;
-      if (base64Data.indexOf(',') !== -1) {
-        base64Data = base64Data.split(',')[1];
-      }
-      const uploadResp = await fetch(APPS_SCRIPT_AGENDA_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({
-          action: 'uploadPDF',
-          token: CDA_TOKEN,
-          base64: base64Data,
-          filename: file.name,
-          mimeType: file.type
-        })
-      });
-      const uploadJson = await uploadResp.json();
-      if (uploadJson.ok) {
-        agenPDFAnexado = {
-          file: file,
-          base64: base64,
-          nome: file.name,
-          tamanho: file.size,
-          driveId: uploadJson.fileId,
-          driveUrl: uploadJson.webViewLink || uploadJson.fileUrl
-        };
-        progressBar.style.width = '100%';
-        statusDiv.textContent = 'PDF salvo no Google Drive!';
-        statusDiv.style.color = '#0F4C5C';
-        document.getElementById('agen-pdf-anexado-info').classList.remove('hidden');
-        document.getElementById('pdf-anexado-nome').textContent = file.name;
-        document.getElementById('pdf-anexado-status').textContent = 'Salvo no Drive ✓';
-        showToast('PDF anexado com sucesso!');
-      } else {
-        throw new Error(uploadJson.erro || 'Falha no upload');
-      }
-      agenAtualizarResumo();
+      // Guarda localmente — upload só acontece no botão Salvar
+      agenPDFAnexado = {
+        file:    file,
+        base64:  base64,
+        nome:    file.name,
+        tamanho: file.size,
+        driveId:  null,
+        driveUrl: null
+      };
+      document.getElementById('agen-pdf-anexado-info').classList.remove('hidden');
+      document.getElementById('pdf-anexado-nome').textContent = file.name;
+      document.getElementById('pdf-anexado-status').textContent = 'Aguardando salvar para enviar ao Drive';
+      showToast('PDF selecionado! Sera enviado ao Drive ao salvar.');
     } catch(err) {
-      console.error('[CDA] Erro ao enviar PDF:', err);
-      progressBar.style.width = '100%';
-      progressBar.style.background = '#ef4444';
-      statusDiv.textContent = 'Erro: ' + err.message;
-      statusDiv.style.color = '#ef4444';
-      showToast('Erro ao enviar PDF: ' + err.message, 'error');
+      showToast('Erro ao ler PDF: ' + err.message, 'error');
       agenPDFAnexado = null;
     }
+    agenAtualizarResumo();
   }
 
 function agenRemoverPDF() {
@@ -2520,13 +2491,57 @@ function agenRemoverPDF() {
       const totalPix = totalBruto * 0.60;
       const totalCredito = totalBruto * 0.65;
       const linhas = orcSelecionados.map(ex => ex.nome + ': ' + formatCurrency(ex.preco)).join('\n');
-      descExames = '\n\nLista de Exames:\n' + linhas + '\n\nTotal particular: ' + formatCurrency(totalBruto) + '\nPIX/Dinheiro/Débito (40% desc): ' + formatCurrency(totalPix) + '\nCartão de crédito (35% desc): ' + formatCurrency(totalCredito) + '\nForma de pagamento: ' + pagamento;
+      descExames = '\n\nLista de Exames:\n' + linhas + '\n\nTotal particular: ' + formatCurrency(totalBruto) + '\nPIX/Dinheiro/Debito (40% desc): ' + formatCurrency(totalPix) + '\nCartao de credito (35% desc): ' + formatCurrency(totalCredito) + '\nForma de pagamento: ' + pagamento;
     }
-    let pdfInfo = '';
-    if (temPDF && agenPDFAnexado) { pdfInfo = '\n\nPDF Anexado: ' + agenPDFAnexado.nome + '\nLink: ' + (agenPDFAnexado.driveUrl || 'Não disponível'); }
-    
+
+    // ---- UPLOAD DO PDF AGORA (no momento de salvar) ----
+    let pdfDriveId  = '';
+    let pdfDriveUrl = '';
+    let pdfInfo     = '';
+    if (temPDF && agenPDFAnexado && !agenPDFAnexado.driveId) {
+      btnSalvar.innerHTML = '<span class="text"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Enviando PDF ao Drive...</span><span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594z"/></svg></span>';
+      try {
+        let base64Data = agenPDFAnexado.base64;
+        if (base64Data.indexOf(',') !== -1) base64Data = base64Data.split(',')[1];
+        const uploadResp = await fetch(APPS_SCRIPT_AGENDA_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            action: 'uploadPDF', token: CDA_TOKEN,
+            base64: base64Data, filename: agenPDFAnexado.nome, mimeType: 'application/pdf'
+          })
+        });
+        const uploadJson = await uploadResp.json();
+        if (uploadJson.ok) {
+          pdfDriveId  = uploadJson.fileId  || '';
+          pdfDriveUrl = uploadJson.webViewLink || uploadJson.fileUrl || '';
+          agenPDFAnexado.driveId  = pdfDriveId;
+          agenPDFAnexado.driveUrl = pdfDriveUrl;
+          // Atualizar UI
+          const statusDiv = document.getElementById('pdf-upload-status');
+          if (statusDiv) { statusDiv.textContent = 'Salvo no Drive!'; statusDiv.classList.remove('hidden'); }
+          const subtituloEl = document.getElementById('pdf-anexado-status');
+          if (subtituloEl) subtituloEl.textContent = 'Salvo no Drive';
+          console.log('[CDA] PDF enviado ao Drive:', pdfDriveId);
+        } else {
+          console.warn('[CDA] Falha no upload do PDF:', uploadJson.erro);
+          showToast('Aviso: nao foi possivel enviar o PDF ao Drive. Continuando...', 'error');
+        }
+      } catch(err) {
+        console.warn('[CDA] Erro ao enviar PDF:', err);
+        showToast('Aviso: erro ao enviar PDF. Continuando sem anexo...', 'error');
+      }
+    } else if (temPDF && agenPDFAnexado && agenPDFAnexado.driveId) {
+      pdfDriveId  = agenPDFAnexado.driveId;
+      pdfDriveUrl = agenPDFAnexado.driveUrl;
+    }
+
+    if (pdfDriveUrl) {
+      pdfInfo = '\n\nPDF Anexado: ' + (agenPDFAnexado ? agenPDFAnexado.nome : 'documento.pdf') + '\nLink: ' + pdfDriveUrl;
+    }
+
     const nascFormatado = nascimento ? new Date(nascimento + 'T12:00:00').toLocaleDateString('pt-BR') : '';
-    let responsavelStr = nomeResponsavel ? '\nResponsável Legal: ' + nomeResponsavel.toUpperCase() : '';
+    let responsavelStr = nomeResponsavel ? '\nResponsavel Legal: ' + nomeResponsavel.toUpperCase() : '';
     const idade = nascimento ? calcularIdade(nascimento) : null;
     const idadeStr = idade !== null ? '\nIdade: ' + idade + ' anos' : '';
 
@@ -2536,6 +2551,8 @@ function agenRemoverPDF() {
       const endHh = hh + 1;
       const endDateTime = data + 'T' + String(endHh).padStart(2,'0') + ':' + String(mm).padStart(2,'0') + ':00';
 
+      btnSalvar.innerHTML = '<span class="text"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Salvando agendamento...</span><span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594z"/></svg></span>';
+
       const resp = await fetch(APPS_SCRIPT_AGENDA_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
@@ -2544,15 +2561,15 @@ function agenRemoverPDF() {
           nascimento: nascFormatado, pagamento: pagamento,
           startTime: startDateTime, endTime: endDateTime,
           usuario: usuarioLogado(),
-          descricao: 'Paciente: ' + nome + '\nTelefone: ' + telefone + '\nNascimento: ' + nascFormatado + idadeStr + responsavelStr + '\nForma de pagamento: ' + pagamento + '\nUsuário: ' + usuarioLogado() + '\nOrigem: Aplicativo CDA' + descExames + pdfInfo,
-          pdfDriveId: agenPDFAnexado ? agenPDFAnexado.driveId : '',
-          pdfDriveUrl: agenPDFAnexado ? agenPDFAnexado.driveUrl : '',
+          descricao: 'Paciente: ' + nome + '\nTelefone: ' + telefone + '\nNascimento: ' + nascFormatado + idadeStr + responsavelStr + '\nForma de pagamento: ' + pagamento + '\nUsuario: ' + usuarioLogado() + '\nOrigem: Aplicativo CDA' + descExames + pdfInfo,
+          pdfDriveId:  pdfDriveId,
+          pdfDriveUrl: pdfDriveUrl,
           temOrcamento: temExames ? '1' : '0'
         })
       });
       const json = await resp.json();
       if (json.ocupado) {
-        showToast('O horário ' + horario + ' acabou de ser reservado. Escolha outro.', 'error', 5000);
+        showToast('O horario ' + horario + ' acabou de ser reservado. Escolha outro.', 'error', 5000);
         btnSalvar.disabled = false;
         btnSalvar.innerHTML = '<span class="text">Salvar Agendamento</span><span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594z"/></svg></span>';
         agenState.horario = null; agenAtualizarResumo(); agenBuscarHorarios(); return;
@@ -2566,7 +2583,6 @@ function agenRemoverPDF() {
       agenFallbackWhatsApp(nome, telefone, data, horario, descExames + pdfInfo + responsavelStr, pagamento);
     }
   }
-
   function agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento) {
     const btnSalvar = document.getElementById('agen-btn-salvar');
     if (btnSalvar) {
@@ -2619,20 +2635,46 @@ function agenRemoverPDF() {
     const modal = document.getElementById('modal-agen-confirmacao');
     modal.classList.add('hidden');
     modal.classList.remove('flex');
+
+    // Limpar exames do orçamento
     orcSelecionados = [];
     orcRenderSelecionados();
     const orcPaciente = document.getElementById('orc-paciente');
     if (orcPaciente) orcPaciente.value = '';
+
+    // Limpar PDF anexado
+    agenPDFAnexado = null;
+    agenRemoverPDF();
+
+    // Limpar todos os campos do agendamento
+    const camposLimpar = ['agen-nome', 'agen-telefone', 'agen-nascimento', 'agen-data'];
+    camposLimpar.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.value = ''; el.style.border = ''; }
+    });
+
+    // Limpar seleção de período
+    ['manha','tarde'].forEach(p => {
+      const btn = document.getElementById('agen-btn-' + p);
+      if (btn) btn.classList.remove('ativo');
+    });
+
+    // Limpar seleção de pagamento
+    document.querySelectorAll('input[name="agen-pagamento"]').forEach(r => { r.checked = false; });
+
+    // Resetar estado
+    agenState = { data: null, periodo: null, horario: null, pagamento: null };
+
+    // Resetar UI
     agenInicializar();
     const btnSalvar = document.getElementById('agen-btn-salvar');
-    const statusEl = document.getElementById('agen-status');
+    const statusEl  = document.getElementById('agen-status');
     if (statusEl) statusEl.classList.add('hidden');
     if (btnSalvar) {
-      btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
+      btnSalvar.innerHTML = '<span class="text">Salvar Agendamento</span><span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594z"/></svg></span>';
       btnSalvar.disabled = false;
-      btnSalvar.classList.remove('opacity-50','pointer-events-none');
+      btnSalvar.classList.add('opacity-50','pointer-events-none');
     }
-    document.getElementById('agen-data').min = new Date().toISOString().split('T')[0];
     navigateToPage('home');
   }
 
