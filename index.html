@@ -1681,184 +1681,183 @@
     }
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    const W = 210;
-    const margin = 20;
-    const hoje = new Date();
+    const W      = 210;
+    const H      = 297;
+    const margin = 18;
+    const hoje   = new Date();
     const dataStr = hoje.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
-    const total = orcSelecionados.reduce((s, e) => s + parseFloat(e.preco || 0), 0);
+    const total    = orcSelecionados.reduce((s, e) => s + parseFloat(e.preco || 0), 0);
     const totalPix = total * 0.60;
-    const totalCc = total * 0.65;
-    const parcelaCc = totalCc / 10;
+    const totalCc  = total * 0.65;
 
-    // CABEÇALHO teal com cantos arredondados
+    // ── Calcular tamanho de fonte adaptativo para exames ──
+    const nExames = orcSelecionados.length;
+    let exFontSize  = 9;
+    let exRowHeight = 9;
+    if (nExames > 15) { exFontSize = 7;   exRowHeight = 7;   }
+    else if (nExames > 10) { exFontSize = 7.5; exRowHeight = 7.5; }
+    else if (nExames > 7)  { exFontSize = 8;   exRowHeight = 8;   }
+
+    // ── CABEÇALHO ──
     doc.setFillColor(15, 76, 92);
-    doc.roundedRect(margin, 10, W - margin * 2, 38, 4, 4, 'F');
-    // Decoração curva direita
+    doc.roundedRect(margin, 8, W - margin * 2, 36, 4, 4, 'F');
     doc.setFillColor(73, 188, 190);
-    doc.roundedRect(W - margin - 36, 10, 36, 38, 4, 4, 'F');
+    doc.roundedRect(W - margin - 34, 8, 34, 36, 4, 4, 'F');
     doc.setFillColor(15, 76, 92);
-    doc.rect(W - margin - 16, 10, 16, 38, 'F');
+    doc.rect(W - margin - 16, 8, 16, 36, 'F');
 
-    // Logo CDA real (base64)
-    try {
-      doc.addImage(LOGO_CDA_B64, 'PNG', margin + 2, 12, 32, 32);
-    } catch(e) {
-      // fallback texto
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(20);
-      doc.setTextColor(73, 188, 190);
-      doc.text('CDA', margin + 4, 30);
+    try { doc.addImage(LOGO_CDA_B64, 'PNG', margin + 2, 10, 30, 30); } catch(e) {
+      doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(73,188,190);
+      doc.text('CDA', margin + 4, 28);
     }
 
-    // Título empresa (deslocado para não sobrepor logo)
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(16);
-    doc.setTextColor(255, 255, 255);
-    doc.text('Laboratório CDA', margin + 38, 22);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
-    doc.setTextColor(200, 240, 240);
-    doc.text('Diagnostico de Confianca', margin + 38, 29);
-    doc.text('Afonso Claudio, ES  -  (27) 99898-0658', margin + 38, 35);
+    doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.setTextColor(255,255,255);
+    doc.text('Laboratorio CDA', margin + 36, 20);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(200,240,240);
+    doc.text('Diagnostico de Confianca', margin + 36, 27);
+    doc.text('Afonso Claudio, ES  -  (27) 99898-0658', margin + 36, 33);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(255,255,255);
+    doc.text('ORCAMENTO', W - margin - 30, 28, { align: 'center' });
 
-    // Badge ORÇAMENTO
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    doc.setTextColor(255, 255, 255);
-    doc.text('ORÇAMENTO', W - margin - 32, 31, { align: 'center' });
-
-    // PACIENTE / DATA
-    let y = 60;
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(100, 116, 139);
+    // ── PACIENTE / DATA ──
+    let y = 54;
+    doc.setFontSize(7.5); doc.setFont('helvetica','bold'); doc.setTextColor(100,116,139);
     doc.text('PACIENTE', margin, y);
     doc.text('DATA', W - margin, y, { align: 'right' });
-    y += 6;
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.setTextColor(16, 22, 32);
+    y += 5;
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(16,22,32);
     doc.text(paciente.toUpperCase(), margin, y);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.setTextColor(55, 65, 81);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(55,65,81);
     doc.text(dataStr, W - margin, y, { align: 'right' });
 
-    // Separador
-    y += 8;
-    doc.setDrawColor(200, 220, 225);
-    doc.setLineWidth(0.3);
+    // ── SEPARADOR ──
+    y += 6;
+    doc.setDrawColor(200,220,225); doc.setLineWidth(0.3);
     doc.line(margin, y, W - margin, y);
 
-    // Tabela exames — cabeçalho
-    y += 6;
-    doc.setFillColor(15, 76, 92);
-    doc.roundedRect(margin, y, W - margin * 2, 9, 2, 2, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8.5);
-    doc.setTextColor(255, 255, 255);
-    doc.text('#', margin + 4, y + 6);
-    doc.text('EXAME', margin + 14, y + 6);
-    doc.text('VALOR', W - margin - 2, y + 6, { align: 'right' });
-    y += 11;
+    // ── TABELA EXAMES — cabeçalho ──
+    y += 5;
+    doc.setFillColor(15,76,92);
+    doc.roundedRect(margin, y, W - margin*2, 8, 2, 2, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(255,255,255);
+    doc.text('#', margin + 3, y + 5.5);
+    doc.text('EXAME', margin + 12, y + 5.5);
+    doc.text('VALOR', W - margin - 2, y + 5.5, { align: 'right' });
+    y += 10;
 
     orcSelecionados.forEach((ex, i) => {
       const preco = parseFloat(ex.preco || 0);
-      if (i % 2 === 0) { doc.setFillColor(255,255,255); } else { doc.setFillColor(248,250,252); }
-      doc.rect(margin, y - 1, W - margin * 2, 9, 'F');
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(55, 65, 81);
-      doc.text(String(i + 1), margin + 4, y + 5.5);
-      const nomeTrunc = doc.splitTextToSize(ex.nome || 'Exame', 118)[0];
-      doc.text(nomeTrunc, margin + 14, y + 5.5);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(73, 188, 190);
-      doc.text(formatarMoeda(preco), W - margin - 2, y + 5.5, { align: 'right' });
-      y += 9;
+      doc.setFillColor(i % 2 === 0 ? 255 : 248, i % 2 === 0 ? 255 : 250, i % 2 === 0 ? 255 : 252);
+      doc.rect(margin, y - 1, W - margin*2, exRowHeight, 'F');
+      doc.setFont('helvetica','normal'); doc.setFontSize(exFontSize); doc.setTextColor(55,65,81);
+      doc.text(String(i+1), margin + 3, y + exRowHeight - 2.5);
+      const nomeTrunc = doc.splitTextToSize(ex.nome || 'Exame', 120)[0];
+      doc.text(nomeTrunc, margin + 12, y + exRowHeight - 2.5);
+      doc.setFont('helvetica','bold'); doc.setTextColor(73,188,190);
+      doc.text(formatarMoeda(preco), W - margin - 2, y + exRowHeight - 2.5, { align: 'right' });
+      y += exRowHeight;
     });
 
-    // Total
-    y += 4;
-    doc.setFillColor(15, 76, 92);
-    doc.roundedRect(margin, y, W - margin * 2, 11, 2, 2, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(255, 255, 255);
-    doc.text('TOTAL ESTIMADO (tabela particular)', margin + 5, y + 7.5);
-    doc.text(formatarMoeda(total), W - margin - 3, y + 7.5, { align: 'right' });
+    // ── TOTAL ──
+    y += 3;
+    doc.setFillColor(15,76,92);
+    doc.roundedRect(margin, y, W - margin*2, 10, 2, 2, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(255,255,255);
+    doc.text('TOTAL ESTIMADO (tabela particular)', margin + 4, y + 7);
+    doc.text(formatarMoeda(total), W - margin - 3, y + 7, { align: 'right' });
+    y += 14;
 
-    // Descontos
-    y += 18;
-    doc.setFillColor(232, 248, 248);
-    doc.roundedRect(margin, y, W - margin * 2, 58, 4, 4, 'F');
-    doc.setDrawColor(73, 188, 190);
-    doc.setLineWidth(0.4);
-    doc.roundedRect(margin, y, W - margin * 2, 58, 4, 4, 'S');
+    // ── CAIXA DE DESCONTOS ──
+    // Calcular parcelas 1x a 10x
+    const parcelas = [];
+    for (let n = 1; n <= 10; n++) {
+      parcelas.push({ n: n, valor: totalCc / n });
+    }
+    // Altura da caixa: título(14) + pix(10) + linha parcelas título(7) + 10 linhas de parcelas(5.5*10=55) + texto cobrir(8) = ~94
+    const alturaDesc = 14 + 10 + 7 + (5.5 * 10) + 10;
+    doc.setFillColor(232,248,248);
+    doc.roundedRect(margin, y, W - margin*2, alturaDesc, 4, 4, 'F');
+    doc.setDrawColor(73,188,190); doc.setLineWidth(0.4);
+    doc.roundedRect(margin, y, W - margin*2, alturaDesc, 4, 4, 'S');
 
     y += 8;
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(15, 76, 92);
+    doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(15,76,92);
     doc.text('Descontos Especiais CDA', margin + 5, y);
     y += 5;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
-    doc.setTextColor(100, 116, 139);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(100,116,139);
     doc.text('Pacientes com convenio ou Cartao Fidelidade CDA tem direito a:', margin + 5, y);
 
-    y += 9;
+    // PIX
+    y += 8;
     doc.setFillColor(255,255,255);
-    doc.roundedRect(margin + 4, y - 4, W - margin * 2 - 8, 10, 3, 3, 'F');
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(55, 65, 81);
+    doc.roundedRect(margin + 4, y - 3, W - margin*2 - 8, 9, 3, 3, 'F');
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(55,65,81);
     doc.text('Pix, dinheiro ou debito (a vista)', margin + 7, y + 3);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(15, 76, 92);
+    doc.setFont('helvetica','bold'); doc.setTextColor(15,76,92);
     doc.text('40% OFF -> ' + formatarMoeda(totalPix), W - margin - 5, y + 3, { align: 'right' });
 
-    y += 13;
-    doc.setFillColor(255,255,255);
-    doc.roundedRect(margin + 4, y - 4, W - margin * 2 - 8, 10, 3, 3, 'F');
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(55, 65, 81);
-    doc.text('Cartao de credito (parcelado em ate 10x)', margin + 7, y + 3);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(15, 76, 92);
-    doc.text('35% OFF -> 10x ' + formatarMoeda(parcelaCc), W - margin - 5, y + 3, { align: 'right' });
+    // CARTÃO — título
+    y += 12;
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(15,76,92);
+    doc.text('Cartao de credito (35% OFF) - Opcoes de parcelamento:', margin + 5, y);
 
-    y += 14;
-    doc.setFont('helvetica', 'italic');
-    doc.setFontSize(8);
-    doc.setTextColor(73, 188, 190);
-    doc.text('Cobrimos qualquer orcamento! Apresente uma proposta e faremos questao de superar.', W / 2, y, { align: 'center' });
+    // Grade de parcelas 2 colunas
+    y += 6;
+    const colW   = (W - margin*2 - 12) / 2;
+    const col1x  = margin + 6;
+    const col2x  = margin + 6 + colW + 4;
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(55,65,81);
 
-    // Benefícios
-    y += 13;
-    doc.setFillColor(232, 248, 248);
-    doc.roundedRect(margin, y, W - margin * 2, 30, 4, 4, 'F');
+    for (let i = 0; i < 10; i++) {
+      const p    = parcelas[i];
+      const cx   = i < 5 ? col1x : col2x;
+      const linha = i < 5 ? i : i - 5;
+      const ly   = y + linha * 5.5;
+      // Fundo alternado
+      if (i % 2 === 0) {
+        doc.setFillColor(245,252,252);
+        doc.rect(cx - 2, ly - 3.5, colW, 5.5, 'F');
+      }
+      doc.setFont('helvetica','bold'); doc.setTextColor(15,76,92);
+      doc.text(p.n + 'x de', cx, ly);
+      doc.setFont('helvetica','bold'); doc.setTextColor(73,188,190);
+      doc.text(formatarMoeda(p.valor), cx + colW - 2, ly, { align: 'right' });
+    }
+
+    // Texto "Cobrimos" — posicionar após as 5 linhas
+    y += (5 * 5.5) + 6;
+    doc.setFont('helvetica','italic'); doc.setFontSize(8); doc.setTextColor(73,188,190);
+    doc.text('Cobrimos qualquer orcamento! Apresente uma proposta e faremos questao de superar.', W/2, y, { align: 'center' });
+
+    y += 12;
+
+    // ── BENEFÍCIOS ──
+    const altBenef = 28;
+    // Verificar se cabe na página antes do rodapé (rodapé em 280)
+    if (y + altBenef > 278) {
+      // Reduzir margem
+      y = 278 - altBenef;
+    }
+    doc.setFillColor(232,248,248);
+    doc.roundedRect(margin, y, W - margin*2, altBenef, 4, 4, 'F');
     y += 7;
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    doc.setTextColor(15, 76, 92);
-    doc.text('Agende e ganhe mimos especiais!', W / 2, y, { align: 'center' });
-    y += 8;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
-    doc.setTextColor(55, 65, 81);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(15,76,92);
+    doc.text('Agende e ganhe mimos especiais!', W/2, y, { align: 'center' });
+    y += 7;
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(55,65,81);
     doc.text('v Atendimento sem fila', margin + 8, y);
-    doc.text('v Sala VIP com TV e ar-condicionado', W / 2 + 4, y);
-    y += 7;
+    doc.text('v Sala VIP com TV e ar-condicionado', W/2 + 4, y);
+    y += 6;
     doc.text('v Cafe expresso', margin + 8, y);
-    doc.text('v Biscoitinho Club Social', W / 2 + 4, y);
+    doc.text('v Biscoitinho Club Social', W/2 + 4, y);
 
-    // Rodapé
-    const rodapeY = 287;
-    doc.setDrawColor(200, 220, 225); doc.setLineWidth(0.3); doc.line(margin, rodapeY, W - margin, rodapeY);
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(150, 160, 170);
-    doc.text('Laboratorio CDA  -  Afonso Claudio, ES  -  (27) 99898-0658', W / 2, rodapeY + 5, { align: 'center' });
-    doc.text('* Valores estimados da tabela particular. Sujeitos a confirmacao. Convenios sob consulta.', W / 2, rodapeY + 9, { align: 'center' });
+    // ── RODAPÉ ──
+    const rodapeY = 289;
+    doc.setDrawColor(200,220,225); doc.setLineWidth(0.3);
+    doc.line(margin, rodapeY, W - margin, rodapeY);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(150,160,170);
+    doc.text('Laboratorio CDA  -  Afonso Claudio, ES  -  (27) 99898-0658', W/2, rodapeY + 4, { align: 'center' });
+    doc.text('* Valores estimados da tabela particular. Sujeitos a confirmacao. Convenios sob consulta.', W/2, rodapeY + 8, { align: 'center' });
 
     return doc.output('blob');
   }
