@@ -3084,10 +3084,11 @@ function agenRemoverPDF() {
   }
 
   // ===== VARIÁVEIS PARA MODAL DE DETALHES =====
-  let recDetalhesIndex = null;
-  let recDetalhesStatus = null;
-  let recComunicacaoValor = null;
+  let recDetalhesIndex     = null;
+  let recDetalhesStatus    = null;
+  let recComunicacaoValor  = null;
   let recFiltroStatusAtual = 'afazer';
+  let recDetalhesRegistro  = null;
 
   function recFiltroStatus(status) {
     recFiltroStatusAtual = status;
@@ -3097,25 +3098,31 @@ function agenRemoverPDF() {
   }
 
   function abrirModalRecDetalhes(index) {
-    console.log('[CDA DEBUG] abrirModalRecDetalhes chamado com index:', index);
     let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
-    console.log('[CDA DEBUG] Total recoletas no localStorage:', recoletas.length);
     const pendentes = recoletas.filter(r => (r.status || 'PENDENTE') !== 'CONCLUIDO');
-    console.log('[CDA DEBUG] Pendentes:', pendentes.length);
     const r = pendentes[index];
-    console.log('[CDA DEBUG] Registro encontrado:', r ? 'SIM' : 'NAO', r);
-    if (!r) { console.log('[CDA DEBUG] Registro nao encontrado, saindo'); return; }
-    recDetalhesIndex = index;
-    recDetalhesStatus = r.status || 'PENDENTE';
+    if (!r) { showToast('Registro não encontrado.', 'error'); return; }
+
+    recDetalhesIndex    = index;
+    recDetalhesStatus   = r.status || 'PENDENTE';
+    recDetalhesRegistro = r;
     recComunicacaoValor = null;
 
-    document.getElementById('modal-rec-subtitulo').innerHTML = 'Código: ' + (r.codigo || '---') + ' | Paciente: ' + (r.nome || '---');
-    document.getElementById('modal-rec-usuario').textContent = r.usuario || '---';
-    document.getElementById('modal-rec-data-cadastro').textContent = r.data || '---';
-    document.getElementById('modal-rec-exames').textContent = Array.isArray(r.exames) ? r.exames.map(e => e.nome || e).join(', ') : (r.exames || '---');
-    document.getElementById('modal-rec-tipo').textContent = r.tipo || '---';
-    document.getElementById('modal-rec-motivo').textContent = r.motivo || '---';
+    // Cabeçalho
+    document.getElementById('modal-rec-subtitulo').innerHTML =
+      'Cód: <b>' + (r.codigo || '---') + '</b> &nbsp;|&nbsp; ' + (r.nome || '---');
 
+    // Informações do cadastro
+    document.getElementById('modal-rec-usuario').textContent       = r.usuario || '---';
+    document.getElementById('modal-rec-data-cadastro').textContent = r.data    || '---';
+    document.getElementById('modal-rec-exames').textContent =
+      Array.isArray(r.exames) ? r.exames.map(e => e.nome || e).join(', ') : (r.exames || '---');
+    document.getElementById('modal-rec-tipo').textContent   = r.tipo   || '---';
+    document.getElementById('modal-rec-motivo').textContent = r.motivo || '---';
+    const obsEl = document.getElementById('modal-rec-obs');
+    if (obsEl) obsEl.textContent = r.observacoes || '---';
+
+    // Badge de status
     const statusEl = document.getElementById('modal-rec-status-atual');
     if (r.status === 'COMUNICADO') {
       statusEl.className = 'modal-rec-status-badge comunicado';
@@ -3125,24 +3132,55 @@ function agenRemoverPDF() {
       statusEl.innerHTML = '<i class="fa-solid fa-clock"></i> Pendente';
     }
 
+    // Seção comunicação
     const comExistente = document.getElementById('modal-rec-comunicacao-existente');
-    const comForm = document.getElementById('modal-rec-comunicacao-form');
+    const comForm      = document.getElementById('modal-rec-comunicacao-form');
 
     if (r.dataComunicacao && r.dataComunicacao.trim() !== '') {
       comExistente.style.display = 'block';
-      comForm.style.display = 'none';
+      comForm.style.display      = 'none';
       document.getElementById('modal-rec-data-comunicacao').textContent = r.dataComunicacao || '---';
-      document.getElementById('modal-rec-quem-comunicou').textContent = r.quemComunicou || '---';
-      document.getElementById('modal-rec-quem-recebeu').textContent = r.quemRecebeu || '---';
-      const conseguiuMap = { 'SIM': 'Sim', 'NAO': 'Não', 'NAO_ATENDEU': 'Não atendeu' };
-      document.getElementById('modal-rec-conseguiu').textContent = conseguiuMap[r.conseguiuComunicar] || '---';
+      document.getElementById('modal-rec-quem-comunicou').textContent   = r.quemComunicou   || '---';
+      document.getElementById('modal-rec-quem-recebeu').textContent     = r.quemRecebeu     || '---';
+      const conseguiuMap = { 'SIM': 'Sim, comunicado', 'NAO': 'Nao conseguiu', 'NAO_ATENDEU': 'Nao atendeu' };
+      document.getElementById('modal-rec-conseguiu').textContent =
+        conseguiuMap[r.conseguiuComunicar] || r.conseguiuComunicar || '---';
     } else {
       comExistente.style.display = 'none';
-      comForm.style.display = 'block';
+      comForm.style.display      = 'block';
       document.getElementById('modal-rec-input-data-comunicacao').value = new Date().toISOString().split('T')[0];
-      document.getElementById('modal-rec-input-quem-comunicou').value = usuarioLogado();
-      document.getElementById('modal-rec-input-quem-recebeu').value = '';
+      document.getElementById('modal-rec-input-quem-comunicou').value   = usuarioLogado();
+      document.getElementById('modal-rec-input-quem-recebeu').value     = '';
       document.querySelectorAll('.modal-rec-checkbox-label').forEach(el => el.classList.remove('ativo'));
+      recComunicacaoValor = null;
+    }
+
+    // Botão concluir
+    const btnConcluir = document.getElementById('modal-rec-btn-concluir');
+    if (btnConcluir) btnConcluir.style.display = 'flex';
+    document.getElementById('modal-rec-secao-conclusao').style.display = 'none';
+
+    document.getElementById('modal-rec-detalhes').classList.add('ativo');
+  }
+
+  function editarComunicacaoExistente() {
+    document.getElementById('modal-rec-comunicacao-existente').style.display = 'none';
+    document.getElementById('modal-rec-comunicacao-form').style.display      = 'block';
+    const r = recDetalhesRegistro;
+    if (r) {
+      document.getElementById('modal-rec-input-data-comunicacao').value = r.dataComunicacao || new Date().toISOString().split('T')[0];
+      document.getElementById('modal-rec-input-quem-comunicou').value   = r.quemComunicou   || usuarioLogado();
+      document.getElementById('modal-rec-input-quem-recebeu').value     = r.quemRecebeu     || '';
+      if (r.conseguiuComunicar) recSelecionarComunicacao(r.conseguiuComunicar);
+    }
+  }
+
+  function fecharModalRecDetalhes() {
+    document.getElementById('modal-rec-detalhes').classList.remove('ativo');
+    recDetalhesIndex    = null;
+    recDetalhesStatus   = null;
+    recDetalhesRegistro = null;
+    recComunicacaoValor = null;
       recComunicacaoValor = null;
     }
 
@@ -3219,24 +3257,59 @@ function agenRemoverPDF() {
     carregarRecoletas();
   }
 
-  async function concluirRecoleta() {
-    if (!confirm('Confirmar que o paciente veio fazer a recoleta? O registro será arquivado.')) return;
+  function mostrarConclusaoForm() {
+    // Mostrar seção com campo de data
+    document.getElementById('modal-rec-secao-conclusao').style.display = 'block';
+    // Preencher data atual como padrão
+    const hoje = new Date().toISOString().split('T')[0];
+    const inputData = document.getElementById('modal-rec-input-data-veio');
+    if (inputData && !inputData.value) inputData.value = hoje;
+    // Esconder botão e mostrar botões de confirmar/cancelar
+    document.getElementById('modal-rec-btn-concluir').style.display = 'none';
+    // Adicionar botões inline
+    const secao = document.getElementById('modal-rec-secao-conclusao');
+    if (!document.getElementById('modal-rec-btns-conclusao')) {
+      const div = document.createElement('div');
+      div.id = 'modal-rec-btns-conclusao';
+      div.style.cssText = 'display:flex;gap:8px;margin-top:12px;';
+      div.innerHTML = '<button class="modal-rec-btn neutral" onclick="cancelarConclusao()" style="flex:1;"><i class="fa-solid fa-xmark mr-1"></i> Cancelar</button>' +
+        '<button class="modal-rec-btn success" onclick="confirmarConclusao()" style="flex:2;"><i class="fa-solid fa-check-circle mr-1"></i> Confirmar</button>';
+      secao.appendChild(div);
+    } else {
+      document.getElementById('modal-rec-btns-conclusao').style.display = 'flex';
+    }
+  }
+
+  function cancelarConclusao() {
+    document.getElementById('modal-rec-secao-conclusao').style.display = 'none';
+    document.getElementById('modal-rec-btn-concluir').style.display = 'flex';
+    const btns = document.getElementById('modal-rec-btns-conclusao');
+    if (btns) btns.style.display = 'none';
+  }
+
+  async function confirmarConclusao() {
+    const inputData = document.getElementById('modal-rec-input-data-veio');
+    const dataVeio  = inputData ? inputData.value : '';
+    if (!dataVeio) { showToast('Informe a data que o paciente veio.', 'error'); return; }
+
+    // Formatar data para DD/MM/YYYY
+    const [y,m,d]        = dataVeio.split('-');
+    const dataVeioFormatada = d + '/' + m + '/' + y;
+    const usuarioConc    = usuarioLogado();
 
     let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
     const pendentes = recoletas.filter(r => (r.status || 'PENDENTE') !== 'CONCLUIDO');
     const r = pendentes[recDetalhesIndex];
     if (!r) return;
 
-    const idxReal = recoletas.findIndex(item => item.id === r.id || (item.codigo === r.codigo && item.nome === r.nome));
+    const idxReal = recoletas.findIndex(item =>
+      item.id === r.id || (item.codigo === r.codigo && item.nome === r.nome)
+    );
     if (idxReal === -1) return;
 
-    const dataVeio = new Date().toLocaleDateString('pt-BR');
-    const usuarioConc = usuarioLogado();
-
-    recoletas[idxReal].status = 'CONCLUIDO';
-    recoletas[idxReal].dataVeio = dataVeio;
+    recoletas[idxReal].status           = 'CONCLUIDO';
+    recoletas[idxReal].dataVeio         = dataVeioFormatada;
     recoletas[idxReal].usuarioConclusao = usuarioConc;
-
     localStorage.setItem('cda_recoletas', JSON.stringify(recoletas));
 
     try {
@@ -3244,22 +3317,26 @@ function agenRemoverPDF() {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
-          action: 'atualizarRecoleta',
-          token: CDA_TOKEN,
-          codigo: r.codigo,
-          nome: r.nome,
+          action: 'atualizarRecoleta', token: CDA_TOKEN,
+          codigo: r.codigo, nome: r.nome,
           status: 'CONCLUIDO',
-          dataVeio: dataVeio,
+          dataVeio: dataVeioFormatada,
           usuarioConclusao: usuarioConc
         })
       });
       const json = await resp.json();
       if (json.ok) console.log('[CDA] Recoleta concluída no servidor');
+      else console.warn('[CDA] Erro ao concluir no servidor:', json.erro);
     } catch(err) { console.warn('[CDA] Falha ao sincronizar conclusão:', err); }
 
     showToast('Recoleta concluída! Registro arquivado.');
     fecharModalRecDetalhes();
     carregarRecoletas();
+  }
+
+  async function concluirRecoleta() {
+    // Mantida por compatibilidade — redireciona para o novo fluxo
+    mostrarConclusaoForm();
   }
 
   async function recFiltrar() {
@@ -3631,6 +3708,10 @@ async function carregarUsuarios() {
                     <span class="modal-rec-info-label">Motivo:</span>
                     <span class="modal-rec-info-value" id="modal-rec-motivo">---</span>
                 </div>
+                <div class="modal-rec-info-row">
+                    <span class="modal-rec-info-label">Observações:</span>
+                    <span class="modal-rec-info-value" id="modal-rec-obs">---</span>
+                </div>
             </div>
 
             <!-- Seção de Comunicação -->
@@ -3653,6 +3734,9 @@ async function carregarUsuarios() {
                         <span class="modal-rec-info-label">Conseguiu comunicar:</span>
                         <span class="modal-rec-info-value" id="modal-rec-conseguiu">---</span>
                     </div>
+                    <button id="modal-rec-btn-editar-com" onclick="editarComunicacaoExistente()" class="modal-rec-btn neutral" style="margin-top:8px;width:100%;font-size:0.8rem;">
+                        <i class="fa-solid fa-pen mr-1"></i> Editar esta comunicação
+                    </button>
                 </div>
                 <div id="modal-rec-comunicacao-form">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Data da comunicação</label>
@@ -3684,8 +3768,10 @@ async function carregarUsuarios() {
 
             <!-- Seção de Conclusão -->
             <div id="modal-rec-secao-conclusao" class="modal-rec-secao" style="display:none;">
-                <h4><i class="fa-solid fa-flag-checkered mr-1"></i> Conclusão</h4>
-                <div class="modal-rec-info-row">
+                <h4><i class="fa-solid fa-flag-checkered mr-1"></i> Paciente Retornou</h4>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5" style="margin-top:4px;">Data que o paciente veio</label>
+                <input type="date" id="modal-rec-input-data-veio" class="modal-rec-field">
+                <div class="modal-rec-info-row" style="display:none;">
                     <span class="modal-rec-info-label">Data que veio:</span>
                     <span class="modal-rec-info-value" id="modal-rec-data-veio">---</span>
                 </div>
@@ -3700,7 +3786,7 @@ async function carregarUsuarios() {
                 <button class="modal-rec-btn neutral" onclick="fecharModalRecDetalhes()" style="flex:1;">
                     <i class="fa-solid fa-xmark mr-1"></i> Fechar
                 </button>
-                <button id="modal-rec-btn-concluir" class="modal-rec-btn success" onclick="concluirRecoleta()" style="flex:2;">
+                <button id="modal-rec-btn-concluir" class="modal-rec-btn success" onclick="mostrarConclusaoForm()" style="flex:2;">
                     <i class="fa-solid fa-check-circle mr-1"></i> Paciente Veio / Concluir
                 </button>
             </div>
