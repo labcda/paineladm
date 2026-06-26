@@ -4244,7 +4244,6 @@ async function carregarUsuarios() {
       }
 
       // ---- Por Usuário ----
-      const orcamentos = resultados.filter(r => r.tipo === 'orc');
       const porUsuario = {};
       orcamentos.forEach(o => {
         const u = o.usuario || 'DESCONHECIDO';
