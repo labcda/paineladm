@@ -869,6 +869,24 @@
             <div class="stat-label">Recoletas Comunicadas</div>
             <div class="stat-mes" id="stat-recoletas-comunicadas-sub" style="color:#16a34a;">paciente informado</div>
           </div>
+          <!-- Separador APP -->
+          <div style="grid-column:span 2;display:flex;align-items:center;gap:10px;margin:4px 0 0;">
+            <div style="flex:1;height:1px;background:#d1d5db;"></div>
+            <span style="font-size:0.7rem;font-weight:800;color:#94a3b8;letter-spacing:.08em;white-space:nowrap;"><i class="fa-solid fa-mobile-screen-button mr-1"></i> APP DO PACIENTE</span>
+            <div style="flex:1;height:1px;background:#d1d5db;"></div>
+          </div>
+          <div class="stat-card" style="cursor:pointer;" onclick="carregarEstatisticas()" title="Clique para atualizar">
+            <div class="stat-icon" style="background:rgba(99,102,241,0.12);"><i class="fa-solid fa-file-invoice-dollar" style="color:#6366f1;"></i></div>
+            <div class="stat-value" id="stat-app-orcamentos"><i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;color:#49BCBE;"></i></div>
+            <div class="stat-label">Orçamentos App</div>
+            <div class="stat-mes" id="stat-mes-app-orcamentos" style="color:#6366f1;">carregando...</div>
+          </div>
+          <div class="stat-card" style="cursor:pointer;" onclick="carregarEstatisticas()" title="Clique para atualizar">
+            <div class="stat-icon" style="background:rgba(236,72,153,0.12);"><i class="fa-solid fa-calendar-check" style="color:#db2777;"></i></div>
+            <div class="stat-value" id="stat-app-agendamentos"><i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;color:#49BCBE;"></i></div>
+            <div class="stat-label">Agendamentos App</div>
+            <div class="stat-mes" id="stat-mes-app-agendamentos" style="color:#db2777;">carregando...</div>
+          </div>
         </div>
         <div class="neumorphic-card">
           <h2 style="font-size: 1.3rem; font-weight: 700; color: #101620; margin-bottom: 20px;">
@@ -1379,7 +1397,15 @@
                     </div>
                 </div>
             </div>
-            <div style="display:flex;gap:8px;">
+            <!-- Filtro de Fonte -->
+            <div style="margin-top:14px;padding-top:14px;border-top:1px solid #e2e8f0;">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-database mr-1"></i> Fonte dos Dados</label>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                    <button type="button" class="rel-filtro-chip ativo" id="rel-chip-fonte-painel" onclick="relFiltroFonte('painel')"><i class="fa-solid fa-desktop mr-1"></i>Painel ADM</button>
+                    <button type="button" class="rel-filtro-chip" id="rel-chip-fonte-app" onclick="relFiltroFonte('app')" style="border-color:#6366f1;"><i class="fa-solid fa-mobile-screen-button mr-1"></i>App do Paciente</button>
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:14px;">
                 <button onclick="relBuscar()" class="orc-btn primary" style="flex:1;justify-content:center;"><i class="fa-solid fa-search mr-1"></i> Buscar</button>
                 <button onclick="relLimpar()" class="orc-btn secondary"><i class="fa-solid fa-xmark mr-1"></i> Limpar</button>
             </div>
@@ -1917,31 +1943,33 @@
     const { mesAnoExtenso, mesAno, mesISO } = getMesAnoAtual();
 
     // Spinners
-    ['stat-orcamentos','stat-agendamentos','stat-recoletas-pendentes','stat-recoletas-comunicadas'].forEach(id => {
+    ['stat-orcamentos','stat-agendamentos','stat-recoletas-pendentes','stat-recoletas-comunicadas','stat-app-orcamentos','stat-app-agendamentos'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;color:#49BCBE;"></i>';
     });
-    document.getElementById('stat-mes-orcamentos').innerText   = mesAnoExtenso;
-    document.getElementById('stat-mes-agendamentos').innerText = mesAnoExtenso;
+    document.getElementById('stat-mes-orcamentos').innerText      = mesAnoExtenso;
+    document.getElementById('stat-mes-agendamentos').innerText    = mesAnoExtenso;
+    document.getElementById('stat-mes-app-orcamentos').innerText  = mesAnoExtenso;
+    document.getElementById('stat-mes-app-agendamentos').innerText = mesAnoExtenso;
 
     // Buscar tudo em paralelo
-    const [resOrc, resAgen, resRec] = await Promise.allSettled([
-      fetch(APPS_SCRIPT_URL + '?action=contarOrcamentos&mesAno='   + encodeURIComponent(mesAno)  + '&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json()),
-      fetch(APPS_SCRIPT_URL + '?action=contarRegistroAgen&mes='    + encodeURIComponent(mesISO)  + '&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json()),
-      fetch(APPS_SCRIPT_URL + '?action=contarRecoletas&token='     + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json())
+    const [resOrc, resAgen, resRec, resAppOrc, resAppAgen] = await Promise.allSettled([
+      fetch(APPS_SCRIPT_URL + '?action=contarOrcamentos&mesAno='    + encodeURIComponent(mesAno)  + '&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json()),
+      fetch(APPS_SCRIPT_URL + '?action=contarRegistroAgen&mes='     + encodeURIComponent(mesISO)  + '&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json()),
+      fetch(APPS_SCRIPT_URL + '?action=contarRecoletas&token='      + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json()),
+      fetch(APPS_SCRIPT_URL + '?action=contarAppOrcamentos&mesAno=' + encodeURIComponent(mesAno)  + '&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json()),
+      fetch(APPS_SCRIPT_URL + '?action=contarAppRegistroAgen&mes='  + encodeURIComponent(mesISO)  + '&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json())
     ]);
 
-    // Orçamentos
+    // Orçamentos Painel
     let totalOrc = 0;
     if (resOrc.status === 'fulfilled' && resOrc.value.ok) totalOrc = resOrc.value.total || 0;
-    else console.warn('[CDA] Erro orçamentos:', resOrc);
     dadosMensais.orcamentos = totalOrc;
     document.getElementById('stat-orcamentos').innerText = totalOrc;
 
-    // Agendamentos
+    // Agendamentos Painel
     let totalAgen = 0;
     if (resAgen.status === 'fulfilled' && resAgen.value.ok) totalAgen = resAgen.value.total || 0;
-    else console.warn('[CDA] Erro agendamentos:', resAgen);
     dadosMensais.agendamentos = totalAgen;
     document.getElementById('stat-agendamentos').innerText = totalAgen;
 
@@ -1950,9 +1978,19 @@
     if (resRec.status === 'fulfilled' && resRec.value.ok) {
       pendentes   = resRec.value.pendentes   || 0;
       comunicadas = resRec.value.comunicadas || 0;
-    } else console.warn('[CDA] Erro recoletas:', resRec);
+    }
     document.getElementById('stat-recoletas-pendentes').innerText   = pendentes;
     document.getElementById('stat-recoletas-comunicadas').innerText = comunicadas;
+
+    // Orçamentos App
+    let totalAppOrc = 0;
+    if (resAppOrc.status === 'fulfilled' && resAppOrc.value.ok) totalAppOrc = resAppOrc.value.total || 0;
+    document.getElementById('stat-app-orcamentos').innerText = totalAppOrc;
+
+    // Agendamentos App
+    let totalAppAgen = 0;
+    if (resAppAgen.status === 'fulfilled' && resAppAgen.value.ok) totalAppAgen = resAppAgen.value.total || 0;
+    document.getElementById('stat-app-agendamentos').innerText = totalAppAgen;
 
     // Atividades recentes
     carregarAtividadesRecentes();
@@ -4055,7 +4093,8 @@ async function carregarUsuarios() {
   }
 
   // ==================== RELATÓRIOS ====================
-  let relTipoAtual = 'todos';
+  let relTipoAtual  = 'todos';
+  let relFonteAtual = 'painel';
 
   let relResultadosCache = [];
 
@@ -4064,6 +4103,14 @@ async function carregarUsuarios() {
     ['todos','orc','agen'].forEach(t => {
       const el = document.getElementById('rel-chip-' + t);
       if (el) el.classList.toggle('ativo', t === tipo);
+    });
+  }
+
+  function relFiltroFonte(fonte) {
+    relFonteAtual = fonte;
+    ['painel','app'].forEach(f => {
+      const el = document.getElementById('rel-chip-fonte-' + f);
+      if (el) el.classList.toggle('ativo', f === fonte);
     });
   }
 
@@ -4076,7 +4123,11 @@ async function carregarUsuarios() {
     const btnExport = document.getElementById('rel-btn-exportar');
     const resumoSec = document.getElementById('rel-resumo-section');
 
-    container.innerHTML = '<div class="flex items-center gap-3 py-6 justify-center"><i class="fa-solid fa-spinner fa-spin text-cda-primary text-xl"></i><p class="text-sm text-slate-400">Consultando servidor...</p></div>';
+    const isApp = relFonteAtual === 'app';
+    const actionOrc  = isApp ? 'listarAppOrcamentos'  : 'listarOrcamentos';
+    const actionAgen = isApp ? 'listarAppRegistroAgen' : 'listarRegistroAgen';
+
+    container.innerHTML = '<div class="flex items-center gap-3 py-6 justify-center"><i class="fa-solid fa-spinner fa-spin text-cda-primary text-xl"></i><p class="text-sm text-slate-400">Consultando ' + (isApp ? 'App do Paciente' : 'Painel ADM') + '...</p></div>';
     if (btnExport) btnExport.style.display = 'none';
 
     const resultados = [];
@@ -4086,7 +4137,7 @@ async function carregarUsuarios() {
       try {
         let mesAno = '';
         if (mes) { const [y,m] = mes.split('-'); mesAno = m + '/' + y; }
-        const url = APPS_SCRIPT_URL + '?action=listarOrcamentos&token=' + encodeURIComponent(CDA_TOKEN)
+        const url = APPS_SCRIPT_URL + '?action=' + actionOrc + '&token=' + encodeURIComponent(CDA_TOKEN)
           + (paciente ? '&paciente=' + encodeURIComponent(paciente) : '')
           + (usuario  ? '&usuario='  + encodeURIComponent(usuario)  : '')
           + (mesAno   ? '&mesAno='   + encodeURIComponent(mesAno)   : '');
@@ -4094,7 +4145,7 @@ async function carregarUsuarios() {
         const json = await resp.json();
         if (json.ok && Array.isArray(json.orcamentos)) {
           json.orcamentos.forEach(o => resultados.push({
-            tipo: 'orc',
+            tipo: 'orc', fonte: isApp ? 'APP' : 'PAINEL',
             data: o.data || '', hora: o.hora || '',
             paciente: o.paciente || '',
             usuario: o.usuario || 'DESCONHECIDO',
@@ -4107,12 +4158,12 @@ async function carregarUsuarios() {
       } catch(e) { console.warn('Orçamentos:', e.message); }
     }
 
-    // Buscar Agendamentos (REGISTRO-AGEN)
+    // Buscar Agendamentos
     if (relTipoAtual === 'todos' || relTipoAtual === 'agen') {
       try {
         let mesAnoAgen = '';
         if (mes) { const [y,m2] = mes.split('-'); mesAnoAgen = m2 + '/' + y; }
-        const url = APPS_SCRIPT_URL + '?action=listarRegistroAgen&token=' + encodeURIComponent(CDA_TOKEN)
+        const url = APPS_SCRIPT_URL + '?action=' + actionAgen + '&token=' + encodeURIComponent(CDA_TOKEN)
           + (paciente   ? '&paciente=' + encodeURIComponent(paciente)   : '')
           + (usuario    ? '&usuario='  + encodeURIComponent(usuario)    : '')
           + (mesAnoAgen ? '&mesAno='   + encodeURIComponent(mesAnoAgen) : '');
@@ -4131,7 +4182,8 @@ async function carregarUsuarios() {
             acao:       (a.origem   || 'DIRETO').toUpperCase(),
             origem:     (a.origem   || 'DIRETO').toUpperCase(),
             status:     (a.status   || 'CONFIRMADO').toUpperCase(),
-            formaPgto:  (a.formaPgto|| 'PIX').toUpperCase()
+            formaPgto:  (a.formaPgto|| 'PIX').toUpperCase(),
+            fonte:      isApp ? 'APP' : 'PAINEL'
           }));
         }
       } catch(e) { console.warn('Agendamentos:', e.message); }
@@ -4152,12 +4204,13 @@ async function carregarUsuarios() {
       // Período label
       const periodoEl = document.getElementById('rel-periodo-label');
       if (periodoEl) {
+        const fonteLabel = isApp ? ' · App' : ' · Painel';
         if (mes) {
           const [y, m] = mes.split('-');
           const nomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-          periodoEl.textContent = nomes[parseInt(m)-1] + '/' + y;
+          periodoEl.textContent = nomes[parseInt(m)-1] + '/' + y + fonteLabel;
         } else {
-          periodoEl.textContent = paciente || usuario ? 'Filtro aplicado' : 'Todos os registros';
+          periodoEl.textContent = (paciente || usuario ? 'Filtro aplicado' : 'Todos os registros') + fonteLabel;
         }
       }
 
@@ -4336,6 +4389,7 @@ async function carregarUsuarios() {
       const el = document.getElementById(id); if (el) el.value = '';
     });
     relFiltroTipo('todos');
+    relFiltroFonte('painel');
     relResultadosCache = [];
     const container = document.getElementById('rel-lista');
     if (container) container.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-solid fa-magnifying-glass text-slate-300 text-3xl mb-3"></i><p class="text-sm text-slate-400 font-medium">Use os filtros acima e clique em Buscar</p></div>';
