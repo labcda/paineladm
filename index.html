@@ -1304,10 +1304,41 @@
                 <div style="font-size:0.78rem;font-weight:800;color:#475569;margin-bottom:12px;"><i class="fa-solid fa-chart-bar mr-1" style="color:#0F4C5C;"></i> Orçamentos por Origem</div>
                 <div id="rel-grafico-barras"></div>
             </div>
-            <!-- Breakdown por usuário -->
+            <!-- Breakdown por usuário (orçamentos) -->
             <div id="rel-usuarios-wrap" style="display:none;margin-top:14px;">
                 <div style="font-size:0.78rem;font-weight:800;color:#475569;margin-bottom:10px;"><i class="fa-solid fa-users mr-1" style="color:#0F4C5C;"></i> Orçamentos por Usuário</div>
                 <div id="rel-usuarios-lista"></div>
+            </div>
+            <!-- Separador Agendamentos -->
+            <div id="rel-agen-section" style="display:none;margin-top:18px;padding-top:14px;border-top:2px solid #e2e8f0;">
+                <div style="font-size:0.85rem;font-weight:800;color:#101620;margin-bottom:12px;"><i class="fa-regular fa-calendar-check mr-2" style="color:#37A7AA;"></i> Detalhes dos Agendamentos</div>
+                <!-- Financeiro -->
+                <div id="rel-agen-financeiro-wrap" style="display:none;">
+                    <div class="rel-resumo-grid" style="margin-bottom:12px;">
+                        <div class="rel-resumo-card">
+                            <div class="rv-num" id="rel-rv-agen-bruto" style="font-size:1.1rem;">R$0</div>
+                            <div class="rv-label"><i class="fa-solid fa-money-bill mr-1"></i>Valor Bruto Total</div>
+                        </div>
+                        <div class="rel-resumo-card">
+                            <div class="rv-num" id="rel-rv-agen-pago" style="font-size:1.1rem;">R$0</div>
+                            <div class="rv-label"><i class="fa-solid fa-check-circle mr-1"></i>Valor c/ Desconto</div>
+                        </div>
+                        <div class="rel-resumo-card">
+                            <div class="rv-num" id="rel-rv-agen-status" style="font-size:1rem;">—</div>
+                            <div class="rv-label"><i class="fa-solid fa-chart-pie mr-1"></i>Status Realizados</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Por Origem -->
+                <div id="rel-agen-origem-wrap" style="display:none;margin-bottom:12px;">
+                    <div style="font-size:0.78rem;font-weight:800;color:#475569;margin-bottom:10px;"><i class="fa-solid fa-route mr-1" style="color:#37A7AA;"></i> Origem dos Agendamentos</div>
+                    <div id="rel-agen-origem-lista"></div>
+                </div>
+                <!-- Por Usuário (agendamentos) -->
+                <div id="rel-agen-usuarios-wrap" style="display:none;">
+                    <div style="font-size:0.78rem;font-weight:800;color:#475569;margin-bottom:10px;"><i class="fa-solid fa-users mr-1" style="color:#37A7AA;"></i> Agendamentos por Usuário</div>
+                    <div id="rel-agen-usuarios-lista"></div>
+                </div>
             </div>
         </div>
 
@@ -1882,7 +1913,7 @@
     // Buscar orçamentos e agendamentos em paralelo
     const [resOrc, resAgen] = await Promise.allSettled([
       fetch(APPS_SCRIPT_URL + '?action=contarOrcamentos&mesAno=' + encodeURIComponent(mesAno) + '&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json()),
-      fetch(APPS_SCRIPT_URL + '?action=contarAgendamentos&mes=' + encodeURIComponent(mesISO) + '&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json())
+      fetch(APPS_SCRIPT_URL + '?action=contarRegistroAgen&mes=' + encodeURIComponent(mesISO) + '&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json())
     ]);
 
     // Orçamentos
@@ -1999,17 +2030,30 @@
       const resp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({
-          action:  'salvarAgendamentoDash',
-          token:   CDA_TOKEN,
-          ...dados
-        }),
+        body: JSON.stringify({ action: 'salvarAgendamentoDash', token: CDA_TOKEN, ...dados }),
         redirect: 'follow'
       });
       const json = await resp.json();
       return json.ok;
     } catch(err) {
       console.error('[CDA] Erro ao salvar agendamento dash:', err);
+      return false;
+    }
+  }
+
+  async function salvarRegistroAgen(dados) {
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'salvarRegistroAgen', token: CDA_TOKEN, ...dados }),
+        redirect: 'follow'
+      });
+      const json = await resp.json();
+      if (json.ok) console.log('[CDA] REGISTRO-AGEN salvo OK');
+      return json.ok;
+    } catch(err) {
+      console.error('[CDA] Erro ao salvar REGISTRO-AGEN:', err);
       return false;
     }
   }
@@ -3180,22 +3224,29 @@ function agenRemoverPDF() {
     if (atividadesRecentes.length > 8) atividadesRecentes.pop();
     renderAtividades();
 
-    // Registrar na aba AGENDAMENTO-DASH
-    const _telefoneAgen = document.getElementById('agen-telefone')?.value.trim() || '';
-    const _nascAgen     = document.getElementById('agen-nascimento')?.value || '';
-    const _examesAgen   = (typeof orcSelecionados !== 'undefined' && orcSelecionados.length)
-      ? orcSelecionados.map(e => e.nome).join(' | ')
+    // Registrar na aba REGISTRO-AGEN (12 colunas)
+    const _telefoneAgen  = document.getElementById('agen-telefone')?.value.trim() || '';
+    const _temOrc        = typeof orcSelecionados !== 'undefined' && orcSelecionados.length > 0;
+    const _examesAgen    = _temOrc
+      ? orcSelecionados.map(e => e.nome || '').join(' | ')
       : (agenPDFAnexado ? agenPDFAnexado.nome : '');
-    salvarAgendamentoDash({
-      data:        new Date(data + 'T12:00:00').toLocaleDateString('pt-BR'),
-      hora:        horario,
-      nome:        nome,
-      telefone:    _telefoneAgen,
-      nascimento:  _nascAgen ? new Date(_nascAgen + 'T12:00:00').toLocaleDateString('pt-BR') : '',
-      exames:      _examesAgen,
-      pagamento:   pagamento,
-      usuario:     usuarioLogado(),
-      origem:      'PAINEL'
+    const _codigosAgen   = _temOrc ? orcSelecionados.map(e => e.codigo || '').join(' | ') : '';
+    const _qtdAgen       = _temOrc ? orcSelecionados.length : 0;
+    const _formaPgtoAgen = (pagamento || '').toLowerCase().indexOf('crédito') >= 0 ? 'CREDITO' : 'PIX';
+    const _origemAgen    = _temOrc ? 'ORCAMENTO' : 'DIRETO';
+    salvarRegistroAgen({
+      data:       new Date(data + 'T12:00:00').toLocaleDateString('pt-BR'),
+      hora:       horario,
+      paciente:   nome,
+      telefone:   _telefoneAgen,
+      exames:     _examesAgen,
+      codigos:    _codigosAgen,
+      qtdExames:  _qtdAgen,
+      totalBruto: totalBruto,
+      formaPgto:  _formaPgtoAgen,
+      status:     'CONFIRMADO',
+      origem:     _origemAgen,
+      usuario:    usuarioLogado()
     });
 
     document.getElementById('modal-agen-nome').textContent = nome;
@@ -4038,24 +4089,31 @@ async function carregarUsuarios() {
       } catch(e) { console.warn('Orçamentos:', e.message); }
     }
 
-    // Buscar Agendamentos
+    // Buscar Agendamentos (REGISTRO-AGEN)
     if (relTipoAtual === 'todos' || relTipoAtual === 'agen') {
       try {
-        const url = APPS_SCRIPT_URL + '?action=listarAgendamentos&token=' + encodeURIComponent(CDA_TOKEN)
-          + (paciente ? '&nome='    + encodeURIComponent(paciente) : '')
-          + (usuario  ? '&usuario=' + encodeURIComponent(usuario)  : '')
-          + (mes      ? '&mes='     + encodeURIComponent(mes)      : '');
+        let mesAnoAgen = '';
+        if (mes) { const [y,m2] = mes.split('-'); mesAnoAgen = m2 + '/' + y; }
+        const url = APPS_SCRIPT_URL + '?action=listarRegistroAgen&token=' + encodeURIComponent(CDA_TOKEN)
+          + (paciente   ? '&paciente=' + encodeURIComponent(paciente)   : '')
+          + (usuario    ? '&usuario='  + encodeURIComponent(usuario)    : '')
+          + (mesAnoAgen ? '&mesAno='   + encodeURIComponent(mesAnoAgen) : '');
         const resp = await fetch(url, { redirect: 'follow' });
         const json = await resp.json();
         if (json.ok && Array.isArray(json.agendamentos)) {
           json.agendamentos.forEach(a => resultados.push({
-            tipo: 'agen',
-            data: a.data || '', hora: a.horario || '',
-            paciente: a.nome || '',
-            usuario: a.usuario || 'DESCONHECIDO',
-            detalhe: a.pagamento || '',
-            totalBruto: 0, totalPix: 0,
-            acao: 'AGENDAMENTO'
+            tipo:       'agen',
+            data:       a.data      || '',
+            hora:       a.hora      || '',
+            paciente:   a.paciente  || '',
+            usuario:    a.usuario   || 'DESCONHECIDO',
+            detalhe:    a.formaPgto || '',
+            totalBruto: parseFloat(a.totalBruto) || 0,
+            totalPix:   0,
+            acao:       (a.origem   || 'DIRETO').toUpperCase(),
+            origem:     (a.origem   || 'DIRETO').toUpperCase(),
+            status:     (a.status   || 'CONFIRMADO').toUpperCase(),
+            formaPgto:  (a.formaPgto|| 'PIX').toUpperCase()
           }));
         }
       } catch(e) { console.warn('Agendamentos:', e.message); }
@@ -4143,6 +4201,82 @@ async function carregarUsuarios() {
         wrapUsr.style.display = '';
       } else if (wrapUsr) {
         wrapUsr.style.display = 'none';
+      }
+
+      // ---- Agendamentos: seção detalhada ----
+      const agens = resultados.filter(r => r.tipo === 'agen');
+      const secAgen = document.getElementById('rel-agen-section');
+      if (secAgen) secAgen.style.display = agens.length > 0 ? '' : 'none';
+
+      if (agens.length > 0) {
+        // Financeiro
+        const brutoTotal = agens.reduce((s, a) => s + a.totalBruto, 0);
+        const pagoTotal  = agens.reduce((s, a) => {
+          if (!a.totalBruto) return s;
+          return s + (a.formaPgto === 'CREDITO' ? a.totalBruto * 0.65 : a.totalBruto * 0.60);
+        }, 0);
+        const realizados = agens.filter(a => a.status === 'REALIZADO').length;
+        const wrapFin = document.getElementById('rel-agen-financeiro-wrap');
+        if (wrapFin) {
+          document.getElementById('rel-rv-agen-bruto').textContent = 'R$' + brutoTotal.toLocaleString('pt-BR', {minimumFractionDigits:2});
+          document.getElementById('rel-rv-agen-pago').textContent  = 'R$' + pagoTotal.toLocaleString('pt-BR',  {minimumFractionDigits:2});
+          document.getElementById('rel-rv-agen-status').textContent = realizados + ' de ' + agens.length;
+          wrapFin.style.display = '';
+        }
+
+        // Por Origem
+        const porOrigem = { ORCAMENTO: 0, DIRETO: 0 };
+        agens.forEach(a => { if (porOrigem[a.origem] !== undefined) porOrigem[a.origem]++; else porOrigem['DIRETO']++; });
+        const wrapOrigem = document.getElementById('rel-agen-origem-wrap');
+        const listaOrigem = document.getElementById('rel-agen-origem-lista');
+        if (wrapOrigem && listaOrigem) {
+          const maxO = Math.max(...Object.values(porOrigem), 1);
+          const coresOrigem = { ORCAMENTO: '#37A7AA', DIRETO: '#0F4C5C' };
+          const labelsOrigem = { ORCAMENTO: 'Veio do Orçamento', DIRETO: 'Direto (sem orçamento)' };
+          listaOrigem.innerHTML = Object.entries(porOrigem).map(([orig, cnt]) => {
+            const pct = Math.round((cnt / maxO) * 100);
+            return '<div class="rel-bar-row">' +
+              '<div class="rel-bar-label">' + labelsOrigem[orig] + '</div>' +
+              '<div class="rel-bar-track" style="flex:1;">' +
+                '<div class="rel-bar-fill" style="width:' + pct + '%;background:' + coresOrigem[orig] + ';">' +
+                  (cnt > 0 ? '<span class="rel-bar-val">' + cnt + '</span>' : '') +
+                '</div>' +
+              '</div>' +
+            '</div>';
+          }).join('');
+          wrapOrigem.style.display = '';
+        }
+
+        // Por Usuário (agendamentos)
+        const porUsrAgen = {};
+        agens.forEach(a => {
+          const u = a.usuario || 'DESCONHECIDO';
+          if (!porUsrAgen[u]) porUsrAgen[u] = { total: 0, bruto: 0 };
+          porUsrAgen[u].total++;
+          porUsrAgen[u].bruto += a.totalBruto || 0;
+        });
+        const wrapUsrAgen = document.getElementById('rel-agen-usuarios-wrap');
+        const listaUsrAgen = document.getElementById('rel-agen-usuarios-lista');
+        if (wrapUsrAgen && listaUsrAgen && Object.keys(porUsrAgen).length > 0) {
+          const maxUA = Math.max(...Object.values(porUsrAgen).map(v => v.total), 1);
+          listaUsrAgen.innerHTML = Object.entries(porUsrAgen)
+            .sort((a, b) => b[1].total - a[1].total)
+            .map(([usr, v]) => {
+              const pct = Math.round((v.total / maxUA) * 100);
+              const brutoStr = v.bruto > 0 ? ' <span style=\'font-size:0.65rem;opacity:0.85;\'>R$' + v.bruto.toLocaleString('pt-BR',{minimumFractionDigits:2}) + '</span>' : '';
+              return '<div class="rel-bar-row">' +
+                '<div class="rel-bar-label" style="min-width:100px;">' + usr + '</div>' +
+                '<div class="rel-bar-track" style="flex:1;">' +
+                  '<div class="rel-bar-fill" style="width:' + pct + '%;background:#49BCBE;">' +
+                    '<span class="rel-bar-val">' + v.total + brutoStr + '</span>' +
+                  '</div>' +
+                '</div>' +
+              '</div>';
+            }).join('');
+          wrapUsrAgen.style.display = '';
+        } else if (wrapUsrAgen) {
+          wrapUsrAgen.style.display = 'none';
+        }
       }
     }
 
