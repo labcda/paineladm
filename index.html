@@ -857,6 +857,18 @@
             <div class="stat-label">Agendamentos no Mês</div>
             <div class="stat-mes" id="stat-mes-agendamentos">carregando...</div>
           </div>
+          <div class="stat-card" style="cursor:pointer;" onclick="carregarEstatisticas()" title="Clique para atualizar">
+            <div class="stat-icon" style="background:rgba(234,179,8,0.15);"><i class="fa-solid fa-vial" style="color:#ca8a04;"></i></div>
+            <div class="stat-value" id="stat-recoletas-pendentes"><i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;color:#49BCBE;"></i></div>
+            <div class="stat-label">Recoletas Pendentes</div>
+            <div class="stat-mes" id="stat-recoletas-pendentes-sub" style="color:#ca8a04;">aguardando coleta</div>
+          </div>
+          <div class="stat-card" style="cursor:pointer;" onclick="carregarEstatisticas()" title="Clique para atualizar">
+            <div class="stat-icon" style="background:rgba(34,197,94,0.15);"><i class="fa-solid fa-vial-circle-check" style="color:#16a34a;"></i></div>
+            <div class="stat-value" id="stat-recoletas-comunicadas"><i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;color:#49BCBE;"></i></div>
+            <div class="stat-label">Recoletas Comunicadas</div>
+            <div class="stat-mes" id="stat-recoletas-comunicadas-sub" style="color:#16a34a;">paciente informado</div>
+          </div>
         </div>
         <div class="neumorphic-card">
           <h2 style="font-size: 1.3rem; font-weight: 700; color: #101620; margin-bottom: 20px;">
@@ -1904,39 +1916,45 @@
   async function carregarEstatisticas() {
     const { mesAnoExtenso, mesAno, mesISO } = getMesAnoAtual();
 
-    // Mostrar spinner
-    document.getElementById('stat-orcamentos').innerHTML   = '<i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;color:#49BCBE;"></i>';
-    document.getElementById('stat-agendamentos').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;color:#49BCBE;"></i>';
+    // Spinners
+    ['stat-orcamentos','stat-agendamentos','stat-recoletas-pendentes','stat-recoletas-comunicadas'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;color:#49BCBE;"></i>';
+    });
     document.getElementById('stat-mes-orcamentos').innerText   = mesAnoExtenso;
     document.getElementById('stat-mes-agendamentos').innerText = mesAnoExtenso;
 
-    // Buscar orçamentos e agendamentos em paralelo
-    const [resOrc, resAgen] = await Promise.allSettled([
-      fetch(APPS_SCRIPT_URL + '?action=contarOrcamentos&mesAno=' + encodeURIComponent(mesAno) + '&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json()),
-      fetch(APPS_SCRIPT_URL + '?action=contarRegistroAgen&mes=' + encodeURIComponent(mesISO) + '&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json())
+    // Buscar tudo em paralelo
+    const [resOrc, resAgen, resRec] = await Promise.allSettled([
+      fetch(APPS_SCRIPT_URL + '?action=contarOrcamentos&mesAno='   + encodeURIComponent(mesAno)  + '&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json()),
+      fetch(APPS_SCRIPT_URL + '?action=contarRegistroAgen&mes='    + encodeURIComponent(mesISO)  + '&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json()),
+      fetch(APPS_SCRIPT_URL + '?action=contarRecoletas&token='     + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json())
     ]);
 
     // Orçamentos
     let totalOrc = 0;
-    if (resOrc.status === 'fulfilled' && resOrc.value.ok) {
-      totalOrc = resOrc.value.total || 0;
-    } else {
-      console.warn('[CDA] Erro ao buscar orçamentos:', resOrc);
-    }
+    if (resOrc.status === 'fulfilled' && resOrc.value.ok) totalOrc = resOrc.value.total || 0;
+    else console.warn('[CDA] Erro orçamentos:', resOrc);
     dadosMensais.orcamentos = totalOrc;
     document.getElementById('stat-orcamentos').innerText = totalOrc;
 
     // Agendamentos
     let totalAgen = 0;
-    if (resAgen.status === 'fulfilled' && resAgen.value.ok) {
-      totalAgen = resAgen.value.total || 0;
-    } else {
-      console.warn('[CDA] Erro ao buscar agendamentos:', resAgen);
-    }
+    if (resAgen.status === 'fulfilled' && resAgen.value.ok) totalAgen = resAgen.value.total || 0;
+    else console.warn('[CDA] Erro agendamentos:', resAgen);
     dadosMensais.agendamentos = totalAgen;
     document.getElementById('stat-agendamentos').innerText = totalAgen;
 
-    // Carregar atividades recentes do servidor
+    // Recoletas
+    let pendentes = 0, comunicadas = 0;
+    if (resRec.status === 'fulfilled' && resRec.value.ok) {
+      pendentes   = resRec.value.pendentes   || 0;
+      comunicadas = resRec.value.comunicadas || 0;
+    } else console.warn('[CDA] Erro recoletas:', resRec);
+    document.getElementById('stat-recoletas-pendentes').innerText   = pendentes;
+    document.getElementById('stat-recoletas-comunicadas').innerText = comunicadas;
+
+    // Atividades recentes
     carregarAtividadesRecentes();
   }
 
