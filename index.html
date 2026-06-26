@@ -1304,6 +1304,11 @@
                 <div style="font-size:0.78rem;font-weight:800;color:#475569;margin-bottom:12px;"><i class="fa-solid fa-chart-bar mr-1" style="color:#0F4C5C;"></i> Orçamentos por Origem</div>
                 <div id="rel-grafico-barras"></div>
             </div>
+            <!-- Breakdown por usuário -->
+            <div id="rel-usuarios-wrap" style="display:none;margin-top:14px;">
+                <div style="font-size:0.78rem;font-weight:800;color:#475569;margin-bottom:10px;"><i class="fa-solid fa-users mr-1" style="color:#0F4C5C;"></i> Orçamentos por Usuário</div>
+                <div id="rel-usuarios-lista"></div>
+            </div>
         </div>
 
         <!-- Filtros -->
@@ -4107,6 +4112,37 @@ async function carregarUsuarios() {
         document.getElementById('rel-grafico-wrap').style.display = '';
       } else {
         document.getElementById('rel-grafico-wrap').style.display = 'none';
+      }
+
+      // ---- Por Usuário ----
+      const orcamentos = resultados.filter(r => r.tipo === 'orc');
+      const porUsuario = {};
+      orcamentos.forEach(o => {
+        const u = o.usuario || 'DESCONHECIDO';
+        if (!porUsuario[u]) porUsuario[u] = { total: 0, agendamento: 0 };
+        porUsuario[u].total++;
+        if (o.acao === 'AGENDAMENTO') porUsuario[u].agendamento++;
+      });
+      const wrapUsr = document.getElementById('rel-usuarios-wrap');
+      const listaUsr = document.getElementById('rel-usuarios-lista');
+      if (wrapUsr && listaUsr && Object.keys(porUsuario).length > 0) {
+        const maxUsr = Math.max(...Object.values(porUsuario).map(v => v.total), 1);
+        listaUsr.innerHTML = Object.entries(porUsuario)
+          .sort((a, b) => b[1].total - a[1].total)
+          .map(([usr, v]) => {
+            const pct = Math.round((v.total / maxUsr) * 100);
+            return '<div class="rel-bar-row">' +
+              '<div class="rel-bar-label" style="min-width:100px;">' + usr + '</div>' +
+              '<div class="rel-bar-track" style="flex:1;">' +
+                '<div class="rel-bar-fill" style="width:' + pct + '%;background:#37A7AA;">' +
+                  '<span class="rel-bar-val">' + v.total + (v.agendamento > 0 ? ' <span style=\'font-size:0.65rem;opacity:0.85;\'>(' + v.agendamento + ' agen.)</span>' : '') + '</span>' +
+                '</div>' +
+              '</div>' +
+            '</div>';
+          }).join('');
+        wrapUsr.style.display = '';
+      } else if (wrapUsr) {
+        wrapUsr.style.display = 'none';
       }
     }
 
