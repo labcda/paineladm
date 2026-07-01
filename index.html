@@ -3225,29 +3225,13 @@ function agenRemoverPDF() {
       agenSucesso(nome, data, horario);
     } catch(err) {
       console.error('Erro agendamento:', err);
-      agenFallbackWhatsApp(nome, telefone, data, horario, descExames + pdfInfo + responsavelStr, pagamento);
+      const btnSalvar = document.getElementById('agen-btn-salvar');
+      if (btnSalvar) {
+        btnSalvar.disabled = false;
+        btnSalvar.innerHTML = '<span class="text">Salvar Agendamento</span><span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594z"/></svg></span>';
+      }
+      showToast('Erro ao salvar agendamento. Tente novamente.', 'error', 5000);
     }
-  }
-  function agenFallbackWhatsApp(nome, telefone, data, horario, descExames, pagamento) {
-    const btnSalvar = document.getElementById('agen-btn-salvar');
-    if (btnSalvar) {
-      btnSalvar.disabled = false;
-      btnSalvar.innerHTML = '<i class="fa-regular fa-calendar-check text-lg"></i> Salvar Agendamento';
-    }
-    const [y, m, d] = data.split('-').map(Number);
-    const dataExt = new Date(y, m - 1, d).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
-    let mensagem = 'Olá! Gostaria de confirmar um agendamento de coleta:\n\n' +
-      'Paciente: ' + nome + '\n' +
-      'Telefone: ' + telefone + '\n' +
-      'Data: ' + dataExt + '\n' +
-      'Horário: ' + horario + '\n' +
-      'Forma de pagamento: ' + (pagamento || '—');
-    if (agenPDFAnexado && agenPDFAnexado.driveUrl) {
-      mensagem += '\n\nPDF do orçamento/pedido: ' + agenPDFAnexado.driveUrl;
-    }
-    mensagem += (descExames || '');
-    showToast('Não foi possível salvar automaticamente. Abrindo WhatsApp para confirmar manualmente.', 'error', 6000);
-    window.open('https://wa.me/5527998980658?text=' + encodeURIComponent(mensagem), '_blank');
   }
 
   function agenSucesso(nome, data, horario) {
@@ -5189,7 +5173,7 @@ async function carregarUsuarios() {
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Data da comunicação</label>
                     <input type="date" id="modal-rec-input-data-comunicacao" class="modal-rec-field">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Quem comunicou</label>
-                    <input type="text" id="modal-rec-input-quem-comunicou" placeholder="Nome de quem ligou..." class="modal-rec-field">
+                    <input type="text" id="modal-rec-input-quem-comunicou" placeholder="Nome de quem ligou..." class="modal-rec-field" disabled>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Quem recebeu o comunicado</label>
                     <input type="text" id="modal-rec-input-quem-recebeu" placeholder="Nome de quem atendeu..." class="modal-rec-field">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Conseguiu comunicar?</label>
