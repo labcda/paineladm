@@ -1901,6 +1901,20 @@
     bContainer.classList.toggle('is-z200');
   }
 
+  // ==================== UPPERCASE GLOBAL EM CAMPOS DE TEXTO ====================
+  document.addEventListener('input', function(e) {
+    const el = e.target;
+    if (el.tagName === 'INPUT' && el.type === 'text') {
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const upper = el.value.toUpperCase();
+      if (upper !== el.value) {
+        el.value = upper;
+        if (start !== null && end !== null) el.setSelectionRange(start, end);
+      }
+    }
+  }, true);
+
   function _getItem(key) {
     try { return localStorage.getItem(key); } catch(e) { return null; }
   }
@@ -2955,10 +2969,12 @@ function agenRemoverPDF() {
     agenEsconderHorarios();
     agenAtualizarResumo();
     agenVerificarOrigem();
-    const nome = _getItem('patient_name');
-    const telefone = _getItem('patient_phone');
-    if (nome) document.getElementById('agen-nome').value = nome;
-    if (telefone) document.getElementById('agen-telefone').value = telefone;
+    // Nome/telefone começam sempre vazios aqui — quem vem do Orçamento já
+    // recebe o nome preenchido por agendarColetaComLoading() separadamente.
+    if (!agenVemDoOrcamento) {
+      document.getElementById('agen-nome').value = '';
+      document.getElementById('agen-telefone').value = '';
+    }
   }
 
   function agenIsDiaUtil(dataStr) {
@@ -5553,7 +5569,7 @@ async function carregarUsuarios() {
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Data da comunicação</label>
                     <input type="date" id="modal-rec-input-data-comunicacao" class="modal-rec-field">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Quem comunicou</label>
-                    <input type="text" id="modal-rec-input-quem-comunicou" placeholder="Nome de quem ligou..." class="modal-rec-field">
+                    <input type="text" id="modal-rec-input-quem-comunicou" placeholder="Nome de quem ligou..." class="modal-rec-field" disabled style="opacity:0.7;cursor:not-allowed;">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Quem recebeu o comunicado</label>
                     <input type="text" id="modal-rec-input-quem-recebeu" placeholder="Nome de quem atendeu..." class="modal-rec-field">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Conseguiu comunicar?</label>
