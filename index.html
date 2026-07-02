@@ -4115,6 +4115,52 @@ function agenRemoverPDF() {
     document.getElementById('modal-rec-label-naoatendeu').classList.toggle('ativo', valor === 'NAO_ATENDEU');
   }
 
+  // Motivos de uso interno do laboratório — não devem ser repassados ao paciente
+  // sem confirmação explícita de quem está enviando a mensagem.
+  const RECOLETA_MOTIVOS_SENSIVEIS = [
+    'Tubo coletado incorretamente',
+    'Tubo errado para o exame solicitado',
+    'Tubo sem identificação',
+    'Identificação incompleta ou incorreta',
+    'Divergência entre etiqueta e requisição',
+    'Troca ou suspeita de troca de amostras',
+    'Hemoconcentração por garroteamento prolongado',
+    'Perda da amostra durante o processamento',
+    'Falha ou interrupção do equipamento analítico',
+    'Resultado incompatível com o quadro clínico, necessitando confirmação',
+    'Perda de amostra',
+    'Amostra acidentada na área técnica'
+  ];
+
+  function recMaterialDoMotivo(motivo) {
+    if ((RECOLETA_MOTIVOS['Urina'] || []).includes(motivo)) return 'Urina';
+    if ((RECOLETA_MOTIVOS['Fezes'] || []).includes(motivo)) return 'Fezes';
+    return 'Sangue';
+  }
+
+  function recCompartilharComunicado() {
+    const r = recDetalhesRegistro;
+    if (!r) return;
+    const motivo = r.motivo || '';
+    if (RECOLETA_MOTIVOS_SENSIVEIS.includes(motivo)) {
+      const confirmar = confirm('O motivo cadastrado ("' + motivo + '") é de uso interno do laboratório e pode não ser adequado para enviar diretamente ao paciente.\n\nTem certeza que deseja usar esse motivo na mensagem?');
+      if (!confirmar) return;
+    }
+    const usuario = usuarioLogado();
+    const material = recMaterialDoMotivo(motivo);
+    const examesNomes = Array.isArray(r.exames) ? r.exames.map(e => e.nome || e).join(', ') : (r.exames || '');
+    const msg = '☀️ Bom dia, ' + r.nome + '! Tudo bem?\n\n' +
+      'Aqui é ' + usuario + ', do Laboratório CDA. 😊\n\n' +
+      'Estou entrando em contato porque precisamos realizar uma nova coleta do seu exame para garantir a qualidade e a confiabilidade do resultado.\n\n' +
+      '📋 Informações da recoleta:\n' +
+      '• Exame: ' + examesNomes + '\n' +
+      '• Material: ' + material + '\n' +
+      '• Motivo da recoleta: ' + motivo + '\n\n' +
+      '📅 Pedimos, por gentileza, que compareça ao laboratório para realizar a nova coleta assim que possível ou nos informe o melhor dia e horário para você.\n\n' +
+      'Caso tenha alguma dúvida, estamos à disposição. Agradecemos pela compreensão e colaboração! 💚';
+    window.open('https://web.whatsapp.com/send?text=' + encodeURIComponent(msg), '_blank');
+  }
+
   async function salvarComunicacaoRecoleta() {
     const dataComunicacao = document.getElementById('modal-rec-input-data-comunicacao').value;
     const quemComunicou = document.getElementById('modal-rec-input-quem-comunicou').value.trim().toUpperCase();
@@ -5587,6 +5633,9 @@ async function carregarUsuarios() {
                             <i class="fa-solid fa-phone-slash"></i> Não atendeu
                         </label>
                     </div>
+                    <button class="modal-rec-btn primary" onclick="recCompartilharComunicado()" style="width:100%; margin-top:8px; background:linear-gradient(135deg,#25D366,#128C7E);">
+                        <i class="fa-brands fa-whatsapp mr-1"></i> Compartilhar Comunicado
+                    </button>
                     <button class="modal-rec-btn primary" onclick="salvarComunicacaoRecoleta()" style="width:100%; margin-top:8px;">
                         <i class="fa-solid fa-save mr-1"></i> Salvar Comunicação
                     </button>
