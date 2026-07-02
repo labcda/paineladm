@@ -3255,8 +3255,10 @@ function agenRemoverPDF() {
     try {
       const [hh, mm] = horario.split(':').map(Number);
       const startDateTime = data + 'T' + String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0') + ':00';
-      const endHh = hh + 1;
-      const endDateTime = data + 'T' + String(endHh).padStart(2,'0') + ':' + String(mm).padStart(2,'0') + ':00';
+      const totalMinFim = hh * 60 + mm + 40; // duração do agendamento: 40 minutos
+      const endHh = Math.floor(totalMinFim / 60) % 24;
+      const endMm = totalMinFim % 60;
+      const endDateTime = data + 'T' + String(endHh).padStart(2,'0') + ':' + String(endMm).padStart(2,'0') + ':00';
 
       btnSalvar.innerHTML = '<span class="text"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Salvando agendamento...</span><span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594z"/></svg></span>';
 
