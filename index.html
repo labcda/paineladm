@@ -1215,9 +1215,26 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                        <i class="fa-solid fa-triangle-exclamation mr-1"></i> Motivo da recoleta <span style="color:#ef4444">*</span>
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i> Categoria do motivo <span style="color:#ef4444">*</span>
                     </label>
-                    <input type="text" id="rec-motivo" placeholder="Ex: hemólise, volume insuficiente..." class="recoleta-form-field">
+                    <select id="rec-motivo-categoria" class="recoleta-form-field" onchange="recAtualizarMotivos()">
+                        <option value="">Selecione a categoria...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-list-check mr-1"></i> Motivo específico <span style="color:#ef4444">*</span>
+                    </label>
+                    <select id="rec-motivo-especifico" class="recoleta-form-field" onchange="recSelecionarMotivoOutro()" disabled>
+                        <option value="">Selecione a categoria primeiro...</option>
+                    </select>
+                </div>
+                <div id="rec-motivo-outro-wrap" style="display:none;grid-column:1 / -1;">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-lock mr-1"></i> Motivo personalizado <span style="color:#ef4444">*</span>
+                    </label>
+                    <input type="text" id="rec-motivo-outro-texto" placeholder="Descreva o motivo real..." class="recoleta-form-field" disabled>
+                    <p style="font-size:11px;color:#94a3b8;margin-top:4px;">Campo liberado após senha de autorização.</p>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
@@ -1308,6 +1325,19 @@
                 <p class="text-sm text-white/80 leading-relaxed">Pesquise orçamentos e agendamentos por paciente, usuário ou período.</p>
             </div>
         </div>
+
+        <div style="display:flex;gap:8px;background:#EBECF0;border-radius:16px;padding:6px;">
+            <button id="rel-aba-geral" onclick="relMostrarAba('geral')"
+                style="flex:1;padding:10px;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;background:linear-gradient(135deg,#0F4C5C,#49BCBE);color:white;box-shadow:2px 2px 8px rgba(15,76,92,0.3);">
+                <i class="fa-solid fa-chart-line mr-2"></i>Orçamentos/Agendamentos
+            </button>
+            <button id="rel-aba-recoletas" onclick="relMostrarAba('recoletas')"
+                style="flex:1;padding:10px;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;background:transparent;color:#64748b;">
+                <i class="fa-solid fa-vial mr-2"></i>Recoletas
+            </button>
+        </div>
+
+        <div id="rel-painel-geral">
 
         <!-- Resumo do mês atual -->
         <div class="neumorphic-card" id="rel-resumo-section" style="display:none;">
@@ -1427,8 +1457,59 @@
                 </div>
             </div>
         </div>
+
+        </div>
+        <!-- /rel-painel-geral -->
+
+        <!-- PAINEL DE RELATÓRIO DE RECOLETAS -->
+        <div id="rel-painel-recoletas" style="display:none;">
+            <div class="neumorphic-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+                    <h3 style="font-size:1rem;font-weight:800;color:#101620;"><i class="fa-solid fa-vial mr-2" style="color:#0F4C5C;"></i> Dashboard de Recoletas</h3>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                        <input type="month" id="relrec-filtro-mes" class="recoleta-form-field" style="max-width:170px;" onchange="relRecGerar()">
+                        <button onclick="relRecGerar()" class="orc-btn primary" style="padding:8px 16px;"><i class="fa-solid fa-rotate-right mr-1"></i> Atualizar</button>
+                    </div>
+                </div>
+                <div class="rel-resumo-grid">
+                    <div class="rel-resumo-card">
+                        <div class="rv-num" id="relrec-total-geral">0</div>
+                        <div class="rv-label"><i class="fa-solid fa-layer-group mr-1"></i>Total de Recoletas</div>
+                    </div>
+                    <div class="rel-resumo-card">
+                        <div class="rv-num" id="relrec-total-mes">0</div>
+                        <div class="rv-label"><i class="fa-regular fa-calendar mr-1"></i>No Período</div>
+                    </div>
+                    <div class="rel-resumo-card">
+                        <div class="rv-num" id="relrec-tempo-aviso" style="font-size:1.2rem;">—</div>
+                        <div class="rv-label"><i class="fa-solid fa-phone mr-1"></i>Tempo Médio p/ Avisar</div>
+                    </div>
+                    <div class="rel-resumo-card">
+                        <div class="rv-num" id="relrec-nao-avisou">0</div>
+                        <div class="rv-label"><i class="fa-solid fa-phone-slash mr-1"></i>Não Conseguiu Avisar</div>
+                    </div>
+                    <div class="rel-resumo-card">
+                        <div class="rv-num" id="relrec-tempo-retorno" style="font-size:1.2rem;">—</div>
+                        <div class="rv-label"><i class="fa-solid fa-person-walking-arrow-loop-left mr-1"></i>Tempo Médio de Retorno</div>
+                    </div>
+                </div>
+            </div>
+            <div class="neumorphic-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                    <h3 style="font-size:1rem;font-weight:800;color:#101620;"><i class="fa-solid fa-list-ul mr-2" style="color:#0F4C5C;"></i> Detalhamento do Período</h3>
+                    <span id="relrec-contador" style="font-size:0.75rem;font-weight:700;color:#8c939e;background:#f1f5f9;padding:4px 10px;border-radius:10px;"></span>
+                </div>
+                <div id="relrec-lista">
+                    <div class="flex flex-col items-center py-8 text-center">
+                        <i class="fa-solid fa-vial text-slate-300 text-3xl mb-3"></i>
+                        <p class="text-sm text-slate-400 font-medium">Selecione um mês e clique em Atualizar</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /rel-painel-recoletas -->
       </section>
-      
+
       <!-- BOLETOS -->
       <section id="page-boletos" class="page space-y-5">
         <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
@@ -3486,6 +3567,149 @@ function agenRemoverPDF() {
   let recTipo = null;
   let recLabExterno = null;
 
+  const RECOLETA_MOTIVOS = {
+    'Problemas na coleta': [
+      'Hemólise (amostra hemolisada)',
+      'Volume insuficiente de sangue',
+      'Tubo coletado incorretamente',
+      'Tubo errado para o exame solicitado'
+    ],
+    'Problemas na identificação': [
+      'Tubo sem identificação',
+      'Identificação incompleta ou incorreta',
+      'Divergência entre etiqueta e requisição',
+      'Troca ou suspeita de troca de amostras'
+    ],
+    'Problemas no transporte e armazenamento': [
+      'Tempo excessivo entre coleta e processamento',
+      'Temperatura inadequada durante transporte',
+      'Vazamento ou quebra'
+    ],
+    'Preparo inadequado do paciente': [
+      'Jejum insuficiente ou excessivo',
+      'Uso de medicamentos que interferem no exame (quando não informado)',
+      'Exercício físico intenso antes da coleta',
+      'Consumo de álcool antes do exame',
+      'Coleta em horário inadequado para exames com horário específico (cortisol, ACTH, ferro, entre outros)'
+    ],
+    'Interferências analíticas': [
+      'Lipemia intensa',
+      'Icterícia acentuada',
+      'Hemoconcentração por garroteamento prolongado',
+      'Amostra inadequada para análise devido a interferentes'
+    ],
+    'Urina': [
+      'Volume insuficiente',
+      'Coleta em recipiente inadequado',
+      'Frasco não estéril quando necessário',
+      'Primeiro jato coletado quando deveria ser jato médio',
+      'Perda parcial da amostra de 24 horas',
+      'Urina de 24 horas com tempo incompleto',
+      'Contaminação por secreções vaginais',
+      'Contaminação por fezes',
+      'Contaminação por papel higiênico',
+      'Uso inadequado de conservantes',
+      'Falta de higiene íntima antes da coleta',
+      'Demora excessiva para entrega',
+      'Armazenamento fora de refrigeração quando indicado',
+      'Vazamento do frasco'
+    ],
+    'Fezes': [
+      'Quantidade insuficiente',
+      'Coleta em recipiente inadequado',
+      'Presença de urina misturada às fezes',
+      'Coleta após uso recente de laxantes (quando contraindicado)',
+      'Amostra entregue fora do prazo recomendado',
+      'Conservação inadequada',
+      'Temperatura inadequada'
+    ],
+    'Apoio / Outros motivos técnicos': [
+      'Inclusão de exame que exige outro tipo de tubo ou amostra',
+      'Perda da amostra durante o processamento',
+      'Falha ou interrupção do equipamento analítico',
+      'Resultado incompatível com o quadro clínico, necessitando confirmação',
+      'Solicitação do Laboratório de Apoio',
+      'Perda de amostra',
+      'Amostra acidentada na área técnica'
+    ]
+  };
+
+  function recPopularCategorias() {
+    const sel = document.getElementById('rec-motivo-categoria');
+    if (!sel || sel.options.length > 1) return;
+    Object.keys(RECOLETA_MOTIVOS).forEach(cat => {
+      const opt = document.createElement('option');
+      opt.value = cat; opt.textContent = cat;
+      sel.appendChild(opt);
+    });
+  }
+  recPopularCategorias();
+
+  function recAtualizarMotivos() {
+    const cat = document.getElementById('rec-motivo-categoria').value;
+    const sel = document.getElementById('rec-motivo-especifico');
+    const outroWrap = document.getElementById('rec-motivo-outro-wrap');
+    const outroInput = document.getElementById('rec-motivo-outro-texto');
+    outroWrap.style.display = 'none';
+    outroInput.disabled = true;
+    outroInput.value = '';
+    sel.innerHTML = '';
+    if (!cat) {
+      sel.disabled = true;
+      sel.innerHTML = '<option value="">Selecione a categoria primeiro...</option>';
+      return;
+    }
+    sel.disabled = false;
+    const opDefault = document.createElement('option');
+    opDefault.value = ''; opDefault.textContent = 'Selecione o motivo...';
+    sel.appendChild(opDefault);
+    (RECOLETA_MOTIVOS[cat] || []).forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m; opt.textContent = m;
+      sel.appendChild(opt);
+    });
+    const opOutro = document.createElement('option');
+    opOutro.value = '__OUTRO__'; opOutro.textContent = 'Outro (especificar)';
+    sel.appendChild(opOutro);
+  }
+
+  function recSelecionarMotivoOutro() {
+    const sel = document.getElementById('rec-motivo-especifico');
+    const outroWrap = document.getElementById('rec-motivo-outro-wrap');
+    const outroInput = document.getElementById('rec-motivo-outro-texto');
+    if (sel.value === '__OUTRO__') {
+      const senha = prompt('Digite a senha de autorização para liberar o campo de motivo personalizado:');
+      if (senha === '5912') {
+        outroWrap.style.display = 'block';
+        outroInput.disabled = false;
+        outroInput.focus();
+      } else {
+        showToast('Senha incorreta. Selecione outro motivo da lista.', 'error');
+        sel.value = '';
+        outroWrap.style.display = 'none';
+        outroInput.disabled = true;
+      }
+    } else {
+      outroWrap.style.display = 'none';
+      outroInput.disabled = true;
+      outroInput.value = '';
+    }
+  }
+
+  function recObterMotivoFinal() {
+    const sel = document.getElementById('rec-motivo-especifico');
+    if (!sel.value) return '';
+    if (sel.value === '__OUTRO__') {
+      return document.getElementById('rec-motivo-outro-texto').value.trim();
+    }
+    return sel.value;
+  }
+
+  function recLimparMotivo() {
+    document.getElementById('rec-motivo-categoria').value = '';
+    recAtualizarMotivos();
+  }
+
   function recMostrarAba(aba) {
     const btnNovo = document.getElementById('rec-aba-novo');
     const btnConsulta = document.getElementById('rec-aba-consulta');
@@ -3580,7 +3804,7 @@ function agenRemoverPDF() {
   async function salvarRecoleta() {
     const codigo = document.getElementById('rec-codigo').value.trim().toUpperCase();
     const nome = document.getElementById('rec-nome').value.trim().toUpperCase();
-    const motivo = document.getElementById('rec-motivo').value.trim();
+    const motivo = recObterMotivoFinal();
     const obs = document.getElementById('rec-obs').value.trim();
     const errorEl = document.getElementById('rec-error');
     const successEl = document.getElementById('rec-success');
@@ -3591,7 +3815,8 @@ function agenRemoverPDF() {
     if (recExamesSelecionados.length === 0) { errorEl.innerText = 'Selecione pelo menos um exame.'; errorEl.style.display = 'block'; setTimeout(() => errorEl.style.display = 'none', 3000); return; }
     if (!recTipo) { errorEl.innerText = 'Selecione o tipo (Interno ou Externo).'; errorEl.style.display = 'block'; setTimeout(() => errorEl.style.display = 'none', 3000); return; }
     if (recTipo === 'externo' && !recLabExterno) { errorEl.innerText = 'Selecione o laboratório externo.'; errorEl.style.display = 'block'; setTimeout(() => errorEl.style.display = 'none', 3000); return; }
-    if (!motivo) { errorEl.innerText = 'O campo Motivo da recoleta é obrigatório.'; errorEl.style.display = 'block'; setTimeout(() => errorEl.style.display = 'none', 3000); return; }
+    if (!document.getElementById('rec-motivo-categoria').value) { errorEl.innerText = 'Selecione a categoria do motivo.'; errorEl.style.display = 'block'; setTimeout(() => errorEl.style.display = 'none', 3000); return; }
+    if (!motivo) { errorEl.innerText = 'Selecione o motivo (ou digite o motivo personalizado).'; errorEl.style.display = 'block'; setTimeout(() => errorEl.style.display = 'none', 3000); return; }
 
     errorEl.style.display = 'none';
     salvandoEl.style.display = 'block';
@@ -3661,7 +3886,7 @@ function agenRemoverPDF() {
 
     document.getElementById('rec-codigo').value = '';
     document.getElementById('rec-nome').value = '';
-    document.getElementById('rec-motivo').value = '';
+    recLimparMotivo();
     document.getElementById('rec-obs').value = '';
     recExamesSelecionados = [];
     recRenderExames();
@@ -4169,6 +4394,73 @@ async function carregarUsuarios() {
   let relFonteAtual = 'painel';
 
   let relResultadosCache = [];
+
+  function relMostrarAba(aba) {
+    document.getElementById('rel-aba-geral').style.background = aba === 'geral' ? 'linear-gradient(135deg,#0F4C5C,#49BCBE)' : 'transparent';
+    document.getElementById('rel-aba-geral').style.color = aba === 'geral' ? 'white' : '#64748b';
+    document.getElementById('rel-aba-geral').style.boxShadow = aba === 'geral' ? '2px 2px 8px rgba(15,76,92,0.3)' : 'none';
+    document.getElementById('rel-aba-recoletas').style.background = aba === 'recoletas' ? 'linear-gradient(135deg,#0F4C5C,#49BCBE)' : 'transparent';
+    document.getElementById('rel-aba-recoletas').style.color = aba === 'recoletas' ? 'white' : '#64748b';
+    document.getElementById('rel-aba-recoletas').style.boxShadow = aba === 'recoletas' ? '2px 2px 8px rgba(15,76,92,0.3)' : 'none';
+    document.getElementById('rel-painel-geral').style.display = aba === 'geral' ? 'block' : 'none';
+    document.getElementById('rel-painel-recoletas').style.display = aba === 'recoletas' ? 'block' : 'none';
+    if (aba === 'recoletas' && !document.getElementById('relrec-filtro-mes').value) {
+      const hoje = new Date();
+      document.getElementById('relrec-filtro-mes').value = hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
+      relRecGerar();
+    }
+  }
+
+  async function relRecGerar() {
+    const mesInput = document.getElementById('relrec-filtro-mes').value; // "YYYY-MM"
+    let mesAno = '';
+    if (mesInput) {
+      const [y, m] = mesInput.split('-');
+      mesAno = m + '/' + y;
+    }
+    const container = document.getElementById('relrec-lista');
+    container.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-solid fa-spinner fa-spin text-cda-primary text-2xl mb-3"></i><p class="text-sm text-slate-400">Carregando...</p></div>';
+    try {
+      const url = APPS_SCRIPT_URL + '?action=relatorioRecoletas&mesAno=' + encodeURIComponent(mesAno) + '&token=' + encodeURIComponent(CDA_TOKEN);
+      const resp = await fetch(url, { redirect: 'follow' });
+      const json = await resp.json();
+      if (!json.ok) throw new Error(json.erro || 'Erro ao gerar relatório');
+
+      document.getElementById('relrec-total-geral').innerText = json.totalGeral;
+      document.getElementById('relrec-total-mes').innerText = json.totalPeriodo;
+      document.getElementById('relrec-tempo-aviso').innerText = json.tempoMedioAvisoDias !== null ? json.tempoMedioAvisoDias + ' dia(s)' : '—';
+      document.getElementById('relrec-nao-avisou').innerText = json.naoConseguiuAvisar;
+      document.getElementById('relrec-tempo-retorno').innerText = json.tempoMedioRetornoDias !== null ? json.tempoMedioRetornoDias + ' dia(s)' : '—';
+      document.getElementById('relrec-contador').innerText = json.detalhes.length + ' registro(s)';
+
+      if (json.detalhes.length === 0) {
+        container.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-solid fa-circle-check text-slate-300 text-3xl mb-3"></i><p class="text-sm text-slate-400 font-medium">Nenhuma recoleta nesse período</p></div>';
+        return;
+      }
+
+      const statusMap = { PENDENTE: ['Pendente', '#92400e', '#fef3c7'], COMUNICADO: ['Comunicado', '#1e40af', '#dbeafe'], CONCLUIDO: ['Concluído', '#065f46', '#d1fae5'] };
+      container.innerHTML = json.detalhes.map(d => {
+        const st = statusMap[d.status] || ['—', '#64748b', '#f1f5f9'];
+        const avisoTxt = d.diasAviso !== null ? d.diasAviso + ' dia(s) até avisar' : 'Ainda não avisado';
+        const retornoTxt = d.diasRetorno !== null ? d.diasRetorno + ' dia(s) até o retorno' : (d.dataComunicacao ? 'Paciente ainda não veio' : '');
+        return '<div class="recoleta-card">' +
+          '<div class="recoleta-header">' +
+            '<div><div class="recoleta-codigo">CÓDIGO: ' + d.codigo + '</div><div class="recoleta-nome">' + d.nome + '</div></div>' +
+            '<span style="padding:4px 10px;border-radius:12px;font-size:11px;font-weight:800;color:' + st[1] + ';background:' + st[2] + ';">' + st[0] + '</span>' +
+          '</div>' +
+          '<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ' + (d.motivo || '—') + '</div>' +
+          '<div style="font-size:11px;color:#64748b;margin-top:8px;display:flex;flex-direction:column;gap:2px;">' +
+            '<span><i class="fa-regular fa-calendar mr-1"></i>Solicitado em: ' + d.data + '</span>' +
+            '<span><i class="fa-solid fa-phone mr-1"></i>' + avisoTxt + (d.dataComunicacao ? ' (' + d.dataComunicacao + ')' : '') + '</span>' +
+            (retornoTxt ? '<span><i class="fa-solid fa-person-walking mr-1"></i>' + retornoTxt + (d.dataVeio ? ' (' + d.dataVeio + ')' : '') + '</span>' : '') +
+          '</div>' +
+        '</div>';
+      }).join('');
+    } catch(err) {
+      console.error('[CDA] Erro ao gerar relatório de recoletas:', err);
+      container.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-solid fa-triangle-exclamation text-amber-400 text-3xl mb-3"></i><p class="text-sm text-slate-400 font-medium">Erro ao carregar relatório</p></div>';
+    }
+  }
 
   function relFiltroTipo(tipo) {
     relTipoAtual = tipo;
