@@ -1469,6 +1469,7 @@
                     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                         <input type="month" id="relrec-filtro-mes" class="recoleta-form-field" style="max-width:170px;" onchange="relRecGerar()">
                         <button onclick="relRecGerar()" class="orc-btn primary" style="padding:8px 16px;"><i class="fa-solid fa-rotate-right mr-1"></i> Atualizar</button>
+                        <button onclick="relRecExportarPDF()" class="orc-btn secondary" style="padding:8px 16px;"><i class="fa-solid fa-file-pdf mr-1"></i> Exportar PDF</button>
                     </div>
                 </div>
                 <div class="rel-resumo-grid">
@@ -4473,6 +4474,9 @@ async function carregarUsuarios() {
     }
   }
 
+  let relRecCache = null;
+  let relRecMesAnoCache = '';
+
   async function relRecGerar() {
     const mesInput = document.getElementById('relrec-filtro-mes').value; // "YYYY-MM"
     let mesAno = '';
@@ -4487,6 +4491,9 @@ async function carregarUsuarios() {
       const resp = await fetch(url, { redirect: 'follow' });
       const json = await resp.json();
       if (!json.ok) throw new Error(json.erro || 'Erro ao gerar relatório');
+
+      relRecCache = json;
+      relRecMesAnoCache = mesAno;
 
       document.getElementById('relrec-total-geral').innerText = json.totalGeral;
       document.getElementById('relrec-total-mes').innerText = json.totalPeriodo;
@@ -4522,6 +4529,61 @@ async function carregarUsuarios() {
       console.error('[CDA] Erro ao gerar relatório de recoletas:', err);
       container.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-solid fa-triangle-exclamation text-amber-400 text-3xl mb-3"></i><p class="text-sm text-slate-400 font-medium">Erro ao carregar relatório</p></div>';
     }
+  }
+
+  function relRecExportarPDF() {
+    if (!relRecCache) { showToast('Gere o relatório antes de exportar.', 'error'); return; }
+    const json = relRecCache;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+    // Cabeçalho
+    doc.setFillColor(15, 76, 92);
+    doc.rect(0, 0, 210, 28, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16); doc.setFont('helvetica', 'bold');
+    doc.text('LABORATÓRIO CDA', 14, 11);
+    doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+    doc.text('Relatório de Recoletas' + (relRecMesAnoCache ? ' — ' + relRecMesAnoCache : ''), 14, 18);
+    doc.text(new Date().toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'}), 196, 11, {align:'right'});
+
+    // Resumo
+    doc.setTextColor(15, 76, 92); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+    const tempoAvisoTxt = json.tempoMedioAvisoDias !== null ? json.tempoMedioAvisoDias + ' dia(s)' : '—';
+    const tempoRetornoTxt = json.tempoMedioRetornoDias !== null ? json.tempoMedioRetornoDias + ' dia(s)' : '—';
+    doc.text(
+      'Total geral: ' + json.totalGeral + '   |   No período: ' + json.totalPeriodo +
+      '   |   Não conseguiu avisar: ' + json.naoConseguiuAvisar, 14, 36
+    );
+    doc.text('Tempo médio p/ avisar: ' + tempoAvisoTxt + '   |   Tempo médio de retorno: ' + tempoRetornoTxt, 14, 42);
+
+    // Tabela
+    const statusLabel = { PENDENTE: 'Pendente', COMUNICADO: 'Comunicado', CONCLUIDO: 'Concluído' };
+    const rows = (json.detalhes || []).map(d => [
+      d.codigo || '',
+      d.nome || '',
+      d.motivo || '',
+      statusLabel[d.status] || d.status || '',
+      d.data || '',
+      d.dataComunicacao || '',
+      d.diasAviso !== null ? String(d.diasAviso) : '—',
+      d.dataVeio || '',
+      d.diasRetorno !== null ? String(d.diasRetorno) : '—'
+    ]);
+
+    doc.autoTable({
+      startY: 48,
+      head: [['Código','Paciente','Motivo','Status','Solicitado','Avisado','Dias p/ avisar','Retornou','Dias p/ retorno']],
+      body: rows,
+      styles: { fontSize: 7, cellPadding: 2.5 },
+      headStyles: { fillColor: [15,76,92], textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [240,246,247] },
+      columnStyles: { 0:{cellWidth:16}, 1:{cellWidth:32}, 2:{cellWidth:42}, 3:{cellWidth:20}, 4:{cellWidth:18}, 5:{cellWidth:18}, 6:{cellWidth:18}, 7:{cellWidth:18}, 8:{cellWidth:18} }
+    });
+
+    const sufixo = relRecMesAnoCache ? relRecMesAnoCache.replace('/','-') : new Date().toLocaleDateString('pt-BR').replace(/\//g,'-');
+    doc.save('relatorio-recoletas-cda-' + sufixo + '.pdf');
+    showToast('PDF exportado com sucesso!');
   }
 
   function relFiltroTipo(tipo) {
