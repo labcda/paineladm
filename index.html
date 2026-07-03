@@ -215,6 +215,17 @@
     .home-status-cancelado { background: #fee2e2; color: #991b1b; }
     .home-status-outro { background: #e8f8f8; color: #0F4C5C; }
 
+    /* ===== AGENDA: CALENDÁRIO MENSAL ===== */
+    .agenda-cal-dow-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 8px; }
+    .agenda-cal-dow { text-align: center; font-size: 0.68rem; font-weight: 800; color: #8c939e; text-transform: uppercase; letter-spacing: 0.5px; }
+    .agenda-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+    .agenda-cal-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 12px; font-size: 0.85rem; font-weight: 700; color: #101620; cursor: pointer; background: #fff; border: 1px solid rgba(0,0,0,0.06); transition: all 0.15s ease; }
+    .agenda-cal-day:hover { border-color: #49BCBE; transform: translateY(-1px); }
+    .agenda-cal-day.vazio { visibility: hidden; cursor: default; }
+    .agenda-cal-day.com-evento { background: linear-gradient(135deg,#0F4C5C,#49BCBE); color: #fff; border-color: transparent; box-shadow: 0 4px 10px rgba(15,76,92,0.25); }
+    .agenda-cal-day.hoje { box-shadow: 0 0 0 2px #37A7AA inset; }
+    .agenda-cal-count { font-size: 0.6rem; font-weight: 800; background: rgba(255,255,255,0.9); color: #0F4C5C; padding: 1px 6px; border-radius: 10px; }
+
     .atividade-item { display: flex; align-items: center; padding: 12px; border-radius: 12px; margin-bottom: 10px; transition: all 0.2s; }
     .atividade-item:hover { transform: translateX(4px); }
     .atividade-icon { margin-right: 12px; font-size: 1.1rem; }
@@ -1211,28 +1222,66 @@
             </div>
         </div>
 
-        <div class="neumorphic-card">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <button onclick="agendaMesAnterior()" class="orc-btn secondary" style="padding:8px 14px;"><i class="fa-solid fa-chevron-left"></i></button>
-                    <span id="agenda-mes-label" style="font-size:0.95rem;font-weight:800;color:#101620;min-width:140px;text-align:center;"></span>
-                    <button onclick="agendaMesProximo()" class="orc-btn secondary" style="padding:8px 14px;"><i class="fa-solid fa-chevron-right"></i></button>
-                </div>
-                <button onclick="agendaCarregarEventos()" class="orc-btn primary" style="padding:8px 16px;"><i class="fa-solid fa-rotate-right mr-1"></i> Atualizar</button>
-            </div>
+        <div style="display:flex;gap:8px;background:#EBECF0;border-radius:16px;padding:6px;">
+            <button id="agenda-aba-diaria" onclick="agendaMostrarAba('diaria')"
+                style="flex:1;padding:10px;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;background:linear-gradient(135deg,#0F4C5C,#49BCBE);color:white;box-shadow:2px 2px 8px rgba(15,76,92,0.3);">
+                <i class="fa-regular fa-calendar-day mr-2"></i>Agenda Diária
+            </button>
+            <button id="agenda-aba-mensal" onclick="agendaMostrarAba('mensal')"
+                style="flex:1;padding:10px;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;background:transparent;color:#64748b;">
+                <i class="fa-regular fa-calendar mr-2"></i>Agenda Mensal
+            </button>
         </div>
 
-        <div class="neumorphic-card">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-                <h3 style="font-size:1rem;font-weight:800;color:#101620;"><i class="fa-regular fa-calendar-days mr-2" style="color:#0F4C5C;"></i> Eventos do Mês</h3>
-                <span id="agenda-contador" style="font-size:0.75rem;font-weight:700;color:#8c939e;background:#f1f5f9;padding:4px 10px;border-radius:10px;"></span>
-            </div>
-            <div id="agenda-lista">
-                <div class="flex flex-col items-center py-8 text-center">
-                    <i class="fa-regular fa-calendar text-slate-300 text-3xl mb-3"></i>
-                    <p class="text-sm text-slate-400 font-medium">Abra esta página para carregar os eventos.</p>
-                </div>
-            </div>
+        <!-- PAINEL DIÁRIA -->
+        <div id="agenda-painel-diaria">
+          <div class="neumorphic-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+                  <div style="display:flex;align-items:center;gap:8px;">
+                      <button onclick="agendaDiaAnterior()" class="orc-btn secondary" style="padding:8px 14px;"><i class="fa-solid fa-chevron-left"></i></button>
+                      <input type="date" id="agenda-dia-input" class="recoleta-form-field" style="max-width:170px;text-align:center;font-weight:800;" onchange="agendaDiaInputMudou()">
+                      <button onclick="agendaDiaProximo()" class="orc-btn secondary" style="padding:8px 14px;"><i class="fa-solid fa-chevron-right"></i></button>
+                  </div>
+                  <button onclick="agendaCarregarDia()" class="orc-btn primary" style="padding:8px 16px;"><i class="fa-solid fa-rotate-right mr-1"></i> Atualizar</button>
+              </div>
+          </div>
+          <div class="neumorphic-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+                  <h3 style="font-size:1rem;font-weight:800;color:#101620;"><i class="fa-regular fa-calendar-day mr-2" style="color:#0F4C5C;"></i> <span id="agenda-dia-label">Hoje</span></h3>
+                  <span id="agenda-dia-contador" style="font-size:0.75rem;font-weight:700;color:#8c939e;background:#f1f5f9;padding:4px 10px;border-radius:10px;"></span>
+              </div>
+              <div id="agenda-dia-lista">
+                  <div class="flex flex-col items-center py-8 text-center">
+                      <i class="fa-regular fa-calendar text-slate-300 text-3xl mb-3"></i>
+                      <p class="text-sm text-slate-400 font-medium">Abra esta página para carregar os eventos.</p>
+                  </div>
+              </div>
+          </div>
+        </div>
+
+        <!-- PAINEL MENSAL -->
+        <div id="agenda-painel-mensal" style="display:none;">
+          <div class="neumorphic-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+                  <div style="display:flex;align-items:center;gap:8px;">
+                      <button onclick="agendaMesAnterior()" class="orc-btn secondary" style="padding:8px 14px;"><i class="fa-solid fa-chevron-left"></i></button>
+                      <span id="agenda-mes-label" style="font-size:0.95rem;font-weight:800;color:#101620;min-width:140px;text-align:center;"></span>
+                      <button onclick="agendaMesProximo()" class="orc-btn secondary" style="padding:8px 14px;"><i class="fa-solid fa-chevron-right"></i></button>
+                  </div>
+                  <button onclick="agendaCarregarMes()" class="orc-btn primary" style="padding:8px 16px;"><i class="fa-solid fa-rotate-right mr-1"></i> Atualizar</button>
+              </div>
+          </div>
+          <div class="neumorphic-card">
+              <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap;">
+                  <span style="display:flex;align-items:center;gap:6px;font-size:0.72rem;font-weight:700;color:#475569;"><span style="width:12px;height:12px;border-radius:4px;background:linear-gradient(135deg,#0F4C5C,#49BCBE);display:inline-block;"></span> Com agendamento</span>
+                  <span style="display:flex;align-items:center;gap:6px;font-size:0.72rem;font-weight:700;color:#475569;"><span style="width:12px;height:12px;border-radius:4px;background:#fff;border:1px solid #e2e8f0;display:inline-block;"></span> Sem agendamento</span>
+              </div>
+              <div class="agenda-cal-dow-row">
+                  <div class="agenda-cal-dow">Dom</div><div class="agenda-cal-dow">Seg</div><div class="agenda-cal-dow">Ter</div>
+                  <div class="agenda-cal-dow">Qua</div><div class="agenda-cal-dow">Qui</div><div class="agenda-cal-dow">Sex</div><div class="agenda-cal-dow">Sáb</div>
+              </div>
+              <div id="agenda-cal-grid" class="agenda-cal-grid"></div>
+          </div>
         </div>
       </section>
 
@@ -2492,7 +2541,7 @@
         bolCarregarPedidos();
       }
       if (pageId === 'agenda') {
-        agendaCarregarEventos();
+        agendaAtualizarAtual();
       }
       if (pageId === 'relatorios') {
         const mesInput = document.getElementById('rel-filtro-mes');
@@ -5231,21 +5280,20 @@ async function carregarUsuarios() {
 
 
   // ==================== AGENDA (GOOGLE CALENDAR) ====================
-  let agendaDataRef = new Date();
+  let agendaDiaRef = new Date();  // dia selecionado na Agenda Diária
+  let agendaMesRef = new Date();  // mês de referência na Agenda Mensal
 
   function agendaFormatarMesLabel(date) {
     const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
     return meses[date.getMonth()] + ' de ' + date.getFullYear();
   }
 
-  function agendaMesAnterior() {
-    agendaDataRef.setMonth(agendaDataRef.getMonth() - 1);
-    agendaCarregarEventos();
+  function agendaDataISO(date) {
+    return date.getFullYear() + '-' + String(date.getMonth()+1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0');
   }
 
-  function agendaMesProximo() {
-    agendaDataRef.setMonth(agendaDataRef.getMonth() + 1);
-    agendaCarregarEventos();
+  function agendaCapitalizar(str) {
+    return str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
   }
 
   function agendaEscapar(str) {
@@ -5254,64 +5302,148 @@ async function carregarUsuarios() {
     return div.innerHTML;
   }
 
-  async function agendaCarregarEventos() {
-    const label = document.getElementById('agenda-mes-label');
-    const lista = document.getElementById('agenda-lista');
-    const contador = document.getElementById('agenda-contador');
-    if (label) label.innerText = agendaFormatarMesLabel(agendaDataRef);
-    if (contador) contador.innerText = '';
-    if (lista) lista.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-solid fa-spinner fa-spin text-slate-300 text-3xl mb-3"></i><p class="text-sm text-slate-400 font-medium">Carregando eventos...</p></div>';
-    const mesISO = agendaDataRef.getFullYear() + '-' + String(agendaDataRef.getMonth() + 1).padStart(2, '0');
+  function agendaRenderItemEvento(ev) {
+    const inicio = new Date(ev.inicio);
+    const fim = new Date(ev.fim);
+    const hora = ev.diaTodo ? 'Dia todo' : (String(inicio.getHours()).padStart(2,'0') + ':' + String(inicio.getMinutes()).padStart(2,'0') + ' - ' + String(fim.getHours()).padStart(2,'0') + ':' + String(fim.getMinutes()).padStart(2,'0'));
+    return '<div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f9;">' +
+      '<div style="min-width:90px;font-size:0.75rem;font-weight:800;color:#37A7AA;">' + hora + '</div>' +
+      '<div style="flex:1;">' +
+        '<p style="font-size:0.85rem;font-weight:700;color:#101620;">' + agendaEscapar(ev.titulo || 'Sem título') + '</p>' +
+        (ev.local ? '<p style="font-size:0.72rem;color:#8c939e;margin-top:2px;"><i class="fa-solid fa-location-dot mr-1"></i>' + agendaEscapar(ev.local) + '</p>' : '') +
+        (ev.descricao ? '<p style="font-size:0.72rem;color:#8c939e;margin-top:2px;">' + agendaEscapar(ev.descricao) + '</p>' : '') +
+      '</div>' +
+    '</div>';
+  }
+
+  // Busca (via Apps Script) todos os eventos do Google Calendar do mês que contém `date`.
+  // Retorna null em caso de erro, ou um array (podendo ser vazio).
+  async function agendaBuscarEventosMes(date) {
+    const mesISO = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0');
     try {
       const resp = await fetch(APPS_SCRIPT_URL + '?action=listarEventosCalendario&mes=' + encodeURIComponent(mesISO) + '&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' });
       const json = await resp.json();
       if (!json.ok) throw new Error(json.erro || 'Falha ao carregar eventos');
-      agendaRenderEventos(json.eventos || []);
+      return json.eventos || [];
     } catch (err) {
       console.error('[CDA] Erro ao carregar eventos do calendário:', err);
-      if (lista) lista.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-solid fa-triangle-exclamation text-slate-300 text-3xl mb-3"></i><p class="text-sm text-slate-400 font-medium">Erro ao carregar eventos da agenda.</p></div>';
+      return null;
     }
   }
 
-  function agendaRenderEventos(eventos) {
-    const lista = document.getElementById('agenda-lista');
-    const contador = document.getElementById('agenda-contador');
-    if (!lista) return;
-    if (contador) contador.innerText = eventos.length + (eventos.length === 1 ? ' evento' : ' eventos');
-    if (eventos.length === 0) {
-      lista.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-regular fa-calendar text-slate-300 text-3xl mb-3"></i><p class="text-sm text-slate-400 font-medium">Nenhum evento neste mês.</p></div>';
+  // ---- Abas ----
+  function agendaMostrarAba(aba) {
+    const ativo = 'linear-gradient(135deg,#0F4C5C,#49BCBE)';
+    const btnD = document.getElementById('agenda-aba-diaria');
+    const btnM = document.getElementById('agenda-aba-mensal');
+    btnD.style.background = aba === 'diaria' ? ativo : 'transparent';
+    btnD.style.color      = aba === 'diaria' ? 'white' : '#64748b';
+    btnD.style.boxShadow  = aba === 'diaria' ? '2px 2px 8px rgba(15,76,92,0.3)' : 'none';
+    btnM.style.background = aba === 'mensal' ? ativo : 'transparent';
+    btnM.style.color      = aba === 'mensal' ? 'white' : '#64748b';
+    btnM.style.boxShadow  = aba === 'mensal' ? '2px 2px 8px rgba(15,76,92,0.3)' : 'none';
+    document.getElementById('agenda-painel-diaria').style.display = aba === 'diaria' ? 'block' : 'none';
+    document.getElementById('agenda-painel-mensal').style.display = aba === 'mensal' ? 'block' : 'none';
+    if (aba === 'diaria') agendaCarregarDia();
+    else agendaCarregarMes();
+  }
+
+  function agendaAtualizarAtual() {
+    const painelDiaria = document.getElementById('agenda-painel-diaria');
+    if (painelDiaria && painelDiaria.style.display !== 'none') agendaCarregarDia();
+    else agendaCarregarMes();
+  }
+
+  // ---- Agenda Diária ----
+  function agendaDiaAnterior() { agendaDiaRef.setDate(agendaDiaRef.getDate() - 1); agendaCarregarDia(); }
+  function agendaDiaProximo()  { agendaDiaRef.setDate(agendaDiaRef.getDate() + 1); agendaCarregarDia(); }
+
+  function agendaDiaInputMudou() {
+    const input = document.getElementById('agenda-dia-input');
+    if (!input || !input.value) return;
+    const [y, m, d] = input.value.split('-').map(Number);
+    agendaDiaRef = new Date(y, m - 1, d);
+    agendaCarregarDia();
+  }
+
+  async function agendaCarregarDia() {
+    const input     = document.getElementById('agenda-dia-input');
+    const label      = document.getElementById('agenda-dia-label');
+    const lista      = document.getElementById('agenda-dia-lista');
+    const contador   = document.getElementById('agenda-dia-contador');
+    if (input) input.value = agendaDataISO(agendaDiaRef);
+    if (label) label.innerText = agendaCapitalizar(homeFormatarDataExtensa(agendaDiaRef));
+    if (contador) contador.innerText = '';
+    if (lista) lista.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-solid fa-spinner fa-spin text-slate-300 text-3xl mb-3"></i><p class="text-sm text-slate-400 font-medium">Carregando eventos...</p></div>';
+
+    const eventos = await agendaBuscarEventosMes(agendaDiaRef);
+    if (eventos === null) {
+      if (lista) lista.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-solid fa-triangle-exclamation text-slate-300 text-3xl mb-3"></i><p class="text-sm text-slate-400 font-medium">Erro ao carregar eventos da agenda.</p></div>';
       return;
     }
-    const grupos = {};
+    const diaISO = agendaDataISO(agendaDiaRef);
+    const doDia  = eventos.filter(ev => agendaDataISO(new Date(ev.inicio)) === diaISO)
+                           .sort((a, b) => new Date(a.inicio) - new Date(b.inicio));
+
+    if (contador) contador.innerText = doDia.length + (doDia.length === 1 ? ' evento' : ' eventos');
+    if (!lista) return;
+    if (doDia.length === 0) {
+      lista.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-regular fa-calendar text-slate-300 text-3xl mb-3"></i><p class="text-sm text-slate-400 font-medium">Nenhum agendamento neste dia.</p></div>';
+      return;
+    }
+    lista.innerHTML = doDia.map(agendaRenderItemEvento).join('');
+  }
+
+  // ---- Agenda Mensal ----
+  function agendaMesAnterior() { agendaMesRef.setMonth(agendaMesRef.getMonth() - 1); agendaCarregarMes(); }
+  function agendaMesProximo()  { agendaMesRef.setMonth(agendaMesRef.getMonth() + 1); agendaCarregarMes(); }
+
+  function agendaSelecionarDiaCalendario(ano, mes, dia) {
+    agendaDiaRef = new Date(ano, mes, dia);
+    agendaMostrarAba('diaria');
+  }
+
+  async function agendaCarregarMes() {
+    const label = document.getElementById('agenda-mes-label');
+    const grid  = document.getElementById('agenda-cal-grid');
+    if (label) label.innerText = agendaFormatarMesLabel(agendaMesRef);
+    if (grid) grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px 0;"><i class="fa-solid fa-spinner fa-spin text-slate-300 text-2xl"></i></div>';
+
+    const eventos = await agendaBuscarEventosMes(agendaMesRef);
+    if (eventos === null) {
+      if (grid) grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px 0;"><i class="fa-solid fa-triangle-exclamation text-slate-300 text-2xl mb-2"></i><p class="text-sm text-slate-400 font-medium">Erro ao carregar eventos da agenda.</p></div>';
+      return;
+    }
+    agendaRenderCalendario(eventos);
+  }
+
+  function agendaRenderCalendario(eventos) {
+    const grid = document.getElementById('agenda-cal-grid');
+    if (!grid) return;
+    const ano = agendaMesRef.getFullYear(), mes = agendaMesRef.getMonth();
+    const primeiroDiaSemana = new Date(ano, mes, 1).getDay(); // 0 = domingo
+    const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+    const contagemPorDia = {};
     eventos.forEach(ev => {
       const dt = new Date(ev.inicio);
-      const chave = dt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-      if (!grupos[chave]) grupos[chave] = [];
-      grupos[chave].push(ev);
+      if (dt.getFullYear() === ano && dt.getMonth() === mes) {
+        contagemPorDia[dt.getDate()] = (contagemPorDia[dt.getDate()] || 0) + 1;
+      }
     });
-    const chaves = Object.keys(grupos).sort((a, b) => {
-      const [da, ma, ya] = a.split('/'); const [db, mb, yb] = b.split('/');
-      return new Date(ya, ma - 1, da) - new Date(yb, mb - 1, db);
-    });
-    lista.innerHTML = chaves.map(chave => {
-      const itens = grupos[chave].map(ev => {
-        const inicio = new Date(ev.inicio);
-        const fim = new Date(ev.fim);
-        const hora = ev.diaTodo ? 'Dia todo' : (String(inicio.getHours()).padStart(2,'0') + ':' + String(inicio.getMinutes()).padStart(2,'0') + ' - ' + String(fim.getHours()).padStart(2,'0') + ':' + String(fim.getMinutes()).padStart(2,'0'));
-        return '<div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f9;">' +
-          '<div style="min-width:90px;font-size:0.75rem;font-weight:800;color:#37A7AA;">' + hora + '</div>' +
-          '<div style="flex:1;">' +
-            '<p style="font-size:0.85rem;font-weight:700;color:#101620;">' + agendaEscapar(ev.titulo || 'Sem título') + '</p>' +
-            (ev.local ? '<p style="font-size:0.72rem;color:#8c939e;margin-top:2px;"><i class="fa-solid fa-location-dot mr-1"></i>' + agendaEscapar(ev.local) + '</p>' : '') +
-            (ev.descricao ? '<p style="font-size:0.72rem;color:#8c939e;margin-top:2px;">' + agendaEscapar(ev.descricao) + '</p>' : '') +
-          '</div>' +
-        '</div>';
-      }).join('');
-      return '<div style="margin-bottom:16px;">' +
-        '<div style="font-size:0.72rem;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">' + chave + '</div>' +
-        itens +
+    const hoje = new Date();
+    const ehMesAtual = hoje.getFullYear() === ano && hoje.getMonth() === mes;
+
+    let html = '';
+    for (let i = 0; i < primeiroDiaSemana; i++) html += '<div class="agenda-cal-day vazio"></div>';
+    for (let d = 1; d <= diasNoMes; d++) {
+      const count = contagemPorDia[d] || 0;
+      const classes = 'agenda-cal-day' + (count > 0 ? ' com-evento' : '') + (ehMesAtual && hoje.getDate() === d ? ' hoje' : '');
+      html += '<div class="' + classes + '" onclick="agendaSelecionarDiaCalendario(' + ano + ',' + mes + ',' + d + ')">' +
+        '<span>' + d + '</span>' +
+        (count > 0 ? '<span class="agenda-cal-count">' + count + '</span>' : '') +
       '</div>';
-    }).join('');
+    }
+    grid.innerHTML = html;
   }
 
   // ==================== MÓDULO BOLETOS ====================
