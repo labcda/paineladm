@@ -216,15 +216,26 @@
     .home-status-outro { background: #e8f8f8; color: #0F4C5C; }
 
     /* ===== AGENDA: CALENDÁRIO MENSAL ===== */
-    .agenda-cal-dow-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 8px; }
-    .agenda-cal-dow { text-align: center; font-size: 0.68rem; font-weight: 800; color: #8c939e; text-transform: uppercase; letter-spacing: 0.5px; }
-    .agenda-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-    .agenda-cal-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 12px; font-size: 0.85rem; font-weight: 700; color: #101620; cursor: pointer; background: #fff; border: 1px solid rgba(0,0,0,0.06); transition: all 0.15s ease; }
+    .agenda-cal-dow-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 6px; }
+    .agenda-cal-dow { text-align: center; font-size: 0.62rem; font-weight: 800; color: #8c939e; text-transform: uppercase; letter-spacing: 0.5px; }
+    .agenda-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .agenda-cal-day { height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; border-radius: 9px; font-size: 0.72rem; font-weight: 700; color: #101620; cursor: pointer; background: #fff; border: 1px solid rgba(0,0,0,0.06); transition: all 0.15s ease; line-height: 1; }
     .agenda-cal-day:hover { border-color: #49BCBE; transform: translateY(-1px); }
     .agenda-cal-day.vazio { visibility: hidden; cursor: default; }
-    .agenda-cal-day.com-evento { background: linear-gradient(135deg,#0F4C5C,#49BCBE); color: #fff; border-color: transparent; box-shadow: 0 4px 10px rgba(15,76,92,0.25); }
+    .agenda-cal-day.com-evento { background: linear-gradient(135deg,#0F4C5C,#49BCBE); color: #fff; border-color: transparent; box-shadow: 0 3px 8px rgba(15,76,92,0.25); }
     .agenda-cal-day.hoje { box-shadow: 0 0 0 2px #37A7AA inset; }
-    .agenda-cal-count { font-size: 0.6rem; font-weight: 800; background: rgba(255,255,255,0.9); color: #0F4C5C; padding: 1px 6px; border-radius: 10px; }
+    .agenda-cal-count { font-size: 0.52rem; font-weight: 800; background: rgba(255,255,255,0.9); color: #0F4C5C; padding: 0 5px; border-radius: 8px; line-height: 1.5; }
+    @media (max-width: 640px) { .agenda-cal-day { height: 36px; font-size: 0.66rem; border-radius: 7px; } .agenda-cal-count { font-size: 0.48rem; } }
+
+    /* ===== AGENDA: LISTA COMPACTA DO DIA ===== */
+    .agenda-evento-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: #fff; margin-bottom: 8px; cursor: pointer; transition: all 0.15s ease; border: 1px solid rgba(0,0,0,0.05); }
+    .agenda-evento-item:last-child { margin-bottom: 0; }
+    .agenda-evento-item:hover { border-color: #49BCBE; transform: translateX(2px); }
+    .agenda-evento-item.compareceu { background: #ecfdf5; border-color: #a7f3d0; }
+    .agenda-evento-hora { min-width: 56px; text-align: center; background: var(--cda-primary-light); color: #0F4C5C; font-weight: 800; font-size: 0.78rem; padding: 6px 4px; border-radius: 10px; flex-shrink: 0; }
+    .agenda-evento-item.compareceu .agenda-evento-hora { background: #a7f3d0; color: #065f46; }
+    .agenda-evento-nome { flex: 1; min-width: 0; font-size: 0.85rem; font-weight: 700; color: #101620; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .agenda-evento-seta { color: #cbd5e1; font-size: 0.75rem; }
 
     .atividade-item { display: flex; align-items: center; padding: 12px; border-radius: 12px; margin-bottom: 10px; transition: all 0.2s; }
     .atividade-item:hover { transform: translateX(4px); }
@@ -1225,7 +1236,7 @@
         <div style="display:flex;gap:8px;background:#EBECF0;border-radius:16px;padding:6px;">
             <button id="agenda-aba-diaria" onclick="agendaMostrarAba('diaria')"
                 style="flex:1;padding:10px;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;background:linear-gradient(135deg,#0F4C5C,#49BCBE);color:white;box-shadow:2px 2px 8px rgba(15,76,92,0.3);">
-                <i class="fa-regular fa-calendar-day mr-2"></i>Agenda Diária
+                <i class="fa-solid fa-calendar-day mr-2"></i>Agenda Diária
             </button>
             <button id="agenda-aba-mensal" onclick="agendaMostrarAba('mensal')"
                 style="flex:1;padding:10px;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;background:transparent;color:#64748b;">
@@ -1247,7 +1258,7 @@
           </div>
           <div class="neumorphic-card">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-                  <h3 style="font-size:1rem;font-weight:800;color:#101620;"><i class="fa-regular fa-calendar-day mr-2" style="color:#0F4C5C;"></i> <span id="agenda-dia-label">Hoje</span></h3>
+                  <h3 style="font-size:1rem;font-weight:800;color:#101620;"><i class="fa-solid fa-calendar-day mr-2" style="color:#0F4C5C;"></i> <span id="agenda-dia-label">Hoje</span></h3>
                   <span id="agenda-dia-contador" style="font-size:0.75rem;font-weight:700;color:#8c939e;background:#f1f5f9;padding:4px 10px;border-radius:10px;"></span>
               </div>
               <div id="agenda-dia-lista">
@@ -5282,6 +5293,8 @@ async function carregarUsuarios() {
   // ==================== AGENDA (GOOGLE CALENDAR) ====================
   let agendaDiaRef = new Date();  // dia selecionado na Agenda Diária
   let agendaMesRef = new Date();  // mês de referência na Agenda Mensal
+  let agendaEventosDoDiaAtual = []; // eventos carregados na Agenda Diária (para abrir o modal por índice)
+  let agendaModalIndexAtual = null;
 
   function agendaFormatarMesLabel(date) {
     const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -5302,18 +5315,117 @@ async function carregarUsuarios() {
     return div.innerHTML;
   }
 
-  function agendaRenderItemEvento(ev) {
+  function agendaNomePaciente(titulo) {
+    return (titulo || 'Sem título').replace(/^CDA\s*-\s*/i, '').trim() || 'Sem título';
+  }
+
+  // Extrai o link do PDF (Google Drive) salvo na descrição do evento, se houver.
+  function agendaExtrairPDF(descricao) {
+    if (!descricao) return null;
+    const porRotulo = descricao.match(/PDF:\s*(https?:\/\/\S+)/i);
+    if (porRotulo) return porRotulo[1];
+    const porDrive = descricao.match(/(https?:\/\/drive\.google\.com\/\S+)/i);
+    if (porDrive) return porDrive[1];
+    const porExtensao = descricao.match(/(https?:\/\/\S+\.pdf\S*)/i);
+    return porExtensao ? porExtensao[1] : null;
+  }
+
+  // Remove a linha "PDF: <link>" da descrição (já vira um botão dedicado).
+  function agendaLimparDescricao(descricao) {
+    return (descricao || '').replace(/\n*PDF:\s*https?:\/\/\S+/i, '').trim();
+  }
+
+  function agendaRenderItemCompacto(ev, index) {
     const inicio = new Date(ev.inicio);
-    const fim = new Date(ev.fim);
-    const hora = ev.diaTodo ? 'Dia todo' : (String(inicio.getHours()).padStart(2,'0') + ':' + String(inicio.getMinutes()).padStart(2,'0') + ' - ' + String(fim.getHours()).padStart(2,'0') + ':' + String(fim.getMinutes()).padStart(2,'0'));
-    return '<div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f9;">' +
-      '<div style="min-width:90px;font-size:0.75rem;font-weight:800;color:#37A7AA;">' + hora + '</div>' +
-      '<div style="flex:1;">' +
-        '<p style="font-size:0.85rem;font-weight:700;color:#101620;">' + agendaEscapar(ev.titulo || 'Sem título') + '</p>' +
-        (ev.local ? '<p style="font-size:0.72rem;color:#8c939e;margin-top:2px;"><i class="fa-solid fa-location-dot mr-1"></i>' + agendaEscapar(ev.local) + '</p>' : '') +
-        (ev.descricao ? '<p style="font-size:0.72rem;color:#8c939e;margin-top:2px;">' + agendaEscapar(ev.descricao) + '</p>' : '') +
-      '</div>' +
+    const hora = ev.diaTodo ? 'Dia todo' : (String(inicio.getHours()).padStart(2,'0') + ':' + String(inicio.getMinutes()).padStart(2,'0'));
+    const icone = ev.compareceu ? '<i class="fa-solid fa-circle-check" style="color:#059669;"></i>' : '<i class="fa-solid fa-chevron-right agenda-evento-seta"></i>';
+    return '<div class="agenda-evento-item' + (ev.compareceu ? ' compareceu' : '') + '" onclick="agendaAbrirModalEvento(' + index + ')">' +
+      '<div class="agenda-evento-hora">' + hora + '</div>' +
+      '<div class="agenda-evento-nome">' + agendaEscapar(agendaNomePaciente(ev.titulo)) + '</div>' +
+      icone +
     '</div>';
+  }
+
+  function agendaAbrirModalEvento(index) {
+    const ev = agendaEventosDoDiaAtual[index];
+    if (!ev) return;
+    agendaModalIndexAtual = index;
+    const inicio = new Date(ev.inicio), fim = new Date(ev.fim);
+    const horaTxt = ev.diaTodo ? 'Dia todo' : (String(inicio.getHours()).padStart(2,'0') + ':' + String(inicio.getMinutes()).padStart(2,'0') + ' - ' + String(fim.getHours()).padStart(2,'0') + ':' + String(fim.getMinutes()).padStart(2,'0'));
+    document.getElementById('modal-agenda-titulo').innerText = agendaNomePaciente(ev.titulo);
+    document.getElementById('modal-agenda-subtitulo').innerText = horaTxt + (ev.local ? ' · ' + ev.local : '');
+    const descLimpa = agendaLimparDescricao(ev.descricao);
+    document.getElementById('modal-agenda-info').innerHTML = descLimpa
+      ? '<p style="white-space:pre-line;font-size:0.8rem;color:#475569;line-height:1.6;">' + agendaEscapar(descLimpa) + '</p>'
+      : '<p style="font-size:0.8rem;color:#94a3b8;">Sem informações adicionais.</p>';
+    const pdfUrl = agendaExtrairPDF(ev.descricao);
+    const pdfWrap = document.getElementById('modal-agenda-pdf-wrap');
+    pdfWrap.style.display = pdfUrl ? 'block' : 'none';
+    pdfWrap.dataset.url = pdfUrl || '';
+    agendaAtualizarBotaoComparecimento(ev.compareceu);
+    document.getElementById('modal-agenda-detalhes').classList.add('ativo');
+  }
+
+  function agendaFecharModal() {
+    document.getElementById('modal-agenda-detalhes').classList.remove('ativo');
+    agendaModalIndexAtual = null;
+  }
+
+  function agendaAbrirPDF() {
+    const url = document.getElementById('modal-agenda-pdf-wrap').dataset.url;
+    if (url) window.open(url, '_blank');
+  }
+
+  function agendaAtualizarBotaoComparecimento(compareceu) {
+    const btn = document.getElementById('modal-agenda-btn-compareceu');
+    if (!btn) return;
+    btn.disabled = false;
+    if (compareceu) {
+      btn.className = 'modal-rec-btn neutral';
+      btn.innerHTML = '<i class="fa-solid fa-rotate-left mr-1"></i> Desfazer "Paciente Veio"';
+    } else {
+      btn.className = 'modal-rec-btn success';
+      btn.innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Paciente Veio Fazer a Coleta';
+    }
+  }
+
+  async function agendaToggleComparecimento() {
+    const ev = agendaEventosDoDiaAtual[agendaModalIndexAtual];
+    if (!ev) return;
+    const novoValor = !ev.compareceu;
+    const btn = document.getElementById('modal-agenda-btn-compareceu');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Salvando...';
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'marcarComparecimento', token: CDA_TOKEN, id: ev.id, compareceu: novoValor }),
+        redirect: 'follow'
+      });
+      const json = await resp.json();
+      if (!json.ok) throw new Error(json.erro || 'Falha ao salvar');
+      ev.compareceu = novoValor;
+      agendaAtualizarBotaoComparecimento(novoValor);
+      agendaRenderDia(agendaEventosDoDiaAtual);
+    } catch (err) {
+      console.error('[CDA] Erro ao marcar comparecimento:', err);
+      alert('Não foi possível salvar. Tente novamente.');
+      agendaAtualizarBotaoComparecimento(ev.compareceu);
+    }
+  }
+
+  function agendaRenderDia(eventos) {
+    agendaEventosDoDiaAtual = eventos;
+    const lista = document.getElementById('agenda-dia-lista');
+    const contador = document.getElementById('agenda-dia-contador');
+    if (contador) contador.innerText = eventos.length + (eventos.length === 1 ? ' evento' : ' eventos');
+    if (!lista) return;
+    if (eventos.length === 0) {
+      lista.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-regular fa-calendar text-slate-300 text-3xl mb-3"></i><p class="text-sm text-slate-400 font-medium">Nenhum agendamento neste dia.</p></div>';
+      return;
+    }
+    lista.innerHTML = eventos.map(agendaRenderItemCompacto).join('');
   }
 
   // Busca (via Apps Script) todos os eventos do Google Calendar do mês que contém `date`.
@@ -5384,14 +5496,7 @@ async function carregarUsuarios() {
     const diaISO = agendaDataISO(agendaDiaRef);
     const doDia  = eventos.filter(ev => agendaDataISO(new Date(ev.inicio)) === diaISO)
                            .sort((a, b) => new Date(a.inicio) - new Date(b.inicio));
-
-    if (contador) contador.innerText = doDia.length + (doDia.length === 1 ? ' evento' : ' eventos');
-    if (!lista) return;
-    if (doDia.length === 0) {
-      lista.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-regular fa-calendar text-slate-300 text-3xl mb-3"></i><p class="text-sm text-slate-400 font-medium">Nenhum agendamento neste dia.</p></div>';
-      return;
-    }
-    lista.innerHTML = doDia.map(agendaRenderItemEvento).join('');
+    agendaRenderDia(doDia);
   }
 
   // ---- Agenda Mensal ----
@@ -6179,6 +6284,37 @@ async function carregarUsuarios() {
                 </button>
                 <button id="modal-rec-btn-concluir" class="modal-rec-btn success" onclick="mostrarConclusaoForm()" style="flex:2;">
                     <i class="fa-solid fa-check-circle mr-1"></i> Paciente Veio / Concluir
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODAL DETALHES AGENDA ==================== -->
+<div id="modal-agenda-detalhes" class="modal-rec-detalhes-overlay">
+    <div class="modal-rec-detalhes">
+        <div class="modal-rec-header">
+            <h3><i class="fa-solid fa-calendar-check mr-2"></i> <span id="modal-agenda-titulo">Detalhes do Agendamento</span></h3>
+            <p class="sub" id="modal-agenda-subtitulo">--:-- - --:--</p>
+        </div>
+        <div class="modal-rec-body">
+            <div class="modal-rec-secao">
+                <h4><i class="fa-solid fa-circle-info mr-1"></i> Informações</h4>
+                <div id="modal-agenda-info">---</div>
+            </div>
+            <div id="modal-agenda-pdf-wrap" style="display:none;">
+                <button class="modal-rec-btn primary" style="width:100%;" onclick="agendaAbrirPDF()">
+                    <i class="fa-solid fa-file-pdf mr-1"></i> Abrir PDF do Google Drive
+                </button>
+            </div>
+
+            <!-- Botões de ação -->
+            <div style="display: flex; gap: 8px; margin-top: 16px;">
+                <button class="modal-rec-btn neutral" onclick="agendaFecharModal()" style="flex:1;">
+                    <i class="fa-solid fa-xmark mr-1"></i> Fechar
+                </button>
+                <button id="modal-agenda-btn-compareceu" class="modal-rec-btn success" onclick="agendaToggleComparecimento()" style="flex:2;">
+                    <i class="fa-solid fa-check-circle mr-1"></i> Paciente Veio Fazer a Coleta
                 </button>
             </div>
         </div>
