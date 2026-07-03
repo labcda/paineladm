@@ -621,6 +621,7 @@
     .modal-rec-btn.primary { background: linear-gradient(135deg,#0F4C5C,#49BCBE); color: white; }
     .modal-rec-btn.neutral { background: #f1f5f9; color: #64748b; }
     .modal-rec-btn.success { background: linear-gradient(135deg,#059669,#10b981); color: white; }
+    .modal-rec-btn.danger { background: linear-gradient(135deg,#dc2626,#ef4444); color: white; }
     .modal-rec-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 
 
@@ -5507,6 +5508,38 @@ async function carregarUsuarios() {
     }
   }
 
+  async function agendaCancelarAgendamento() {
+    const ev = agendaEventosDoDiaAtual[agendaModalIndexAtual];
+    if (!ev) return;
+    const nome = agendaNomePaciente(ev.titulo);
+    const confirmado = confirm('Confirma que ' + nome + ' desmarcou ou pediu para reagendar?\n\nO horário será removido da agenda e ficará livre para outro paciente.');
+    if (!confirmado) return;
+
+    const btn = document.getElementById('modal-agenda-btn-cancelar');
+    const textoOriginal = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Cancelando...';
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'cancelarAgendamento', token: CDA_TOKEN, id: ev.id }),
+        redirect: 'follow'
+      });
+      const json = await resp.json();
+      if (!json.ok) throw new Error(json.erro || 'Falha ao cancelar');
+      agendaFecharModal();
+      showToast('Agendamento de ' + nome + ' cancelado — horário liberado.');
+      const restante = agendaEventosDoDiaAtual.filter(e => e.id !== ev.id);
+      agendaRenderDia(restante);
+    } catch (err) {
+      console.error('[CDA] Erro ao cancelar agendamento:', err);
+      alert('Não foi possível cancelar. Tente novamente.');
+      btn.disabled = false;
+      btn.innerHTML = textoOriginal;
+    }
+  }
+
   function agendaRenderDia(eventos) {
     agendaEventosDoDiaAtual = eventos;
     const lista = document.getElementById('agenda-dia-lista');
@@ -6409,6 +6442,9 @@ async function carregarUsuarios() {
                     <i class="fa-solid fa-check-circle mr-1"></i> Paciente Veio Fazer a Coleta
                 </button>
             </div>
+            <button id="modal-agenda-btn-cancelar" class="modal-rec-btn danger" onclick="agendaCancelarAgendamento()" style="width:100%;margin-top:8px;">
+                <i class="fa-solid fa-calendar-xmark mr-1"></i> Paciente Desmarcou / Quer Reagendar
+            </button>
         </div>
     </div>
 </div>
