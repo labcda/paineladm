@@ -816,6 +816,7 @@
       <li class="active" data-page="home"><a href="#"><i class="fa-solid fa-home mr-2"></i> Home</a></li>
       <li data-page="orcamento"><a href="#"><i class="fa-solid fa-calculator mr-2"></i> Orçamentos</a></li>
       <li data-page="agendamento"><a href="#"><i class="fa-regular fa-calendar-check mr-2"></i> Agendamento</a></li>
+      <li data-page="agenda"><a href="#"><i class="fa-regular fa-calendar-days mr-2"></i> Agenda</a></li>
       <li data-page="recoletas"><a href="#"><i class="fa-solid fa-vial mr-2"></i> Recoletas</a></li>
       <li data-page="relatorios"><a href="#"><i class="fa-solid fa-chart-line mr-2"></i> Relatórios</a></li>
       <li data-page="boletos"><a href="#"><i class="fa-solid fa-file-invoice-dollar mr-2"></i> Boletos</a></li>
@@ -1140,6 +1141,43 @@
                 <p id="agen-status" class="text-xs text-center mt-3 hidden"></p>
             </div>
         </section>
+
+      <!-- AGENDA (GOOGLE CALENDAR) -->
+      <section id="page-agenda" class="page space-y-5">
+        <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 60%,#49BCBE 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(15,76,92,0.20);">
+            <div class="relative z-10">
+                <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
+                    <i class="fa-regular fa-calendar-days"></i> Agenda
+                </span>
+                <h2 class="text-2xl font-extrabold leading-tight mb-1">Agenda do Google Calendar</h2>
+                <p class="text-sm text-white/80 leading-relaxed">Eventos sincronizados em tempo real com o Google Agenda da clínica.</p>
+            </div>
+        </div>
+
+        <div class="neumorphic-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <button onclick="agendaMesAnterior()" class="orc-btn secondary" style="padding:8px 14px;"><i class="fa-solid fa-chevron-left"></i></button>
+                    <span id="agenda-mes-label" style="font-size:0.95rem;font-weight:800;color:#101620;min-width:140px;text-align:center;"></span>
+                    <button onclick="agendaMesProximo()" class="orc-btn secondary" style="padding:8px 14px;"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+                <button onclick="agendaCarregarEventos()" class="orc-btn primary" style="padding:8px 16px;"><i class="fa-solid fa-rotate-right mr-1"></i> Atualizar</button>
+            </div>
+        </div>
+
+        <div class="neumorphic-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+                <h3 style="font-size:1rem;font-weight:800;color:#101620;"><i class="fa-regular fa-calendar-days mr-2" style="color:#0F4C5C;"></i> Eventos do Mês</h3>
+                <span id="agenda-contador" style="font-size:0.75rem;font-weight:700;color:#8c939e;background:#f1f5f9;padding:4px 10px;border-radius:10px;"></span>
+            </div>
+            <div id="agenda-lista">
+                <div class="flex flex-col items-center py-8 text-center">
+                    <i class="fa-regular fa-calendar text-slate-300 text-3xl mb-3"></i>
+                    <p class="text-sm text-slate-400 font-medium">Abra esta página para carregar os eventos.</p>
+                </div>
+            </div>
+        </div>
+      </section>
 
       <!-- RECOLETAS -->
       <section id="page-recoletas" class="page space-y-5">
@@ -2257,6 +2295,9 @@
       if (pageId === 'boletos') {
         bolInicializarForm();
         bolCarregarPedidos();
+      }
+      if (pageId === 'agenda') {
+        agendaCarregarEventos();
       }
       if (pageId === 'relatorios') {
         const mesInput = document.getElementById('rel-filtro-mes');
@@ -4993,6 +5034,90 @@ async function carregarUsuarios() {
   });
 
 
+
+  // ==================== AGENDA (GOOGLE CALENDAR) ====================
+  let agendaDataRef = new Date();
+
+  function agendaFormatarMesLabel(date) {
+    const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    return meses[date.getMonth()] + ' de ' + date.getFullYear();
+  }
+
+  function agendaMesAnterior() {
+    agendaDataRef.setMonth(agendaDataRef.getMonth() - 1);
+    agendaCarregarEventos();
+  }
+
+  function agendaMesProximo() {
+    agendaDataRef.setMonth(agendaDataRef.getMonth() + 1);
+    agendaCarregarEventos();
+  }
+
+  function agendaEscapar(str) {
+    const div = document.createElement('div');
+    div.innerText = str || '';
+    return div.innerHTML;
+  }
+
+  async function agendaCarregarEventos() {
+    const label = document.getElementById('agenda-mes-label');
+    const lista = document.getElementById('agenda-lista');
+    const contador = document.getElementById('agenda-contador');
+    if (label) label.innerText = agendaFormatarMesLabel(agendaDataRef);
+    if (contador) contador.innerText = '';
+    if (lista) lista.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-solid fa-spinner fa-spin text-slate-300 text-3xl mb-3"></i><p class="text-sm text-slate-400 font-medium">Carregando eventos...</p></div>';
+    const mesISO = agendaDataRef.getFullYear() + '-' + String(agendaDataRef.getMonth() + 1).padStart(2, '0');
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL + '?action=listarEventosCalendario&mes=' + encodeURIComponent(mesISO) + '&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' });
+      const json = await resp.json();
+      if (!json.ok) throw new Error(json.erro || 'Falha ao carregar eventos');
+      agendaRenderEventos(json.eventos || []);
+    } catch (err) {
+      console.error('[CDA] Erro ao carregar eventos do calendário:', err);
+      if (lista) lista.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-solid fa-triangle-exclamation text-slate-300 text-3xl mb-3"></i><p class="text-sm text-slate-400 font-medium">Erro ao carregar eventos da agenda.</p></div>';
+    }
+  }
+
+  function agendaRenderEventos(eventos) {
+    const lista = document.getElementById('agenda-lista');
+    const contador = document.getElementById('agenda-contador');
+    if (!lista) return;
+    if (contador) contador.innerText = eventos.length + (eventos.length === 1 ? ' evento' : ' eventos');
+    if (eventos.length === 0) {
+      lista.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-regular fa-calendar text-slate-300 text-3xl mb-3"></i><p class="text-sm text-slate-400 font-medium">Nenhum evento neste mês.</p></div>';
+      return;
+    }
+    const grupos = {};
+    eventos.forEach(ev => {
+      const dt = new Date(ev.inicio);
+      const chave = dt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      if (!grupos[chave]) grupos[chave] = [];
+      grupos[chave].push(ev);
+    });
+    const chaves = Object.keys(grupos).sort((a, b) => {
+      const [da, ma, ya] = a.split('/'); const [db, mb, yb] = b.split('/');
+      return new Date(ya, ma - 1, da) - new Date(yb, mb - 1, db);
+    });
+    lista.innerHTML = chaves.map(chave => {
+      const itens = grupos[chave].map(ev => {
+        const inicio = new Date(ev.inicio);
+        const fim = new Date(ev.fim);
+        const hora = ev.diaTodo ? 'Dia todo' : (String(inicio.getHours()).padStart(2,'0') + ':' + String(inicio.getMinutes()).padStart(2,'0') + ' - ' + String(fim.getHours()).padStart(2,'0') + ':' + String(fim.getMinutes()).padStart(2,'0'));
+        return '<div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f9;">' +
+          '<div style="min-width:90px;font-size:0.75rem;font-weight:800;color:#37A7AA;">' + hora + '</div>' +
+          '<div style="flex:1;">' +
+            '<p style="font-size:0.85rem;font-weight:700;color:#101620;">' + agendaEscapar(ev.titulo || 'Sem título') + '</p>' +
+            (ev.local ? '<p style="font-size:0.72rem;color:#8c939e;margin-top:2px;"><i class="fa-solid fa-location-dot mr-1"></i>' + agendaEscapar(ev.local) + '</p>' : '') +
+            (ev.descricao ? '<p style="font-size:0.72rem;color:#8c939e;margin-top:2px;">' + agendaEscapar(ev.descricao) + '</p>' : '') +
+          '</div>' +
+        '</div>';
+      }).join('');
+      return '<div style="margin-bottom:16px;">' +
+        '<div style="font-size:0.72rem;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">' + chave + '</div>' +
+        itens +
+      '</div>';
+    }).join('');
+  }
 
   // ==================== MÓDULO BOLETOS ====================
   const BOLETOS_FOLDER_ID = '1AT2pQJhV-5oM5xGoKFkUJdb_EJfcJbc7'; // Pasta do Google Drive para espelhos
