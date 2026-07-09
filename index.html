@@ -397,17 +397,27 @@
     .send .icon svg { fill: currentColor; width: 1.6rem; height: 1.6rem; transition: transform 0.4s ease-out; }
     .send:disabled { opacity: 0.5; cursor: not-allowed; }
 
+    /* ===== AGENDAMENTO: DUAS COLUNAS (ETAPAS + RESUMO FIXO) ===== */
+    .agen-2col { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; align-items: start; }
+    @media (max-width: 900px) { .agen-2col { grid-template-columns: 1fr; } .agen-summary-col { position: static !important; } }
+    .agen-summary-col { position: sticky; top: 20px; }
+    .agen-summary-col .card-cda { border: 2px solid #338b85; padding: 16px; }
+    .agen-summary-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .agen-summary-icon { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #005954 0%, #338b85 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0; box-shadow: 0 3px 8px rgba(0,89,84,0.28); }
+    .agen-summary-title { font-size: 0.75rem; font-weight: 800; color: #334155; text-transform: uppercase; letter-spacing: 0.05em; }
+
     /* ===== AGENDAMENTO: TIMELINE DE ETAPAS ===== */
     .agen-steps-timeline { position: relative; }
     .agen-steps-timeline::before {
-      content: ""; position: absolute; left: 34px; top: 34px; bottom: 34px; width: 2px;
+      content: ""; position: absolute; left: 27px; top: 27px; bottom: 27px; width: 2px;
       background: repeating-linear-gradient(to bottom, rgba(51,139,133,0.3) 0 6px, transparent 6px 12px); z-index: 0;
     }
-    .agen-steps-timeline .card-cda { position: relative; z-index: 1; }
+    .agen-steps-timeline .card-cda { position: relative; z-index: 1; padding: 16px; }
+    .agen-steps-timeline .card-cda p.text-xs { margin-bottom: 12px !important; }
     .agen-steps-timeline .card-cda p.text-xs > span.rounded-full {
-      width: 30px !important; height: 30px !important; font-size: 0.85rem !important; font-weight: 800;
+      width: 22px !important; height: 22px !important; font-size: 0.7rem !important; font-weight: 800;
       background: linear-gradient(135deg, #005954 0%, #338b85 100%) !important;
-      box-shadow: 0 4px 10px rgba(0,89,84,0.3);
+      box-shadow: 0 3px 8px rgba(0,89,84,0.28);
     }
 
     .agen-pagamento-opcao:has(input:checked) {
@@ -482,8 +492,8 @@
     /* ===== ESTILOS PARA UPLOAD DE PDF ===== */
     .pdf-upload-area {
       border: 2px dashed #cbd5e1;
-      border-radius: 16px;
-      padding: 24px;
+      border-radius: 14px;
+      padding: 16px;
       text-align: center;
       transition: all 0.3s ease;
       cursor: pointer;
@@ -499,9 +509,9 @@
       transform: scale(1.02);
     }
     .pdf-upload-area i {
-      font-size: 2.5rem;
+      font-size: 1.7rem;
       color: #94a3b8;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     .pdf-upload-area:hover i {
       color: #005954;
@@ -1136,6 +1146,7 @@
                     <p class="text-sm text-white/80 leading-relaxed">Escolha a data e veja os horários disponíveis em tempo real.</p>
                 </div>
             </div>
+            <div class="agen-2col">
             <div class="agen-steps-timeline">
             <div class="card-cda p-5" id="agen-step-1">
                 <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
@@ -1144,15 +1155,15 @@
                 <div class="space-y-3">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1"><i class="fa-regular fa-user text-cda-primary mr-1"></i> Nome completo *</label>
-                        <input type="text" id="agen-nome" placeholder="Digite o nome do paciente..." class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary" oninput="agenAtualizarResumo()">
+                        <input type="text" id="agen-nome" placeholder="Digite o nome do paciente..." class="w-full bg-slate-50 border-none rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-cda-primary" oninput="agenAtualizarResumo()">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1"><i class="fa-solid fa-phone text-cda-primary mr-1"></i> Telefone (com DDD) *</label>
-                        <input type="tel" id="agen-telefone" placeholder="(27) 99999-9999" class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary" oninput="agenAtualizarResumo()">
+                        <input type="tel" id="agen-telefone" placeholder="(27) 99999-9999" class="w-full bg-slate-50 border-none rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-cda-primary" oninput="agenAtualizarResumo()">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1"><i class="fa-regular fa-calendar text-cda-primary mr-1"></i> Data de nascimento *</label>
-                        <input type="date" id="agen-nascimento" class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary" onchange="agenAtualizarResumo()">
+                        <input type="date" id="agen-nascimento" class="w-full bg-slate-50 border-none rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-cda-primary" onchange="agenAtualizarResumo()">
                     </div>
                 </div>
             </div>
@@ -1218,7 +1229,7 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1"><i class="fa-regular fa-calendar text-cda-primary mr-1"></i> Data da coleta</label>
-                        <input type="date" id="agen-data" class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cda-primary" onchange="agenOnDataChange(); agenAtualizarResumo();">
+                        <input type="date" id="agen-data" class="w-full bg-slate-50 border-none rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-cda-primary" onchange="agenOnDataChange(); agenAtualizarResumo();">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1"><i class="fa-regular fa-sun text-cda-primary mr-1"></i> Período</label>
@@ -1259,10 +1270,13 @@
                     </div>
                 </div>
             </div>
+            </div>
+            <div class="agen-summary-col">
             <div class="card-cda p-5" id="agen-step-4">
-                <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
-                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">5</span> Confirmar agendamento
-                </p>
+                <div class="agen-summary-head">
+                    <div class="agen-summary-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+                    <p class="agen-summary-title">Resumo e confirmação</p>
+                </div>
                 <div id="agen-resumo" class="bg-slate-50 rounded-2xl p-4 mb-4 space-y-2 hidden">
                     <div class="flex items-center gap-3"><i class="fa-regular fa-calendar-check text-cda-primary w-4"></i><span id="agen-resumo-data" class="text-sm font-bold text-slate-700"></span></div>
                     <div class="flex items-center gap-3"><i class="fa-regular fa-clock text-cda-primary w-4"></i><span id="agen-resumo-hora" class="text-sm font-bold text-slate-700"></span></div>
@@ -1300,6 +1314,7 @@
                     <span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594z"/></svg></span>
                 </button>
                 <p id="agen-status" class="text-xs text-center mt-3 hidden"></p>
+            </div>
             </div>
             </div>
         </section>
