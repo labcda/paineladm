@@ -116,18 +116,22 @@
     }
 
     #splashScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: linear-gradient(135deg, #005954 0%, #5dc1b9 60%, #338b85 100%);
+      background: radial-gradient(circle at 30% 20%, #338b85 0%, #005954 55%, #002A27 100%);
       z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center;
-      opacity: 1; transition: opacity 0.6s ease;
+      opacity: 1; transition: opacity 0.6s ease; overflow: hidden;
     }
+    #splashScreen::before, #splashScreen::after { content: ""; position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; }
+    #splashScreen::before { width: 380px; height: 380px; background: rgba(93,193,185,0.35); top: -100px; left: -80px; }
+    #splashScreen::after { width: 340px; height: 340px; background: rgba(156,224,219,0.25); bottom: -100px; right: -60px; }
     #splashScreen.fade-out { opacity: 0; pointer-events: none; }
-    .splash-content { text-align: center; color: white; animation: fadeInDown 0.8s ease; }
-    .splash-logo { width: 120px; height: 120px; margin-bottom: 30px; animation: float 3s ease-in-out infinite; }
-    .splash-title { font-size: 2.5rem; font-weight: 800; margin-bottom: 10px; letter-spacing: 1px; }
-    .splash-subtitle { font-size: 1rem; opacity: 0.9; margin-bottom: 40px; font-weight: 500; }
-    .splash-progress { width: 200px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
-    .splash-progress-bar { height: 100%; background: linear-gradient(90deg, #FFFFFF, #7EFDE0); width: 0%; animation: progress 2.5s ease-in-out forwards; border-radius: 10px; }
-    .splash-text { font-size: 0.85rem; opacity: 0.8; margin-top: 20px; }
+    .splash-content { position: relative; z-index: 1; text-align: center; color: white; animation: fadeInDown 0.8s ease; }
+    .splash-logo { width: 88px; height: 88px; margin: 0 auto 28px; padding: 12px; background: #fff; border-radius: 22px; box-shadow: 0 16px 36px rgba(0,0,0,0.25); animation: float 3s ease-in-out infinite; display: flex; align-items: center; justify-content: center; }
+    .splash-logo img { width: 100%; height: 100%; object-fit: contain; }
+    .splash-title { font-size: 2rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.2px; }
+    .splash-subtitle { font-size: 0.95rem; opacity: 0.85; margin-bottom: 36px; font-weight: 500; }
+    .splash-progress { width: 180px; height: 4px; background: rgba(255,255,255,0.18); border-radius: 10px; overflow: hidden; margin: 0 auto 18px; }
+    .splash-progress-bar { height: 100%; background: linear-gradient(90deg, #9ce0db, #ffffff); width: 0%; animation: progress 2.5s ease-in-out forwards; border-radius: 10px; box-shadow: 0 0 10px rgba(156,224,219,0.7); }
+    .splash-text { font-size: 0.8rem; opacity: 0.75; margin-top: 18px; letter-spacing: 0.02em; }
     @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
     @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes progress { 0% { width: 0%; } 100% { width: 100%; } }
@@ -159,7 +163,7 @@
       border-radius: 0 190px 190px 0; transition: background 250ms;
     }
     .brand { display: flex; align-items: center; justify-content: center; padding: 0 0 20px; }
-    .brand img { width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.15); object-fit: contain; padding: 4px; }
+    .brand img { width: 52px; height: 52px; border-radius: 14px; background: #fff; object-fit: contain; padding: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.18); }
     .site-nav ul { margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; list-style: none; }
     #main-nav { flex: 1; display: flex; align-items: center; }
     .site-nav li > a {
@@ -176,7 +180,7 @@
     .rail-avatar:hover { background: rgba(255,255,255,0.28); }
     .note { display: none; }
 
-    main { background: var(--fin-bg); display: flex; flex-direction: column; overflow: hidden; position: relative; transition: background 250ms; border-right: 1px solid var(--fin-border); }
+    main { background: var(--fin-bg); display: flex; flex: 1; min-width: 0; flex-direction: column; overflow: hidden; position: relative; transition: background 250ms; border-right: 1px solid var(--fin-border); }
     main > header { padding: 2.5rem 3rem 1.5rem; background: var(--fin-bg); border-bottom: 1px solid var(--fin-border); }
     .breadcrumbs { font-size: 0.75rem; color: var(--fin-text-muted); margin-bottom: 0.4rem; }
     h1.title { font-size: 1.6rem; font-weight: 700; color: var(--fin-text); margin-bottom: 0; }
