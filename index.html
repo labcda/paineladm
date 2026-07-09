@@ -384,18 +384,36 @@
     .horario-btn.ocupado, .agen-horario-btn.ocupado { background: #fee2e2; color: #ef4444; cursor: not-allowed; opacity: 0.6; }
 
     .send {
-      position: relative; display: flex; align-items: center; color: #353535;
-      background: #e0e5ec; border: none; font-family: 'Plus Jakarta Sans', sans-serif;
-      padding: 0; border-radius: 3rem; font-size: 1.2rem; font-weight: 600;
-      cursor: pointer; transition: transform 0.4s ease-out;
-      box-shadow: 9px 9px 16px 0px #a3b1c6, -9px -9px 16px 0px rgba(255, 255, 255, 0.6);
+      position: relative; display: flex; align-items: center; color: #fff;
+      background: linear-gradient(135deg, #005954 0%, #338b85 100%); border: none; font-family: 'Plus Jakarta Sans', sans-serif;
+      padding: 0; border-radius: 3rem; font-size: 1.05rem; font-weight: 700;
+      cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 10px 24px rgba(0,89,84,0.28);
     }
-    .send:hover { transform: translateY(-2px); }
+    .send:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(0,89,84,0.36); }
     .send:hover .icon svg { transform: translate(-5px, 5px); }
-    .send .text { height: 4.5rem; padding: 1rem 1rem 1rem 2rem; display: flex; align-items: center; }
-    .send .icon { display: block; padding: 1rem; box-shadow: 9px 9px 16px 0px #a3b1c6, -9px -9px 16px 0px rgba(255, 255, 255, 0.6); border-radius: 50%; width: 4.5rem; height: 4.5rem; display: flex; justify-content: center; align-items: center; background: #e0e5ec; }
-    .send .icon svg { fill: currentColor; width: 2rem; height: 2rem; transition: transform 0.4s ease-out; }
+    .send .text { height: 3.75rem; padding: 1rem 1.25rem 1rem 2rem; display: flex; align-items: center; }
+    .send .icon { display: flex; padding: 0; box-shadow: none; border-radius: 50%; width: 3.75rem; height: 3.75rem; justify-content: center; align-items: center; background: rgba(255,255,255,0.18); margin-right: 6px; }
+    .send .icon svg { fill: currentColor; width: 1.6rem; height: 1.6rem; transition: transform 0.4s ease-out; }
     .send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ===== AGENDAMENTO: TIMELINE DE ETAPAS ===== */
+    .agen-steps-timeline { position: relative; }
+    .agen-steps-timeline::before {
+      content: ""; position: absolute; left: 34px; top: 34px; bottom: 34px; width: 2px;
+      background: repeating-linear-gradient(to bottom, rgba(51,139,133,0.3) 0 6px, transparent 6px 12px); z-index: 0;
+    }
+    .agen-steps-timeline .card-cda { position: relative; z-index: 1; }
+    .agen-steps-timeline .card-cda p.text-xs > span.rounded-full {
+      width: 30px !important; height: 30px !important; font-size: 0.85rem !important; font-weight: 800;
+      background: linear-gradient(135deg, #005954 0%, #338b85 100%) !important;
+      box-shadow: 0 4px 10px rgba(0,89,84,0.3);
+    }
+
+    .agen-pagamento-opcao:has(input:checked) {
+      border-color: #338b85 !important; background: #d5ffff !important;
+      box-shadow: 0 4px 12px rgba(51,139,133,0.18);
+    }
     .send:disabled .icon svg { transform: none !important; }
 
     .recoleta-card {
@@ -1118,6 +1136,7 @@
                     <p class="text-sm text-white/80 leading-relaxed">Escolha a data e veja os horários disponíveis em tempo real.</p>
                 </div>
             </div>
+            <div class="agen-steps-timeline">
             <div class="card-cda p-5" id="agen-step-1">
                 <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-4">
                     <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cda-primary text-white text-[10px] mr-2">1</span> Dados do paciente
@@ -1281,6 +1300,7 @@
                     <span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594z"/></svg></span>
                 </button>
                 <p id="agen-status" class="text-xs text-center mt-3 hidden"></p>
+            </div>
             </div>
         </section>
 
