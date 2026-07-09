@@ -2232,10 +2232,10 @@
       const el = document.getElementById(id);
       if (el) el.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;color:#5B4FE5;"></i>';
     });
-    document.getElementById('stat-mes-orcamentos').innerText      = mesAnoExtenso;
-    document.getElementById('stat-mes-agendamentos').innerText    = mesAnoExtenso;
-    document.getElementById('stat-mes-app-orcamentos').innerText  = mesAnoExtenso;
-    document.getElementById('stat-mes-app-agendamentos').innerText = mesAnoExtenso;
+    ['stat-mes-orcamentos','stat-mes-agendamentos','stat-mes-app-orcamentos','stat-mes-app-agendamentos'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerText = mesAnoExtenso;
+    });
 
     // Buscar tudo em paralelo
     const [resOrc, resAgen, resRec, resAppOrc, resAppAgen] = await Promise.allSettled([
@@ -2246,17 +2246,19 @@
       fetch(APPS_SCRIPT_URL + '?action=contarAppRegistroAgen&mes='  + encodeURIComponent(mesISO)  + '&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json())
     ]);
 
+    const setTexto = (id, valor) => { const el = document.getElementById(id); if (el) el.innerText = valor; };
+
     // Orçamentos Painel
     let totalOrc = 0;
     if (resOrc.status === 'fulfilled' && resOrc.value.ok) totalOrc = resOrc.value.total || 0;
     dadosMensais.orcamentos = totalOrc;
-    document.getElementById('stat-orcamentos').innerText = totalOrc;
+    setTexto('stat-orcamentos', totalOrc);
 
     // Agendamentos Painel
     let totalAgen = 0;
     if (resAgen.status === 'fulfilled' && resAgen.value.ok) totalAgen = resAgen.value.total || 0;
     dadosMensais.agendamentos = totalAgen;
-    document.getElementById('stat-agendamentos').innerText = totalAgen;
+    setTexto('stat-agendamentos', totalAgen);
 
     // Recoletas
     let pendentes = 0, comunicadas = 0;
@@ -2264,24 +2266,24 @@
       pendentes   = resRec.value.pendentes   || 0;
       comunicadas = resRec.value.comunicadas || 0;
     }
-    document.getElementById('stat-recoletas-pendentes').innerText   = pendentes;
-    document.getElementById('stat-recoletas-comunicadas').innerText = comunicadas;
+    setTexto('stat-recoletas-pendentes', pendentes);
+    setTexto('stat-recoletas-comunicadas', comunicadas);
     renderGraficoRecoletas(pendentes, comunicadas);
 
     // Orçamentos App
     let totalAppOrc = 0;
     if (resAppOrc.status === 'fulfilled' && resAppOrc.value.ok) totalAppOrc = resAppOrc.value.total || 0;
-    document.getElementById('stat-app-orcamentos').innerText = totalAppOrc;
+    setTexto('stat-app-orcamentos', totalAppOrc);
 
     // Agendamentos App
     let totalAppAgen = 0;
     if (resAppAgen.status === 'fulfilled' && resAppAgen.value.ok) totalAppAgen = resAppAgen.value.total || 0;
-    document.getElementById('stat-app-agendamentos').innerText = totalAppAgen;
+    setTexto('stat-app-agendamentos', totalAppAgen);
 
     // Atividades recentes
     carregarAtividadesRecentes();
     // Agenda do dia + gráficos
-    document.getElementById('home-data-hoje-extenso').innerText = homeFormatarDataExtensa(new Date());
+    setTexto('home-data-hoje-extenso', homeFormatarDataExtensa(new Date()));
     carregarPacientesHoje();
     carregarGraficoAgendamentos7Dias();
   }
