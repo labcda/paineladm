@@ -400,6 +400,30 @@
     .send .icon svg { fill: currentColor; width: 1.6rem; height: 1.6rem; transition: transform 0.4s ease-out; }
     .send:disabled { opacity: 0.5; cursor: not-allowed; }
 
+    /* ===== CONTROLE DE QUALIDADE ===== */
+    .qc-drive-card { display: flex; align-items: center; gap: 12px; background: #f8fafc; border-radius: 14px; padding: 14px 16px; text-decoration: none; transition: all 0.2s ease; border: 1px solid transparent; }
+    .qc-drive-card:hover { border-color: #338b85; background: #d5ffff; transform: translateY(-2px); }
+    .qc-drive-icon { width: 42px; height: 42px; border-radius: 12px; background: #005954; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0; }
+    .qc-drive-titulo { font-size: 0.9rem; font-weight: 700; color: #0B302D; }
+    .qc-drive-sub { font-size: 0.72rem; color: #94a3b8; margin-top: 2px; }
+    .qc-drive-arrow { margin-left: auto; color: #94a3b8; font-size: 0.8rem; }
+
+    .qc-check-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+    .qc-check-item { display: flex; align-items: center; gap: 8px; background: #f8fafc; border: 2px solid transparent; border-radius: 10px; padding: 8px 10px; cursor: pointer; transition: all 0.2s ease; font-size: 0.78rem; font-weight: 600; color: #334155; }
+    .qc-check-item:hover { border-color: #9ce0db; }
+    .qc-check-item:has(input:checked) { background: #d5ffff; border-color: #338b85; color: #005954; }
+    .qc-check-item input { accent-color: #005954; width: 15px; height: 15px; flex-shrink: 0; }
+
+    .qc-nc-row { display: flex; align-items: center; gap: 12px; background: #f8fafc; border-radius: 14px; padding: 12px 14px; }
+    .qc-nc-info { flex: 1; min-width: 0; }
+    .qc-nc-codigo { font-size: 0.88rem; font-weight: 800; color: #005954; }
+    .qc-nc-sub { font-size: 0.72rem; color: #94a3b8; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .qc-nc-gravidade { font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; padding: 3px 8px; border-radius: 20px; flex-shrink: 0; }
+    .qc-nc-gravidade.baixa { background: #d1fae5; color: #065f46; }
+    .qc-nc-gravidade.media { background: #fef3c7; color: #92400e; }
+    .qc-nc-gravidade.alta { background: #ffedd5; color: #9a3412; }
+    .qc-nc-gravidade.critica { background: #fee2e2; color: #991b1b; }
+
     /* ===== CONFIGURAÇÕES: CADASTRO DE USUÁRIO E PERMISSÕES ===== */
     .cfg-label { display: block; font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
     .cfg-input { width: 100%; background: #f8fafc; border: none; border-radius: 12px; padding: 10px 14px; font-size: 0.85rem; font-family: inherit; color: #0B302D; }
@@ -976,6 +1000,7 @@
         <li data-page="recoletas" title="Recoletas"><a href="#"><i class="fa-solid fa-vial"></i><span>Recoletas</span></a></li>
         <li data-page="relatorios" title="Relatórios"><a href="#"><i class="fa-solid fa-chart-line"></i><span>Relatórios</span></a></li>
         <li data-page="boletos" title="Boletos"><a href="#"><i class="fa-solid fa-file-invoice-dollar"></i><span>Boletos</span></a></li>
+        <li data-page="qualidade" title="Controle de Qualidade"><a href="#"><i class="fa-solid fa-award"></i><span>Controle de Qualidade</span></a></li>
         <li data-page="configuracoes" id="nav-configuracoes" title="Configurações"><a href="#"><i class="fa-solid fa-gear"></i><span>Configurações</span></a></li>
       </ul>
     </div>
@@ -2018,6 +2043,44 @@
         </div>
       </section>
 
+      <!-- CONTROLE DE QUALIDADE -->
+      <section id="page-qualidade" class="page space-y-5">
+        <div style="background:linear-gradient(135deg,#005954 0%,#5dc1b9 60%,#338b85 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(0,89,84,0.20);">
+            <div class="relative z-10">
+                <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-4">
+                    <i class="fa-solid fa-award"></i> Controle de Qualidade
+                </span>
+                <h2 class="text-2xl font-extrabold leading-tight mb-1">Qualidade e Não Conformidades</h2>
+                <p class="text-sm text-white/80 leading-relaxed">Acesse os POPs e formulários, e registre não conformidades quando necessário.</p>
+            </div>
+        </div>
+
+        <div class="fin-card">
+          <div class="fin-card-head">
+            <div class="fin-card-title"><i class="fa-solid fa-folder-open mr-1" style="color:#338b85;"></i> POPs e Formulários</div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <a href="https://drive.google.com/drive/folders/1B8J54bDA8DKhe6YTSHvtVzSFhHMjtgwH" target="_blank" class="qc-drive-card">
+              <div class="qc-drive-icon"><i class="fa-brands fa-google-drive"></i></div>
+              <div><div class="qc-drive-titulo">Matriz</div><div class="qc-drive-sub">Abrir pasta no Google Drive</div></div>
+              <i class="fa-solid fa-arrow-up-right-from-square qc-drive-arrow"></i>
+            </a>
+            <a href="https://drive.google.com/drive/folders/1cVu-h-__dJ-uxESeBuoRS-hFdrTSOOs2" target="_blank" class="qc-drive-card">
+              <div class="qc-drive-icon"><i class="fa-brands fa-google-drive"></i></div>
+              <div><div class="qc-drive-titulo">Filial Mata Fria</div><div class="qc-drive-sub">Abrir pasta no Google Drive</div></div>
+              <i class="fa-solid fa-arrow-up-right-from-square qc-drive-arrow"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="fin-card">
+          <div class="fin-card-head">
+            <div class="fin-card-title"><i class="fa-solid fa-triangle-exclamation mr-1" style="color:#338b85;"></i> Não Conformidades</div>
+            <button class="fin-btn-primary" onclick="ncAbrirFormulario()"><i class="fa-solid fa-plus"></i> Nova NC</button>
+          </div>
+          <div id="qc-lista-nc" class="space-y-2"><p class="text-sm text-slate-500 text-center py-4">Carregando não conformidades...</p></div>
+        </div>
+      </section>
 
       <section id="page-configuracoes" class="page space-y-5">
         <div style="background:linear-gradient(135deg,#005954 0%,#5dc1b9 60%,#338b85 100%);border-radius:26px;padding:22px;color:white;position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(0,89,84,0.20);">
@@ -2076,6 +2139,57 @@
     </div>
     <div class="cfg-permissoes-grid" id="modal-permissoes-grid" style="margin-bottom:18px;"></div>
     <button class="fin-btn-primary" onclick="salvarPermissoesModal()" style="width:100%; justify-content:center; padding:12px;"><i class="fa-solid fa-check"></i> Salvar permissões</button>
+  </div>
+</div>
+
+<!-- MODAL: NOVA NÃO CONFORMIDADE -->
+<div id="modal-nc" style="display:none; position:fixed; inset:0; background:rgba(0,89,84,0.4); z-index:99996; align-items:center; justify-content:center; backdrop-filter:blur(4px); padding:20px;">
+  <div style="background:#fff; border-radius:20px; width:100%; max-width:720px; max-height:92vh; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.3); display:flex; flex-direction:column;">
+    <div style="background:linear-gradient(135deg,#005954,#338b85); color:#fff; padding:18px 24px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+      <div>
+        <p style="font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; opacity:0.8; margin-bottom:2px;">Registro de</p>
+        <p style="font-size:1.1rem; font-weight:800;">Não Conformidade</p>
+      </div>
+      <button onclick="ncFecharFormulario()" style="width:32px;height:32px;border-radius:50%;border:none;background:rgba(255,255,255,0.2);color:#fff;cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div style="padding:24px; overflow-y:auto; flex:1;">
+      <div class="cfg-label">Setor *</div>
+      <div class="qc-check-grid" id="nc-setor-grid" style="margin-bottom:16px;"></div>
+
+      <div class="cfg-label">Responsável pela abertura *</div>
+      <input type="text" id="nc-responsavel-abertura" class="cfg-input" placeholder="Nome de quem está abrindo a NC..." style="margin-bottom:16px;">
+
+      <div class="cfg-label">Origem da não conformidade *</div>
+      <div class="qc-check-grid" id="nc-origem-grid" style="margin-bottom:16px;"></div>
+
+      <div class="cfg-label">Descrição da não conformidade *</div>
+      <textarea id="nc-descricao" class="cfg-input" rows="4" placeholder="Descreva o que aconteceu, onde ocorreu e quando foi identificado..." style="margin-bottom:16px; resize:vertical;"></textarea>
+
+      <div class="cfg-label">Evidências</div>
+      <textarea id="nc-evidencias" class="cfg-input" rows="3" placeholder="Número do atendimento, OS, protocolo, lote de reagente, equipamento, documento, POP..." style="margin-bottom:16px; resize:vertical;"></textarea>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" style="margin-bottom:16px;">
+        <div>
+          <div class="cfg-label">Processo afetado *</div>
+          <div class="qc-check-grid" id="nc-processo-grid"></div>
+        </div>
+        <div>
+          <div class="cfg-label">Gravidade *</div>
+          <div class="qc-check-grid" id="nc-gravidade-grid"></div>
+        </div>
+      </div>
+
+      <div class="cfg-label">Ação imediata (contenção)</div>
+      <textarea id="nc-acao-imediata" class="cfg-input" rows="3" placeholder="Caso tenha sido realizada alguma ação imediata para controlar o problema..." style="margin-bottom:16px; resize:vertical;"></textarea>
+
+      <div class="cfg-label">Responsável pela análise da NC</div>
+      <input type="text" id="nc-responsavel-analise" class="cfg-input" placeholder="Nome do responsável (opcional)..." style="margin-bottom:8px;">
+
+      <div id="nc-error" style="display:none; color:#ef4444; font-size:0.8rem; margin-top:8px; text-align:center; font-weight:600;"></div>
+    </div>
+    <div style="padding:16px 24px; border-top:1px solid #f1f5f9; flex-shrink:0;">
+      <button class="fin-btn-primary" id="nc-btn-salvar" onclick="ncSalvar()" style="width:100%; justify-content:center; padding:13px;"><i class="fa-solid fa-file-pdf"></i> Gerar PDF e Salvar</button>
+    </div>
   </div>
 </div>
 
@@ -2799,6 +2913,9 @@
       }
       if (pageId === 'agenda') {
         agendaAtualizarAtual();
+      }
+      if (pageId === 'qualidade') {
+        carregarNaoConformidades();
       }
       if (pageId === 'relatorios') {
         const mesInput = document.getElementById('rel-filtro-mes');
@@ -5673,6 +5790,7 @@ async function carregarUsuarios() {
     { id: 'recoletas',     label: 'Recoletas',     icon: 'fa-solid fa-vial' },
     { id: 'relatorios',    label: 'Relatórios',    icon: 'fa-solid fa-chart-line' },
     { id: 'boletos',       label: 'Boletos',       icon: 'fa-solid fa-file-invoice-dollar' },
+    { id: 'qualidade',     label: 'Controle de Qualidade', icon: 'fa-solid fa-award' },
     { id: 'configuracoes', label: 'Configurações', icon: 'fa-solid fa-gear' }
   ];
 
@@ -5740,6 +5858,308 @@ async function carregarUsuarios() {
     } catch(e) {
       showToast('Erro ao salvar permissões: ' + e.message, 'error');
     }
+  }
+
+  // ==================== CONTROLE DE QUALIDADE — NÃO CONFORMIDADE (NC) ====================
+  const NC_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx8vEliX48ELofgHZaJyXn2VWqLLXJzuPj0JfiW3YwaSAq6l_cleaoFNOdsv0pJoFSV/exec';
+  const NC_PASTA_DRIVE_ID = '1M6mbRvfBb2TPUDE8dKUaPgB9YJt1Yf_t';
+  const NC_SETORES = ['Recepção','Coleta','Triagem','Hematologia','Bioquímica','Imunologia','Microbiologia','Parasitologia','Uroanálise','Biologia Molecular','Administração','Outro'];
+  const NC_ORIGENS = ['Reclamação de paciente','Auditoria Interna','Auditoria Externa','Controle Interno da Qualidade','Controle Externo da Qualidade','Equipamento','Processo Analítico','Processo Pré-Analítico','Processo Pós-Analítico','Fornecedor','Colaborador','Outro'];
+  const NC_PROCESSOS = ['Pré-Analítico','Analítico','Pós-Analítico','Gestão'];
+  const NC_GRAVIDADES = ['Baixa','Média','Alta','Crítica'];
+
+  function ncRenderGrupoRadio(containerId, opcoes, nomeGrupo) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = opcoes.map((op, i) => {
+      return '<label class="qc-check-item"><input type="radio" name="' + nomeGrupo + '" value="' + op + '"><span>' + op + '</span></label>';
+    }).join('');
+  }
+
+  function ncRenderGrupoCheckbox(containerId, opcoes, nomeGrupo) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = opcoes.map((op, i) => {
+      return '<label class="qc-check-item"><input type="checkbox" data-grupo="' + nomeGrupo + '" value="' + op + '"><span>' + op + '</span></label>';
+    }).join('');
+  }
+
+  function ncColetarRadio(nomeGrupo) {
+    const el = document.querySelector('input[name="' + nomeGrupo + '"]:checked');
+    return el ? el.value : '';
+  }
+
+  function ncColetarCheckbox(nomeGrupo) {
+    return Array.from(document.querySelectorAll('input[data-grupo="' + nomeGrupo + '"]:checked')).map(i => i.value);
+  }
+
+  function ncAbrirFormulario() {
+    ncRenderGrupoRadio('nc-setor-grid', NC_SETORES, 'nc-setor');
+    ncRenderGrupoCheckbox('nc-origem-grid', NC_ORIGENS, 'nc-origem');
+    ncRenderGrupoRadio('nc-processo-grid', NC_PROCESSOS, 'nc-processo');
+    ncRenderGrupoRadio('nc-gravidade-grid', NC_GRAVIDADES, 'nc-gravidade');
+    document.getElementById('nc-responsavel-abertura').value = '';
+    document.getElementById('nc-descricao').value = '';
+    document.getElementById('nc-evidencias').value = '';
+    document.getElementById('nc-acao-imediata').value = '';
+    document.getElementById('nc-responsavel-analise').value = '';
+    document.getElementById('nc-error').style.display = 'none';
+    document.getElementById('modal-nc').style.display = 'flex';
+  }
+
+  function ncFecharFormulario() {
+    document.getElementById('modal-nc').style.display = 'none';
+  }
+
+  function ncGravidadeClasse(gravidade) {
+    const mapa = { 'Baixa': 'baixa', 'Média': 'media', 'Alta': 'alta', 'Crítica': 'critica' };
+    return mapa[gravidade] || 'baixa';
+  }
+
+  function ncGerarPDF(dados) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const W = 210, H = 297, margin = 18;
+    const contentW = W - margin * 2;
+    const AZUL_ESCURO = [0,89,84], TEAL = [51,139,133], TEAL_CLARO = [213,255,255], TEXTO = [16,22,32], MUTED = [100,116,139], FUNDO_CARD = [248,250,252], BORDA_CARD = [226,232,240];
+    let y = 0;
+
+    function barraTopo() {
+      doc.setFillColor(AZUL_ESCURO[0], AZUL_ESCURO[1], AZUL_ESCURO[2]);
+      doc.rect(0, 0, W, 8, 'F');
+      try { doc.addImage(LOGO_CDA_B64, 'PNG', margin, 15, 17, 17); } catch(e) {}
+      doc.setFont('helvetica','bold'); doc.setFontSize(11.5); doc.setTextColor(AZUL_ESCURO[0], AZUL_ESCURO[1], AZUL_ESCURO[2]);
+      doc.text('Laboratório CDA', W - margin, 20, { align: 'right' });
+      doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+      doc.text('Qualidade e Precisão em Diagnósticos', W - margin, 24.5, { align: 'right' });
+      doc.setDrawColor(BORDA_CARD[0], BORDA_CARD[1], BORDA_CARD[2]); doc.setLineWidth(0.4); doc.line(margin, 39, W - margin, 39);
+    }
+
+    function rodape() {
+      doc.setFillColor(AZUL_ESCURO[0], AZUL_ESCURO[1], AZUL_ESCURO[2]);
+      doc.rect(0, H - 13, W, 13, 'F');
+      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(255,255,255);
+      doc.text('(27) 3735-1546   •   contato@laboratoriocda.com.br', W/2, H - 7.5, { align: 'center' });
+      doc.text('Rua José Giestas, Av. Mal. Deodoro, 46 - Térreo - Centro, Afonso Cláudio - ES', W/2, H - 4, { align: 'center' });
+    }
+
+    function novaPagina() {
+      doc.addPage();
+      barraTopo();
+      y = 50;
+    }
+
+    function verificarEspaco(altura) {
+      if (y + altura > H - 20) novaPagina();
+    }
+
+    function tituloSecao(txt) {
+      verificarEspaco(16);
+      y += 4;
+      doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(AZUL_ESCURO[0], AZUL_ESCURO[1], AZUL_ESCURO[2]);
+      doc.text(txt.toUpperCase(), margin, y);
+      y += 2.5;
+      doc.setDrawColor(TEAL[0], TEAL[1], TEAL[2]); doc.setLineWidth(0.7);
+      doc.line(margin, y, W - margin, y);
+      y += 9;
+    }
+
+    function campo(label, valor) {
+      verificarEspaco(15);
+      doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+      doc.text(label.toUpperCase(), margin, y);
+      doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.setTextColor(TEXTO[0], TEXTO[1], TEXTO[2]);
+      doc.text(valor || '—', margin, y + 6.5);
+      y += 15;
+    }
+
+    function camposDuplos(label1, valor1, label2, valor2) {
+      verificarEspaco(15);
+      const colX2 = margin + contentW/2 + 5;
+      doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+      doc.text(label1.toUpperCase(), margin, y);
+      doc.text(label2.toUpperCase(), colX2, y);
+      doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.setTextColor(TEXTO[0], TEXTO[1], TEXTO[2]);
+      doc.text(valor1 || '—', margin, y + 6.5);
+      doc.text(valor2 || '—', colX2, y + 6.5);
+      y += 15;
+    }
+
+    function paragrafo(label, texto) {
+      doc.setFont('helvetica','normal'); doc.setFontSize(10);
+      const linhas = doc.splitTextToSize(texto && texto.trim() ? texto : '—', contentW - 14);
+      const lineH = 6;
+      const alturaCaixa = 10 + linhas.length * lineH + 5;
+      verificarEspaco(alturaCaixa + 6);
+
+      doc.setFillColor(FUNDO_CARD[0], FUNDO_CARD[1], FUNDO_CARD[2]);
+      doc.setDrawColor(BORDA_CARD[0], BORDA_CARD[1], BORDA_CARD[2]);
+      doc.setLineWidth(0.25);
+      doc.roundedRect(margin, y, contentW, alturaCaixa, 2, 2, 'FD');
+      doc.setFillColor(TEAL[0], TEAL[1], TEAL[2]);
+      doc.rect(margin, y, 1.4, alturaCaixa, 'F');
+
+      let ty = y + 8;
+      doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+      doc.text(label.toUpperCase(), margin + 7, ty);
+      ty += lineH;
+      doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(TEXTO[0], TEXTO[1], TEXTO[2]);
+      linhas.forEach(linha => {
+        doc.text(linha, margin + 7, ty);
+        ty += lineH;
+      });
+
+      y += alturaCaixa + 8;
+    }
+
+    barraTopo();
+    y = 50;
+
+    doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.setTextColor(TEXTO[0], TEXTO[1], TEXTO[2]);
+    doc.text('REGISTRO DE NÃO CONFORMIDADE (NC)', W/2, y, { align: 'center' });
+    y += 12;
+
+    // Caixa com o número da NC em destaque
+    verificarEspaco(20);
+    doc.setFillColor(TEAL_CLARO[0], TEAL_CLARO[1], TEAL_CLARO[2]);
+    doc.roundedRect(margin, y, contentW, 17, 3, 3, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+    doc.text('Nº DA NC', margin + 7, y + 6.5);
+    doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.setTextColor(AZUL_ESCURO[0], AZUL_ESCURO[1], AZUL_ESCURO[2]);
+    doc.text(dados.codigo, margin + 7, y + 13);
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+    doc.text('DATA/HORA DA ABERTURA', W - margin - 7, y + 6.5, { align: 'right' });
+    doc.setFont('helvetica','bold'); doc.setFontSize(11.5); doc.setTextColor(TEXTO[0], TEXTO[1], TEXTO[2]);
+    doc.text(dados.dataAbertura + ' às ' + dados.hora, W - margin - 7, y + 13, { align: 'right' });
+    y += 27;
+
+    tituloSecao('Dados da Não Conformidade');
+    camposDuplos('Setor', dados.setor, 'Responsável pela abertura', dados.responsavelAbertura);
+
+    tituloSecao('Origem da Não Conformidade');
+    paragrafo('Origem', dados.origem.join(', '));
+
+    tituloSecao('Descrição da Não Conformidade');
+    paragrafo('Descrição', dados.descricao);
+
+    tituloSecao('Evidências');
+    paragrafo('Evidências', dados.evidencias);
+
+    tituloSecao('Classificação');
+    camposDuplos('Processo afetado', dados.processoAfetado, 'Gravidade', dados.gravidade);
+
+    tituloSecao('Ação Imediata (Contenção)');
+    paragrafo('Ação imediata', dados.acaoImediata);
+
+    tituloSecao('Encaminhamento');
+    campo('Responsável pela análise da NC', dados.responsavelAnalise);
+    verificarEspaco(24);
+    y += 4;
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+    doc.text('DATA DO ENCAMINHAMENTO', margin, y);
+    doc.text('ASSINATURA', margin + contentW/2 + 5, y);
+    y += 11;
+    doc.setDrawColor(203,213,225); doc.setLineWidth(0.3);
+    doc.line(margin, y, margin + contentW/2 - 8, y);
+    doc.line(margin + contentW/2 + 5, y, W - margin, y);
+
+    rodape();
+    return doc;
+  }
+
+  async function ncObterProximoCodigo() {
+    const ano = new Date().getFullYear();
+    const url = NC_APPS_SCRIPT_URL + '?action=obterProximoCodigoNC&pastaId=' + encodeURIComponent(NC_PASTA_DRIVE_ID) + '&ano=' + ano + '&token=' + encodeURIComponent(CDA_TOKEN);
+    const resp = await fetch(url, { redirect: 'follow' });
+    const json = await resp.json();
+    if (json.ok && json.proximoCodigo) return json.proximoCodigo;
+    throw new Error(json.erro || 'Não foi possível obter o próximo código da NC.');
+  }
+
+  async function ncSalvar() {
+    const setor = ncColetarRadio('nc-setor');
+    const responsavelAbertura = document.getElementById('nc-responsavel-abertura').value.trim();
+    const origem = ncColetarCheckbox('nc-origem');
+    const descricao = document.getElementById('nc-descricao').value.trim();
+    const evidencias = document.getElementById('nc-evidencias').value.trim();
+    const processoAfetado = ncColetarRadio('nc-processo');
+    const gravidade = ncColetarRadio('nc-gravidade');
+    const acaoImediata = document.getElementById('nc-acao-imediata').value.trim();
+    const responsavelAnalise = document.getElementById('nc-responsavel-analise').value.trim();
+    const errorEl = document.getElementById('nc-error');
+
+    if (!setor || !responsavelAbertura || origem.length === 0 || !descricao || !processoAfetado || !gravidade) {
+      errorEl.textContent = 'Preencha os campos obrigatórios: setor, responsável, origem, descrição, processo afetado e gravidade.';
+      errorEl.style.display = 'block';
+      return;
+    }
+
+    const btn = document.getElementById('nc-btn-salvar');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gerando...';
+    errorEl.style.display = 'none';
+
+    try {
+      const codigo = await ncObterProximoCodigo();
+      const agora = new Date();
+      const dados = {
+        codigo: codigo,
+        dataAbertura: agora.toLocaleDateString('pt-BR'),
+        hora: agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+        setor, responsavelAbertura, origem, descricao, evidencias,
+        processoAfetado, gravidade, acaoImediata, responsavelAnalise
+      };
+      const doc = ncGerarPDF(dados);
+      const pdfBase64 = doc.output('datauristring').split(',')[1];
+
+      const resp = await fetch(NC_APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'salvarNaoConformidade', token: CDA_TOKEN, pastaId: NC_PASTA_DRIVE_ID,
+          nomeArquivo: codigo.replace('/', '-') + '.pdf', pdfBase64: pdfBase64, dados: dados
+        })
+      });
+      const json = await resp.json();
+      if (json.ok) {
+        showToast('NC ' + codigo + ' registrada com sucesso!');
+        doc.save('NC-' + codigo.replace('/', '-') + '.pdf');
+        ncFecharFormulario();
+        carregarNaoConformidades();
+      } else { throw new Error(json.erro || 'Não foi possível salvar a NC.'); }
+    } catch(e) {
+      errorEl.textContent = 'Erro: ' + e.message;
+      errorEl.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-file-pdf"></i> Gerar PDF e Salvar';
+    }
+  }
+
+  async function carregarNaoConformidades() {
+    const container = document.getElementById('qc-lista-nc');
+    if (!container) return;
+    container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Carregando...</p>';
+    try {
+      const url = NC_APPS_SCRIPT_URL + '?action=listarNaoConformidades&token=' + encodeURIComponent(CDA_TOKEN);
+      const resp = await fetch(url, { redirect: 'follow' });
+      const json = await resp.json();
+      if (json.ok && Array.isArray(json.registros)) {
+        if (json.registros.length === 0) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhuma não conformidade registrada ainda.</p>'; return; }
+        container.innerHTML = json.registros.slice().reverse().map(r => {
+          const classe = ncGravidadeClasse(r.gravidade);
+          const linkBtn = r.linkPDF ? '<a href="' + r.linkPDF + '" target="_blank" class="cfg-user-btn editar" title="Abrir PDF"><i class="fa-solid fa-file-pdf"></i></a>' : '';
+          return '<div class="qc-nc-row">' +
+              '<div class="qc-nc-info">' +
+                '<div class="qc-nc-codigo">NC ' + r.codigo + ' — ' + (r.setor || '') + '</div>' +
+                '<div class="qc-nc-sub">' + (r.dataAbertura || '') + ' · ' + (r.responsavelAbertura || '') + '</div>' +
+              '</div>' +
+              '<span class="qc-nc-gravidade ' + classe + '">' + (r.gravidade || '') + '</span>' +
+              linkBtn +
+            '</div>';
+        }).join('');
+      } else { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Erro ao carregar não conformidades.</p>'; }
+    } catch(err) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Erro ao carregar. Tente novamente.</p>'; }
   }
 
   // Corrigir nascimento: remover borda vermelha quando preenchido
