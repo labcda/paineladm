@@ -424,6 +424,14 @@
     .qc-nc-gravidade.alta { background: #ffedd5; color: #9a3412; }
     .qc-nc-gravidade.critica { background: #fee2e2; color: #991b1b; }
 
+    .qc-chart-title { font-size: 0.82rem; font-weight: 800; color: var(--fin-text); margin-bottom: 10px; }
+    .qc-chart-legend { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-bottom: 12px; }
+    .qc-chart-legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.74rem; font-weight: 700; color: var(--fin-text-muted); }
+    .qc-chart-legend-item b { color: var(--fin-text); font-weight: 800; }
+    .qc-chart-legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .qc-dash-delta-up { color: var(--fin-danger); font-weight: 700; }
+    .qc-dash-delta-down { color: var(--fin-success); font-weight: 700; }
+
     /* ===== CONFIGURAÇÕES: CADASTRO DE USUÁRIO E PERMISSÕES ===== */
     .cfg-label { display: block; font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
     .cfg-input { width: 100%; background: #f8fafc; border: none; border-radius: 12px; padding: 10px 14px; font-size: 0.85rem; font-family: inherit; color: #0B302D; }
@@ -2057,6 +2065,70 @@
 
         <div class="fin-card">
           <div class="fin-card-head">
+            <div class="fin-card-title"><i class="fa-solid fa-chart-line mr-1" style="color:#338b85;"></i> Dashboard de Não Conformidades</div>
+            <button class="fin-btn-ghost" onclick="carregarNaoConformidades()"><i class="fa-solid fa-rotate-right"></i> Atualizar</button>
+          </div>
+
+          <div class="fin-mini-grid" id="qc-dash-kpis">
+            <div class="fin-mini-card">
+              <div class="fin-mini-icon"><i class="fa-solid fa-list-check"></i></div>
+              <div class="fin-mini-label">Total de NCs</div>
+              <div class="fin-mini-value" id="qc-kpi-total">—</div>
+              <div class="fin-mini-sub" id="qc-kpi-total-sub">carregando...</div>
+            </div>
+            <div class="fin-mini-card">
+              <div class="fin-mini-icon"><i class="fa-solid fa-folder-open"></i></div>
+              <div class="fin-mini-label">NCs Abertas</div>
+              <div class="fin-mini-value" id="qc-kpi-abertas">—</div>
+              <div class="fin-mini-sub" id="qc-kpi-abertas-sub">carregando...</div>
+            </div>
+            <div class="fin-mini-card">
+              <div class="fin-mini-icon" style="background:rgba(220,38,38,0.12); color:#DC2626;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+              <div class="fin-mini-label">Alta + Crítica</div>
+              <div class="fin-mini-value" id="qc-kpi-graves">—</div>
+              <div class="fin-mini-sub">requerem atenção prioritária</div>
+            </div>
+            <div class="fin-mini-card">
+              <div class="fin-mini-icon"><i class="fa-solid fa-calendar-day"></i></div>
+              <div class="fin-mini-label">NCs neste mês</div>
+              <div class="fin-mini-value" id="qc-kpi-mes">—</div>
+              <div class="fin-mini-sub" id="qc-kpi-mes-sub">carregando...</div>
+            </div>
+          </div>
+
+          <p id="qc-dash-vazio" class="text-sm text-slate-500 text-center py-6" style="display:none;">Ainda não há dados suficientes para os gráficos — cadastre a primeira não conformidade.</p>
+
+          <div id="qc-dash-graficos">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" style="margin-bottom:20px;">
+              <div>
+                <div class="qc-chart-title">Por gravidade</div>
+                <div id="qc-chart-gravidade-legend" class="qc-chart-legend"></div>
+                <div style="height:200px;"><canvas id="qc-chart-gravidade"></canvas></div>
+              </div>
+              <div>
+                <div class="qc-chart-title">Tendência mensal (últimos 6 meses)</div>
+                <div style="height:200px; margin-top:26px;"><canvas id="qc-chart-tendencia"></canvas></div>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" style="margin-bottom:20px;">
+              <div>
+                <div class="qc-chart-title">Por setor</div>
+                <div style="height:240px;"><canvas id="qc-chart-setor"></canvas></div>
+              </div>
+              <div>
+                <div class="qc-chart-title">Por processo afetado</div>
+                <div style="height:240px;"><canvas id="qc-chart-processo"></canvas></div>
+              </div>
+            </div>
+            <div>
+              <div class="qc-chart-title">Principais origens</div>
+              <div style="height:240px;"><canvas id="qc-chart-origem"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fin-card">
+          <div class="fin-card-head">
             <div class="fin-card-title"><i class="fa-solid fa-folder-open mr-1" style="color:#338b85;"></i> POPs e Formulários</div>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -2521,6 +2593,11 @@
   // ==================== HOME: PACIENTES DO DIA + GRÁFICOS ====================
   let homeChart7Dias = null;
   let homeChartRecoletas = null;
+  let qcChartGravidade = null;
+  let qcChartTendencia = null;
+  let qcChartSetor = null;
+  let qcChartProcesso = null;
+  let qcChartOrigem = null;
   let lastAgendamentos7DiasLabels = null;
   let lastAgendamentos7DiasValores = null;
   let lastRecoletasPendentes = 0;
@@ -6145,6 +6222,7 @@ async function carregarUsuarios() {
       const resp = await fetch(url, { redirect: 'follow' });
       const json = await resp.json();
       if (json.ok && Array.isArray(json.registros)) {
+        renderDashboardNC(json.registros);
         if (json.registros.length === 0) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhuma não conformidade registrada ainda.</p>'; return; }
         container.innerHTML = json.registros.slice().reverse().map(r => {
           const classe = ncGravidadeClasse(r.gravidade);
@@ -6158,8 +6236,249 @@ async function carregarUsuarios() {
               linkBtn +
             '</div>';
         }).join('');
-      } else { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Erro ao carregar não conformidades.</p>'; }
-    } catch(err) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Erro ao carregar. Tente novamente.</p>'; }
+      } else { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Erro ao carregar não conformidades.</p>'; renderDashboardNC([]); }
+    } catch(err) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Erro ao carregar. Tente novamente.</p>'; renderDashboardNC([]); }
+  }
+
+  // ==================== DASHBOARD DE NÃO CONFORMIDADES ====================
+
+  function ncParseDataBR(str) {
+    if (!str) return null;
+    const partes = String(str).split('/');
+    if (partes.length !== 3) return null;
+    const d = parseInt(partes[0], 10), m = parseInt(partes[1], 10), y = parseInt(partes[2], 10);
+    if (!d || !m || !y) return null;
+    return new Date(y, m - 1, d);
+  }
+
+  function renderDashboardNC(registros) {
+    const total = registros.length;
+
+    document.getElementById('qc-kpi-total').textContent = total;
+    document.getElementById('qc-kpi-total-sub').textContent = total === 0 ? 'nenhum registro ainda' : 'desde o início do registro';
+
+    const abertas = registros.filter(r => (r.status || '').toLowerCase() === 'aberta').length;
+    document.getElementById('qc-kpi-abertas').textContent = abertas;
+    document.getElementById('qc-kpi-abertas-sub').textContent = total === 0 ? '—' : (total - abertas) + ' encerrada(s)';
+
+    const graves = registros.filter(r => r.gravidade === 'Alta' || r.gravidade === 'Crítica').length;
+    document.getElementById('qc-kpi-graves').textContent = graves;
+
+    const hoje = new Date();
+    const mesAtual = hoje.getMonth(), anoAtual = hoje.getFullYear();
+    let mesAnterior = mesAtual - 1, anoAnterior = anoAtual;
+    if (mesAnterior < 0) { mesAnterior = 11; anoAnterior--; }
+    let contAtual = 0, contAnterior = 0;
+    registros.forEach(r => {
+      const d = ncParseDataBR(r.dataAbertura);
+      if (!d) return;
+      if (d.getMonth() === mesAtual && d.getFullYear() === anoAtual) contAtual++;
+      else if (d.getMonth() === mesAnterior && d.getFullYear() === anoAnterior) contAnterior++;
+    });
+    document.getElementById('qc-kpi-mes').textContent = contAtual;
+    const subMes = document.getElementById('qc-kpi-mes-sub');
+    if (subMes) {
+      if (contAnterior === 0) {
+        subMes.textContent = contAtual === 0 ? 'sem registros no mês' : 'sem NCs no mês anterior p/ comparar';
+      } else {
+        const delta = Math.round(((contAtual - contAnterior) / contAnterior) * 100);
+        if (delta === 0) { subMes.textContent = 'estável vs mês anterior'; }
+        else {
+          const subindo = delta > 0;
+          subMes.innerHTML = '<span class="' + (subindo ? 'qc-dash-delta-up' : 'qc-dash-delta-down') + '">' +
+            (subindo ? '▲' : '▼') + ' ' + Math.abs(delta) + '%</span> vs mês anterior';
+        }
+      }
+    }
+
+    const vazio = document.getElementById('qc-dash-vazio');
+    const graficos = document.getElementById('qc-dash-graficos');
+    if (total === 0) {
+      if (vazio) vazio.style.display = 'block';
+      if (graficos) graficos.style.display = 'none';
+      return;
+    }
+    if (vazio) vazio.style.display = 'none';
+    if (graficos) graficos.style.display = 'block';
+
+    desenharGraficoGravidadeNC(registros);
+    desenharGraficoTendenciaNC(registros);
+    desenharGraficoSetorNC(registros);
+    desenharGraficoProcessoNC(registros);
+    desenharGraficoOrigemNC(registros);
+  }
+
+  function ncCriarGraficoRanking(ctx, entradas, cor) {
+    const corMuted = finVar('--fin-text-muted', '#667085');
+    const corGrid = finVar('--fin-border', 'rgba(148,163,184,0.15)');
+    const corTexto = finVar('--fin-text', '#0B302D');
+    return new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: entradas.map(e => e[0]),
+        datasets: [{ data: entradas.map(e => e[1]), backgroundColor: cor, borderRadius: 6, maxBarThickness: 22 }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { backgroundColor: cor, padding: 10, cornerRadius: 10, callbacks: { label: (c) => c.parsed.x + ' NC(s)' } }
+        },
+        scales: {
+          x: { beginAtZero: true, ticks: { precision: 0, color: corMuted }, grid: { color: corGrid } },
+          y: { ticks: { color: corTexto, font: { size: 11, weight: 600 } }, grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  function ncAgruparTopN(contagem, n, rotuloOutros) {
+    let entradas = Object.entries(contagem).sort((a, b) => b[1] - a[1]);
+    if (entradas.length > n) {
+      const top = entradas.slice(0, n - 1);
+      const outros = entradas.slice(n - 1).reduce((s, e) => s + e[1], 0);
+      entradas = top.concat([[rotuloOutros, outros]]);
+    }
+    return entradas.reverse();
+  }
+
+  function desenharGraficoGravidadeNC(registros) {
+    const ctx = document.getElementById('qc-chart-gravidade');
+    if (!ctx || typeof Chart === 'undefined') return;
+    if (qcChartGravidade) qcChartGravidade.destroy();
+
+    const ordem = ['Crítica', 'Alta', 'Média', 'Baixa'];
+    const cores = { 'Crítica': '#DC2626', 'Alta': '#F97316', 'Média': '#F59E0B', 'Baixa': '#16A34A' };
+    const contagem = {}; ordem.forEach(g => contagem[g] = 0);
+    registros.forEach(r => { if (contagem.hasOwnProperty(r.gravidade)) contagem[r.gravidade]++; });
+
+    const legend = document.getElementById('qc-chart-gravidade-legend');
+    if (legend) {
+      legend.innerHTML = ordem.map(g =>
+        '<div class="qc-chart-legend-item"><span class="qc-chart-legend-dot" style="background:' + cores[g] + ';"></span>' + g + ' <b>' + contagem[g] + '</b></div>'
+      ).join('');
+    }
+
+    qcChartGravidade = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ordem,
+        datasets: [{ data: ordem.map(g => contagem[g]), backgroundColor: ordem.map(g => cores[g]), borderRadius: 8, maxBarThickness: 26 }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: (c) => c.parsed.x + ' não conformidade(s)' } }
+        },
+        scales: {
+          x: { beginAtZero: true, ticks: { precision: 0, color: finVar('--fin-text-muted', '#667085') }, grid: { color: finVar('--fin-border', 'rgba(148,163,184,0.15)') } },
+          y: { ticks: { color: finVar('--fin-text', '#0B302D'), font: { weight: 700 } }, grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  function desenharGraficoTendenciaNC(registros) {
+    const ctx = document.getElementById('qc-chart-tendencia');
+    if (!ctx || typeof Chart === 'undefined') return;
+    if (qcChartTendencia) qcChartTendencia.destroy();
+
+    const hoje = new Date();
+    const meses = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+      meses.push({ mes: d.getMonth(), ano: d.getFullYear(), label: d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '') + '/' + String(d.getFullYear()).slice(2) });
+    }
+    const valores = meses.map(m => registros.filter(r => {
+      const d = ncParseDataBR(r.dataAbertura);
+      return d && d.getMonth() === m.mes && d.getFullYear() === m.ano;
+    }).length);
+
+    const corPrimaria = finVar('--fin-primary', '#338b85');
+    const corMuted = finVar('--fin-text-muted', '#667085');
+    const corGrid = finVar('--fin-border', 'rgba(148,163,184,0.15)');
+
+    qcChartTendencia = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: meses.map(m => m.label),
+        datasets: [{
+          label: 'NCs abertas',
+          data: valores,
+          borderColor: corPrimaria,
+          backgroundColor: (context) => {
+            const { ctx: c, chartArea } = context.chart;
+            if (!chartArea) return corPrimaria + '22';
+            const gradient = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            gradient.addColorStop(0, corPrimaria + '33');
+            gradient.addColorStop(1, corPrimaria + '00');
+            return gradient;
+          },
+          fill: true,
+          tension: 0.35,
+          pointRadius: 4,
+          pointBackgroundColor: corPrimaria,
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          borderWidth: 2.5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { backgroundColor: corPrimaria, padding: 10, cornerRadius: 10, callbacks: { label: (c) => c.parsed.y + ' NC(s)' } }
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { precision: 0, color: corMuted, font: { size: 11 } }, grid: { color: corGrid } },
+          x: { ticks: { color: corMuted, font: { size: 11, weight: 600 } }, grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  function desenharGraficoSetorNC(registros) {
+    const ctx = document.getElementById('qc-chart-setor');
+    if (!ctx || typeof Chart === 'undefined') return;
+    if (qcChartSetor) qcChartSetor.destroy();
+    const contagem = {};
+    registros.forEach(r => { const v = (r.setor || '').trim(); if (v) contagem[v] = (contagem[v] || 0) + 1; });
+    const entradas = ncAgruparTopN(contagem, 8, 'Outros');
+    qcChartSetor = ncCriarGraficoRanking(ctx, entradas, finVar('--fin-primary', '#338b85'));
+  }
+
+  function desenharGraficoProcessoNC(registros) {
+    const ctx = document.getElementById('qc-chart-processo');
+    if (!ctx || typeof Chart === 'undefined') return;
+    if (qcChartProcesso) qcChartProcesso.destroy();
+    const ordem = ['Pré-Analítico', 'Analítico', 'Pós-Analítico', 'Gestão'];
+    const contagem = {}; ordem.forEach(o => contagem[o] = 0);
+    registros.forEach(r => { if (contagem.hasOwnProperty(r.processoAfetado)) contagem[r.processoAfetado]++; });
+    const entradas = ordem.map(o => [o, contagem[o]]).reverse();
+    qcChartProcesso = ncCriarGraficoRanking(ctx, entradas, finVar('--fin-primary-dark', '#005954'));
+  }
+
+  function desenharGraficoOrigemNC(registros) {
+    const ctx = document.getElementById('qc-chart-origem');
+    if (!ctx || typeof Chart === 'undefined') return;
+    if (qcChartOrigem) qcChartOrigem.destroy();
+    const contagem = {};
+    registros.forEach(r => {
+      String(r.origem || '').split(',').map(s => s.trim()).filter(Boolean).forEach(o => {
+        contagem[o] = (contagem[o] || 0) + 1;
+      });
+    });
+    const entradas = ncAgruparTopN(contagem, 8, 'Outras');
+    qcChartOrigem = ncCriarGraficoRanking(ctx, entradas, finVar('--fin-primary-dark', '#005954'));
   }
 
   // Corrigir nascimento: remover borda vermelha quando preenchido
