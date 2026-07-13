@@ -523,6 +523,50 @@
     .recoleta-motivo { font-size: 0.75rem; color: #8c939e; margin-top: 6px; font-style: italic; }
     .recoleta-obs { font-size: 0.75rem; color: #64748b; margin-top: 4px; background: #f8fafc; padding: 8px; border-radius: 8px; }
 
+    /* ===== PRIORIDADE DA RECOLETA ===== */
+    .rec-prioridade-group { display: flex; gap: 10px; flex-wrap: wrap; }
+    .rec-prioridade-opt {
+      flex: 1; min-width: 120px; display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 14px; border-radius: 12px; border: 2px solid #e2e8f0; background: #f8fafc;
+      cursor: pointer; transition: all 0.2s; font-size: 0.85rem; font-weight: 700; color: #475569;
+    }
+    .rec-prioridade-opt:hover { border-color: #cbd5e1; }
+    .rec-prioridade-opt.ativo.baixa { background: #d1fae5; border-color: #16A34A; color: #065f46; }
+    .rec-prioridade-opt.ativo.media { background: #fef3c7; border-color: #F59E0B; color: #92400e; }
+    .rec-prioridade-opt.ativo.alta  { background: #fee2e2; border-color: #DC2626; color: #991b1b; }
+    .rec-prioridade-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+    .rec-prioridade-dot.baixa { background: #16A34A; }
+    .rec-prioridade-dot.media { background: #F59E0B; }
+    .rec-prioridade-dot.alta  { background: #DC2626; }
+
+    /* ===== KANBAN DE RECOLETAS ===== */
+    .rec-kanban-board { display: grid; grid-template-columns: repeat(5, minmax(200px, 1fr)); gap: 12px; overflow-x: auto; padding-bottom: 6px; }
+    @media (max-width: 1100px) { .rec-kanban-board { grid-template-columns: repeat(5, 220px); } }
+    .rec-kanban-col { background: #f8fafc; border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 8px; min-height: 120px; }
+    .rec-kanban-col-titulo { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; color: #475569; padding: 4px 6px 8px; display: flex; justify-content: space-between; align-items: center; }
+    .rec-kanban-col-count { background: #e2e8f0; color: #334155; border-radius: 10px; padding: 1px 8px; font-size: 0.68rem; }
+    .rec-kanban-card { background: #fff; border-radius: 12px; padding: 10px 12px; box-shadow: 0 1px 4px rgba(15,23,42,0.08); cursor: pointer; border-left: 4px solid #94a3b8; transition: transform .15s, box-shadow .15s; }
+    .rec-kanban-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(15,23,42,0.14); }
+    .rec-kanban-card.prioridade-alta  { border-left-color: #DC2626; }
+    .rec-kanban-card.prioridade-media { border-left-color: #F59E0B; }
+    .rec-kanban-card.prioridade-baixa { border-left-color: #16A34A; }
+    .rec-kanban-card-codigo { font-size: 0.65rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; }
+    .rec-kanban-card-nome { font-size: 0.84rem; font-weight: 700; color: #101620; margin-top: 1px; }
+    .rec-kanban-card-exames { font-size: 0.7rem; color: #64748b; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rec-kanban-card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.65rem; color: #94a3b8; }
+    .rec-kanban-vazio { font-size: 0.72rem; color: #cbd5e1; text-align: center; padding: 14px 4px; }
+
+    /* ===== ETAPA (BADGE) DA RECOLETA ===== */
+    .rec-etapa-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; white-space: nowrap; }
+
+    /* ===== HISTÓRICO DE CONTATO ===== */
+    .rec-contato-lista { display: flex; flex-direction: column; gap: 0; margin-top: 6px; max-height: 220px; overflow-y: auto; }
+    .rec-contato-row { display: grid; grid-template-columns: 62px 52px 90px 1fr; gap: 10px; padding: 9px 4px; border-bottom: 1px solid #f1f5f9; font-size: 0.78rem; align-items: center; }
+    .rec-contato-row.header { font-weight: 800; color: #94a3b8; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.03em; border-bottom: 2px solid #e2e8f0; }
+    .rec-contato-data { color: #338b85; font-weight: 700; }
+    .rec-contato-resp { font-weight: 700; color: #334155; }
+    .rec-contato-resultado { color: #475569; }
+
     .recoleta-form-field {
       background: white; border: 1px solid #e2e8f0; border-radius: 12px;
       padding: 12px 14px; font-size: 0.9rem; color: #101620; width: 100%;
@@ -1513,6 +1557,10 @@
                 style="flex:1;padding:10px;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;background:transparent;color:#64748b;">
                 <i class="fa-solid fa-magnifying-glass mr-2"></i>Consultar Registros
             </button>
+            <button id="rec-aba-kanban" onclick="recMostrarAba('kanban')"
+                style="flex:1;padding:10px;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;background:transparent;color:#64748b;">
+                <i class="fa-solid fa-table-columns mr-2"></i>Painel Kanban
+            </button>
         </div>
         <div id="rec-painel-novo">
           <div class="neumorphic-card">
@@ -1562,6 +1610,16 @@
                     <button type="button" class="recoleta-externo-btn" data-lab="Hermes Pardini" onclick="recSelecionarLabExterno(this)">Hermes Pardini</button>
                     <button type="button" class="recoleta-externo-btn" data-lab="DB - Diagnósticos do Brasil" onclick="recSelecionarLabExterno(this)">DB - Diagnósticos do Brasil</button>
                     <button type="button" class="recoleta-externo-btn" data-lab="Álvaro Apoio" onclick="recSelecionarLabExterno(this)">Álvaro Apoio</button>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                    <i class="fa-solid fa-flag mr-1"></i> Prioridade
+                </label>
+                <div class="rec-prioridade-group" id="rec-prioridade-group">
+                    <label class="rec-prioridade-opt baixa" id="rec-prioridade-baixa" onclick="recSelecionarPrioridade('BAIXA')">🟢 Baixa prioridade</label>
+                    <label class="rec-prioridade-opt media ativo" id="rec-prioridade-media" onclick="recSelecionarPrioridade('MEDIA')">🟡 Média prioridade</label>
+                    <label class="rec-prioridade-opt alta" id="rec-prioridade-alta" onclick="recSelecionarPrioridade('ALTA')">🔴 Alta prioridade</label>
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -1661,6 +1719,19 @@
             </div>
             <div id="rec-consulta-lista" class="space-y-3">
                 <p class="text-sm text-slate-500 text-center py-4">Use os filtros acima para consultar registros.</p>
+            </div>
+          </div>
+        </div>
+        <div id="rec-painel-kanban" style="display:none;">
+          <div class="neumorphic-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap:wrap; gap:8px;">
+                <h3 style="font-size: 1.1rem; font-weight: 700; color: #101620;">
+                    <i class="fa-solid fa-table-columns mr-2" style="color: #005954;"></i> Painel de Acompanhamento
+                </h3>
+                <button class="btn-limpar" onclick="carregarKanbanRecoletas()"><i class="fa-solid fa-rotate-right"></i> Atualizar</button>
+            </div>
+            <div id="rec-kanban-board" class="rec-kanban-board">
+                <p class="text-sm text-slate-500 text-center py-4">Carregando...</p>
             </div>
           </div>
         </div>
@@ -1835,7 +1906,7 @@
                     </div>
                     <div class="rel-resumo-card">
                         <div class="rv-num" id="relrec-tempo-aviso" style="font-size:1.2rem;">—</div>
-                        <div class="rv-label"><i class="fa-solid fa-phone mr-1"></i>Tempo Médio p/ Avisar</div>
+                        <div class="rv-label"><i class="fa-solid fa-phone mr-1"></i>Tempo Médio até 1º Contato</div>
                     </div>
                     <div class="rel-resumo-card">
                         <div class="rv-num" id="relrec-nao-avisou">0</div>
@@ -1847,6 +1918,26 @@
                     </div>
                 </div>
             </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="neumorphic-card">
+                    <h3 style="font-size:0.95rem;font-weight:800;color:#101620;margin-bottom:12px;"><i class="fa-solid fa-chart-pie mr-2" style="color:#005954;"></i> % por Motivo</h3>
+                    <div id="relrec-motivos-lista"><p class="text-sm text-slate-400 text-center py-4">Sem dados.</p></div>
+                </div>
+                <div class="neumorphic-card">
+                    <h3 style="font-size:0.95rem;font-weight:800;color:#101620;margin-bottom:12px;"><i class="fa-solid fa-vial mr-2" style="color:#005954;"></i> Exames que mais geram recoletas</h3>
+                    <div id="relrec-exames-lista"><p class="text-sm text-slate-400 text-center py-4">Sem dados.</p></div>
+                </div>
+            </div>
+
+            <div class="neumorphic-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                    <h3 style="font-size:1rem;font-weight:800;color:#101620;"><i class="fa-solid fa-person-circle-question mr-2" style="color:#005954;"></i> Pacientes que Não Retornaram</h3>
+                    <span id="relrec-nao-retornaram-contador" style="font-size:0.75rem;font-weight:700;color:#8c939e;background:#f1f5f9;padding:4px 10px;border-radius:10px;"></span>
+                </div>
+                <div id="relrec-nao-retornaram-lista"><p class="text-sm text-slate-400 text-center py-4">Sem dados.</p></div>
+            </div>
+
             <div class="neumorphic-card">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
                     <h3 style="font-size:1rem;font-weight:800;color:#101620;"><i class="fa-solid fa-list-ul mr-2" style="color:#005954;"></i> Detalhamento do Período</h3>
@@ -4492,6 +4583,34 @@ function agenRemoverPDF() {
   let recExamesSelecionados = [];
   let recTipo = null;
   let recLabExterno = null;
+  let recPrioridade = 'MEDIA';
+
+  function recSelecionarPrioridade(valor) {
+    recPrioridade = valor;
+    ['baixa','media','alta'].forEach(p => {
+      const el = document.getElementById('rec-prioridade-' + p);
+      if (el) el.classList.toggle('ativo', p === valor.toLowerCase());
+    });
+  }
+
+  // Metadados das 7 etapas do fluxo de recoleta e o mapeamento para as 5
+  // colunas do painel Kanban (várias etapas podem cair na mesma coluna).
+  const REC_ETAPAS = {
+    RECOLETA_ABERTA:     { label: 'Recoleta Aberta',      cor: '#475569', bg: '#f1f5f9', coluna: 'col-aberta' },
+    AGUARDANDO_CONTATO:  { label: 'Aguardando Contato',   cor: '#92400e', bg: '#fef3c7', coluna: 'col-aguardando' },
+    CONTATO_REALIZADO:   { label: 'Contato Realizado',    cor: '#1e40af', bg: '#dbeafe', coluna: 'col-contato' },
+    PACIENTE_CONFIRMOU:  { label: 'Paciente Confirmou',   cor: '#1e40af', bg: '#dbeafe', coluna: 'col-contato' },
+    AGENDADA:            { label: 'Agendada',             cor: '#6d28d9', bg: '#ede9fe', coluna: 'col-agendada' },
+    PACIENTE_COMPARECEU: { label: 'Paciente Compareceu',  cor: '#065f46', bg: '#d1fae5', coluna: 'col-finalizada' },
+    FINALIZADA:          { label: 'Finalizada',           cor: '#065f46', bg: '#d1fae5', coluna: 'col-finalizada' }
+  };
+  const REC_KANBAN_COLUNAS = [
+    { id: 'col-aberta',     label: 'Nova solicitação de recoleta' },
+    { id: 'col-aguardando', label: 'Aguardando contato' },
+    { id: 'col-contato',    label: 'Contato realizado' },
+    { id: 'col-agendada',   label: 'Agendada' },
+    { id: 'col-finalizada', label: 'Compareceu/Finalizada' }
+  ];
 
   const RECOLETA_MOTIVOS = {
     'Problemas na coleta': [
@@ -4639,27 +4758,37 @@ function agenRemoverPDF() {
   function recMostrarAba(aba) {
     const btnNovo = document.getElementById('rec-aba-novo');
     const btnConsulta = document.getElementById('rec-aba-consulta');
+    const btnKanban = document.getElementById('rec-aba-kanban');
     const painelNovo = document.getElementById('rec-painel-novo');
     const painelConsulta = document.getElementById('rec-painel-consulta');
+    const painelKanban = document.getElementById('rec-painel-kanban');
+
+    [btnNovo, btnConsulta, btnKanban].forEach(b => {
+      b.style.background = 'transparent';
+      b.style.color = '#64748b';
+      b.style.boxShadow = 'none';
+    });
+    painelNovo.style.display = 'none';
+    painelConsulta.style.display = 'none';
+    painelKanban.style.display = 'none';
+
     if (aba === 'novo') {
       painelNovo.style.display = '';
-      painelConsulta.style.display = 'none';
       btnNovo.style.background = 'linear-gradient(135deg,#005954,#338b85)';
       btnNovo.style.color = 'white';
       btnNovo.style.boxShadow = '2px 2px 8px rgba(0,89,84,0.3)';
-      btnConsulta.style.background = 'transparent';
-      btnConsulta.style.color = '#64748b';
-      btnConsulta.style.boxShadow = 'none';
-    } else {
-      painelNovo.style.display = 'none';
+    } else if (aba === 'consulta') {
       painelConsulta.style.display = '';
       btnConsulta.style.background = 'linear-gradient(135deg,#005954,#338b85)';
       btnConsulta.style.color = 'white';
       btnConsulta.style.boxShadow = '2px 2px 8px rgba(0,89,84,0.3)';
-      btnNovo.style.background = 'transparent';
-      btnNovo.style.color = '#64748b';
-      btnNovo.style.boxShadow = 'none';
       recFiltrar();
+    } else if (aba === 'kanban') {
+      painelKanban.style.display = '';
+      btnKanban.style.background = 'linear-gradient(135deg,#005954,#338b85)';
+      btnKanban.style.color = 'white';
+      btnKanban.style.boxShadow = '2px 2px 8px rgba(0,89,84,0.3)';
+      carregarKanbanRecoletas();
     }
   }
 
@@ -4758,7 +4887,8 @@ function agenRemoverPDF() {
       tipo: tipoCompleto, motivo: motivo, observacoes: obs,
       data: dataAtual,
       usuario: usuario,
-      status: 'PENDENTE',
+      status: 'RECOLETA_ABERTA',
+      prioridade: recPrioridade,
       dataComunicacao: '',
       quemComunicou: '',
       quemRecebeu: '',
@@ -4784,7 +4914,8 @@ function agenRemoverPDF() {
           motivo: motivo,
           observacoes: obs,
           usuario: usuario,
-          status: 'PENDENTE',
+          status: 'RECOLETA_ABERTA',
+          prioridade: recPrioridade,
           dataComunicacao: '',
           quemComunicou: '',
           quemRecebeu: '',
@@ -4821,6 +4952,7 @@ function agenRemoverPDF() {
     document.querySelectorAll('.recoleta-radio-label').forEach(el => el.classList.remove('ativo'));
     document.getElementById('rec-externo-options').classList.remove('show');
     document.querySelectorAll('.recoleta-externo-btn').forEach(btn => btn.classList.remove('ativo'));
+    recSelecionarPrioridade('MEDIA');
 
     carregarRecoletas();
     showToast('Recoleta cadastrada com sucesso!');
@@ -4838,7 +4970,7 @@ function agenRemoverPDF() {
       clearTimeout(timeout);
       const json = await resp.json();
       if (json.ok && Array.isArray(json.recoletas)) {
-        const pendentes = json.recoletas.filter(r => (r.status || 'PENDENTE') !== 'CONCLUIDO');
+        const pendentes = json.recoletas.filter(r => (r.status || 'RECOLETA_ABERTA') !== 'FINALIZADA');
         if (pendentes.length === 0) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhuma recoleta pendente cadastrada.</p>'; return; }
         localStorage.setItem('cda_recoletas', JSON.stringify(json.recoletas));
         container.innerHTML = pendentes.map((r, index) => recCardHTML(r, index)).join('');
@@ -4846,7 +4978,7 @@ function agenRemoverPDF() {
     } catch(err) {
       console.error('[CDA] Erro ao carregar recoletas do servidor:', err);
       const recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
-      const pendentes = recoletas.filter(r => (r.status || 'PENDENTE') !== 'CONCLUIDO');
+      const pendentes = recoletas.filter(r => (r.status || 'RECOLETA_ABERTA') !== 'FINALIZADA');
       if (pendentes.length === 0) {
         container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Não foi possível carregar do servidor. Nenhuma recoleta pendente em cache.</p>';
       } else {
@@ -4867,9 +4999,8 @@ function agenRemoverPDF() {
     const motivoInfo = r.motivo ? '<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ' + r.motivo + '</div>' : '';
     const obsInfo = r.observacoes ? '<div class="recoleta-obs"><i class="fa-solid fa-note-sticky mr-1"></i> ' + r.observacoes + '</div>' : '';
     const usuarioInfo = r.usuario ? '<div style="font-size:10px;color:#94a3b8;margin-top:4px;"><i class="fa-solid fa-user mr-1"></i> Criado por: ' + r.usuario + '</div>' : '';
-    const statusBadge = r.status === 'COMUNICADO' 
-      ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;background:#dbeafe;color:#1e40af;margin-left:6px;"><i class="fa-solid fa-phone"></i> Comunicado</span>'
-      : '';
+    const etapaMeta = REC_ETAPAS[r.status] || REC_ETAPAS.RECOLETA_ABERTA;
+    const statusBadge = '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;background:' + etapaMeta.bg + ';color:' + etapaMeta.cor + ';margin-left:6px;">' + etapaMeta.label + '</span>';
     const dataAttr = typeof index === 'number' ? 'data-rec-index="' + index + '"' : '';
     return '<div class="recoleta-card" ' + dataAttr + '>' +
       '<div class="recoleta-header">' +
@@ -4931,12 +5062,12 @@ function agenRemoverPDF() {
 
   function abrirModalRecDetalhes(index) {
     let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
-    const pendentes = recoletas.filter(r => (r.status || 'PENDENTE') !== 'CONCLUIDO');
+    const pendentes = recoletas.filter(r => (r.status || 'RECOLETA_ABERTA') !== 'FINALIZADA');
     const r = pendentes[index];
     if (!r) { showToast('Registro não encontrado.', 'error'); return; }
 
     recDetalhesIndex    = index;
-    recDetalhesStatus   = r.status || 'PENDENTE';
+    recDetalhesStatus   = r.status || 'RECOLETA_ABERTA';
     recDetalhesRegistro = r;
     recComunicacaoValor = null;
 
@@ -4956,13 +5087,11 @@ function agenRemoverPDF() {
 
     // Badge de status
     const statusEl = document.getElementById('modal-rec-status-atual');
-    if (r.status === 'COMUNICADO') {
-      statusEl.className = 'modal-rec-status-badge comunicado';
-      statusEl.innerHTML = '<i class="fa-solid fa-phone"></i> Comunicado';
-    } else {
-      statusEl.className = 'modal-rec-status-badge pendente';
-      statusEl.innerHTML = '<i class="fa-solid fa-clock"></i> Pendente';
-    }
+    const etapaMetaModal = REC_ETAPAS[r.status] || REC_ETAPAS.RECOLETA_ABERTA;
+    statusEl.className = 'modal-rec-status-badge';
+    statusEl.style.color = etapaMetaModal.cor;
+    statusEl.style.background = etapaMetaModal.bg;
+    statusEl.innerHTML = etapaMetaModal.label;
 
     // Seção comunicação
     const comExistente = document.getElementById('modal-rec-comunicacao-existente');
@@ -5083,7 +5212,7 @@ function agenRemoverPDF() {
     if (!recComunicacaoValor) { showToast('Selecione se conseguiu comunicar.', 'error'); return; }
 
     let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
-    const pendentes = recoletas.filter(r => (r.status || 'PENDENTE') !== 'CONCLUIDO');
+    const pendentes = recoletas.filter(r => (r.status || 'RECOLETA_ABERTA') !== 'FINALIZADA');
     const r = pendentes[recDetalhesIndex];
     if (!r) return;
 
@@ -5094,7 +5223,7 @@ function agenRemoverPDF() {
     recoletas[idxReal].quemComunicou = quemComunicou;
     recoletas[idxReal].quemRecebeu = quemRecebeu;
     recoletas[idxReal].conseguiuComunicar = recComunicacaoValor;
-    recoletas[idxReal].status = 'COMUNICADO';
+    recoletas[idxReal].status = 'CONTATO_REALIZADO';
 
     localStorage.setItem('cda_recoletas', JSON.stringify(recoletas));
 
@@ -5111,7 +5240,7 @@ function agenRemoverPDF() {
           quemComunicou: quemComunicou,
           quemRecebeu: quemRecebeu,
           conseguiuComunicar: recComunicacaoValor,
-          status: 'COMUNICADO'
+          status: 'CONTATO_REALIZADO'
         })
       });
       const json = await resp.json();
@@ -5164,7 +5293,7 @@ function agenRemoverPDF() {
     const usuarioConc    = usuarioLogado();
 
     let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
-    const pendentes = recoletas.filter(r => (r.status || 'PENDENTE') !== 'CONCLUIDO');
+    const pendentes = recoletas.filter(r => (r.status || 'RECOLETA_ABERTA') !== 'FINALIZADA');
     const r = pendentes[recDetalhesIndex];
     if (!r) return;
 
@@ -5173,7 +5302,7 @@ function agenRemoverPDF() {
     );
     if (idxReal === -1) return;
 
-    recoletas[idxReal].status           = 'CONCLUIDO';
+    recoletas[idxReal].status           = 'FINALIZADA';
     recoletas[idxReal].dataVeio         = dataVeioFormatada;
     recoletas[idxReal].usuarioConclusao = usuarioConc;
     localStorage.setItem('cda_recoletas', JSON.stringify(recoletas));
@@ -5185,7 +5314,7 @@ function agenRemoverPDF() {
         body: JSON.stringify({
           action: 'atualizarRecoleta', token: CDA_TOKEN,
           codigo: r.codigo, nome: r.nome,
-          status: 'CONCLUIDO',
+          status: 'FINALIZADA',
           dataVeio: dataVeioFormatada,
           usuarioConclusao: usuarioConc
         })
@@ -5217,7 +5346,7 @@ function agenRemoverPDF() {
       let url = APPS_SCRIPT_URL + '?action=consultarRecoletas' + 
         (filtroCodigo ? '&codigo=' + encodeURIComponent(filtroCodigo) : '') +
         (filtroNome ? '&nome=' + encodeURIComponent(filtroNome) : '') +
-        '&status=' + (recFiltroStatusAtual === 'feita' ? 'CONCLUIDO' : 'PENDENTE,COMUNICADO') +
+        '&status=' + (recFiltroStatusAtual === 'feita' ? 'FINALIZADA' : 'RECOLETA_ABERTA,AGUARDANDO_CONTATO,CONTATO_REALIZADO,PACIENTE_CONFIRMOU,AGENDADA,PACIENTE_COMPARECEU') +
         '&token=' + encodeURIComponent(CDA_TOKEN);
       const resp = await fetch(url, { signal: controller.signal, redirect: 'follow' });
       clearTimeout(timeout);
@@ -5234,9 +5363,9 @@ function agenRemoverPDF() {
       const recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
       let resultado = recoletas;
       if (recFiltroStatusAtual === 'afazer') {
-        resultado = resultado.filter(r => (r.status || 'PENDENTE') !== 'CONCLUIDO');
+        resultado = resultado.filter(r => (r.status || 'RECOLETA_ABERTA') !== 'FINALIZADA');
       } else {
-        resultado = resultado.filter(r => (r.status || 'PENDENTE') === 'CONCLUIDO');
+        resultado = resultado.filter(r => (r.status || 'RECOLETA_ABERTA') === 'FINALIZADA');
       }
       if (!filtroCodigo && !filtroNome) {
         if (resultado.length === 0) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhum registro encontrado. (offline)</p>'; }
@@ -5260,12 +5389,9 @@ function agenRemoverPDF() {
     const tipoBadge = isExterno
       ? '<span class="recoleta-badge externo"><i class="fa-solid fa-truck-medical"></i> Externo</span>'
       : '<span class="recoleta-badge interno"><i class="fa-solid fa-house-medical"></i> Interno</span>';
-    const isConcluido = (r.status || 'PENDENTE') === 'CONCLUIDO';
-    const statusBadge = isConcluido
-      ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;background:#d1fae5;color:#065f46;margin-left:6px;"><i class="fa-solid fa-check-circle"></i> Concluído</span>'
-      : (r.status === 'COMUNICADO' 
-        ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;background:#dbeafe;color:#1e40af;margin-left:6px;"><i class="fa-solid fa-phone"></i> Comunicado</span>'
-        : '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;background:#fef3c7;color:#92400e;margin-left:6px;"><i class="fa-solid fa-clock"></i> Pendente</span>');
+    const isConcluido = (r.status || 'RECOLETA_ABERTA') === 'FINALIZADA';
+    const etapaMetaConsulta = REC_ETAPAS[r.status] || REC_ETAPAS.RECOLETA_ABERTA;
+    const statusBadge = '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;background:' + etapaMetaConsulta.bg + ';color:' + etapaMetaConsulta.cor + ';margin-left:6px;">' + etapaMetaConsulta.label + '</span>';
     const labInfo = isExterno && r.tipo && r.tipo.includes(' - ') ? '<div class="recoleta-externo-lab"><i class="fa-solid fa-building mr-1"></i> ' + r.tipo.split(' - ')[1] + '</div>' : '';
     const motivoInfo = r.motivo ? '<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ' + r.motivo + '</div>' : '';
     const obsInfo = r.observacoes ? '<div class="recoleta-obs"><i class="fa-solid fa-note-sticky mr-1"></i> ' + r.observacoes + '</div>' : '';
@@ -5300,6 +5426,193 @@ function agenRemoverPDF() {
     document.getElementById('rec-filtro-status-feita').classList.remove('ativo');
     const container = document.getElementById('rec-consulta-lista');
     container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Use os filtros acima ou clique em Buscar para carregar todos os registros.</p>';
+  }
+
+  // ==================== PAINEL KANBAN DE RECOLETAS ====================
+  let recKanbanCache = [];
+  let reckCodigoAtual = null;
+  let reckNomeAtual = null;
+
+  async function carregarKanbanRecoletas() {
+    const board = document.getElementById('rec-kanban-board');
+    board.innerHTML = '<p class="text-sm text-slate-500 text-center py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Carregando...</p>';
+    try {
+      const url = APPS_SCRIPT_URL + '?action=consultarRecoletas&token=' + encodeURIComponent(CDA_TOKEN);
+      const resp = await fetch(url, { redirect: 'follow' });
+      const json = await resp.json();
+      if (!json.ok || !Array.isArray(json.recoletas)) throw new Error(json.erro || 'Erro ao carregar');
+      recKanbanCache = json.recoletas;
+      renderKanbanBoard();
+    } catch(err) {
+      console.error('[CDA] Erro ao carregar painel Kanban:', err);
+      board.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Erro ao carregar o painel. Tente novamente.</p>';
+    }
+  }
+
+  function renderKanbanBoard() {
+    const board = document.getElementById('rec-kanban-board');
+    const porColuna = {};
+    REC_KANBAN_COLUNAS.forEach(c => porColuna[c.id] = []);
+    recKanbanCache.forEach(r => {
+      const meta = REC_ETAPAS[r.status] || REC_ETAPAS.RECOLETA_ABERTA;
+      porColuna[meta.coluna].push(r);
+    });
+    board.innerHTML = REC_KANBAN_COLUNAS.map(col => {
+      const itens = porColuna[col.id] || [];
+      const cards = itens.length
+        ? itens.map(r => recKanbanCardHTML(r)).join('')
+        : '<div class="rec-kanban-vazio">Nenhuma recoleta aqui</div>';
+      return '<div class="rec-kanban-col">' +
+        '<div class="rec-kanban-col-titulo">' + col.label + '<span class="rec-kanban-col-count">' + itens.length + '</span></div>' +
+        cards +
+      '</div>';
+    }).join('');
+  }
+
+  function recKanbanCardHTML(r) {
+    const prioridade = (r.prioridade || 'MEDIA').toLowerCase();
+    const codigoEsc = (r.codigo || '').replace(/'/g, "\\'");
+    const nomeEsc = (r.nome || '').replace(/'/g, "\\'");
+    return '<div class="rec-kanban-card prioridade-' + prioridade + '" onclick="abrirModalRecKanban(\'' + codigoEsc + '\',\'' + nomeEsc + '\')">' +
+      '<div class="rec-kanban-card-codigo">' + (r.codigo || '') + '</div>' +
+      '<div class="rec-kanban-card-nome">' + (r.nome || '') + '</div>' +
+      '<div class="rec-kanban-card-exames">' + (r.exames || '') + '</div>' +
+      '<div class="rec-kanban-card-footer">' +
+        '<span><i class="fa-regular fa-calendar mr-1"></i>' + (r.data || '') + '</span>' +
+        '<span class="rec-prioridade-dot ' + prioridade + '"></span>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function abrirModalRecKanban(codigo, nome) {
+    const r = recKanbanCache.find(x => x.codigo === codigo && x.nome === nome);
+    if (!r) { showToast('Registro não encontrado.', 'error'); return; }
+    reckCodigoAtual = codigo;
+    reckNomeAtual = nome;
+
+    document.getElementById('reck-subtitulo').innerHTML = 'Código: <b>' + (r.codigo || '---') + '</b> &nbsp;|&nbsp; ' + (r.nome || '---');
+    document.getElementById('reck-usuario').textContent = r.usuario || '---';
+    document.getElementById('reck-data-cadastro').textContent = r.data || '---';
+    document.getElementById('reck-exames').textContent = r.exames || '---';
+    document.getElementById('reck-tipo').textContent = r.tipo || '---';
+    document.getElementById('reck-motivo').textContent = r.motivo || '---';
+    document.getElementById('reck-obs').textContent = r.observacoes || '---';
+
+    const meta = REC_ETAPAS[r.status] || REC_ETAPAS.RECOLETA_ABERTA;
+    const badge = document.getElementById('reck-etapa-badge');
+    badge.textContent = meta.label;
+    badge.style.color = meta.cor;
+    badge.style.background = meta.bg;
+    document.getElementById('reck-select-etapa').value = REC_ETAPAS[r.status] ? r.status : 'RECOLETA_ABERTA';
+
+    const prioridadeAtual = (r.prioridade || 'MEDIA').toLowerCase();
+    ['baixa','media','alta'].forEach(p => {
+      const el = document.getElementById('reck-prioridade-' + p);
+      if (el) el.classList.toggle('ativo', p === prioridadeAtual);
+    });
+
+    reckCarregarContatos(codigo);
+    document.getElementById('modal-rec-kanban').classList.add('ativo');
+  }
+
+  function fecharModalRecKanban() {
+    document.getElementById('modal-rec-kanban').classList.remove('ativo');
+    reckCodigoAtual = null;
+    reckNomeAtual = null;
+  }
+
+  async function reckMudarEtapa(novoStatus) {
+    if (!reckCodigoAtual) return;
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'atualizarRecoleta', token: CDA_TOKEN, codigo: reckCodigoAtual, nome: reckNomeAtual, status: novoStatus })
+      });
+      const json = await resp.json();
+      if (!json.ok) throw new Error(json.erro || 'Erro ao mover etapa');
+      const r = recKanbanCache.find(x => x.codigo === reckCodigoAtual && x.nome === reckNomeAtual);
+      if (r) r.status = novoStatus;
+      const meta = REC_ETAPAS[novoStatus] || REC_ETAPAS.RECOLETA_ABERTA;
+      const badge = document.getElementById('reck-etapa-badge');
+      badge.textContent = meta.label;
+      badge.style.color = meta.cor;
+      badge.style.background = meta.bg;
+      renderKanbanBoard();
+      showToast('Etapa atualizada!');
+    } catch(err) {
+      console.error('[CDA] Erro ao mudar etapa:', err);
+      showToast('Erro ao mover etapa. Tente novamente.', 'error');
+    }
+  }
+
+  async function reckMudarPrioridade(novaPrioridade) {
+    if (!reckCodigoAtual) return;
+    ['baixa','media','alta'].forEach(p => {
+      const el = document.getElementById('reck-prioridade-' + p);
+      if (el) el.classList.toggle('ativo', p === novaPrioridade.toLowerCase());
+    });
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'atualizarRecoleta', token: CDA_TOKEN, codigo: reckCodigoAtual, nome: reckNomeAtual, prioridade: novaPrioridade })
+      });
+      const json = await resp.json();
+      if (!json.ok) throw new Error(json.erro || 'Erro ao mudar prioridade');
+      const r = recKanbanCache.find(x => x.codigo === reckCodigoAtual && x.nome === reckNomeAtual);
+      if (r) r.prioridade = novaPrioridade;
+      renderKanbanBoard();
+      showToast('Prioridade atualizada!');
+    } catch(err) {
+      console.error('[CDA] Erro ao mudar prioridade:', err);
+      showToast('Erro ao mudar prioridade.', 'error');
+    }
+  }
+
+  async function reckCarregarContatos(codigo) {
+    const lista = document.getElementById('reck-contatos-lista');
+    lista.innerHTML = '<p class="text-xs text-slate-400 text-center py-3"><i class="fa-solid fa-spinner fa-spin mr-1"></i>Carregando...</p>';
+    try {
+      const url = APPS_SCRIPT_URL + '?action=listarContatosRecoleta&codigo=' + encodeURIComponent(codigo) + '&token=' + encodeURIComponent(CDA_TOKEN);
+      const resp = await fetch(url, { redirect: 'follow' });
+      const json = await resp.json();
+      if (!json.ok || !Array.isArray(json.contatos)) throw new Error(json.erro || 'Erro');
+      if (json.contatos.length === 0) { lista.innerHTML = '<p class="text-xs text-slate-400 text-center py-3">Nenhum contato registrado ainda.</p>'; return; }
+      lista.innerHTML = json.contatos.map(c =>
+        '<div class="rec-contato-row">' +
+          '<span class="rec-contato-data">' + (c.data || '') + '</span>' +
+          '<span>' + (c.hora || '') + '</span>' +
+          '<span class="rec-contato-resp">' + (c.responsavel || '') + '</span>' +
+          '<span class="rec-contato-resultado">' + (c.resultado || '') + '</span>' +
+        '</div>'
+      ).join('');
+    } catch(err) {
+      console.error('[CDA] Erro ao carregar contatos:', err);
+      lista.innerHTML = '<p class="text-xs text-slate-400 text-center py-3">Erro ao carregar histórico.</p>';
+    }
+  }
+
+  async function reckRegistrarContato() {
+    if (!reckCodigoAtual) return;
+    const input = document.getElementById('reck-input-resultado');
+    const resultado = input.value.trim();
+    if (!resultado) { showToast('Descreva o resultado do contato.', 'error'); return; }
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'registrarContatoRecoleta', token: CDA_TOKEN, codigo: reckCodigoAtual, responsavel: usuarioLogado(), resultado: resultado })
+      });
+      const json = await resp.json();
+      if (!json.ok) throw new Error(json.erro || 'Erro ao registrar contato');
+      input.value = '';
+      reckCarregarContatos(reckCodigoAtual);
+      showToast('Contato registrado!');
+    } catch(err) {
+      console.error('[CDA] Erro ao registrar contato:', err);
+      showToast('Erro ao registrar contato.', 'error');
+    }
   }
 
   // ===== EVENT DELEGATION PARA CARDS DE RECOLETA =====
@@ -5420,20 +5733,23 @@ async function carregarUsuarios() {
       document.getElementById('relrec-tempo-retorno').innerText = json.tempoMedioRetornoDias !== null ? json.tempoMedioRetornoDias + ' dia(s)' : '—';
       document.getElementById('relrec-contador').innerText = json.detalhes.length + ' registro(s)';
 
+      relRecRenderMotivos(json.detalhes);
+      relRecRenderExames(json.detalhes);
+      relRecRenderNaoRetornaram(json.detalhes);
+
       if (json.detalhes.length === 0) {
         container.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-solid fa-circle-check text-slate-300 text-3xl mb-3"></i><p class="text-sm text-slate-400 font-medium">Nenhuma recoleta nesse período</p></div>';
         return;
       }
 
-      const statusMap = { PENDENTE: ['Pendente', '#92400e', '#fef3c7'], COMUNICADO: ['Comunicado', '#1e40af', '#dbeafe'], CONCLUIDO: ['Concluído', '#065f46', '#d1fae5'] };
       container.innerHTML = json.detalhes.map(d => {
-        const st = statusMap[d.status] || ['—', '#64748b', '#f1f5f9'];
-        const avisoTxt = d.diasAviso !== null ? d.diasAviso + ' dia(s) até avisar' : 'Ainda não avisado';
+        const st = REC_ETAPAS[d.status] || REC_ETAPAS.RECOLETA_ABERTA;
+        const avisoTxt = d.diasAviso !== null ? d.diasAviso + ' dia(s) até o 1º contato' : 'Ainda não contatado';
         const retornoTxt = d.diasRetorno !== null ? d.diasRetorno + ' dia(s) até o retorno' : (d.dataComunicacao ? 'Paciente ainda não veio' : '');
         return '<div class="recoleta-card">' +
           '<div class="recoleta-header">' +
             '<div><div class="recoleta-codigo">CÓDIGO: ' + d.codigo + '</div><div class="recoleta-nome">' + d.nome + '</div></div>' +
-            '<span style="padding:4px 10px;border-radius:12px;font-size:11px;font-weight:800;color:' + st[1] + ';background:' + st[2] + ';">' + st[0] + '</span>' +
+            '<span style="padding:4px 10px;border-radius:12px;font-size:11px;font-weight:800;color:' + st.cor + ';background:' + st.bg + ';">' + st.label + '</span>' +
           '</div>' +
           '<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ' + (d.motivo || '—') + '</div>' +
           '<div style="font-size:11px;color:#64748b;margin-top:8px;display:flex;flex-direction:column;gap:2px;">' +
@@ -5449,9 +5765,66 @@ async function carregarUsuarios() {
     }
   }
 
+  function relRecBarraHTML(rotulo, valor, total, cor) {
+    const pct = total > 0 ? Math.round((valor / total) * 100) : 0;
+    return '<div style="margin-bottom:10px;">' +
+      '<div style="display:flex;justify-content:space-between;font-size:0.78rem;color:#334155;font-weight:600;margin-bottom:4px;">' +
+        '<span>' + rotulo + '</span><span>' + valor + ' (' + pct + '%)</span>' +
+      '</div>' +
+      '<div style="background:#f1f5f9;border-radius:8px;height:8px;overflow:hidden;">' +
+        '<div style="width:' + pct + '%;height:100%;background:' + cor + ';border-radius:8px;"></div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function relRecRenderMotivos(detalhes) {
+    const container = document.getElementById('relrec-motivos-lista');
+    if (!detalhes.length) { container.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">Sem dados no período.</p>'; return; }
+    const contagem = {};
+    detalhes.forEach(d => { const m = d.motivo || 'Não informado'; contagem[m] = (contagem[m] || 0) + 1; });
+    const entradas = Object.entries(contagem).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    container.innerHTML = entradas.map(([motivo, qtd]) => relRecBarraHTML(motivo, qtd, detalhes.length, '#338b85')).join('');
+  }
+
+  function relRecRenderExames(detalhes) {
+    const container = document.getElementById('relrec-exames-lista');
+    if (!detalhes.length) { container.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">Sem dados no período.</p>'; return; }
+    const contagem = {};
+    let totalExames = 0;
+    detalhes.forEach(d => {
+      String(d.exames || '').split('|').map(s => s.trim()).filter(Boolean).forEach(ex => {
+        contagem[ex] = (contagem[ex] || 0) + 1;
+        totalExames++;
+      });
+    });
+    const entradas = Object.entries(contagem).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    if (!entradas.length) { container.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">Sem dados de exames.</p>'; return; }
+    container.innerHTML = entradas.map(([exame, qtd]) => relRecBarraHTML(exame, qtd, totalExames, '#005954')).join('');
+  }
+
+  function relRecRenderNaoRetornaram(detalhes) {
+    const container = document.getElementById('relrec-nao-retornaram-lista');
+    const contador = document.getElementById('relrec-nao-retornaram-contador');
+    const naoRetornaram = detalhes.filter(d => d.status !== 'FINALIZADA' && d.dataComunicacao && !d.dataVeio);
+    if (contador) contador.innerText = naoRetornaram.length + ' paciente(s)';
+    if (!naoRetornaram.length) { container.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">Nenhum paciente pendente de retorno nesse período.</p>'; return; }
+    container.innerHTML = naoRetornaram.map(d => {
+      const st = REC_ETAPAS[d.status] || REC_ETAPAS.RECOLETA_ABERTA;
+      return '<div class="recoleta-card">' +
+        '<div class="recoleta-header">' +
+          '<div><div class="recoleta-codigo">CÓDIGO: ' + d.codigo + '</div><div class="recoleta-nome">' + d.nome + '</div></div>' +
+          '<span style="padding:4px 10px;border-radius:12px;font-size:11px;font-weight:800;color:' + st.cor + ';background:' + st.bg + ';">' + st.label + '</span>' +
+        '</div>' +
+        '<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ' + (d.motivo || '—') + '</div>' +
+        '<div style="font-size:11px;color:#64748b;margin-top:8px;"><i class="fa-solid fa-phone mr-1"></i>Contatado em: ' + d.dataComunicacao + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
   function relRecExportarPDF() {
     if (!relRecCache) { showToast('Gere o relatório antes de exportar.', 'error'); return; }
     const json = relRecCache;
+    const detalhes = json.detalhes || [];
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
@@ -5473,15 +5846,74 @@ async function carregarUsuarios() {
       'Total geral: ' + json.totalGeral + '   |   No período: ' + json.totalPeriodo +
       '   |   Não conseguiu avisar: ' + json.naoConseguiuAvisar, 14, 36
     );
-    doc.text('Tempo médio p/ avisar: ' + tempoAvisoTxt + '   |   Tempo médio de retorno: ' + tempoRetornoTxt, 14, 42);
+    doc.text('Tempo médio até 1º contato: ' + tempoAvisoTxt + '   |   Tempo médio de retorno: ' + tempoRetornoTxt, 14, 42);
 
-    // Tabela
-    const statusLabel = { PENDENTE: 'Pendente', COMUNICADO: 'Comunicado', CONCLUIDO: 'Concluído' };
-    const rows = (json.detalhes || []).map(d => [
+    let y = 48;
+
+    // % por motivo
+    const contagemMotivo = {};
+    detalhes.forEach(d => { const m = d.motivo || 'Não informado'; contagemMotivo[m] = (contagemMotivo[m] || 0) + 1; });
+    const motivosOrdenados = Object.entries(contagemMotivo).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    if (motivosOrdenados.length) {
+      doc.setFontSize(9); doc.setTextColor(0, 89, 84); doc.setFont('helvetica', 'bold');
+      doc.text('% por Motivo', 14, y);
+      doc.autoTable({
+        startY: y + 2,
+        head: [['Motivo', 'Qtd', '%']],
+        body: motivosOrdenados.map(([m, q]) => [m, String(q), (detalhes.length ? Math.round((q / detalhes.length) * 100) : 0) + '%']),
+        styles: { fontSize: 7, cellPadding: 2 },
+        headStyles: { fillColor: [51,139,133], textColor: 255, fontStyle: 'bold' }
+      });
+      y = doc.lastAutoTable.finalY + 8;
+    }
+
+    // Exames que mais geram recoletas
+    const contagemExame = {}; let totalExames = 0;
+    detalhes.forEach(d => {
+      String(d.exames || '').split('|').map(s => s.trim()).filter(Boolean).forEach(ex => {
+        contagemExame[ex] = (contagemExame[ex] || 0) + 1;
+        totalExames++;
+      });
+    });
+    const examesOrdenados = Object.entries(contagemExame).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    if (examesOrdenados.length) {
+      doc.setFontSize(9); doc.setTextColor(0, 89, 84); doc.setFont('helvetica', 'bold');
+      doc.text('Exames que mais geram recoletas', 14, y);
+      doc.autoTable({
+        startY: y + 2,
+        head: [['Exame', 'Qtd', '%']],
+        body: examesOrdenados.map(([ex, q]) => [ex, String(q), (totalExames ? Math.round((q / totalExames) * 100) : 0) + '%']),
+        styles: { fontSize: 7, cellPadding: 2 },
+        headStyles: { fillColor: [0,89,84], textColor: 255, fontStyle: 'bold' }
+      });
+      y = doc.lastAutoTable.finalY + 8;
+    }
+
+    // Pacientes que não retornaram
+    const naoRetornaram = detalhes.filter(d => d.status !== 'FINALIZADA' && d.dataComunicacao && !d.dataVeio);
+    if (naoRetornaram.length) {
+      doc.setFontSize(9); doc.setTextColor(0, 89, 84); doc.setFont('helvetica', 'bold');
+      doc.text('Pacientes que Não Retornaram (' + naoRetornaram.length + ')', 14, y);
+      doc.autoTable({
+        startY: y + 2,
+        head: [['Código', 'Paciente', 'Motivo', 'Contatado em']],
+        body: naoRetornaram.map(d => [d.codigo || '', d.nome || '', d.motivo || '', d.dataComunicacao || '']),
+        styles: { fontSize: 7, cellPadding: 2 },
+        headStyles: { fillColor: [153,27,27], textColor: 255, fontStyle: 'bold' }
+      });
+      y = doc.lastAutoTable.finalY + 8;
+    }
+
+    if (y > 250) { doc.addPage(); y = 20; }
+    doc.setFontSize(10); doc.setTextColor(0, 89, 84); doc.setFont('helvetica', 'bold');
+    doc.text('Detalhamento do Período', 14, y);
+
+    // Tabela detalhada
+    const rows = detalhes.map(d => [
       d.codigo || '',
       d.nome || '',
       d.motivo || '',
-      statusLabel[d.status] || d.status || '',
+      (REC_ETAPAS[d.status] || REC_ETAPAS.RECOLETA_ABERTA).label,
       d.data || '',
       d.dataComunicacao || '',
       d.diasAviso !== null ? String(d.diasAviso) : '—',
@@ -5490,13 +5922,13 @@ async function carregarUsuarios() {
     ]);
 
     doc.autoTable({
-      startY: 48,
-      head: [['Código','Paciente','Motivo','Status','Solicitado','Avisado','Dias p/ avisar','Retornou','Dias p/ retorno']],
+      startY: y + 3,
+      head: [['Código','Paciente','Motivo','Etapa','Solicitado','Contatado','Dias p/ contato','Retornou','Dias p/ retorno']],
       body: rows,
       styles: { fontSize: 7, cellPadding: 2.5 },
       headStyles: { fillColor: [0,89,84], textColor: 255, fontStyle: 'bold' },
       alternateRowStyles: { fillColor: [240,246,247] },
-      columnStyles: { 0:{cellWidth:16}, 1:{cellWidth:32}, 2:{cellWidth:42}, 3:{cellWidth:20}, 4:{cellWidth:18}, 5:{cellWidth:18}, 6:{cellWidth:18}, 7:{cellWidth:18}, 8:{cellWidth:18} }
+      columnStyles: { 0:{cellWidth:16}, 1:{cellWidth:30}, 2:{cellWidth:36}, 3:{cellWidth:24}, 4:{cellWidth:16}, 5:{cellWidth:16}, 6:{cellWidth:16}, 7:{cellWidth:16}, 8:{cellWidth:16} }
     });
 
     const sufixo = relRecMesAnoCache ? relRecMesAnoCache.replace('/','-') : new Date().toLocaleDateString('pt-BR').replace(/\//g,'-');
@@ -7561,6 +7993,98 @@ async function carregarUsuarios() {
                 </button>
                 <button id="modal-rec-btn-concluir" class="modal-rec-btn success" onclick="mostrarConclusaoForm()" style="flex:2;">
                     <i class="fa-solid fa-check-circle mr-1"></i> Paciente Veio / Concluir
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODAL DETALHES DA RECOLETA (KANBAN) ==================== -->
+<div id="modal-rec-kanban" class="modal-rec-detalhes-overlay">
+    <div class="modal-rec-detalhes">
+        <div class="modal-rec-header">
+            <h3><i class="fa-solid fa-vial mr-2"></i> Recoleta</h3>
+            <p class="sub" id="reck-subtitulo">Código: --- | Paciente: ---</p>
+        </div>
+        <div class="modal-rec-body">
+            <!-- Etapa atual -->
+            <div class="modal-rec-secao">
+                <h4><i class="fa-solid fa-diagram-project mr-1"></i> Etapa Atual</h4>
+                <div id="reck-etapa-badge" class="rec-etapa-badge">---</div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5" style="margin-top:12px;">Mover para</label>
+                <select id="reck-select-etapa" class="modal-rec-field" onchange="reckMudarEtapa(this.value)">
+                    <option value="RECOLETA_ABERTA">Recoleta Aberta</option>
+                    <option value="AGUARDANDO_CONTATO">Aguardando contato</option>
+                    <option value="CONTATO_REALIZADO">Contato realizado</option>
+                    <option value="PACIENTE_CONFIRMOU">Paciente confirmou</option>
+                    <option value="AGENDADA">Agendada</option>
+                    <option value="PACIENTE_COMPARECEU">Paciente compareceu</option>
+                    <option value="FINALIZADA">Finalizada</option>
+                </select>
+            </div>
+
+            <!-- Prioridade -->
+            <div class="modal-rec-secao">
+                <h4><i class="fa-solid fa-flag mr-1"></i> Prioridade</h4>
+                <div class="rec-prioridade-group" id="reck-prioridade-group">
+                    <label class="rec-prioridade-opt baixa" id="reck-prioridade-baixa" onclick="reckMudarPrioridade('BAIXA')">🟢 Baixa</label>
+                    <label class="rec-prioridade-opt media" id="reck-prioridade-media" onclick="reckMudarPrioridade('MEDIA')">🟡 Média</label>
+                    <label class="rec-prioridade-opt alta" id="reck-prioridade-alta" onclick="reckMudarPrioridade('ALTA')">🔴 Alta</label>
+                </div>
+            </div>
+
+            <!-- Informações do cadastro -->
+            <div class="modal-rec-secao">
+                <h4><i class="fa-solid fa-clipboard-list mr-1"></i> Informações do Cadastro</h4>
+                <div class="modal-rec-info-row">
+                    <span class="modal-rec-info-label">Criado por:</span>
+                    <span class="modal-rec-info-value" id="reck-usuario">---</span>
+                </div>
+                <div class="modal-rec-info-row">
+                    <span class="modal-rec-info-label">Data do cadastro:</span>
+                    <span class="modal-rec-info-value" id="reck-data-cadastro">---</span>
+                </div>
+                <div class="modal-rec-info-row">
+                    <span class="modal-rec-info-label">Exames:</span>
+                    <span class="modal-rec-info-value" id="reck-exames">---</span>
+                </div>
+                <div class="modal-rec-info-row">
+                    <span class="modal-rec-info-label">Tipo:</span>
+                    <span class="modal-rec-info-value" id="reck-tipo">---</span>
+                </div>
+                <div class="modal-rec-info-row">
+                    <span class="modal-rec-info-label">Motivo:</span>
+                    <span class="modal-rec-info-value" id="reck-motivo">---</span>
+                </div>
+                <div class="modal-rec-info-row">
+                    <span class="modal-rec-info-label">Observações:</span>
+                    <span class="modal-rec-info-value" id="reck-obs">---</span>
+                </div>
+            </div>
+
+            <!-- Registro de contato (histórico) -->
+            <div class="modal-rec-secao">
+                <h4><i class="fa-solid fa-phone mr-1"></i> Registro do Contato</h4>
+                <p style="font-size:0.72rem;color:#94a3b8;margin-bottom:6px;">Toda tentativa fica registrada.</p>
+                <div class="rec-contato-row header">
+                    <span>Data</span><span>Hora</span><span>Responsável</span><span>Resultado</span>
+                </div>
+                <div id="reck-contatos-lista" class="rec-contato-lista">
+                    <p class="text-xs text-slate-400 text-center py-3">Nenhum contato registrado ainda.</p>
+                </div>
+                <div style="margin-top:12px;">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Novo registro de contato</label>
+                    <input type="text" id="reck-input-resultado" placeholder="Ex: Ligou e não atendeu, WhatsApp enviado, Recoleta agendada..." class="modal-rec-field">
+                    <button class="modal-rec-btn primary" onclick="reckRegistrarContato()" style="width:100%;margin-top:8px;">
+                        <i class="fa-solid fa-plus mr-1"></i> Registrar contato
+                    </button>
+                </div>
+            </div>
+
+            <!-- Botões de ação -->
+            <div style="display: flex; gap: 8px; margin-top: 24px;">
+                <button class="modal-rec-btn neutral" onclick="fecharModalRecKanban()" style="flex:1;">
+                    <i class="fa-solid fa-xmark mr-1"></i> Fechar
                 </button>
             </div>
         </div>
