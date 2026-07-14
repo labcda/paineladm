@@ -1968,12 +1968,92 @@
 
         <!-- Abas -->
         <div style="display:flex;gap:8px;background:#EBECF0;border-radius:16px;padding:6px;">
+            <button id="bol-aba-dashboard" onclick="bolMostrarAba('dashboard')" class="bol-aba-btn">
+                <i class="fa-solid fa-chart-line mr-2"></i>Dashboard
+            </button>
             <button id="bol-aba-novo" onclick="bolMostrarAba('novo')" class="bol-aba-btn ativo">
                 <i class="fa-solid fa-plus mr-2"></i>Novo Pedido
             </button>
             <button id="bol-aba-lista" onclick="bolMostrarAba('lista')" class="bol-aba-btn">
                 <i class="fa-solid fa-list mr-2"></i>Lista de Pedidos
             </button>
+        </div>
+
+        <!-- PAINEL: DASHBOARD -->
+        <div id="bol-painel-dashboard" style="display:none;">
+          <div class="fin-card">
+            <div class="fin-card-head">
+              <div class="fin-card-title"><i class="fa-solid fa-chart-line mr-1" style="color:#338b85;"></i> Dashboard de Boletos</div>
+              <button class="fin-btn-ghost" onclick="bolCarregarDashboard()"><i class="fa-solid fa-rotate-right"></i> Atualizar</button>
+            </div>
+
+            <div class="fin-mini-grid" id="bol-dash-kpis">
+              <div class="fin-mini-card">
+                <div class="fin-mini-icon"><i class="fa-solid fa-cart-shopping"></i></div>
+                <div class="fin-mini-label">Total de Pedidos</div>
+                <div class="fin-mini-value" id="bol-kpi-total">—</div>
+                <div class="fin-mini-sub" id="bol-kpi-total-sub">carregando...</div>
+              </div>
+              <div class="fin-mini-card">
+                <div class="fin-mini-icon" style="background:rgba(245,158,11,0.14); color:#F59E0B;"><i class="fa-solid fa-truck-fast"></i></div>
+                <div class="fin-mini-label">Recebimentos em Aberto</div>
+                <div class="fin-mini-value" id="bol-kpi-abertos">—</div>
+                <div class="fin-mini-sub">aguardando chegar a mercadoria</div>
+              </div>
+              <div class="fin-mini-card">
+                <div class="fin-mini-icon" style="background:rgba(30,64,175,0.12); color:#1e40af;"><i class="fa-solid fa-money-check-dollar"></i></div>
+                <div class="fin-mini-label">Boletos p/ Entregar ao Financeiro</div>
+                <div class="fin-mini-value" id="bol-kpi-financeiro">—</div>
+                <div class="fin-mini-sub">recebidos, aguardando conferência</div>
+              </div>
+              <div class="fin-mini-card">
+                <div class="fin-mini-icon" style="background:rgba(22,163,74,0.14); color:#16A34A;"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="fin-mini-label">Finalizados</div>
+                <div class="fin-mini-value" id="bol-kpi-finalizados">—</div>
+                <div class="fin-mini-sub" id="bol-kpi-finalizados-sub">—</div>
+              </div>
+              <div class="fin-mini-card">
+                <div class="fin-mini-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+                <div class="fin-mini-label">Valor em Aberto</div>
+                <div class="fin-mini-value" id="bol-kpi-valor-aberto">—</div>
+                <div class="fin-mini-sub">soma dos pedidos não finalizados</div>
+              </div>
+              <div class="fin-mini-card">
+                <div class="fin-mini-icon"><i class="fa-regular fa-calendar-check"></i></div>
+                <div class="fin-mini-label">Pedidos neste mês</div>
+                <div class="fin-mini-value" id="bol-kpi-mes">—</div>
+                <div class="fin-mini-sub" id="bol-kpi-mes-sub">carregando...</div>
+              </div>
+            </div>
+
+            <p id="bol-dash-vazio" class="text-sm text-slate-500 text-center py-6" style="display:none;">Ainda não há pedidos suficientes para os gráficos — cadastre o primeiro pedido.</p>
+
+            <div id="bol-dash-graficos">
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" style="margin-bottom:20px;">
+                <div>
+                  <div class="qc-chart-title">Por Etapa do Fluxo</div>
+                  <div style="height:200px;"><canvas id="bol-chart-etapa"></canvas></div>
+                </div>
+                <div>
+                  <div class="qc-chart-title">Pedidos por Mês (últimos 6 meses)</div>
+                  <div style="height:200px;"><canvas id="bol-chart-tendencia"></canvas></div>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div>
+                  <div class="qc-chart-title">Valor por Fornecedor</div>
+                  <div style="height:240px;"><canvas id="bol-chart-fornecedor"></canvas></div>
+                </div>
+                <div>
+                  <div class="qc-chart-title">À Vista vs. Dividido</div>
+                  <div style="height:240px;display:flex;align-items:center;justify-content:center;position:relative;">
+                    <canvas id="bol-chart-dividido"></canvas>
+                    <div id="bol-chart-dividido-legend" class="qc-chart-legend" style="position:absolute;bottom:0;left:0;right:0;justify-content:center;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- PAINEL: NOVO PEDIDO (Parte 1) -->
@@ -2129,7 +2209,6 @@
                         <button type="button" class="bol-filtro-chip ativo" id="bol-filtro-todos" onclick="bolFiltroStatus('todos')">Todos</button>
                         <button type="button" class="bol-filtro-chip" id="bol-filtro-pendente" onclick="bolFiltroStatus('pendente')">Pedido Feito</button>
                         <button type="button" class="bol-filtro-chip" id="bol-filtro-recebido" onclick="bolFiltroStatus('recebido')">Mercadoria Recebida</button>
-                        <button type="button" class="bol-filtro-chip" id="bol-filtro-conferido" onclick="bolFiltroStatus('conferido')">Boletos Conferidos</button>
                         <button type="button" class="bol-filtro-chip" id="bol-filtro-finalizado" onclick="bolFiltroStatus('finalizado')">Finalizado</button>
                     </div>
                 </div>
@@ -7261,8 +7340,12 @@ async function carregarUsuarios() {
   }
 
   // ==================== MÓDULO BOLETOS ====================
-  const BOLETOS_FOLDER_ID = '1AT2pQJhV-5oM5xGoKFkUJdb_EJfcJbc7'; // Pasta do Google Drive para espelhos
+  // A pasta do ano (2026, 2027...) é resolvida no backend a partir da data do pedido.
   let bolDadosAtuais = [];
+  let bolChartEtapa = null;
+  let bolChartTendencia = null;
+  let bolChartFornecedor = null;
+  let bolChartDividido = null;
   let bolFiltroStatusAtual = 'todos';
   let bolPDFSelecionado = null;
   let bolDividido = 'nao';
@@ -7293,10 +7376,13 @@ async function carregarUsuarios() {
   }
 
   function bolMostrarAba(aba) {
+    document.getElementById('bol-aba-dashboard').classList.toggle('ativo', aba === 'dashboard');
     document.getElementById('bol-aba-novo').classList.toggle('ativo', aba === 'novo');
     document.getElementById('bol-aba-lista').classList.toggle('ativo', aba === 'lista');
+    document.getElementById('bol-painel-dashboard').style.display = aba === 'dashboard' ? 'block' : 'none';
     document.getElementById('bol-painel-novo').style.display = aba === 'novo' ? 'block' : 'none';
     document.getElementById('bol-painel-lista').style.display = aba === 'lista' ? 'block' : 'none';
+    if (aba === 'dashboard') bolCarregarDashboard();
     if (aba === 'novo') bolInicializarForm();
     if (aba === 'lista') bolCarregarPedidos();
   }
@@ -7416,31 +7502,30 @@ async function carregarUsuarios() {
     }
   });
 
-  // Upload para Google Drive via Apps Script
-  async function bolUploadPDFToDrive(file, fornecedor) {
+  // Upload do espelho para o Google Drive via Apps Script — o backend decide a
+  // pasta do ano (a partir de dataPedido) e o nome do arquivo (fornecedor + data).
+  async function bolUploadPDFToDrive(file, fornecedor, dataPedidoISO) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.readAsArrayBuffer(file);
-      reader.onload = async (f) => {
+      reader.readAsDataURL(file);
+      reader.onload = async () => {
         try {
-          const bytes = [...new Int8Array(f.target.result)];
-          const fileName = 'ESP_' + fornecedor.replace(/\s+/g, '_').toUpperCase() + '_' + new Date().getTime() + '.pdf';
-
-          const qs = new URLSearchParams({
-            filename: fileName,
-            mimeType: file.type,
-            folderId: BOLETOS_FOLDER_ID,
-            token: CDA_TOKEN
-          });
-
-          const resp = await fetch(APPS_SCRIPT_URL + '?' + qs.toString(), {
+          const base64 = reader.result.split(',')[1];
+          const resp = await fetch(APPS_SCRIPT_URL, {
             method: 'POST',
-            body: JSON.stringify(bytes),
-            redirect: 'follow'
+            headers: { 'Content-Type': 'text/plain' },
+            redirect: 'follow',
+            body: JSON.stringify({
+              action: 'uploadEspelhoBoleto',
+              token: CDA_TOKEN,
+              base64: base64,
+              fornecedor: fornecedor,
+              dataPedido: dataPedidoISO
+            })
           });
-
           if (!resp.ok) throw new Error('Erro no upload: ' + resp.status);
           const json = await resp.json();
+          if (!json.ok) throw new Error(json.erro || 'Erro ao enviar espelho ao Drive');
           resolve(json);
         } catch (err) { reject(err); }
       };
@@ -7471,14 +7556,15 @@ async function carregarUsuarios() {
       document.getElementById('bol-upload-status').classList.remove('hidden');
       document.getElementById('bol-upload-status').textContent = 'Enviando espelho para o Drive...';
 
-      const uploadResult = await bolUploadPDFToDrive(bolPDFSelecionado, fornecedor);
+      const dataPedidoISO = new Date().toISOString();
+      const uploadResult = await bolUploadPDFToDrive(bolPDFSelecionado, fornecedor.toUpperCase(), dataPedidoISO);
       document.getElementById('bol-upload-progress-bar').style.width = '70%';
 
       const pedido = {
         action: 'salvarBoleto',
         token: CDA_TOKEN,
         fornecedor: fornecedor.toUpperCase(),
-        dataPedido: new Date().toISOString(),
+        dataPedido: dataPedidoISO,
         quemPedido: getUsuarioLogado()?.login || 'DESCONHECIDO',
         valorTotal: bolParseValor(valorStr),
         espelhoUrl: uploadResult.fileUrl || uploadResult.url || '',
@@ -7494,7 +7580,7 @@ async function carregarUsuarios() {
         method: 'POST',
         body: JSON.stringify(pedido),
         redirect: 'follow',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'text/plain' }
       });
 
       document.getElementById('bol-upload-progress-bar').style.width = '100%';
@@ -7620,14 +7706,14 @@ async function carregarUsuarios() {
         boletosChegaram: boletosChegaram ? 'SIM' : 'NÃO',
         conferenciaOK: 'SIM',
         entreguePara: entreguePara || '',
-        status: boletosChegaram ? 'recebido' : 'recebido'
+        status: 'recebido'
       };
 
       const resp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         body: JSON.stringify(dados),
         redirect: 'follow',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'text/plain' }
       });
 
       const json = await resp.json();
@@ -7749,7 +7835,7 @@ async function carregarUsuarios() {
         method: 'POST',
         body: JSON.stringify(dados),
         redirect: 'follow',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'text/plain' }
       });
 
       const json = await resp.json();
@@ -7867,6 +7953,251 @@ async function carregarUsuarios() {
     document.getElementById('bol-filtro-fornecedor').value = '';
     document.getElementById('bol-filtro-mes').value = '';
     bolFiltroStatus('todos');
+  }
+
+  // ==================== DASHBOARD DE BOLETOS ====================
+
+  async function bolCarregarDashboard() {
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL + '?action=listarBoletos&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' });
+      const json = await resp.json();
+      if (!json.ok || !Array.isArray(json.dados)) throw new Error(json.erro || 'Erro ao carregar');
+      bolRenderDashboard(json.dados);
+    } catch(err) {
+      console.error('[CDA] Erro ao carregar dashboard de boletos:', err);
+      showToast('Erro ao carregar o dashboard de boletos.', 'error');
+    }
+  }
+
+  function bolRenderDashboard(dados) {
+    const total = dados.length;
+    document.getElementById('bol-kpi-total').textContent = total;
+    document.getElementById('bol-kpi-total-sub').textContent = total === 0 ? 'nenhum pedido ainda' : 'desde o início do registro';
+
+    const abertos = dados.filter(p => p.status === 'pendente').length;
+    const financeiro = dados.filter(p => p.status === 'recebido').length;
+    const finalizados = dados.filter(p => p.status === 'finalizado').length;
+    document.getElementById('bol-kpi-abertos').textContent = abertos;
+    document.getElementById('bol-kpi-financeiro').textContent = financeiro;
+    document.getElementById('bol-kpi-finalizados').textContent = finalizados;
+    document.getElementById('bol-kpi-finalizados-sub').textContent = total > 0 ? Math.round((finalizados / total) * 100) + '% do total' : '—';
+
+    const valorAberto = dados.filter(p => p.status !== 'finalizado').reduce((s, p) => s + (parseFloat(p.valorTotal) || 0), 0);
+    document.getElementById('bol-kpi-valor-aberto').textContent = 'R$ ' + valorAberto.toFixed(2).replace('.', ',');
+
+    const hoje = new Date();
+    const mesAtual = hoje.getMonth(), anoAtual = hoje.getFullYear();
+    let mesAnterior = mesAtual - 1, anoAnterior = anoAtual;
+    if (mesAnterior < 0) { mesAnterior = 11; anoAnterior--; }
+    let contAtual = 0, contAnterior = 0;
+    dados.forEach(p => {
+      const d = new Date(p.dataPedido);
+      if (isNaN(d.getTime())) return;
+      if (d.getMonth() === mesAtual && d.getFullYear() === anoAtual) contAtual++;
+      else if (d.getMonth() === mesAnterior && d.getFullYear() === anoAnterior) contAnterior++;
+    });
+    document.getElementById('bol-kpi-mes').textContent = contAtual;
+    const subMes = document.getElementById('bol-kpi-mes-sub');
+    if (contAnterior === 0) {
+      subMes.textContent = contAtual === 0 ? 'sem pedidos no mês' : 'sem pedidos no mês anterior p/ comparar';
+    } else {
+      const delta = Math.round(((contAtual - contAnterior) / contAnterior) * 100);
+      if (delta === 0) { subMes.textContent = 'estável vs mês anterior'; }
+      else {
+        const subindo = delta > 0;
+        subMes.innerHTML = '<span class="' + (subindo ? 'qc-dash-delta-up' : 'qc-dash-delta-down') + '">' +
+          (subindo ? '▲' : '▼') + ' ' + Math.abs(delta) + '%</span> vs mês anterior';
+      }
+    }
+
+    const vazio = document.getElementById('bol-dash-vazio');
+    const graficos = document.getElementById('bol-dash-graficos');
+    if (total === 0) {
+      if (vazio) vazio.style.display = 'block';
+      if (graficos) graficos.style.display = 'none';
+      return;
+    }
+    if (vazio) vazio.style.display = 'none';
+    if (graficos) graficos.style.display = 'block';
+
+    bolDesenharGraficoEtapa(dados);
+    bolDesenharGraficoTendencia(dados);
+    bolDesenharGraficoFornecedor(dados);
+    bolDesenharGraficoDividido(dados);
+  }
+
+  function bolDesenharGraficoEtapa(dados) {
+    const ctx = document.getElementById('bol-chart-etapa');
+    if (!ctx || typeof Chart === 'undefined') return;
+    if (bolChartEtapa) bolChartEtapa.destroy();
+
+    const etapas = [
+      { valor: 'pendente',   label: 'Pedido Feito',        cor: '#9ce0db' },
+      { valor: 'recebido',   label: 'Mercadoria Recebida',  cor: '#5dc1b9' },
+      { valor: 'finalizado', label: 'Finalizado',           cor: '#005954' }
+    ];
+    const contagem = etapas.map(e => dados.filter(p => p.status === e.valor).length);
+
+    bolChartEtapa = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: etapas.map(e => e.label),
+        datasets: [{ data: contagem, backgroundColor: etapas.map(e => e.cor), borderRadius: 8, maxBarThickness: 28 }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: (c) => c.parsed.x + ' pedido(s)' } }
+        },
+        scales: {
+          x: { beginAtZero: true, ticks: { precision: 0, color: finVar('--fin-text-muted', '#667085') }, grid: { color: finVar('--fin-border', 'rgba(148,163,184,0.15)') } },
+          y: { ticks: { color: finVar('--fin-text', '#0B302D'), font: { weight: 700 } }, grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  function bolDesenharGraficoTendencia(dados) {
+    const ctx = document.getElementById('bol-chart-tendencia');
+    if (!ctx || typeof Chart === 'undefined') return;
+    if (bolChartTendencia) bolChartTendencia.destroy();
+
+    const hoje = new Date();
+    const meses = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+      meses.push({ mes: d.getMonth(), ano: d.getFullYear(), label: d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '') + '/' + String(d.getFullYear()).slice(2) });
+    }
+    const valores = meses.map(m => dados.filter(p => {
+      const d = new Date(p.dataPedido);
+      return !isNaN(d.getTime()) && d.getMonth() === m.mes && d.getFullYear() === m.ano;
+    }).length);
+
+    const corPrimaria = finVar('--fin-primary', '#338b85');
+    const corMuted = finVar('--fin-text-muted', '#667085');
+    const corGrid = finVar('--fin-border', 'rgba(148,163,184,0.15)');
+
+    bolChartTendencia = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: meses.map(m => m.label),
+        datasets: [{
+          label: 'Pedidos',
+          data: valores,
+          borderColor: corPrimaria,
+          backgroundColor: (context) => {
+            const { ctx: c, chartArea } = context.chart;
+            if (!chartArea) return corPrimaria + '22';
+            const gradient = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            gradient.addColorStop(0, corPrimaria + '33');
+            gradient.addColorStop(1, corPrimaria + '00');
+            return gradient;
+          },
+          fill: true,
+          tension: 0.35,
+          pointRadius: 4,
+          pointBackgroundColor: corPrimaria,
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          borderWidth: 2.5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { backgroundColor: corPrimaria, padding: 10, cornerRadius: 10, callbacks: { label: (c) => c.parsed.y + ' pedido(s)' } }
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { precision: 0, color: corMuted, font: { size: 12 } }, grid: { color: corGrid } },
+          x: { ticks: { color: corMuted, font: { size: 12, weight: 600 } }, grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  function bolDesenharGraficoFornecedor(dados) {
+    const ctx = document.getElementById('bol-chart-fornecedor');
+    if (!ctx || typeof Chart === 'undefined') return;
+    if (bolChartFornecedor) bolChartFornecedor.destroy();
+
+    const somaPorFornecedor = {};
+    dados.forEach(p => {
+      const f = p.fornecedor || 'Não informado';
+      somaPorFornecedor[f] = (somaPorFornecedor[f] || 0) + (parseFloat(p.valorTotal) || 0);
+    });
+    let entradas = Object.entries(somaPorFornecedor).sort((a, b) => b[1] - a[1]);
+    if (entradas.length > 8) {
+      const top = entradas.slice(0, 7);
+      const outros = entradas.slice(7).reduce((s, e) => s + e[1], 0);
+      entradas = top.concat([['Outros', outros]]);
+    }
+    entradas.reverse();
+
+    const corPrimaria = finVar('--fin-primary', '#338b85');
+    const corMuted = finVar('--fin-text-muted', '#667085');
+    const corGrid = finVar('--fin-border', 'rgba(148,163,184,0.15)');
+
+    bolChartFornecedor = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: entradas.map(e => e[0]),
+        datasets: [{ data: entradas.map(e => e[1]), backgroundColor: corPrimaria, borderRadius: 6, maxBarThickness: 22 }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { backgroundColor: corPrimaria, padding: 10, cornerRadius: 10, callbacks: { label: (c) => 'R$ ' + c.parsed.x.toFixed(2).replace('.', ',') } }
+        },
+        scales: {
+          x: { beginAtZero: true, ticks: { color: corMuted, callback: (v) => 'R$ ' + v }, grid: { color: corGrid } },
+          y: { ticks: { color: finVar('--fin-text', '#0B302D'), font: { size: 11, weight: 600 } }, grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  function bolDesenharGraficoDividido(dados) {
+    const ctx = document.getElementById('bol-chart-dividido');
+    const legend = document.getElementById('bol-chart-dividido-legend');
+    if (!ctx || typeof Chart === 'undefined') return;
+    if (bolChartDividido) bolChartDividido.destroy();
+
+    const divididos = dados.filter(p => (p.dividido || '').toUpperCase() === 'SIM').length;
+    const avista = dados.length - divididos;
+    const corAvista = finVar('--fin-primary', '#338b85');
+    const corDividido = finVar('--fin-donut-2', '#FBBF24');
+
+    if (legend) {
+      legend.innerHTML =
+        '<div class="qc-chart-legend-item"><span class="qc-chart-legend-dot" style="background:' + corAvista + ';"></span>À vista <b>' + avista + '</b></div>' +
+        '<div class="qc-chart-legend-item"><span class="qc-chart-legend-dot" style="background:' + corDividido + ';"></span>Dividido <b>' + divididos + '</b></div>';
+    }
+
+    bolChartDividido = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['À vista', 'Dividido'],
+        datasets: [{ data: [avista, divididos], backgroundColor: [corAvista, corDividido], borderWidth: 4, borderColor: finVar('--fin-card-bg', '#ffffff'), hoverOffset: 6 }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        cutout: '68%',
+        plugins: { legend: { display: false } }
+      }
+    });
   }
 
 </script>
