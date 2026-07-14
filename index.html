@@ -7119,7 +7119,18 @@ async function carregarUsuarios() {
     pdfWrap.style.display = pdfUrl ? 'block' : 'none';
     pdfWrap.dataset.url = pdfUrl || '';
     agendaAtualizarBotaoComparecimento(ev.compareceu);
+    agendaResetarBotaoCancelar();
     document.getElementById('modal-agenda-detalhes').classList.add('ativo');
+  }
+
+  // O modal é reaproveitado entre aberturas — sem isso, o botão de cancelar
+  // ficava travado em "Cancelando..." se o agendamento anterior aberto tivesse
+  // sido cancelado com sucesso (o innerHTML mutado nunca era desfeito).
+  function agendaResetarBotaoCancelar() {
+    const btn = document.getElementById('modal-agenda-btn-cancelar');
+    if (!btn) return;
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-calendar-xmark mr-1"></i> Paciente Desmarcou / Quer Reagendar';
   }
 
   function agendaFecharModal() {
@@ -7191,6 +7202,7 @@ async function carregarUsuarios() {
       });
       const json = await resp.json();
       if (!json.ok) throw new Error(json.erro || 'Falha ao cancelar');
+      agendaResetarBotaoCancelar();
       agendaFecharModal();
       showToast('Agendamento de ' + nome + ' cancelado — horário liberado.');
       const restante = agendaEventosDoDiaAtual.filter(e => e.id !== ev.id);
