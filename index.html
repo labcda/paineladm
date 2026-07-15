@@ -209,6 +209,17 @@
     .fin-quickadd { position: relative; }
     .fin-dropdown-menu { position: absolute; top: calc(100% + 10px); right: 0; background: var(--fin-card-bg); border: 1px solid var(--fin-border); border-radius: 14px; box-shadow: 0 16px 36px rgba(15,23,42,0.16); padding: 6px; min-width: 230px; z-index: 500; display: none; flex-direction: column; gap: 2px; }
     .fin-dropdown-menu.aberto { display: flex; }
+    .fin-notif-dropdown { min-width: 320px; max-width: 360px; padding: 8px; }
+    .fin-notif-header { font-size: 0.8rem; font-weight: 700; color: var(--fin-text); padding: 6px 8px 10px; border-bottom: 1px solid var(--fin-border); margin-bottom: 4px; }
+    #fin-notif-lista { max-height: 340px; overflow-y: auto; }
+    .fin-notif-empty { font-size: 0.82rem; color: var(--fin-text-muted); text-align: center; padding: 18px 8px; }
+    .fin-notif-item { display: flex; gap: 10px; padding: 10px 8px; border-radius: 10px; transition: background 0.15s; }
+    .fin-notif-item:hover { background: var(--fin-primary-soft); }
+    .fin-notif-icon { width: 32px; height: 32px; border-radius: 50%; background: var(--fin-primary-soft); color: var(--fin-primary); display: flex; align-items: center; justify-content: center; font-size: 0.82rem; flex-shrink: 0; }
+    .fin-notif-info { flex: 1; min-width: 0; }
+    .fin-notif-titulo { font-size: 0.84rem; font-weight: 700; color: var(--fin-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fin-notif-sub { font-size: 0.76rem; color: var(--fin-text-muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fin-notif-data { font-size: 0.72rem; color: var(--fin-text-muted); margin-top: 3px; }
     .fin-dropdown-menu button { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: none; background: transparent; border-radius: 10px; font-size: 0.84rem; font-weight: 700; color: var(--fin-text); cursor: pointer; text-align: left; width: 100%; font-family: inherit; transition: background 0.15s; }
     .fin-dropdown-menu button:hover { background: var(--fin-primary-soft); color: var(--fin-primary); }
     .fin-dropdown-menu button i { width: 16px; text-align: center; color: var(--fin-primary); }
@@ -1087,9 +1098,15 @@
             <button type="button" class="fin-theme-opt active" data-mode="light" onclick="definirTemaDashboard('light')"><i class="fa-solid fa-sun"></i></button>
             <button type="button" class="fin-theme-opt" data-mode="dark" onclick="definirTemaDashboard('dark')"><i class="fa-solid fa-moon"></i></button>
           </div>
-          <div class="fin-icon-btn" title="Notificações">
-            <i class="fa-regular fa-bell"></i>
-            <span class="fin-notif-dot"></span>
+          <div class="fin-quickadd" id="fin-notif-wrap">
+            <div class="fin-icon-btn" title="Notificações" onclick="toggleNotifMenu(event)">
+              <i class="fa-regular fa-bell"></i>
+              <span class="fin-notif-dot" id="fin-notif-dot" style="display:none;"></span>
+            </div>
+            <div class="fin-dropdown-menu fin-notif-dropdown" id="fin-notif-dropdown">
+              <div class="fin-notif-header">Novidades recentes</div>
+              <div id="fin-notif-lista"><p class="fin-notif-empty">Carregando...</p></div>
+            </div>
           </div>
           <button class="fin-btn-ghost" onclick="carregarEstatisticas()" title="Atualizar dados"><i class="fa-solid fa-rotate"></i> Atualizar</button>
 
@@ -2631,6 +2648,7 @@
   function toggleQuickAdd(e) {
     if (e) e.stopPropagation();
     document.getElementById('fin-user-dropdown')?.classList.remove('aberto');
+    document.getElementById('fin-notif-dropdown')?.classList.remove('aberto');
     document.getElementById('fin-quickadd-menu')?.classList.toggle('aberto');
   }
 
@@ -2641,6 +2659,7 @@
   function toggleUserMenu(e) {
     if (e) e.stopPropagation();
     document.getElementById('fin-quickadd-menu')?.classList.remove('aberto');
+    document.getElementById('fin-notif-dropdown')?.classList.remove('aberto');
     document.getElementById('fin-user-dropdown')?.classList.toggle('aberto');
   }
 
@@ -2648,7 +2667,18 @@
     document.getElementById('fin-user-dropdown')?.classList.remove('aberto');
   }
 
-  document.addEventListener('click', function() { fecharQuickAdd(); fecharUserMenu(); });
+  function toggleNotifMenu(e) {
+    if (e) e.stopPropagation();
+    document.getElementById('fin-quickadd-menu')?.classList.remove('aberto');
+    document.getElementById('fin-user-dropdown')?.classList.remove('aberto');
+    document.getElementById('fin-notif-dropdown')?.classList.toggle('aberto');
+  }
+
+  function fecharNotifMenu() {
+    document.getElementById('fin-notif-dropdown')?.classList.remove('aberto');
+  }
+
+  document.addEventListener('click', function() { fecharQuickAdd(); fecharUserMenu(); fecharNotifMenu(); });
 
   function quickAbrir(pagina, callback) {
     fecharQuickAdd();
@@ -2864,6 +2894,7 @@
     carregarPacientesHoje();
     carregarGraficoAgendamentos7Dias();
     carregarComparativoPainelApp();
+    carregarNotificacoesApp();
   }
 
   // ==================== HOME: PACIENTES DO DIA + GRÁFICOS ====================
@@ -2950,7 +2981,7 @@
     container.innerHTML = doDia.map(a => {
       const statusClasse = homeStatusClasse(a.status);
       return '<div class="home-paciente-item">' +
-        '<div class="home-paciente-hora">' + (a.hora || '--:--') + '</div>' +
+        '<div class="home-paciente-hora">' + (horaValida(a.hora) || '--:--') + '</div>' +
         '<div class="home-paciente-info">' +
           '<p class="home-paciente-nome">' + agendaEscapar(a.paciente || 'Sem nome') + '</p>' +
           '<p class="home-paciente-sub">' + (a.telefone ? '<i class="fa-solid fa-phone mr-1"></i>' + agendaEscapar(a.telefone) : '') + (a.exames ? (a.telefone ? ' · ' : '') + agendaEscapar(a.exames) : '') + '</p>' +
@@ -3168,6 +3199,95 @@
         }
       }
     });
+  }
+
+  function horaValida(str) {
+    return typeof str === 'string' && /^\d{1,2}:\d{2}/.test(str.trim()) ? str.trim().slice(0, 5) : '';
+  }
+
+  function homeParseDataHora(dataStr, horaStr) {
+    const partes = (dataStr || '').split('/');
+    if (partes.length !== 3) return null;
+    const d = parseInt(partes[0], 10), m = parseInt(partes[1], 10), y = parseInt(partes[2], 10);
+    if (!d || !m || !y) return null;
+    const [hh, mm] = (horaStr || '00:00').split(':').map(Number);
+    return new Date(y, m - 1, d, hh || 0, mm || 0);
+  }
+
+  async function carregarNotificacoesApp() {
+    const lista = document.getElementById('fin-notif-lista');
+    const dot   = document.getElementById('fin-notif-dot');
+    try {
+      const hoje = new Date();
+      const seteDiasAtras = new Date(hoje); seteDiasAtras.setDate(hoje.getDate() - 7);
+      const mesesParaBuscar = [...new Set([
+        String(hoje.getMonth() + 1).padStart(2, '0') + '/' + hoje.getFullYear(),
+        String(seteDiasAtras.getMonth() + 1).padStart(2, '0') + '/' + seteDiasAtras.getFullYear()
+      ])];
+
+      const [resOrcApp, resAgenApp, resRecoletas, listasAgenPainel] = await Promise.all([
+        fetch(APPS_SCRIPT_URL + '?action=listarAppOrcamentos&token='   + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json()).catch(() => ({ ok: false })),
+        fetch(APPS_SCRIPT_URL + '?action=listarAppRegistroAgen&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json()).catch(() => ({ ok: false })),
+        fetch(APPS_SCRIPT_URL + '?action=listarRecoletas&token='       + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json()).catch(() => ({ ok: false })),
+        Promise.all(mesesParaBuscar.map(homeBuscarAgendamentosMes))
+      ]);
+
+      const itens = [];
+      if (resOrcApp.ok && Array.isArray(resOrcApp.orcamentos)) {
+        resOrcApp.orcamentos.forEach(o => itens.push({
+          tipo: 'orc-app', paciente: o.paciente, detalhe: o.exames, data: o.data, hora: o.hora,
+          quando: homeParseDataHora(o.data, o.hora)
+        }));
+      }
+      if (resAgenApp.ok && Array.isArray(resAgenApp.agendamentos)) {
+        resAgenApp.agendamentos.forEach(a => itens.push({
+          tipo: 'agen-app', paciente: a.paciente, detalhe: a.formaPgto ? 'Pagamento: ' + a.formaPgto : '', data: a.data, hora: a.hora,
+          quando: homeParseDataHora(a.data, a.hora)
+        }));
+      }
+      listasAgenPainel.flat().forEach(a => itens.push({
+        tipo: 'agen-painel', paciente: a.paciente, detalhe: a.exames || '', data: a.data, hora: a.hora,
+        quando: homeParseDataHora(a.data, a.hora)
+      }));
+      if (resRecoletas.ok && Array.isArray(resRecoletas.recoletas)) {
+        resRecoletas.recoletas.forEach(r => itens.push({
+          tipo: 'recoleta', paciente: r.nome, detalhe: r.motivo || r.exames || '', data: r.data, hora: '',
+          quando: homeParseDataHora(r.data, '00:00')
+        }));
+      }
+
+      itens.sort((a, b) => (b.quando ? b.quando.getTime() : 0) - (a.quando ? a.quando.getTime() : 0));
+
+      const recentes = itens.filter(i => i.quando && i.quando >= seteDiasAtras).slice(0, 12);
+
+      const ontem = new Date(); ontem.setDate(ontem.getDate() - 1); ontem.setHours(0, 0, 0, 0);
+      if (dot) dot.style.display = itens.some(i => i.quando && i.quando >= ontem) ? 'block' : 'none';
+
+      if (!lista) return;
+      if (recentes.length === 0) {
+        lista.innerHTML = '<p class="fin-notif-empty">Nenhuma novidade nos últimos 7 dias.</p>';
+        return;
+      }
+      const config = {
+        'orc-app':     { icone: 'fa-calculator',     label: 'Orçamento via App' },
+        'agen-app':    { icone: 'fa-calendar-check', label: 'Agendamento via App' },
+        'agen-painel': { icone: 'fa-calendar-plus',  label: 'Agendamento no Painel' },
+        'recoleta':    { icone: 'fa-vial',           label: 'Abertura de Recoleta' }
+      };
+      lista.innerHTML = recentes.map(i => {
+        const cfg = config[i.tipo] || { icone: 'fa-bell', label: 'Novidade' };
+        return '<div class="fin-notif-item">' +
+          '<div class="fin-notif-icon"><i class="fa-solid ' + cfg.icone + '"></i></div>' +
+          '<div class="fin-notif-info">' +
+            '<div class="fin-notif-titulo">' + cfg.label + (i.paciente ? ' — ' + agendaEscapar(i.paciente) : '') + '</div>' +
+            (i.detalhe ? '<div class="fin-notif-sub">' + agendaEscapar(i.detalhe) + '</div>' : '') +
+            '<div class="fin-notif-data">' + agendaEscapar(i.data || '') + (horaValida(i.hora) ? ' às ' + agendaEscapar(horaValida(i.hora)) : '') + '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    } catch(e) {
+      if (lista) lista.innerHTML = '<p class="fin-notif-empty">Erro ao carregar notificações.</p>';
+    }
   }
 
   async function carregarAtividadesRecentes() {
