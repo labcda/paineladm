@@ -2563,7 +2563,15 @@
 
   function limparUsuarioLogado() {
       USUARIO_LOGADO = null;
-      try { localStorage.removeItem('cda_usuario_logado'); } catch(e) {}
+      // Também remove os caches locais que guardam dados de pacientes (nome,
+      // telefone, recoletas) — evita que fiquem no navegador após o logout,
+      // visíveis para a próxima pessoa a usar o computador.
+      try {
+        localStorage.removeItem('cda_usuario_logado');
+        localStorage.removeItem('patient_name');
+        localStorage.removeItem('patient_phone');
+        localStorage.removeItem('cda_recoletas');
+      } catch(e) {}
       atualizarBadgeUsuario();
   }
 
@@ -2717,8 +2725,14 @@
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
-      const url = APPS_SCRIPT_URL + '?action=verificarLogin&login=' + encodeURIComponent(usuario) + '&senha=' + encodeURIComponent(senha) + '&token=' + encodeURIComponent(CDA_TOKEN);
-      const resp = await fetch(url, { method: 'GET', signal: controller.signal, redirect: 'follow' });
+      // POST (não GET) para a senha não ficar salva na URL/histórico do navegador.
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        signal: controller.signal,
+        redirect: 'follow',
+        body: JSON.stringify({ action: 'verificarLogin', login: usuario, senha: senha, token: CDA_TOKEN })
+      });
       clearTimeout(timeout);
       if (!resp.ok) throw new Error('Erro HTTP: ' + resp.status);
       const json = await resp.json();
@@ -2730,7 +2744,7 @@
       } else { throw new Error(json.erro || 'Acesso negado'); }
     } catch(err) {
       if (err.name === 'AbortError') { errorEl.innerText = 'TEMPO ESGOTADO: Servidor não respondeu.'; }
-      else if (err.message && err.message.includes('Failed to fetch')) { errorEl.innerText = 'SEM CONEXÃO: Verifique sua internet ou tente ADMIN/CDA2024.'; }
+      else if (err.message && err.message.includes('Failed to fetch')) { errorEl.innerText = 'SEM CONEXÃO: Verifique sua internet e tente novamente.'; }
       else { errorEl.innerText = 'ERRO: ' + (err.message || 'Erro desconhecido'); }
       errorEl.style.color = '#ef4444';
       setTimeout(() => errorEl.style.display = 'none', 8000);
@@ -4136,11 +4150,9 @@ function agenRemoverPDF() {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
       const url = APPS_SCRIPT_AGENDA_URL + '?action=listar&data=' + data + '&token=' + encodeURIComponent(CDA_TOKEN);
-      console.log('[CDA] Consultando agenda:', url);
       const resp = await fetch(url, { method: 'GET', redirect: 'follow', signal: controller.signal });
       clearTimeout(timeout);
       const texto = await resp.text();
-      console.log('[CDA] Resposta bruta:', texto);
       const json = JSON.parse(texto);
       ocupados = Array.isArray(json.ocupados) ? json.ocupados.map(h => String(h).trim()) : [];
       console.log('[CDA] Ocupados (normalizado):', ocupados);
@@ -5005,10 +5017,9 @@ function agenRemoverPDF() {
       });
       clearTimeout(timeout);
       const json = await resp.json();
-      console.log('[CDA] Resposta do servidor (salvarRecoleta):', json);
       if (!json.ok) console.error('[CDA] Erro do servidor:', json.erro || 'Erro desconhecido');
       salvouPlanilha = json.ok === true;
-      if (!salvouPlanilha) console.warn('[CDA] Planilha retornou erro:', json);
+      if (!salvouPlanilha) console.warn('[CDA] Planilha retornou erro ao salvar recoleta.');
     } catch(err) { console.warn('[CDA] Erro ao salvar na planilha:', err); }
 
     let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
@@ -5068,24 +5079,24 @@ function agenRemoverPDF() {
   }
 
   function recCardHTML(r, index) {
-    const examesNomes = Array.isArray(r.exames) ? r.exames.map(e => e.nome || e).join(', ') : (r.exames || '');
+    const examesNomes = agendaEscapar(Array.isArray(r.exames) ? r.exames.map(e => e.nome || e).join(', ') : (r.exames || ''));
     const isExterno = (r.tipo || '').toLowerCase().includes('externo');
     const tipoBadge = isExterno
       ? '<span class="recoleta-badge externo"><i class="fa-solid fa-truck-medical"></i> Externo</span>'
       : '<span class="recoleta-badge interno"><i class="fa-solid fa-house-medical"></i> Interno</span>';
-    const labInfo = isExterno && r.labExterno ? '<div class="recoleta-externo-lab"><i class="fa-solid fa-building mr-1"></i> ' + r.labExterno + '</div>' :
-                    isExterno && r.tipo && r.tipo.includes(' - ') ? '<div class="recoleta-externo-lab"><i class="fa-solid fa-building mr-1"></i> ' + r.tipo.split(' - ')[1] + '</div>' : '';
-    const motivoInfo = r.motivo ? '<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ' + r.motivo + '</div>' : '';
-    const obsInfo = r.observacoes ? '<div class="recoleta-obs"><i class="fa-solid fa-note-sticky mr-1"></i> ' + r.observacoes + '</div>' : '';
-    const usuarioInfo = r.usuario ? '<div style="font-size:10px;color:#94a3b8;margin-top:4px;"><i class="fa-solid fa-user mr-1"></i> Criado por: ' + r.usuario + '</div>' : '';
+    const labInfo = isExterno && r.labExterno ? '<div class="recoleta-externo-lab"><i class="fa-solid fa-building mr-1"></i> ' + agendaEscapar(r.labExterno) + '</div>' :
+                    isExterno && r.tipo && r.tipo.includes(' - ') ? '<div class="recoleta-externo-lab"><i class="fa-solid fa-building mr-1"></i> ' + agendaEscapar(r.tipo.split(' - ')[1]) + '</div>' : '';
+    const motivoInfo = r.motivo ? '<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ' + agendaEscapar(r.motivo) + '</div>' : '';
+    const obsInfo = r.observacoes ? '<div class="recoleta-obs"><i class="fa-solid fa-note-sticky mr-1"></i> ' + agendaEscapar(r.observacoes) + '</div>' : '';
+    const usuarioInfo = r.usuario ? '<div style="font-size:10px;color:#94a3b8;margin-top:4px;"><i class="fa-solid fa-user mr-1"></i> Criado por: ' + agendaEscapar(r.usuario) + '</div>' : '';
     const etapaMeta = REC_ETAPAS[r.status] || REC_ETAPAS.RECOLETA_ABERTA;
     const statusBadge = '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;background:' + etapaMeta.bg + ';color:' + etapaMeta.cor + ';margin-left:6px;">' + etapaMeta.label + '</span>';
     const dataAttr = typeof index === 'number' ? 'data-rec-index="' + index + '"' : '';
     return '<div class="recoleta-card" ' + dataAttr + '>' +
       '<div class="recoleta-header">' +
         '<div>' +
-          '<div class="recoleta-codigo">CÓDIGO: ' + r.codigo + statusBadge + '</div>' +
-          '<div class="recoleta-nome">' + r.nome + '</div>' +
+          '<div class="recoleta-codigo">CÓDIGO: ' + agendaEscapar(r.codigo) + statusBadge + '</div>' +
+          '<div class="recoleta-nome">' + agendaEscapar(r.nome) + '</div>' +
         '</div>' +
         '<div>' + tipoBadge + '</div>' +
       '</div>' +
@@ -5093,7 +5104,7 @@ function agenRemoverPDF() {
       '<div class="recoleta-exames"><i class="fa-solid fa-vial mr-1 text-cda-primary"></i> ' + examesNomes + '</div>' +
       motivoInfo + obsInfo + usuarioInfo +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">' +
-        '<span class="text-xs text-slate-400">Cadastrado em: ' + (r.data || '') + '</span>' +
+        '<span class="text-xs text-slate-400">Cadastrado em: ' + agendaEscapar(r.data || '') + '</span>' +
         (typeof index === 'number' ? '<button class="btn-remover-exame" onclick="event.stopPropagation(); excluirRecoleta(' + index + ')" title="Excluir" style="width:32px;height:32px;"><i class="fa-solid fa-trash"></i></button>' : '') +
       '</div>' +
     '</div>';
@@ -5463,7 +5474,7 @@ function agenRemoverPDF() {
   }
 
   function recCardHTMLConsulta(r) {
-    const examesNomes = Array.isArray(r.exames) ? r.exames.map(e => e.nome || e).join(', ') : (r.exames || '');
+    const examesNomes = agendaEscapar(Array.isArray(r.exames) ? r.exames.map(e => e.nome || e).join(', ') : (r.exames || ''));
     const isExterno = (r.tipo || '').toLowerCase().includes('externo');
     const tipoBadge = isExterno
       ? '<span class="recoleta-badge externo"><i class="fa-solid fa-truck-medical"></i> Externo</span>'
@@ -5471,18 +5482,18 @@ function agenRemoverPDF() {
     const isConcluido = (r.status || 'RECOLETA_ABERTA') === 'FINALIZADA';
     const etapaMetaConsulta = REC_ETAPAS[r.status] || REC_ETAPAS.RECOLETA_ABERTA;
     const statusBadge = '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;background:' + etapaMetaConsulta.bg + ';color:' + etapaMetaConsulta.cor + ';margin-left:6px;">' + etapaMetaConsulta.label + '</span>';
-    const labInfo = isExterno && r.tipo && r.tipo.includes(' - ') ? '<div class="recoleta-externo-lab"><i class="fa-solid fa-building mr-1"></i> ' + r.tipo.split(' - ')[1] + '</div>' : '';
-    const motivoInfo = r.motivo ? '<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ' + r.motivo + '</div>' : '';
-    const obsInfo = r.observacoes ? '<div class="recoleta-obs"><i class="fa-solid fa-note-sticky mr-1"></i> ' + r.observacoes + '</div>' : '';
-    const usuarioInfo = r.usuario ? '<div style="font-size:10px;color:#94a3b8;margin-top:4px;"><i class="fa-solid fa-user mr-1"></i> Criado por: ' + r.usuario + '</div>' : '';
-    const conclusaoInfo = isConcluido ? '<div style="font-size:10px;color:#059669;margin-top:4px;"><i class="fa-solid fa-check-circle mr-1"></i> Concluído em: ' + (r.dataVeio || '---') + ' por ' + (r.usuarioConclusao || '---') + '</div>' : '';
-    const comunicacaoInfo = (!isConcluido && r.dataComunicacao) ? '<div style="font-size:10px;color:#1e40af;margin-top:4px;"><i class="fa-solid fa-phone mr-1"></i> Comunicado em: ' + r.dataComunicacao + ' por ' + (r.quemComunicou || '---') + '</div>' : '';
+    const labInfo = isExterno && r.tipo && r.tipo.includes(' - ') ? '<div class="recoleta-externo-lab"><i class="fa-solid fa-building mr-1"></i> ' + agendaEscapar(r.tipo.split(' - ')[1]) + '</div>' : '';
+    const motivoInfo = r.motivo ? '<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ' + agendaEscapar(r.motivo) + '</div>' : '';
+    const obsInfo = r.observacoes ? '<div class="recoleta-obs"><i class="fa-solid fa-note-sticky mr-1"></i> ' + agendaEscapar(r.observacoes) + '</div>' : '';
+    const usuarioInfo = r.usuario ? '<div style="font-size:10px;color:#94a3b8;margin-top:4px;"><i class="fa-solid fa-user mr-1"></i> Criado por: ' + agendaEscapar(r.usuario) + '</div>' : '';
+    const conclusaoInfo = isConcluido ? '<div style="font-size:10px;color:#059669;margin-top:4px;"><i class="fa-solid fa-check-circle mr-1"></i> Concluído em: ' + agendaEscapar(r.dataVeio || '---') + ' por ' + agendaEscapar(r.usuarioConclusao || '---') + '</div>' : '';
+    const comunicacaoInfo = (!isConcluido && r.dataComunicacao) ? '<div style="font-size:10px;color:#1e40af;margin-top:4px;"><i class="fa-solid fa-phone mr-1"></i> Comunicado em: ' + agendaEscapar(r.dataComunicacao) + ' por ' + agendaEscapar(r.quemComunicou || '---') + '</div>' : '';
 
     return '<div class="recoleta-card">' +
       '<div class="recoleta-header">' +
         '<div>' +
-          '<div class="recoleta-codigo">CÓDIGO: ' + r.codigo + statusBadge + '</div>' +
-          '<div class="recoleta-nome">' + r.nome + '</div>' +
+          '<div class="recoleta-codigo">CÓDIGO: ' + agendaEscapar(r.codigo) + statusBadge + '</div>' +
+          '<div class="recoleta-nome">' + agendaEscapar(r.nome) + '</div>' +
         '</div>' +
         '<div>' + tipoBadge + '</div>' +
       '</div>' +
@@ -5490,7 +5501,7 @@ function agenRemoverPDF() {
       '<div class="recoleta-exames"><i class="fa-solid fa-vial mr-1 text-cda-primary"></i> ' + examesNomes + '</div>' +
       motivoInfo + obsInfo + usuarioInfo + comunicacaoInfo + conclusaoInfo +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">' +
-        '<span class="text-xs text-slate-400">Cadastrado em: ' + (r.data || '') + '</span>' +
+        '<span class="text-xs text-slate-400">Cadastrado em: ' + agendaEscapar(r.data || '') + '</span>' +
       '</div>' +
     '</div>';
   }
@@ -5553,11 +5564,11 @@ function agenRemoverPDF() {
     const codigoEsc = (r.codigo || '').replace(/'/g, "\\'");
     const nomeEsc = (r.nome || '').replace(/'/g, "\\'");
     return '<div class="rec-kanban-card prioridade-' + prioridade + '" onclick="abrirModalRecKanban(\'' + codigoEsc + '\',\'' + nomeEsc + '\')">' +
-      '<div class="rec-kanban-card-codigo">' + (r.codigo || '') + '</div>' +
-      '<div class="rec-kanban-card-nome">' + (r.nome || '') + '</div>' +
-      '<div class="rec-kanban-card-exames">' + (r.exames || '') + '</div>' +
+      '<div class="rec-kanban-card-codigo">' + agendaEscapar(r.codigo || '') + '</div>' +
+      '<div class="rec-kanban-card-nome">' + agendaEscapar(r.nome || '') + '</div>' +
+      '<div class="rec-kanban-card-exames">' + agendaEscapar(r.exames || '') + '</div>' +
       '<div class="rec-kanban-card-footer">' +
-        '<span><i class="fa-regular fa-calendar mr-1"></i>' + (r.data || '') + '</span>' +
+        '<span><i class="fa-regular fa-calendar mr-1"></i>' + agendaEscapar(r.data || '') + '</span>' +
         '<span class="rec-prioridade-dot ' + prioridade + '"></span>' +
       '</div>' +
     '</div>';
@@ -5569,7 +5580,7 @@ function agenRemoverPDF() {
     reckCodigoAtual = codigo;
     reckNomeAtual = nome;
 
-    document.getElementById('reck-subtitulo').innerHTML = 'Código: <b>' + (r.codigo || '---') + '</b> &nbsp;|&nbsp; ' + (r.nome || '---');
+    document.getElementById('reck-subtitulo').innerHTML = 'Código: <b>' + agendaEscapar(r.codigo || '---') + '</b> &nbsp;|&nbsp; ' + agendaEscapar(r.nome || '---');
     document.getElementById('reck-usuario').textContent = r.usuario || '---';
     document.getElementById('reck-data-cadastro').textContent = r.data || '---';
     document.getElementById('reck-exames').textContent = r.exames || '---';
@@ -5660,10 +5671,10 @@ function agenRemoverPDF() {
       if (json.contatos.length === 0) { lista.innerHTML = '<p class="text-xs text-slate-400 text-center py-3">Nenhum contato registrado ainda.</p>'; return; }
       lista.innerHTML = json.contatos.map(c =>
         '<div class="rec-contato-row">' +
-          '<span class="rec-contato-data">' + (c.data || '') + '</span>' +
-          '<span>' + (c.hora || '') + '</span>' +
-          '<span class="rec-contato-resp">' + (c.responsavel || '') + '</span>' +
-          '<span class="rec-contato-resultado">' + (c.resultado || '') + '</span>' +
+          '<span class="rec-contato-data">' + agendaEscapar(c.data || '') + '</span>' +
+          '<span>' + agendaEscapar(c.hora || '') + '</span>' +
+          '<span class="rec-contato-resp">' + agendaEscapar(c.responsavel || '') + '</span>' +
+          '<span class="rec-contato-resultado">' + agendaEscapar(c.resultado || '') + '</span>' +
         '</div>'
       ).join('');
     } catch(err) {
@@ -5696,18 +5707,13 @@ function agenRemoverPDF() {
 
   // ===== EVENT DELEGATION PARA CARDS DE RECOLETA =====
   document.addEventListener('click', function(e) {
-    console.log('[CDA DEBUG] Click em:', e.target.tagName, e.target.className);
     const card = e.target.closest('.recoleta-card');
     if (card) {
-      console.log('[CDA DEBUG] Card encontrado, dataset:', card.dataset);
       if (card.dataset.recIndex !== undefined) {
         const index = parseInt(card.dataset.recIndex, 10);
-        console.log('[CDA DEBUG] Index:', index);
         if (!isNaN(index)) {
           abrirModalRecDetalhes(index);
         }
-      } else {
-        console.log('[CDA DEBUG] Card sem data-rec-index');
       }
     }
   });
@@ -5734,8 +5740,8 @@ async function carregarUsuarios() {
             : '<span class="cfg-user-badge total"><i class="fa-solid fa-shield-halved"></i> Acesso total</span>';
           return '<div class="cfg-user-row">' +
               '<div class="cfg-user-info">' +
-                '<div class="cfg-user-nome"><i class="fa-solid fa-user mr-1" style="color:#338b85;"></i> ' + (u.login || '---') + '</div>' +
-                '<div class="cfg-user-sub">Cadastrado em: ' + (u.data || '---') + '</div>' +
+                '<div class="cfg-user-nome"><i class="fa-solid fa-user mr-1" style="color:#338b85;"></i> ' + agendaEscapar(u.login || '---') + '</div>' +
+                '<div class="cfg-user-sub">Cadastrado em: ' + agendaEscapar(u.data || '---') + '</div>' +
                 badge +
               '</div>' +
               '<div class="cfg-user-actions">' +
@@ -6290,9 +6296,9 @@ async function carregarUsuarios() {
       return '<div class="rel-card">' +
         '<div class="rel-icon ' + corClasse + '"><i class="fa-solid ' + icone + '"></i></div>' +
         '<div class="rel-info">' +
-          '<div class="rel-titulo">' + tipoLabel + (r.paciente ? ' — ' + r.paciente : '') + acaoBadge + '</div>' +
-          (detalhe ? '<div class="rel-sub">' + detalhe + '</div>' : '') +
-          '<div class="rel-usuario"><i class="fa-solid fa-user mr-1"></i>' + r.usuario + ' · ' + (r.data || 'sem data') + (r.hora && r.tipo === 'orc' ? ' às ' + r.hora : '') + '</div>' +
+          '<div class="rel-titulo">' + tipoLabel + (r.paciente ? ' — ' + agendaEscapar(r.paciente) : '') + acaoBadge + '</div>' +
+          (detalhe ? '<div class="rel-sub">' + agendaEscapar(detalhe) + '</div>' : '') +
+          '<div class="rel-usuario"><i class="fa-solid fa-user mr-1"></i>' + agendaEscapar(r.usuario) + ' · ' + agendaEscapar(r.data || 'sem data') + (r.hora && r.tipo === 'orc' ? ' às ' + agendaEscapar(r.hora) : '') + '</div>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -6392,7 +6398,7 @@ async function carregarUsuarios() {
       });
       const json = await resp.json();
       if (json.ok) {
-        successEl.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Usuário ' + login + ' cadastrado com sucesso!';
+        successEl.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Usuário ' + agendaEscapar(login) + ' cadastrado com sucesso!';
         successEl.style.display = 'block';
         document.getElementById('config-login').value = '';
         document.getElementById('config-senha').value = '';
@@ -6779,13 +6785,13 @@ async function carregarUsuarios() {
         if (json.registros.length === 0) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Nenhuma não conformidade registrada ainda.</p>'; return; }
         container.innerHTML = json.registros.slice().reverse().map(r => {
           const classe = ncGravidadeClasse(r.gravidade);
-          const linkBtn = r.linkPDF ? '<a href="' + r.linkPDF + '" target="_blank" class="cfg-user-btn editar" title="Abrir PDF"><i class="fa-solid fa-file-pdf"></i></a>' : '';
+          const linkBtn = r.linkPDF ? '<a href="' + agendaEscapar(r.linkPDF) + '" target="_blank" class="cfg-user-btn editar" title="Abrir PDF"><i class="fa-solid fa-file-pdf"></i></a>' : '';
           return '<div class="qc-nc-row">' +
               '<div class="qc-nc-info">' +
-                '<div class="qc-nc-codigo">NC ' + r.codigo + ' — ' + (r.setor || '') + '</div>' +
-                '<div class="qc-nc-sub">' + (r.dataAbertura || '') + ' · ' + (r.responsavelAbertura || '') + '</div>' +
+                '<div class="qc-nc-codigo">NC ' + agendaEscapar(r.codigo) + ' — ' + agendaEscapar(r.setor || '') + '</div>' +
+                '<div class="qc-nc-sub">' + agendaEscapar(r.dataAbertura || '') + ' · ' + agendaEscapar(r.responsavelAbertura || '') + '</div>' +
               '</div>' +
-              '<span class="qc-nc-gravidade ' + classe + '">' + (r.gravidade || '') + '</span>' +
+              '<span class="qc-nc-gravidade ' + classe + '">' + agendaEscapar(r.gravidade || '') + '</span>' +
               linkBtn +
             '</div>';
         }).join('');
@@ -7939,22 +7945,22 @@ async function carregarUsuarios() {
       <div class="bol-card">
         <div class="bol-card-header">
           <div>
-            <div class="bol-card-codigo">PEDIDO #${p.id?.slice(-6) || '---'}</div>
-            <div class="bol-card-fornecedor">${p.fornecedor}</div>
+            <div class="bol-card-codigo">PEDIDO #${agendaEscapar(p.id?.slice(-6) || '---')}</div>
+            <div class="bol-card-fornecedor">${agendaEscapar(p.fornecedor || '')}</div>
           </div>
           <span class="bol-status-badge ${cfg.classe}"><i class="fa-solid ${cfg.icone} mr-1"></i> ${cfg.texto}</span>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <span class="bol-card-valor">R$ ${parseFloat(p.valorTotal).toFixed(2).replace('.', ',')}</span>
-          ${p.dividido === 'SIM' ? `<span class="bol-card-dividido"><i class="fa-solid fa-divide mr-1"></i>${p.parcelas}x parcelas</span>` : ''}
+          ${p.dividido === 'SIM' ? `<span class="bol-card-dividido"><i class="fa-solid fa-divide mr-1"></i>${agendaEscapar(p.parcelas || '')}x parcelas</span>` : ''}
         </div>
         <div class="bol-card-info">
-          <i class="fa-regular fa-calendar mr-1"></i> Pedido: ${new Date(p.dataPedido).toLocaleDateString('pt-BR')} por <span class="bol-responsavel-badge">${p.quemPedido}</span>
-          ${p.dataRecebimento ? `<br><i class="fa-solid fa-truck-fast mr-1"></i> Recebido: ${new Date(p.dataRecebimento).toLocaleDateString('pt-BR')} por <span class="bol-responsavel-badge">${p.quemRecebeu}</span>` : ''}
-          ${p.dataConferencia ? `<br><i class="fa-solid fa-money-check mr-1"></i> Conferido: ${new Date(p.dataConferencia).toLocaleDateString('pt-BR')} por <span class="bol-responsavel-badge">${p.quemConferiu}</span>` : ''}
+          <i class="fa-regular fa-calendar mr-1"></i> Pedido: ${new Date(p.dataPedido).toLocaleDateString('pt-BR')} por <span class="bol-responsavel-badge">${agendaEscapar(p.quemPedido || '')}</span>
+          ${p.dataRecebimento ? `<br><i class="fa-solid fa-truck-fast mr-1"></i> Recebido: ${new Date(p.dataRecebimento).toLocaleDateString('pt-BR')} por <span class="bol-responsavel-badge">${agendaEscapar(p.quemRecebeu || '')}</span>` : ''}
+          ${p.dataConferencia ? `<br><i class="fa-solid fa-money-check mr-1"></i> Conferido: ${new Date(p.dataConferencia).toLocaleDateString('pt-BR')} por <span class="bol-responsavel-badge">${agendaEscapar(p.quemConferiu || '')}</span>` : ''}
         </div>
         <div class="bol-card-actions">
-          <a href="${p.espelhoUrl}" target="_blank" class="bol-espelho-link"><i class="fa-solid fa-eye"></i> Ver Espelho</a>
+          <a href="${agendaEscapar(p.espelhoUrl || '#')}" target="_blank" class="bol-espelho-link"><i class="fa-solid fa-eye"></i> Ver Espelho</a>
           ${acoes}
         </div>
       </div>
