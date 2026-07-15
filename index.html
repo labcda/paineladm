@@ -2552,6 +2552,16 @@
       atualizarBadgeUsuario();
   }
 
+  // Token de sessão emitido pelo backend no login (verificarLogin) — só quem
+  // logou de verdade (não o atalho ADMIN/CDA2024, que é só front-end) tem um,
+  // e só com ele o backend libera ações administrativas sensíveis.
+  function setSessionToken(token) {
+      try { if (token) localStorage.setItem('cda_session_token', token); } catch(e) {}
+  }
+  function getSessionToken() {
+      try { return localStorage.getItem('cda_session_token') || ''; } catch(e) { return ''; }
+  }
+
   function getUsuarioLogado() {
       if (USUARIO_LOGADO) return USUARIO_LOGADO;
       try {
@@ -2568,6 +2578,7 @@
       // visíveis para a próxima pessoa a usar o computador.
       try {
         localStorage.removeItem('cda_usuario_logado');
+        localStorage.removeItem('cda_session_token');
         localStorage.removeItem('patient_name');
         localStorage.removeItem('patient_phone');
         localStorage.removeItem('cda_recoletas');
@@ -2736,7 +2747,7 @@
       clearTimeout(timeout);
       if (!resp.ok) throw new Error('Erro HTTP: ' + resp.status);
       const json = await resp.json();
-      if (json.ok && json.autorizado) { loginSucesso(usuario, json.permissoes); }
+      if (json.ok && json.autorizado) { setSessionToken(json.sessionToken); loginSucesso(usuario, json.permissoes); }
       else if (json.ok && !json.autorizado) {
         errorEl.innerText = 'LOGIN OU SENHA INCORRETOS.';
         errorEl.style.color = '#ef4444';
@@ -5725,7 +5736,7 @@ async function carregarUsuarios() {
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 8000);
-      const url = APPS_SCRIPT_URL + '?action=listarUsuarios&token=' + encodeURIComponent(CDA_TOKEN);
+      const url = APPS_SCRIPT_URL + '?action=listarUsuarios&token=' + encodeURIComponent(CDA_TOKEN) + '&sessionToken=' + encodeURIComponent(getSessionToken());
       const resp = await fetch(url, { signal: controller.signal });
       clearTimeout(timeout);
       const json = await resp.json();
@@ -5750,7 +5761,7 @@ async function carregarUsuarios() {
               '</div>' +
             '</div>';
         }).join('');
-      } else { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">ERRO AO CARREGAR USUÁRIOS</p>'; }
+      } else { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">' + agendaEscapar(json.erro || 'ERRO AO CARREGAR USUÁRIOS') + '</p>'; }
     } catch(err) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">ERRO AO CARREGAR. TENTE NOVAMENTE.</p>'; }
   }
 
@@ -5760,12 +5771,12 @@ async function carregarUsuarios() {
       const resp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ action: 'excluirUsuario', token: CDA_TOKEN, login: login })
+        body: JSON.stringify({ action: 'excluirUsuario', token: CDA_TOKEN, login: login, sessionToken: getSessionToken() })
       });
       const json = await resp.json();
       if (json.ok) { showToast('USUÁRIO EXCLUÍDO COM SUCESSO!'); carregarUsuarios(); }
       else { throw new Error(json.erro || 'Erro ao excluir'); }
-    } catch(err) { showToast('ERRO AO EXCLUIR USUÁRIO', 'error'); }
+    } catch(err) { showToast('ERRO AO EXCLUIR USUÁRIO: ' + err.message, 'error'); }
   }
 
   // ==================== RELATÓRIOS ====================
@@ -6394,7 +6405,7 @@ async function carregarUsuarios() {
       const resp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ action: 'cadastrarUsuario', token: CDA_TOKEN, login: login, senha: senha, permissoes: permissoes })
+        body: JSON.stringify({ action: 'cadastrarUsuario', token: CDA_TOKEN, login: login, senha: senha, permissoes: permissoes, sessionToken: getSessionToken() })
       });
       const json = await resp.json();
       if (json.ok) {
@@ -6483,7 +6494,7 @@ async function carregarUsuarios() {
       const resp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ action: 'atualizarPermissoesUsuario', token: CDA_TOKEN, login: usuario.login, permissoes: permissoes })
+        body: JSON.stringify({ action: 'atualizarPermissoesUsuario', token: CDA_TOKEN, login: usuario.login, permissoes: permissoes, sessionToken: getSessionToken() })
       });
       const json = await resp.json();
       if (json.ok) {
