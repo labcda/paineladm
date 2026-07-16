@@ -1302,7 +1302,7 @@
           </div>
         </div>
         <div class="orc-btn-group">
-          <button class="orc-btn primary" onclick="compartilharOrcamento()"><i class="fa-brands fa-whatsapp"></i> Compartilhar</button>
+          <button id="orc-btn-compartilhar" class="orc-btn primary" onclick="compartilharOrcamento()"><i class="fa-brands fa-whatsapp"></i> Compartilhar</button>
           <button class="orc-btn primary" onclick="baixarPDF()"><i class="fa-solid fa-file-pdf"></i> Baixar PDF</button>
           <button class="orc-btn secondary" id="btn-agendar-coleta" onclick="agendarColetaComLoading(this)"><i class="fa-regular fa-calendar-check"></i> Agendar Coleta</button>
           <button class="orc-btn secondary" onclick="novoOrcamento()"><i class="fa-solid fa-rotate-right"></i> Novo Orçamento</button>
@@ -2033,7 +2033,7 @@
           <div class="fin-card">
             <div class="fin-card-head">
               <div class="fin-card-title"><i class="fa-solid fa-chart-line mr-1" style="color:#338b85;"></i> Dashboard de Boletos</div>
-              <button class="fin-btn-ghost" onclick="bolCarregarDashboard()"><i class="fa-solid fa-rotate-right"></i> Atualizar</button>
+              <button id="bol-dash-btn-atualizar" class="fin-btn-ghost" onclick="bolCarregarDashboard()"><i class="fa-solid fa-rotate-right"></i> Atualizar</button>
             </div>
 
             <div class="fin-mini-grid" id="bol-dash-kpis">
@@ -2349,7 +2349,7 @@
                     </div>
                 </div>
                 <div style="display:flex;align-items:end;">
-                    <button class="bol-modal-btn success" style="width:100%;" onclick="bolDarBaixaSelecionados()">
+                    <button id="bol-venc-btn-baixa-lote" class="bol-modal-btn success" style="width:100%;" onclick="bolDarBaixaSelecionados()">
                         <i class="fa-solid fa-check-double mr-1"></i> Dar Baixa nos Selecionados
                     </button>
                 </div>
@@ -2535,7 +2535,7 @@
                 </div>
                 <div id="config-error" class="login-error-msg" style="display: none; margin-top: 6px;">Preencha todos os campos</div>
                 <div id="config-success" style="color: #005954; font-size: 0.85rem; margin-top: 6px; text-align: center; display: none; font-weight: 600;"><i class="fa-solid fa-circle-check mr-1"></i> Usuário cadastrado com sucesso!</div>
-                <button class="fin-btn-primary" onclick="cadastrarUsuario()" style="width: 100%; justify-content: center; padding: 12px; margin-top: 6px;"><i class="fa-solid fa-user-plus"></i> Cadastrar Usuário</button>
+                <button id="btn-cadastrar-usuario" class="fin-btn-primary" onclick="cadastrarUsuario()" style="width: 100%; justify-content: center; padding: 12px; margin-top: 6px;"><i class="fa-solid fa-user-plus"></i> Cadastrar Usuário</button>
             </div>
         </div>
         <div class="fin-card">
@@ -2562,7 +2562,7 @@
       <button onclick="fecharModalPermissoes()" style="width:30px;height:30px;border-radius:50%;border:none;background:#f1f5f9;color:#64748b;cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="cfg-permissoes-grid" id="modal-permissoes-grid" style="margin-bottom:18px;"></div>
-    <button class="fin-btn-primary" onclick="salvarPermissoesModal()" style="width:100%; justify-content:center; padding:12px;"><i class="fa-solid fa-check"></i> Salvar permissões</button>
+    <button id="btn-salvar-permissoes" class="fin-btn-primary" onclick="salvarPermissoesModal()" style="width:100%; justify-content:center; padding:12px;"><i class="fa-solid fa-check"></i> Salvar permissões</button>
   </div>
 </div>
 
@@ -3736,6 +3736,11 @@
     if (!pdfBlob) return;
     const nomeArquivo = 'orcamento_cda_' + (paciente || 'paciente').replace(/\s+/g,'_').toLowerCase() + '.pdf';
 
+    const btnCompartilhar = document.getElementById('orc-btn-compartilhar');
+    const textoOriginalCompartilhar = btnCompartilhar ? btnCompartilhar.innerHTML : '';
+    if (btnCompartilhar) { btnCompartilhar.disabled = true; btnCompartilhar.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Preparando...'; }
+    try {
+
     const total = orcSelecionados.reduce((s, e) => s + parseFloat(e.preco || 0), 0);
     const totalPix = total * 0.60;
     const parcelaCc = (total * 0.65) / 10;
@@ -3796,6 +3801,9 @@
     }
 
     computarOrcamento('COMPARTILHADO');
+    } finally {
+      if (btnCompartilhar) { btnCompartilhar.disabled = false; btnCompartilhar.innerHTML = textoOriginalCompartilhar; }
+    }
   }
 
   // ==================== GERAR PDF (função central) ====================
@@ -5474,13 +5482,15 @@ function agenRemoverPDF() {
       motivoInfo + obsInfo + usuarioInfo +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">' +
         '<span class="text-xs text-slate-400">Cadastrado em: ' + agendaEscapar(r.data || '') + '</span>' +
-        (typeof index === 'number' ? '<button class="btn-remover-exame" onclick="event.stopPropagation(); excluirRecoleta(' + index + ')" title="Excluir" style="width:32px;height:32px;"><i class="fa-solid fa-trash"></i></button>' : '') +
+        (typeof index === 'number' ? '<button class="btn-remover-exame" onclick="event.stopPropagation(); excluirRecoleta(' + index + ', this)" title="Excluir" style="width:32px;height:32px;"><i class="fa-solid fa-trash"></i></button>' : '') +
       '</div>' +
     '</div>';
   }
 
-  async function excluirRecoleta(index) {
+  async function excluirRecoleta(index, btn) {
     if (!confirm('Tem certeza que deseja excluir esta recoleta?')) return;
+    const textoOriginal = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; }
     let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
     const rec = recoletas[index];
     if (rec && rec.codigo) {
@@ -5678,6 +5688,9 @@ function agenRemoverPDF() {
     const idxReal = recoletas.findIndex(item => item.id === r.id || (item.codigo === r.codigo && item.nome === r.nome));
     if (idxReal === -1) return;
 
+    const btnSalvarComunicacao = document.getElementById('btn-salvar-comunicacao-recoleta');
+    if (btnSalvarComunicacao) { btnSalvarComunicacao.disabled = true; btnSalvarComunicacao.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Salvando...'; }
+
     recoletas[idxReal].dataComunicacao = dataComunicacao;
     recoletas[idxReal].quemComunicou = quemComunicou;
     recoletas[idxReal].quemRecebeu = quemRecebeu;
@@ -5727,7 +5740,7 @@ function agenRemoverPDF() {
       div.id = 'modal-rec-btns-conclusao';
       div.style.cssText = 'display:flex;gap:8px;margin-top:12px;';
       div.innerHTML = '<button class="modal-rec-btn neutral" onclick="cancelarConclusao()" style="flex:1;"><i class="fa-solid fa-xmark mr-1"></i> Cancelar</button>' +
-        '<button class="modal-rec-btn success" onclick="confirmarConclusao()" style="flex:2;"><i class="fa-solid fa-check-circle mr-1"></i> Confirmar</button>';
+        '<button id="btn-confirmar-conclusao-recoleta" class="modal-rec-btn success" onclick="confirmarConclusao()" style="flex:2;"><i class="fa-solid fa-check-circle mr-1"></i> Confirmar</button>';
       secao.appendChild(div);
     } else {
       document.getElementById('modal-rec-btns-conclusao').style.display = 'flex';
@@ -5760,6 +5773,9 @@ function agenRemoverPDF() {
       item.id === r.id || (item.codigo === r.codigo && item.nome === r.nome)
     );
     if (idxReal === -1) return;
+
+    const btnConfirmarConclusao = document.getElementById('btn-confirmar-conclusao-recoleta');
+    if (btnConfirmarConclusao) { btnConfirmarConclusao.disabled = true; btnConfirmarConclusao.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Salvando...'; }
 
     recoletas[idxReal].status           = 'FINALIZADA';
     recoletas[idxReal].dataVeio         = dataVeioFormatada;
@@ -6057,6 +6073,9 @@ function agenRemoverPDF() {
     const input = document.getElementById('reck-input-resultado');
     const resultado = input.value.trim();
     if (!resultado) { showToast('Descreva o resultado do contato.', 'error'); return; }
+    const btnRegistrar = document.getElementById('btn-reck-registrar-contato');
+    const textoOriginalRegistrar = btnRegistrar ? btnRegistrar.innerHTML : '';
+    if (btnRegistrar) { btnRegistrar.disabled = true; btnRegistrar.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Registrando...'; }
     try {
       const resp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
@@ -6071,6 +6090,8 @@ function agenRemoverPDF() {
     } catch(err) {
       console.error('[CDA] Erro ao registrar contato:', err);
       showToast('Erro ao registrar contato.', 'error');
+    } finally {
+      if (btnRegistrar) { btnRegistrar.disabled = false; btnRegistrar.innerHTML = textoOriginalRegistrar; }
     }
   }
 
@@ -6115,7 +6136,7 @@ async function carregarUsuarios() {
               '</div>' +
               '<div class="cfg-user-actions">' +
                 '<button class="cfg-user-btn editar" onclick="abrirModalPermissoes(' + idx + ')" title="Editar permissões"><i class="fa-solid fa-shield-halved"></i></button>' +
-                '<button class="cfg-user-btn excluir" onclick="excluirUsuario(' + idx + ', ' + (u.login ? "'" + u.login + "'" : "''") + ')" title="Excluir"><i class="fa-solid fa-trash"></i></button>' +
+                '<button class="cfg-user-btn excluir" onclick="excluirUsuario(' + idx + ', ' + (u.login ? "'" + u.login + "'" : "''") + ', this)" title="Excluir"><i class="fa-solid fa-trash"></i></button>' +
               '</div>' +
             '</div>';
         }).join('');
@@ -6123,8 +6144,10 @@ async function carregarUsuarios() {
     } catch(err) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">ERRO AO CARREGAR. TENTE NOVAMENTE.</p>'; }
   }
 
-  async function excluirUsuario(index, login) {
+  async function excluirUsuario(index, login, btn) {
     if (!confirm('TEM CERTEZA QUE DESEJA EXCLUIR O USUÁRIO "' + login + '"?')) return;
+    const textoOriginal = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; }
     try {
       const resp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
@@ -6134,7 +6157,10 @@ async function carregarUsuarios() {
       const json = await resp.json();
       if (json.ok) { showToast('USUÁRIO EXCLUÍDO COM SUCESSO!'); carregarUsuarios(); }
       else { throw new Error(json.erro || 'Erro ao excluir'); }
-    } catch(err) { showToast('ERRO AO EXCLUIR USUÁRIO: ' + err.message, 'error'); }
+    } catch(err) {
+      showToast('ERRO AO EXCLUIR USUÁRIO: ' + err.message, 'error');
+      if (btn) { btn.disabled = false; btn.innerHTML = textoOriginal; }
+    }
   }
 
   // ==================== RELATÓRIOS ====================
@@ -6759,6 +6785,9 @@ async function carregarUsuarios() {
       return;
     }
     const permissoes = cfgColetarPermissoes('cfg-permissoes-grid');
+    const btnCadastrar = document.getElementById('btn-cadastrar-usuario');
+    const textoOriginalCadastrar = btnCadastrar ? btnCadastrar.innerHTML : '';
+    if (btnCadastrar) { btnCadastrar.disabled = true; btnCadastrar.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Cadastrando...'; }
     try {
       const resp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
@@ -6784,6 +6813,8 @@ async function carregarUsuarios() {
       errorEl.innerText = 'Erro: ' + e.message;
       errorEl.style.display = 'block';
       setTimeout(() => errorEl.style.display = 'none', 4000);
+    } finally {
+      if (btnCadastrar) { btnCadastrar.disabled = false; btnCadastrar.innerHTML = textoOriginalCadastrar; }
     }
   }
 
@@ -6848,6 +6879,9 @@ async function carregarUsuarios() {
     const usuario = usuariosCadastrados[cfgEditandoIndex];
     if (!usuario) return;
     const permissoes = cfgColetarPermissoes('modal-permissoes-grid');
+    const btnSalvarPerm = document.getElementById('btn-salvar-permissoes');
+    const textoOriginalPerm = btnSalvarPerm ? btnSalvarPerm.innerHTML : '';
+    if (btnSalvarPerm) { btnSalvarPerm.disabled = true; btnSalvarPerm.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...'; }
     try {
       const resp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
@@ -6862,6 +6896,7 @@ async function carregarUsuarios() {
       } else { throw new Error(json.erro || 'Não foi possível salvar'); }
     } catch(e) {
       showToast('Erro ao salvar permissões: ' + e.message, 'error');
+      if (btnSalvarPerm) { btnSalvarPerm.disabled = false; btnSalvarPerm.innerHTML = textoOriginalPerm; }
     }
   }
 
@@ -8067,7 +8102,7 @@ async function carregarUsuarios() {
         </div>
         <div style="padding:16px 20px;border-top:1px solid #e2e8f0;display:flex;gap:10px;">
           <button onclick="bolFecharModalRecebimento()" class="bol-modal-btn neutral" style="flex:1;">Cancelar</button>
-          <button onclick="bolSalvarRecebimento('${id}')" class="bol-modal-btn primary" style="flex:2;">
+          <button id="bol-rec-btn-salvar" onclick="bolSalvarRecebimento('${id}')" class="bol-modal-btn primary" style="flex:2;">
             <i class="fa-solid fa-check"></i> Confirmar Recebimento
           </button>
         </div>
@@ -8097,6 +8132,10 @@ async function carregarUsuarios() {
 
     if (!conferenciaOK) { showToast('Marque que conferiu a mercadoria.'); return; }
     if (boletosChegaram && !entreguePara) { showToast('Informe para quem entregou os boletos.'); return; }
+
+    const btnRecebimento = document.getElementById('bol-rec-btn-salvar');
+    const textoOriginalRecebimento = btnRecebimento ? btnRecebimento.innerHTML : '';
+    if (btnRecebimento) { btnRecebimento.disabled = true; btnRecebimento.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...'; }
 
     try {
       const dados = {
@@ -8129,6 +8168,7 @@ async function carregarUsuarios() {
     } catch (err) {
       showToast('Erro: ' + (err.message || 'Falha ao salvar recebimento'));
       console.error(err);
+      if (btnRecebimento) { btnRecebimento.disabled = false; btnRecebimento.innerHTML = textoOriginalRecebimento; }
     }
   }
 
@@ -8508,7 +8548,7 @@ async function carregarUsuarios() {
         : '<span style="width:18px;display:inline-block;margin-right:10px;"></span>';
 
       const acaoPagar = p.status === 'ABERTO'
-        ? '<button onclick="bolDarBaixaUnica(' + p.linha + ')" class="bol-modal-btn success" style="padding:6px 12px;font-size:0.72rem;"><i class="fa-solid fa-check mr-1"></i> Dar Baixa</button>'
+        ? '<button onclick="bolDarBaixaUnica(' + p.linha + ', this)" class="bol-modal-btn success" style="padding:6px 12px;font-size:0.72rem;"><i class="fa-solid fa-check mr-1"></i> Dar Baixa</button>'
         : '';
       const infoPagamento = p.status === 'PAGO'
         ? '<div class="bol-card-info" style="margin-top:4px;"><i class="fa-solid fa-money-check mr-1"></i> Pago em ' + agendaEscapar(p.dataPagamento) + ' por <span class="bol-responsavel-badge">' + agendaEscapar(p.quemPagou) + '</span>' + (p.pagoAntecipado === 'SIM' ? ' <span style="color:#338b85;font-weight:700;">(antecipado)</span>' : '') + '</div>'
@@ -8543,22 +8583,32 @@ async function carregarUsuarios() {
     if (checks.length === 0) { showToast('Selecione ao menos um boleto.'); return; }
     if (!confirm('Confirma o pagamento de ' + checks.length + ' boleto(s)?')) return;
     const usuario = getUsuarioLogado()?.login || 'DESCONHECIDO';
-    for (const chk of checks) {
-      await bolEnviarBaixa(parseInt(chk.value), usuario, false);
+    const btnLote = document.getElementById('bol-venc-btn-baixa-lote');
+    const textoOriginalLote = btnLote ? btnLote.innerHTML : '';
+    if (btnLote) { btnLote.disabled = true; btnLote.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Dando baixa...'; }
+    try {
+      for (const chk of checks) {
+        await bolEnviarBaixa(parseInt(chk.value), usuario, false);
+      }
+      showToast('Baixa registrada em ' + checks.length + ' boleto(s)!');
+      bolCarregarVencimentos();
+    } finally {
+      if (btnLote) { btnLote.disabled = false; btnLote.innerHTML = textoOriginalLote; }
     }
-    showToast('Baixa registrada em ' + checks.length + ' boleto(s)!');
-    bolCarregarVencimentos();
   }
 
-  async function bolDarBaixaUnica(linha) {
+  async function bolDarBaixaUnica(linha, btn) {
     if (!confirm('Confirma o pagamento deste boleto?')) return;
     const usuario = getUsuarioLogado()?.login || 'DESCONHECIDO';
     const parcela = bolParcelasCache.find(p => p.linha === linha);
     const dataVenc = parcela ? bolParseDataBR(parcela.dataVencimento) : null;
     const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
     const antecipado = !!(dataVenc && dataVenc > hoje);
+    const textoOriginal = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; }
     const ok = await bolEnviarBaixa(linha, usuario, antecipado);
     if (ok) { showToast('Baixa registrada!'); bolCarregarVencimentos(); }
+    else if (btn) { btn.disabled = false; btn.innerHTML = textoOriginal; }
   }
 
   async function bolEnviarBaixa(linha, usuario, antecipado) {
@@ -8603,7 +8653,7 @@ async function carregarUsuarios() {
         </div>
         <div style="padding:16px 20px;border-top:1px solid #e2e8f0;display:flex;gap:10px;">
           <button onclick="bolFecharEditarVencimento()" class="bol-modal-btn neutral" style="flex:1;">Cancelar</button>
-          <button onclick="bolSalvarEditarVencimento(${linha})" class="bol-modal-btn success" style="flex:2;"><i class="fa-solid fa-check"></i> Salvar</button>
+          <button id="bol-edit-venc-btn-salvar" onclick="bolSalvarEditarVencimento(${linha})" class="bol-modal-btn success" style="flex:2;"><i class="fa-solid fa-check"></i> Salvar</button>
         </div>
       </div>
     `;
@@ -8620,6 +8670,9 @@ async function carregarUsuarios() {
     const valor = bolParseValor(document.getElementById('bol-edit-venc-valor').value);
     if (!vencISO) { showToast('Informe a data de vencimento.'); return; }
     const [y, m, d] = vencISO.split('-');
+    const btnEditVenc = document.getElementById('bol-edit-venc-btn-salvar');
+    const textoOriginalEditVenc = btnEditVenc ? btnEditVenc.innerHTML : '';
+    if (btnEditVenc) { btnEditVenc.disabled = true; btnEditVenc.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...'; }
     try {
       const resp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
@@ -8628,8 +8681,11 @@ async function carregarUsuarios() {
       });
       const json = await resp.json();
       if (json.ok) { showToast('Boleto atualizado!'); bolFecharEditarVencimento(); bolCarregarVencimentos(); }
-      else { showToast('Erro: ' + (json.erro || ''), 'error'); }
-    } catch(e) { showToast('Erro ao salvar.', 'error'); }
+      else { showToast('Erro: ' + (json.erro || ''), 'error'); if (btnEditVenc) { btnEditVenc.disabled = false; btnEditVenc.innerHTML = textoOriginalEditVenc; } }
+    } catch(e) {
+      showToast('Erro ao salvar.', 'error');
+      if (btnEditVenc) { btnEditVenc.disabled = false; btnEditVenc.innerHTML = textoOriginalEditVenc; }
+    }
   }
 
   // ==================== RELATÓRIO DE BOLETOS ====================
@@ -8750,6 +8806,12 @@ async function carregarUsuarios() {
   // ==================== DASHBOARD DE BOLETOS ====================
 
   async function bolCarregarDashboard() {
+    const btnAtualizar = document.getElementById('bol-dash-btn-atualizar');
+    if (btnAtualizar) { btnAtualizar.disabled = true; btnAtualizar.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Atualizando...'; }
+    ['bol-kpi-total','bol-kpi-abertos','bol-kpi-financeiro','bol-kpi-finalizados','bol-kpi-valor-aberto','bol-kpi-mes','bol-kpi-contas-abertas','bol-kpi-pagar-mes','bol-kpi-pagar-hoje'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size:1rem;"></i>';
+    });
     try {
       const [resPedidos, resParcelas] = await Promise.all([
         fetch(APPS_SCRIPT_URL + '?action=listarBoletos&token='         + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' }).then(r => r.json()),
@@ -8761,6 +8823,8 @@ async function carregarUsuarios() {
     } catch(err) {
       console.error('[CDA] Erro ao carregar dashboard de boletos:', err);
       showToast('Erro ao carregar o dashboard de boletos.', 'error');
+    } finally {
+      if (btnAtualizar) { btnAtualizar.disabled = false; btnAtualizar.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Atualizar'; }
     }
   }
 
@@ -9115,7 +9179,7 @@ async function carregarUsuarios() {
                     <button class="modal-rec-btn primary" onclick="recCompartilharComunicado()" style="width:100%; margin-top:8px; background:linear-gradient(135deg,#25D366,#128C7E);">
                         <i class="fa-brands fa-whatsapp mr-1"></i> Compartilhar Comunicado
                     </button>
-                    <button class="modal-rec-btn primary" onclick="salvarComunicacaoRecoleta()" style="width:100%; margin-top:8px;">
+                    <button id="btn-salvar-comunicacao-recoleta" class="modal-rec-btn primary" onclick="salvarComunicacaoRecoleta()" style="width:100%; margin-top:8px;">
                         <i class="fa-solid fa-save mr-1"></i> Salvar Comunicação
                     </button>
                 </div>
@@ -9225,7 +9289,7 @@ async function carregarUsuarios() {
                 <div style="margin-top:12px;">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Novo registro de contato</label>
                     <input type="text" id="reck-input-resultado" placeholder="Ex: Ligou e não atendeu, WhatsApp enviado, Recoleta agendada..." class="modal-rec-field">
-                    <button class="modal-rec-btn primary" onclick="reckRegistrarContato()" style="width:100%;margin-top:8px;">
+                    <button id="btn-reck-registrar-contato" class="modal-rec-btn primary" onclick="reckRegistrarContato()" style="width:100%;margin-top:8px;">
                         <i class="fa-solid fa-plus mr-1"></i> Registrar contato
                     </button>
                 </div>
