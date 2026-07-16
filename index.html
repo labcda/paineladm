@@ -2331,12 +2331,18 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                         <i class="fa-solid fa-building mr-1"></i> Fornecedor
                     </label>
                     <input type="text" id="bol-venc-filtro-fornecedor" placeholder="Filtrar por fornecedor..." class="bol-form-field" oninput="bolRenderVencimentos()">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-barcode mr-1"></i> Nº do Boleto
+                    </label>
+                    <input type="text" id="bol-venc-filtro-numero" placeholder="Buscar pelo número do boleto..." class="bol-form-field" oninput="bolRenderVencimentos()">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
@@ -2366,10 +2372,14 @@
               <div class="fin-card-title"><i class="fa-solid fa-chart-pie mr-1" style="color:#338b85;"></i> Relatório de Boletos</div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Fornecedor</label>
                     <input type="text" id="bol-rel-filtro-fornecedor" class="bol-form-field" placeholder="Todos">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nº do Boleto</label>
+                    <input type="text" id="bol-rel-filtro-numero" class="bol-form-field" placeholder="Buscar pelo número...">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Vencimento de</label>
@@ -8263,14 +8273,21 @@ async function carregarUsuarios() {
     if (!container) return;
     let html = '';
     for (let i = 1; i <= n; i++) {
-      html += '<div class="grid grid-cols-2 gap-3 mb-2">' +
-        '<div>' +
-          '<label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Parcela ' + i + '/' + n + ' — Vencimento</label>' +
-          '<input type="date" class="bol-form-field bol-fin-parcela-venc" data-numero="' + i + '">' +
-        '</div>' +
-        '<div>' +
-          '<label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Valor (R$)</label>' +
-          '<input type="text" class="bol-form-field bol-fin-parcela-valor" data-numero="' + i + '" value="R$ ' + valorParcela.toFixed(2).replace('.', ',') + '" oninput="bolFormatarValorSimples(this)">' +
+      html += '<div style="border-bottom:1px solid #e2e8f0;padding-bottom:10px;margin-bottom:10px;">' +
+        '<label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Parcela ' + i + '/' + n + '</label>' +
+        '<div class="grid grid-cols-3 gap-3">' +
+          '<div>' +
+            '<label class="block text-xs text-slate-400 mb-1">Vencimento</label>' +
+            '<input type="date" class="bol-form-field bol-fin-parcela-venc" data-numero="' + i + '">' +
+          '</div>' +
+          '<div>' +
+            '<label class="block text-xs text-slate-400 mb-1">Valor (R$)</label>' +
+            '<input type="text" class="bol-form-field bol-fin-parcela-valor" data-numero="' + i + '" value="R$ ' + valorParcela.toFixed(2).replace('.', ',') + '" oninput="bolFormatarValorSimples(this)">' +
+          '</div>' +
+          '<div>' +
+            '<label class="block text-xs text-slate-400 mb-1">Nº do Boleto</label>' +
+            '<input type="text" class="bol-form-field bol-fin-parcela-numero" data-numero="' + i + '" placeholder="Ex: 34191...">' +
+          '</div>' +
         '</div>' +
       '</div>';
     }
@@ -8298,12 +8315,13 @@ async function carregarUsuarios() {
     vencEls.forEach(el => {
       const numero = el.getAttribute('data-numero');
       const valorEl = document.querySelector('.bol-fin-parcela-valor[data-numero="' + numero + '"]');
+      const numeroBoletoEl = document.querySelector('.bol-fin-parcela-numero[data-numero="' + numero + '"]');
       const valor = bolParseValor(valorEl ? valorEl.value : '0');
       const vencISO = el.value;
       if (!vencISO) todasPreenchidas = false;
       let dataVencimento = '';
       if (vencISO) { const [y, m, d] = vencISO.split('-'); dataVencimento = d + '/' + m + '/' + y; }
-      parcelas.push({ numero: numero, valor: valor, dataVencimento: dataVencimento });
+      parcelas.push({ numero: numero, valor: valor, dataVencimento: dataVencimento, numeroBoleto: numeroBoletoEl ? numeroBoletoEl.value.trim() : '' });
     });
     if (!todasPreenchidas) { showToast('Preencha o vencimento de todos os boletos.'); return; }
 
@@ -8516,12 +8534,14 @@ async function carregarUsuarios() {
     const container = document.getElementById('bol-venc-lista');
     if (!container) return;
     const filtroFornecedor = (document.getElementById('bol-venc-filtro-fornecedor').value || '').toUpperCase().trim();
+    const filtroNumero = (document.getElementById('bol-venc-filtro-numero').value || '').toUpperCase().trim();
     const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
     const hojeStr = bolHojeDDMMYYYY();
 
     let itens = bolParcelasCache.filter(p => {
       if (bolVencFiltroStatusAtual !== 'TODOS' && p.status !== bolVencFiltroStatusAtual) return false;
       if (filtroFornecedor && p.fornecedor.toUpperCase().indexOf(filtroFornecedor) < 0) return false;
+      if (filtroNumero && (p.numeroBoleto || '').toUpperCase().indexOf(filtroNumero) < 0) return false;
       return true;
     });
     itens.sort((a, b) => {
@@ -8568,6 +8588,7 @@ async function carregarUsuarios() {
             '<span class="bol-card-valor">R$ ' + parseFloat(p.valor).toFixed(2).replace('.', ',') + '</span>' +
             '<span class="text-xs text-slate-400"><i class="fa-regular fa-calendar mr-1"></i>Vence: ' + agendaEscapar(p.dataVencimento || '-') + '</span>' +
           '</div>' +
+          (p.numeroBoleto ? '<div class="text-xs text-slate-400" style="margin-top:2px;"><i class="fa-solid fa-barcode mr-1"></i>Nº: ' + agendaEscapar(p.numeroBoleto) + '</div>' : '') +
           infoPagamento +
         '</div>' +
         '<div style="display:flex;gap:6px;flex-shrink:0;">' +
@@ -8650,6 +8671,10 @@ async function carregarUsuarios() {
             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Valor (R$)</label>
             <input type="text" id="bol-edit-venc-valor" class="bol-form-field" value="R$ ${parseFloat(parcela.valor).toFixed(2).replace('.', ',')}" oninput="bolFormatarValorSimples(this)">
           </div>
+          <div class="mb-3">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nº do Boleto</label>
+            <input type="text" id="bol-edit-venc-numero" class="bol-form-field" value="${agendaEscapar(parcela.numeroBoleto || '')}" placeholder="Ex: 34191...">
+          </div>
         </div>
         <div style="padding:16px 20px;border-top:1px solid #e2e8f0;display:flex;gap:10px;">
           <button onclick="bolFecharEditarVencimento()" class="bol-modal-btn neutral" style="flex:1;">Cancelar</button>
@@ -8668,6 +8693,7 @@ async function carregarUsuarios() {
   async function bolSalvarEditarVencimento(linha) {
     const vencISO = document.getElementById('bol-edit-venc-data').value;
     const valor = bolParseValor(document.getElementById('bol-edit-venc-valor').value);
+    const numeroBoleto = (document.getElementById('bol-edit-venc-numero').value || '').trim();
     if (!vencISO) { showToast('Informe a data de vencimento.'); return; }
     const [y, m, d] = vencISO.split('-');
     const btnEditVenc = document.getElementById('bol-edit-venc-btn-salvar');
@@ -8677,7 +8703,7 @@ async function carregarUsuarios() {
       const resp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ action: 'atualizarVencimentoParcela', token: CDA_TOKEN, linha: linha, dataVencimento: d + '/' + m + '/' + y, valor: valor })
+        body: JSON.stringify({ action: 'atualizarVencimentoParcela', token: CDA_TOKEN, linha: linha, dataVencimento: d + '/' + m + '/' + y, valor: valor, numeroBoleto: numeroBoleto })
       });
       const json = await resp.json();
       if (json.ok) { showToast('Boleto atualizado!'); bolFecharEditarVencimento(); bolCarregarVencimentos(); }
@@ -8692,6 +8718,7 @@ async function carregarUsuarios() {
 
   async function bolGerarRelatorio() {
     const fornecedor = (document.getElementById('bol-rel-filtro-fornecedor').value || '').toUpperCase().trim();
+    const numeroBoleto = (document.getElementById('bol-rel-filtro-numero').value || '').toUpperCase().trim();
     const deISO  = document.getElementById('bol-rel-filtro-de').value;
     const ateISO = document.getElementById('bol-rel-filtro-ate').value;
     const resumo = document.getElementById('bol-rel-resumo');
@@ -8713,6 +8740,7 @@ async function carregarUsuarios() {
 
       let itens = json.parcelas.filter(p => {
         if (fornecedor && p.fornecedor.toUpperCase().indexOf(fornecedor) < 0) return false;
+        if (numeroBoleto && (p.numeroBoleto || '').toUpperCase().indexOf(numeroBoleto) < 0) return false;
         const dVenc = bolParseDataBR(p.dataVencimento);
         if (deData  && (!dVenc || dVenc < deData))  return false;
         if (ateData && (!dVenc || dVenc > ateData))  return false;
@@ -8720,7 +8748,7 @@ async function carregarUsuarios() {
       });
 
       if (itens.length === 0) {
-        lista.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-solid fa-circle-xmark text-slate-300 text-3xl mb-3"></i><p class="text-sm text-slate-400">Nenhum boleto encontrado no período.</p></div>';
+        lista.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-solid fa-circle-xmark text-slate-300 text-3xl mb-3"></i><p class="text-sm text-slate-400">Nenhum boleto encontrado.</p></div>';
         return;
       }
 
@@ -8793,6 +8821,7 @@ async function carregarUsuarios() {
             '<span class="bol-card-valor">R$ ' + parseFloat(p.valor).toFixed(2).replace('.', ',') + '</span>' +
             '<span class="text-xs text-slate-400">Vencimento: ' + agendaEscapar(p.dataVencimento || '-') + '</span>' +
           '</div>' +
+          (p.numeroBoleto ? '<div class="text-xs text-slate-400" style="margin-bottom:6px;"><i class="fa-solid fa-barcode mr-1"></i>Nº do Boleto: ' + agendaEscapar(p.numeroBoleto) + '</div>' : '') +
           (p.status === 'PAGO' ? '<div class="bol-card-info"><i class="fa-solid fa-money-check mr-1"></i> Pago em ' + agendaEscapar(p.dataPagamento) + ' por <span class="bol-responsavel-badge">' + agendaEscapar(p.quemPagou) + '</span></div>' : '') +
           '<div class="bol-card-info"><i class="fa-solid fa-user mr-1"></i> Boleto cadastrado por <span class="bol-responsavel-badge">' + agendaEscapar(p.quemCadastrou) + '</span></div>' +
         '</div>';
