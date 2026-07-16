@@ -8206,7 +8206,7 @@ async function carregarUsuarios() {
         </div>
         <div style="padding:16px 20px;border-top:1px solid #e2e8f0;display:flex;gap:10px;">
           <button onclick="bolFecharModalFinanceiro()" class="bol-modal-btn neutral" style="flex:1;">Cancelar</button>
-          <button onclick="bolSalvarFinanceiro('${id}')" class="bol-modal-btn success" style="flex:2;">
+          <button id="bol-fin-btn-salvar" onclick="bolSalvarFinanceiro('${id}')" class="bol-modal-btn success" style="flex:2;">
             <i class="fa-solid fa-check-double"></i> Finalizar Conferência
           </button>
         </div>
@@ -8243,6 +8243,9 @@ async function carregarUsuarios() {
   }
 
   async function bolSalvarFinanceiro(id) {
+    const btnSalvar = document.getElementById('bol-fin-btn-salvar');
+    if (btnSalvar && btnSalvar.disabled) return; // já está enviando — evita duplo clique gerar 2x as parcelas
+
     const recebi = document.getElementById('bol-fin-recebi').checked;
     const conferi = document.getElementById('bol-fin-conferi').checked;
 
@@ -8263,6 +8266,8 @@ async function carregarUsuarios() {
       parcelas.push({ numero: numero, valor: valor, dataVencimento: dataVencimento });
     });
     if (!todasPreenchidas) { showToast('Preencha o vencimento de todos os boletos.'); return; }
+
+    if (btnSalvar) { btnSalvar.disabled = true; btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...'; }
 
     try {
       const dados = {
@@ -8295,6 +8300,7 @@ async function carregarUsuarios() {
     } catch (err) {
       showToast('Erro: ' + (err.message || 'Falha ao salvar conferência'));
       console.error(err);
+      if (btnSalvar) { btnSalvar.disabled = false; btnSalvar.innerHTML = '<i class="fa-solid fa-check-double"></i> Finalizar Conferência'; }
     }
   }
 
