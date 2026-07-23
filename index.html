@@ -1217,6 +1217,12 @@
               <div class="fin-mini-value" id="stat-app-agendamentos"><i class="fa-solid fa-spinner dash-spin" style="font-size:1rem;color:var(--fin-primary);"></i></div>
               <div class="fin-mini-sub" id="stat-mes-app-agendamentos">carregando...</div>
             </div>
+            <div class="fin-mini-card" style="cursor:pointer;" onclick="carregarEstatisticas()" title="Clique para atualizar">
+              <div class="fin-mini-icon"><i class="fa-solid fa-star"></i></div>
+              <div class="fin-mini-label">NPS (satisfação App)</div>
+              <div class="fin-mini-value" id="stat-nps"><i class="fa-solid fa-spinner dash-spin" style="font-size:1rem;color:var(--fin-primary);"></i></div>
+              <div class="fin-mini-sub" id="stat-nps-sub">carregando...</div>
+            </div>
           </div>
         </div>
 
@@ -3019,6 +3025,21 @@
     let totalAppAgen = 0;
     if (resAppAgen.status === 'fulfilled' && resAppAgen.value.ok) totalAppAgen = resAppAgen.value.total || 0;
     setTexto('stat-app-agendamentos', totalAppAgen);
+
+    // NPS (pesquisa de satisfação enviada pelo App do Paciente)
+    fetch(APPS_SCRIPT_URL + '?action=resumoNPS&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' })
+      .then(r => r.json())
+      .then(json => {
+        const sub = document.getElementById('stat-nps-sub');
+        if (json.ok && json.total > 0) {
+          setTexto('stat-nps', json.nps);
+          if (sub) sub.innerText = json.total + ' resposta(s) · média ' + json.media;
+        } else {
+          setTexto('stat-nps', '—');
+          if (sub) sub.innerText = 'sem respostas ainda';
+        }
+      })
+      .catch(() => { setTexto('stat-nps', '—'); const sub = document.getElementById('stat-nps-sub'); if (sub) sub.innerText = 'indisponível'; });
 
     // Atividades recentes
     carregarAtividadesRecentes();
