@@ -1217,13 +1217,51 @@
               <div class="fin-mini-value" id="stat-app-agendamentos"><i class="fa-solid fa-spinner dash-spin" style="font-size:1rem;color:var(--fin-primary);"></i></div>
               <div class="fin-mini-sub" id="stat-mes-app-agendamentos">carregando...</div>
             </div>
-            <div class="fin-mini-card" style="cursor:pointer;" onclick="carregarEstatisticas()" title="Clique para atualizar">
+            <div class="fin-mini-card" style="cursor:pointer;" onclick="abrirModalNPS()" title="Clique para ver as avaliações e comentários">
               <div class="fin-mini-icon"><i class="fa-solid fa-star"></i></div>
               <div class="fin-mini-label">NPS (satisfação App)</div>
               <div class="fin-mini-value" id="stat-nps"><i class="fa-solid fa-spinner dash-spin" style="font-size:1rem;color:var(--fin-primary);"></i></div>
               <div class="fin-mini-sub" id="stat-nps-sub">carregando...</div>
             </div>
           </div>
+        </div>
+
+        <div class="fin-card">
+          <div class="fin-card-head">
+            <div class="fin-card-title">Satisfação dos Pacientes (NPS)</div>
+            <span class="fin-card-select" style="cursor:pointer;" onclick="abrirModalNPS()">Ver comentários <i class="fa-solid fa-chevron-right" style="font-size:0.65rem;margin-left:3px;"></i></span>
+          </div>
+          <div class="fin-mini-grid" style="margin-bottom:20px;">
+            <div class="fin-mini-card">
+              <div class="fin-mini-icon" style="background:rgba(22,163,74,0.12);color:#16a34a;"><i class="fa-solid fa-face-smile"></i></div>
+              <div class="fin-mini-label">Promotores (9-10)</div>
+              <div class="fin-mini-value" id="nps-kpi-promotores">—</div>
+              <div class="fin-mini-sub" id="nps-kpi-promotores-sub">—</div>
+            </div>
+            <div class="fin-mini-card">
+              <div class="fin-mini-icon" style="background:rgba(217,119,6,0.12);color:#d97706;"><i class="fa-solid fa-face-meh"></i></div>
+              <div class="fin-mini-label">Neutros (7-8)</div>
+              <div class="fin-mini-value" id="nps-kpi-neutros">—</div>
+              <div class="fin-mini-sub" id="nps-kpi-neutros-sub">—</div>
+            </div>
+            <div class="fin-mini-card">
+              <div class="fin-mini-icon" style="background:rgba(239,68,68,0.12);color:#ef4444;"><i class="fa-solid fa-face-frown"></i></div>
+              <div class="fin-mini-label">Detratores (0-6)</div>
+              <div class="fin-mini-value" id="nps-kpi-detratores">—</div>
+              <div class="fin-mini-sub" id="nps-kpi-detratores-sub">—</div>
+            </div>
+          </div>
+          <div class="home-charts-grid">
+            <div>
+              <p style="font-size:0.78rem;font-weight:700;color:var(--fin-text-muted);margin-bottom:8px;">Evolução do NPS — últimos 6 meses</p>
+              <div class="home-chart-wrap" style="height:180px;"><canvas id="nps-chart-tendencia"></canvas></div>
+            </div>
+            <div>
+              <p style="font-size:0.78rem;font-weight:700;color:var(--fin-text-muted);margin-bottom:8px;">Distribuição das notas (0 a 10)</p>
+              <div class="home-chart-wrap" style="height:180px;"><canvas id="nps-chart-distribuicao"></canvas></div>
+            </div>
+          </div>
+          <div id="nps-dash-vazio" class="hidden" style="text-align:center;padding:20px 0;color:var(--fin-text-muted);font-size:0.85rem;">Nenhuma avaliação recebida ainda.</div>
         </div>
 
         <div class="fin-card">
@@ -1905,6 +1943,7 @@
                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
                     <button type="button" class="rel-filtro-chip ativo" id="rel-chip-fonte-painel" onclick="relFiltroFonte('painel')"><i class="fa-solid fa-desktop mr-1"></i>Painel ADM</button>
                     <button type="button" class="rel-filtro-chip" id="rel-chip-fonte-app" onclick="relFiltroFonte('app')" style="border-color:#6366f1;"><i class="fa-solid fa-mobile-screen-button mr-1"></i>App do Paciente</button>
+                    <button type="button" class="rel-filtro-chip" id="rel-chip-fonte-ambos" onclick="relFiltroFonte('ambos')" style="border-color:#f59e0b;"><i class="fa-solid fa-layer-group mr-1"></i>Ambos (Painel + App)</button>
                 </div>
             </div>
             <div style="display:flex;gap:8px;margin-top:14px;">
@@ -2711,6 +2750,27 @@
     </div>
 </div>
 
+<!-- MODAL NPS: AVALIAÇÕES E COMENTÁRIOS DO APP -->
+<div id="modal-nps-detalhes" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 89, 84, 0.85); z-index: 99998; display: none; justify-content: center; align-items: center; backdrop-filter: blur(8px);" onclick="if(event.target===this)fecharModalNPS()">
+    <div style="background: #ecf0f3; border-radius: 24px; padding: 32px; width: 480px; max-width: 92vw; max-height: 82vh; display: flex; flex-direction: column; box-shadow: 10px 10px 30px rgba(0,0,0,0.3);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-shrink:0;">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width: 42px; height: 42px; background: linear-gradient(135deg, #005954 0%, #5dc1b9 60%, #338b85 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-star" style="color: white; font-size: 16px;"></i>
+                </div>
+                <div>
+                    <h2 style="font-family: 'Montserrat', sans-serif; font-size: 17px; font-weight: 700; color: #181818;">Avaliações do App (NPS)</h2>
+                    <p id="modal-nps-resumo" style="font-size:11px;color:#a0a5a8;">Carregando...</p>
+                </div>
+            </div>
+            <button onclick="fecharModalNPS()" style="background:none;border:none;font-size:1.2rem;color:#64748B;cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="modal-nps-lista" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px;">
+            <p style="font-size:13px;color:#a0a5a8;text-align:center;padding:20px 0;"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Carregando avaliações...</p>
+        </div>
+    </div>
+</div>
+
 <script>
 
   // ==================== LOGO CDA (base64) ====================
@@ -3040,6 +3100,7 @@
         }
       })
       .catch(() => { setTexto('stat-nps', '—'); const sub = document.getElementById('stat-nps-sub'); if (sub) sub.innerText = 'indisponível'; });
+    carregarSecaoNPS();
 
     // Atividades recentes
     carregarAtividadesRecentes();
@@ -3049,6 +3110,180 @@
     carregarGraficoAgendamentos7Dias();
     carregarComparativoPainelApp();
     carregarNotificacoesApp();
+  }
+
+  // ==================== SEÇÃO NPS DO DASHBOARD (KPIs + GRÁFICOS) ====================
+  let _npsChartTendencia = null;
+  let _npsChartDistribuicao = null;
+
+  async function carregarSecaoNPS() {
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL + '?action=listarNPS&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' });
+      const json = await resp.json();
+      if (!json.ok || !Array.isArray(json.avaliacoes)) throw new Error(json.erro || 'Erro');
+      renderSecaoNPS(json.avaliacoes);
+    } catch(e) {
+      console.warn('[CDA] Erro ao carregar seção NPS:', e);
+      renderSecaoNPS([]);
+    }
+  }
+
+  function renderSecaoNPS(avaliacoes) {
+    const setTexto = (id, valor) => { const el = document.getElementById(id); if (el) el.innerText = valor; };
+    const vazio = document.getElementById('nps-dash-vazio');
+    const total = avaliacoes.length;
+    if (vazio) vazio.style.display = total === 0 ? 'block' : 'none';
+
+    let promotores = 0, neutros = 0, detratores = 0;
+    const distribuicao = new Array(11).fill(0); // notas 0-10
+    avaliacoes.forEach(a => {
+      const n = Number(a.nota);
+      if (isNaN(n)) return;
+      if (n >= 9) promotores++;
+      else if (n >= 7) neutros++;
+      else detratores++;
+      if (n >= 0 && n <= 10) distribuicao[n]++;
+    });
+    const pct = (v) => total ? Math.round((v / total) * 100) + '% do total' : '—';
+    setTexto('nps-kpi-promotores', promotores);
+    setTexto('nps-kpi-promotores-sub', pct(promotores));
+    setTexto('nps-kpi-neutros', neutros);
+    setTexto('nps-kpi-neutros-sub', pct(neutros));
+    setTexto('nps-kpi-detratores', detratores);
+    setTexto('nps-kpi-detratores-sub', pct(detratores));
+
+    // Tendência mensal (últimos 6 meses) — DATA vem como "DD/MM/YYYY"
+    const nomesMes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    const hoje = new Date();
+    const meses = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+      meses.push({ mes: d.getMonth(), ano: d.getFullYear(), label: nomesMes[d.getMonth()] + '/' + String(d.getFullYear()).slice(2) });
+    }
+    const somaPorMes = meses.map(() => ({ soma: 0, qtd: 0 }));
+    avaliacoes.forEach(a => {
+      const p = (a.data || '').split('/');
+      if (p.length !== 3) return;
+      const mes = parseInt(p[1], 10) - 1, ano = parseInt(p[2], 10);
+      const idx = meses.findIndex(m => m.mes === mes && m.ano === ano);
+      if (idx === -1) return;
+      const n = Number(a.nota);
+      if (isNaN(n)) return;
+      somaPorMes[idx].soma += n;
+      somaPorMes[idx].qtd++;
+    });
+    const mediasPorMes = somaPorMes.map(s => s.qtd ? Math.round((s.soma / s.qtd) * 10) / 10 : null);
+
+    desenharGraficoNPSTendencia(meses.map(m => m.label), mediasPorMes);
+    desenharGraficoNPSDistribuicao(distribuicao);
+  }
+
+  function desenharGraficoNPSTendencia(labels, valores) {
+    const ctx = document.getElementById('nps-chart-tendencia');
+    if (!ctx || typeof Chart === 'undefined') return;
+    if (_npsChartTendencia) _npsChartTendencia.destroy();
+    const corPrimaria = finVar('--fin-primary', '#338b85');
+    const corMuted = finVar('--fin-text-muted', '#667085');
+    const corGrid = finVar('--fin-border', 'rgba(148,163,184,0.15)');
+    _npsChartTendencia = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Nota média',
+          data: valores,
+          spanGaps: true,
+          borderColor: corPrimaria,
+          backgroundColor: (context) => {
+            const { ctx: c, chartArea } = context.chart;
+            if (!chartArea) return corPrimaria + '22';
+            const gradient = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            gradient.addColorStop(0, corPrimaria + '33');
+            gradient.addColorStop(1, corPrimaria + '00');
+            return gradient;
+          },
+          fill: true, tension: 0.35, pointRadius: 4, pointBackgroundColor: corPrimaria, pointBorderColor: '#fff', pointBorderWidth: 2, borderWidth: 2.5
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: (c) => c.parsed.y !== null ? 'Nota média: ' + c.parsed.y : 'Sem respostas' } }
+        },
+        scales: {
+          y: { min: 0, max: 10, ticks: { stepSize: 2, color: corMuted }, grid: { color: corGrid } },
+          x: { ticks: { color: corMuted, font: { weight: 600 } }, grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  function desenharGraficoNPSDistribuicao(distribuicao) {
+    const ctx = document.getElementById('nps-chart-distribuicao');
+    if (!ctx || typeof Chart === 'undefined') return;
+    if (_npsChartDistribuicao) _npsChartDistribuicao.destroy();
+    const corMuted = finVar('--fin-text-muted', '#667085');
+    const corGrid = finVar('--fin-border', 'rgba(148,163,184,0.15)');
+    const cores = distribuicao.map((_, n) => n >= 9 ? '#16a34a' : (n >= 7 ? '#d97706' : '#ef4444'));
+    _npsChartDistribuicao = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: distribuicao.map((_, i) => String(i)),
+        datasets: [{ data: distribuicao, backgroundColor: cores, borderRadius: 6, maxBarThickness: 22 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: (c) => c.parsed.y + ' resposta(s)' } }
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { precision: 0, color: corMuted }, grid: { color: corGrid } },
+          x: { ticks: { color: corMuted, font: { weight: 600 } }, grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  function abrirModalNPS() {
+    const modal = document.getElementById('modal-nps-detalhes');
+    modal.style.display = 'flex';
+    carregarListaNPS();
+  }
+
+  function fecharModalNPS() {
+    document.getElementById('modal-nps-detalhes').style.display = 'none';
+  }
+
+  async function carregarListaNPS() {
+    const lista = document.getElementById('modal-nps-lista');
+    const resumo = document.getElementById('modal-nps-resumo');
+    lista.innerHTML = '<p style="font-size:13px;color:#a0a5a8;text-align:center;padding:20px 0;"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Carregando avaliações...</p>';
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL + '?action=listarNPS&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' });
+      const json = await resp.json();
+      if (!json.ok || !Array.isArray(json.avaliacoes)) throw new Error(json.erro || 'Erro ao carregar');
+      if (resumo) resumo.innerText = json.avaliacoes.length + ' avaliação(ões) — mais recentes primeiro';
+      if (json.avaliacoes.length === 0) {
+        lista.innerHTML = '<p style="font-size:13px;color:#a0a5a8;text-align:center;padding:20px 0;">Nenhuma avaliação recebida ainda.</p>';
+        return;
+      }
+      lista.innerHTML = json.avaliacoes.map(a => {
+        const nota = Number(a.nota);
+        const cor = nota >= 9 ? '#16a34a' : (nota >= 7 ? '#d97706' : '#ef4444');
+        return '<div style="background:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">' +
+            '<span style="font-weight:800;color:#181818;font-size:13px;">' + agendaEscapar(a.paciente || 'PACIENTE') + '</span>' +
+            '<span style="font-weight:800;color:' + cor + ';font-size:14px;">' + nota + '/10</span>' +
+          '</div>' +
+          (a.comentario ? '<p style="font-size:12px;color:#475569;margin-bottom:4px;">"' + agendaEscapar(a.comentario) + '"</p>' : '') +
+          '<span style="font-size:10px;color:#94a3b8;">' + agendaEscapar(a.data || '') + ' às ' + agendaEscapar(a.hora || '') + '</span>' +
+        '</div>';
+      }).join('');
+    } catch(err) {
+      lista.innerHTML = '<p style="font-size:13px;color:#a0a5a8;text-align:center;padding:20px 0;">Erro ao carregar avaliações. Tente novamente.</p>';
+    }
   }
 
   // ==================== HOME: PACIENTES DO DIA + GRÁFICOS ====================
@@ -6487,7 +6722,7 @@ async function carregarUsuarios() {
 
   function relFiltroFonte(fonte) {
     relFonteAtual = fonte;
-    ['painel','app'].forEach(f => {
+    ['painel','app','ambos'].forEach(f => {
       const el = document.getElementById('rel-chip-fonte-' + f);
       if (el) el.classList.toggle('ativo', f === fonte);
     });
@@ -6502,72 +6737,89 @@ async function carregarUsuarios() {
     const btnExport = document.getElementById('rel-btn-exportar');
     const resumoSec = document.getElementById('rel-resumo-section');
 
-    const isApp = relFonteAtual === 'app';
-    const actionOrc  = isApp ? 'listarAppOrcamentos'  : 'listarOrcamentos';
-    const actionAgen = isApp ? 'listarAppRegistroAgen' : 'listarRegistroAgen';
+    // "Ambos" busca as duas fontes e junta tudo num único relatório —
+    // é o que permite incluir orçamentos/agendamentos feitos no App junto
+    // com os do Painel na mesma exportação/relatório.
+    const fontesParaBuscar = relFonteAtual === 'ambos' ? ['painel', 'app'] : [relFonteAtual];
+    const labelFonte = { painel: 'Painel ADM', app: 'App do Paciente' };
 
-    container.innerHTML = '<div class="flex items-center gap-3 py-6 justify-center"><i class="fa-solid fa-spinner fa-spin text-cda-primary text-xl"></i><p class="text-sm text-slate-400">Consultando ' + (isApp ? 'App do Paciente' : 'Painel ADM') + '...</p></div>';
+    container.innerHTML = '<div class="flex items-center gap-3 py-6 justify-center"><i class="fa-solid fa-spinner fa-spin text-cda-primary text-xl"></i><p class="text-sm text-slate-400">Consultando ' + fontesParaBuscar.map(f => labelFonte[f]).join(' e ') + '...</p></div>';
     if (btnExport) btnExport.style.display = 'none';
 
     const resultados = [];
 
-    // Buscar Orçamentos
-    if (relTipoAtual === 'todos' || relTipoAtual === 'orc') {
-      try {
-        let mesAno = '';
-        if (mes) { const [y,m] = mes.split('-'); mesAno = m + '/' + y; }
-        const url = APPS_SCRIPT_URL + '?action=' + actionOrc + '&token=' + encodeURIComponent(CDA_TOKEN)
-          + (paciente ? '&paciente=' + encodeURIComponent(paciente) : '')
-          + (usuario  ? '&usuario='  + encodeURIComponent(usuario)  : '')
-          + (mesAno   ? '&mesAno='   + encodeURIComponent(mesAno)   : '');
-        const resp = await fetch(url, { redirect: 'follow' });
-        const json = await resp.json();
-        if (json.ok && Array.isArray(json.orcamentos)) {
-          json.orcamentos.forEach(o => resultados.push({
-            tipo: 'orc', fonte: isApp ? 'APP' : 'PAINEL',
-            data: o.data || '', hora: o.hora || '',
-            paciente: o.paciente || '',
-            usuario: o.usuario || 'DESCONHECIDO',
-            detalhe: o.exames || '',
-            totalBruto: parseFloat(o.totalBruto) || 0,
-            totalPix: parseFloat(o.totalPix) || 0,
-            acao: (o.acao || 'BAIXADO').toUpperCase()
-          }));
-        }
-      } catch(e) { console.warn('Orçamentos:', e.message); }
+    for (const fonteAtual of fontesParaBuscar) {
+      const isApp = fonteAtual === 'app';
+      const actionOrc  = isApp ? 'listarAppOrcamentos'  : 'listarOrcamentos';
+      const actionAgen = isApp ? 'listarAppRegistroAgen' : 'listarRegistroAgen';
+
+      // Buscar Orçamentos
+      if (relTipoAtual === 'todos' || relTipoAtual === 'orc') {
+        try {
+          let mesAno = '';
+          if (mes) { const [y,m] = mes.split('-'); mesAno = m + '/' + y; }
+          const url = APPS_SCRIPT_URL + '?action=' + actionOrc + '&token=' + encodeURIComponent(CDA_TOKEN)
+            + (paciente ? '&paciente=' + encodeURIComponent(paciente) : '')
+            + (usuario  ? '&usuario='  + encodeURIComponent(usuario)  : '')
+            + (mesAno   ? '&mesAno='   + encodeURIComponent(mesAno)   : '');
+          const resp = await fetch(url, { redirect: 'follow' });
+          const json = await resp.json();
+          if (json.ok && Array.isArray(json.orcamentos)) {
+            json.orcamentos.forEach(o => resultados.push({
+              tipo: 'orc', fonte: isApp ? 'APP' : 'PAINEL',
+              data: o.data || '', hora: o.hora || '',
+              paciente: o.paciente || '',
+              usuario: o.usuario || 'DESCONHECIDO',
+              detalhe: o.exames || '',
+              totalBruto: parseFloat(o.totalBruto) || 0,
+              totalPix: parseFloat(o.totalPix) || 0,
+              acao: (o.acao || 'BAIXADO').toUpperCase()
+            }));
+          }
+        } catch(e) { console.warn('Orçamentos (' + fonteAtual + '):', e.message); }
+      }
+
+      // Buscar Agendamentos
+      if (relTipoAtual === 'todos' || relTipoAtual === 'agen') {
+        try {
+          let mesAnoAgen = '';
+          if (mes) { const [y,m2] = mes.split('-'); mesAnoAgen = m2 + '/' + y; }
+          const url = APPS_SCRIPT_URL + '?action=' + actionAgen + '&token=' + encodeURIComponent(CDA_TOKEN)
+            + (paciente   ? '&paciente=' + encodeURIComponent(paciente)   : '')
+            + (usuario    ? '&usuario='  + encodeURIComponent(usuario)    : '')
+            + (mesAnoAgen ? '&mesAno='   + encodeURIComponent(mesAnoAgen) : '');
+          const resp = await fetch(url, { redirect: 'follow' });
+          const json = await resp.json();
+          if (json.ok && Array.isArray(json.agendamentos)) {
+            json.agendamentos.forEach(a => resultados.push({
+              tipo:       'agen',
+              data:       a.data      || '',
+              hora:       a.hora      || '',
+              paciente:   a.paciente  || '',
+              usuario:    a.usuario   || 'DESCONHECIDO',
+              detalhe:    a.formaPgto || '',
+              totalBruto: parseFloat(a.totalBruto) || 0,
+              totalPix:   0,
+              acao:       (a.origem   || 'DIRETO').toUpperCase(),
+              origem:     (a.origem   || 'DIRETO').toUpperCase(),
+              status:     (a.status   || 'CONFIRMADO').toUpperCase(),
+              formaPgto:  (a.formaPgto|| 'PIX').toUpperCase(),
+              fonte:      isApp ? 'APP' : 'PAINEL'
+            }));
+          }
+        } catch(e) { console.warn('Agendamentos (' + fonteAtual + '):', e.message); }
+      }
     }
 
-    // Buscar Agendamentos
-    if (relTipoAtual === 'todos' || relTipoAtual === 'agen') {
-      try {
-        let mesAnoAgen = '';
-        if (mes) { const [y,m2] = mes.split('-'); mesAnoAgen = m2 + '/' + y; }
-        const url = APPS_SCRIPT_URL + '?action=' + actionAgen + '&token=' + encodeURIComponent(CDA_TOKEN)
-          + (paciente   ? '&paciente=' + encodeURIComponent(paciente)   : '')
-          + (usuario    ? '&usuario='  + encodeURIComponent(usuario)    : '')
-          + (mesAnoAgen ? '&mesAno='   + encodeURIComponent(mesAnoAgen) : '');
-        const resp = await fetch(url, { redirect: 'follow' });
-        const json = await resp.json();
-        if (json.ok && Array.isArray(json.agendamentos)) {
-          json.agendamentos.forEach(a => resultados.push({
-            tipo:       'agen',
-            data:       a.data      || '',
-            hora:       a.hora      || '',
-            paciente:   a.paciente  || '',
-            usuario:    a.usuario   || 'DESCONHECIDO',
-            detalhe:    a.formaPgto || '',
-            totalBruto: parseFloat(a.totalBruto) || 0,
-            totalPix:   0,
-            acao:       (a.origem   || 'DIRETO').toUpperCase(),
-            origem:     (a.origem   || 'DIRETO').toUpperCase(),
-            status:     (a.status   || 'CONFIRMADO').toUpperCase(),
-            formaPgto:  (a.formaPgto|| 'PIX').toUpperCase(),
-            fonte:      isApp ? 'APP' : 'PAINEL'
-          }));
-        }
-      } catch(e) { console.warn('Agendamentos:', e.message); }
-    }
-
+    // Mais recentes primeiro (útil sobretudo no modo "Ambos", onde os dois
+    // lotes vêm em sequência e ficariam fora de ordem cronológica se não reordenados)
+    const parseDataHoraBR = (r) => {
+      const p = (r.data || '').split('/');
+      if (p.length !== 3) return 0;
+      const [hh, mm] = (r.hora || '00:00').split(':').map(Number);
+      return new Date(+p[2], +p[1] - 1, +p[0], hh || 0, mm || 0).getTime();
+    };
+    resultados.sort((a, b) => parseDataHoraBR(b) - parseDataHoraBR(a));
     relResultadosCache = resultados;
 
     // ---- Resumo ----
@@ -6583,7 +6835,7 @@ async function carregarUsuarios() {
       // Período label
       const periodoEl = document.getElementById('rel-periodo-label');
       if (periodoEl) {
-        const fonteLabel = isApp ? ' · App' : ' · Painel';
+        const fonteLabel = relFonteAtual === 'ambos' ? ' · Painel + App' : (relFonteAtual === 'app' ? ' · App' : ' · Painel');
         if (mes) {
           const [y, m] = mes.split('-');
           const nomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
@@ -6746,13 +6998,16 @@ async function carregarUsuarios() {
       const acaoBadge = r.tipo === 'orc'
         ? '<span class="rel-acao-badge ' + r.acao + '">' + r.acao + '</span>'
         : '';
+      const fonteBadge = relFonteAtual === 'ambos'
+        ? '<span class="rel-acao-badge" style="background:' + (r.fonte === 'APP' ? '#eef2ff;color:#6366f1' : '#f0f9ff;color:#0284c7') + ';">' + r.fonte + '</span>'
+        : '';
       const detalhe = r.tipo === 'orc'
         ? (r.detalhe ? r.detalhe.split(' | ').slice(0,3).join(', ') : '') + (r.totalBruto ? ' · R$' + r.totalBruto.toLocaleString('pt-BR',{minimumFractionDigits:2}) : '')
         : (r.hora ? 'Horário: ' + r.hora : '') + (r.detalhe ? ' · Pgto: ' + r.detalhe : '');
       return '<div class="rel-card">' +
         '<div class="rel-icon ' + corClasse + '"><i class="fa-solid ' + icone + '"></i></div>' +
         '<div class="rel-info">' +
-          '<div class="rel-titulo">' + tipoLabel + (r.paciente ? ' — ' + agendaEscapar(r.paciente) : '') + acaoBadge + '</div>' +
+          '<div class="rel-titulo">' + tipoLabel + (r.paciente ? ' — ' + agendaEscapar(r.paciente) : '') + acaoBadge + fonteBadge + '</div>' +
           (detalhe ? '<div class="rel-sub">' + agendaEscapar(detalhe) + '</div>' : '') +
           '<div class="rel-usuario"><i class="fa-solid fa-user mr-1"></i>' + agendaEscapar(r.usuario) + ' · ' + agendaEscapar(r.data || 'sem data') + (r.hora && r.tipo === 'orc' ? ' às ' + agendaEscapar(r.hora) : '') + '</div>' +
         '</div>' +
@@ -6801,25 +7056,34 @@ async function carregarUsuarios() {
     doc.setTextColor(0, 89, 84); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
     doc.text('Orçamentos: ' + totalOrc + '   |   Agendamentos: ' + totalAgen + '   |   Fat. PIX estimado: R$ ' + fatPix.toLocaleString('pt-BR',{minimumFractionDigits:2}), 14, 36);
 
-    // Tabela
-    const rows = relResultadosCache.map(r => [
-      r.tipo === 'orc' ? 'Orçamento' : 'Agendamento',
-      r.data || '',
-      r.hora || '',
-      r.paciente || '',
-      r.usuario || '',
-      r.tipo === 'orc' ? r.acao : 'AGENDAMENTO',
-      r.tipo === 'orc' ? (r.totalBruto ? 'R$ ' + Number(r.totalBruto).toLocaleString('pt-BR',{minimumFractionDigits:2}) : '') : (r.detalhe || '')
-    ]);
+    // Tabela — inclui coluna Fonte (Painel/App) quando o relatório combina as duas origens
+    const incluirFonte = relFonteAtual === 'ambos';
+    const rows = relResultadosCache.map(r => {
+      const linha = [
+        r.tipo === 'orc' ? 'Orçamento' : 'Agendamento',
+        r.data || '',
+        r.hora || '',
+        r.paciente || '',
+        r.usuario || '',
+        r.tipo === 'orc' ? r.acao : 'AGENDAMENTO',
+        r.tipo === 'orc' ? (r.totalBruto ? 'R$ ' + Number(r.totalBruto).toLocaleString('pt-BR',{minimumFractionDigits:2}) : '') : (r.detalhe || '')
+      ];
+      if (incluirFonte) linha.push(r.fonte || '');
+      return linha;
+    });
+
+    const head = ['Tipo','Data','Hora','Paciente/Nome','Usuário','Ação','Valor/Pgto'];
+    const columnStyles = { 0:{cellWidth:22}, 1:{cellWidth:20}, 2:{cellWidth:14}, 3:{cellWidth:44}, 4:{cellWidth:20}, 5:{cellWidth:22}, 6:{cellWidth:26} };
+    if (incluirFonte) { head.push('Fonte'); columnStyles[7] = { cellWidth: 16 }; }
 
     doc.autoTable({
       startY: 42,
-      head: [['Tipo','Data','Hora','Paciente/Nome','Usuário','Ação','Valor/Pgto']],
+      head: [head],
       body: rows,
       styles: { fontSize: 8, cellPadding: 3 },
       headStyles: { fillColor: [0,89,84], textColor: 255, fontStyle: 'bold' },
       alternateRowStyles: { fillColor: [240,246,247] },
-      columnStyles: { 0:{cellWidth:22}, 1:{cellWidth:20}, 2:{cellWidth:14}, 3:{cellWidth:50}, 4:{cellWidth:22}, 5:{cellWidth:24}, 6:{cellWidth:28} }
+      columnStyles: columnStyles
     });
 
     doc.save('relatorio-cda-' + new Date().toLocaleDateString('pt-BR').replace(/\//g,'-') + '.pdf');
