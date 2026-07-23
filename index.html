@@ -2904,9 +2904,12 @@
     const usuarioEl = document.getElementById('login-usuario');
     const senhaEl = document.getElementById('login-senha');
     const errorEl = document.getElementById('login-error');
-    if (!usuarioEl || !senhaEl) {
-      errorEl.innerText = 'Erro interno do sistema. Recarregue a página.';
-      errorEl.style.display = 'block'; errorEl.style.color = '#ef4444'; return;
+    if (!usuarioEl || !senhaEl || !errorEl) {
+      if (errorEl) {
+        errorEl.innerText = 'Erro interno do sistema. Recarregue a página.';
+        errorEl.style.display = 'block'; errorEl.style.color = '#ef4444';
+      } else { alert('Erro interno do sistema. Recarregue a página.'); }
+      return;
     }
     const usuario = usuarioEl.value.trim().toUpperCase();
     const senha = senhaEl.value.trim().toUpperCase();
@@ -3391,7 +3394,10 @@
       const recentes = itens.filter(i => i.quando && i.quando >= seteDiasAtras).slice(0, 12);
 
       const ontem = new Date(); ontem.setDate(ontem.getDate() - 1); ontem.setHours(0, 0, 0, 0);
-      if (dot) dot.style.display = itens.some(i => i.quando && i.quando >= ontem) ? 'block' : 'none';
+      const agoraDot = new Date();
+      // Só acende o ponto para itens das últimas 24h — itens com data futura
+      // (agendamentos marcados para os próximos dias) deixariam o ponto sempre aceso.
+      if (dot) dot.style.display = itens.some(i => i.quando && i.quando >= ontem && i.quando <= agoraDot) ? 'block' : 'none';
 
       if (!lista) return;
       if (recentes.length === 0) {
@@ -3469,7 +3475,15 @@
     if (atividadesRecentes.length > 8) atividadesRecentes.pop();
     renderAtividades();
     // Salvar na planilha
-    salvarOrcamentoNaPlanilha(acao || 'BAIXADO').then(ok => { if (ok) console.log('[CDA] Orçamento registrado na planilha - acao:', acao); });
+    salvarOrcamentoNaPlanilha(acao || 'BAIXADO').then(ok => {
+      if (ok) { console.log('[CDA] Orçamento registrado na planilha - acao:', acao); return; }
+      // Falhou no servidor: desfaz o incremento local para o contador da home
+      // não ficar maior que o registrado de fato na planilha.
+      dadosMensais.orcamentos = Math.max(0, dadosMensais.orcamentos - 1);
+      const statOrc = document.getElementById('stat-orcamentos');
+      if (statOrc) statOrc.innerText = dadosMensais.orcamentos;
+      showToast('Orçamento gerado, mas houve falha ao registrar na planilha.', 'error');
+    });
   }
 
   async function salvarOrcamentoNaPlanilha(acao) {
@@ -3554,7 +3568,7 @@
     const icones = { orcamento: 'fa-file-invoice-dollar', agendamento: 'fa-calendar-check', recoleta: 'fa-vial' };
     container.innerHTML = atividadesRecentes.map(at => {
       const icone = icones[at.tipo] || 'fa-circle-check';
-      return '<div class="fin-tx-row"><div class="fin-tx-icon"><i class="fa-solid ' + icone + '"></i></div><div class="fin-tx-info"><p class="fin-tx-name">' + at.titulo + '</p><p class="fin-tx-date">' + at.tempo + '</p></div></div>';
+      return '<div class="fin-tx-row"><div class="fin-tx-icon"><i class="fa-solid ' + icone + '"></i></div><div class="fin-tx-info"><p class="fin-tx-name">' + agendaEscapar(at.titulo) + '</p><p class="fin-tx-date">' + agendaEscapar(at.tempo) + '</p></div></div>';
     }).join('');
   }
 
@@ -3609,15 +3623,18 @@
     });
   });
 
-  function showToast(msg, tipo) {
+  let cdaToastTimer = null;
+  function showToast(msg, tipo, duracao) {
     tipo = tipo || 'success';
     const t = document.getElementById('cda-toast');
     const icon = document.getElementById('cda-toast-icon');
     document.getElementById('cda-toast-msg').innerText = msg;
     if (tipo === 'error') { icon.className = 'fa-solid fa-circle-xmark'; t.style.background = '#ef4444'; }
+    else if (tipo === 'info') { icon.className = 'fa-solid fa-circle-info'; t.style.background = '#2a78d6'; }
     else { icon.className = 'fa-solid fa-circle-check'; t.style.background = '#338b85'; }
     t.className = 'toast-show';
-    setTimeout(() => t.classList.remove('toast-show'), 3000);
+    if (cdaToastTimer) clearTimeout(cdaToastTimer);
+    cdaToastTimer = setTimeout(() => t.classList.remove('toast-show'), duracao || 3000);
   }
 
   let listaExames = [];
@@ -3675,7 +3692,7 @@
           const nome = ex.nome || 'Sem nome';
           const codigo = ex.codigo || '---';
           const preco = ex.preco || 0;
-          return '<div class="autocomplete-item" onclick="adicionarExame(' + ex.id + ')"><div class="autocomplete-item-nome">' + nome + '</div><div class="autocomplete-item-codigo">Código: ' + codigo + '</div><div class="autocomplete-item-preco">R$ ' + parseFloat(preco).toFixed(2).replace('.', ',') + '</div></div>';
+          return '<div class="autocomplete-item" onclick="adicionarExame(' + ex.id + ')"><div class="autocomplete-item-nome">' + agendaEscapar(nome) + '</div><div class="autocomplete-item-codigo">Código: ' + agendaEscapar(codigo) + '</div><div class="autocomplete-item-preco">R$ ' + parseFloat(preco).toFixed(2).replace('.', ',') + '</div></div>';
         }).join('');
       }
       autocompleteList.classList.add('show');
@@ -3694,7 +3711,7 @@
     if (orcSelecionados.some(e => e.id === id)) { showToast('Exame já selecionado!', 'error'); return; }
     orcSelecionados.push(exame);
     orcRenderSelecionados();
-    if (searchInput) searchInput.value = '';
+    if (searchInput) { searchInput.value = ''; searchInput.focus(); }
     if (autocompleteList) autocompleteList.classList.remove('show');
     showExameToast(exame.nome);
   }
@@ -4184,7 +4201,7 @@
       const codigo = ex.codigo || '---';
       const preco = parseFloat(ex.preco || 0);
       total += preco;
-      return '<div class="exame-selecionado-item"><div class="exame-info"><div class="exame-nome" title="' + nome + '">' + nome + '</div><div class="exame-codigo">' + codigo + '</div></div><div class="exame-preco">' + formatarMoeda(preco) + '</div><button class="btn-remover-exame" onclick="removerExame(' + index + ')" title="Remover"><i class="fa-solid fa-xmark"></i></button></div>';
+      return '<div class="exame-selecionado-item"><div class="exame-info"><div class="exame-nome" title="' + agendaEscapar(nome) + '">' + agendaEscapar(nome) + '</div><div class="exame-codigo">' + agendaEscapar(codigo) + '</div></div><div class="exame-preco">' + formatarMoeda(preco) + '</div><button class="btn-remover-exame" onclick="removerExame(' + index + ')" title="Remover"><i class="fa-solid fa-xmark"></i></button></div>';
     }).join('');
     totalEl.innerText = formatarMoeda(total);
     btnLimpar.style.display = 'inline-flex';
@@ -4366,7 +4383,7 @@ function agenRemoverPDF() {
     const totalPix = total * 0.60;
     const totalCredito = total * 0.65;
     conteudo.innerHTML = '<div class="space-y-2">' +
-      exames.map(ex => '<div class="flex justify-between items-center text-sm"><span>' + ex.nome + '</span><span class="font-bold">' + formatCurrency(ex.preco) + '</span></div>').join('') +
+      exames.map(ex => '<div class="flex justify-between items-center text-sm"><span>' + agendaEscapar(ex.nome) + '</span><span class="font-bold">' + formatCurrency(ex.preco) + '</span></div>').join('') +
       '<div class="border-t border-slate-200 pt-2 mt-2">' +
       '<div class="flex justify-between items-center text-sm font-bold text-cda-primary"><span>Total (PIX/Débito 40% OFF):</span><span>' + formatCurrency(totalPix) + '</span></div>' +
       '<div class="flex justify-between items-center text-xs text-slate-500 mt-1"><span>Cartão de crédito (35% OFF):</span><span>' + formatCurrency(totalCredito) + '</span></div>' +
@@ -4647,7 +4664,7 @@ function agenRemoverPDF() {
         const totalCredito = totalBruto * 0.65;
         const pagamentoLinha = pagamento ? '<div class="text-slate-600 dark:text-slate-300 font-bold mt-1">Pagamento escolhido: ' + pagamento + '</div>' : '';
         document.getElementById('agen-resumo-exames').innerHTML = orcSelecionados
-          .map(ex => '<div class="flex justify-between gap-3"><span>' + ex.nome + '</span><span class="font-bold whitespace-nowrap">' + formatCurrency(ex.preco) + '</span></div>').join('');
+          .map(ex => '<div class="flex justify-between gap-3"><span>' + agendaEscapar(ex.nome) + '</span><span class="font-bold whitespace-nowrap">' + formatCurrency(ex.preco) + '</span></div>').join('');
         document.getElementById('agen-resumo-total').innerHTML =
           '<div class="text-slate-500 dark:text-slate-400 line-through text-xs">Particular: ' + formatCurrency(totalBruto) + '</div>' +
           '<div class="text-cda-primary font-extrabold">PIX/Dinheiro/Débito: ' + formatCurrency(totalPix) + '</div>' +
@@ -4750,11 +4767,17 @@ function agenRemoverPDF() {
       _executarSalvarAgendamento._confirmouValorBaixo = true;
       btnSalvar.innerHTML = '<span class="text" style="color:#f59e0b"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Valor baixo — Confirmar mesmo assim?</span><span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594z"/></svg></span>';
       showToast('Valor abaixo de R$ 150,00. Clique novamente para confirmar.', 'info', 6000);
-      setTimeout(() => {
+      _executarSalvarAgendamento._timerValorBaixo = setTimeout(() => {
         _executarSalvarAgendamento._confirmouValorBaixo = false;
         btnSalvar.innerHTML = '<span class="text">Salvar Agendamento</span><span class="icon"><svg viewBox="0 0 512.005 512.005"><path d="M511.658 51.675c2.496-11.619-8.895-21.416-20.007-17.176l-482 184a15 15 0 00-.054 28.006L145 298.8v164.713a15 15 0 0028.396 6.75l56.001-111.128 136.664 101.423c8.313 6.17 20.262 2.246 23.287-7.669C516.947 34.532 511.431 52.726 511.658 51.675zm-118.981 52.718L157.874 271.612 56.846 232.594z"/></svg></span>';
       }, 7000);
       return;
+    }
+    // Cancela o timer do aviso de valor baixo — sem isso, ele restauraria o
+    // texto do botão no meio do salvamento em andamento.
+    if (_executarSalvarAgendamento._timerValorBaixo) {
+      clearTimeout(_executarSalvarAgendamento._timerValorBaixo);
+      _executarSalvarAgendamento._timerValorBaixo = null;
     }
     _executarSalvarAgendamento._confirmouValorBaixo = false;
 
@@ -5282,9 +5305,9 @@ function agenRemoverPDF() {
       }).slice(0, 8);
       if (filtrados.length === 0) { recAutocompleteList.classList.remove('show'); return; }
       recAutocompleteList.innerHTML = filtrados.map(ex =>
-        '<div class="autocomplete-item" onclick="recAdicionarExame(' + ex.id + ',\'' + ex.nome.replace(/'/g,"\'") + '\',\'' + (ex.codigo||'').replace(/'/g,"\'") + '\')">' +
-          '<span class="font-semibold">' + ex.nome + '</span>' +
-          (ex.codigo ? '<span class="text-slate-400 text-xs ml-2">' + ex.codigo + '</span>' : '') +
+        '<div class="autocomplete-item" onclick="recAdicionarExame(' + ex.id + ',\'' + agendaEscapar(ex.nome.replace(/'/g,"\\'")) + '\',\'' + agendaEscapar((ex.codigo||'').replace(/'/g,"\\'")) + '\')">' +
+          '<span class="font-semibold">' + agendaEscapar(ex.nome) + '</span>' +
+          (ex.codigo ? '<span class="text-slate-400 text-xs ml-2">' + agendaEscapar(ex.codigo) + '</span>' : '') +
         '</div>'
       ).join('');
       recAutocompleteList.classList.add('show');
@@ -5299,6 +5322,7 @@ function agenRemoverPDF() {
     recExamesSelecionados.push({ id: id, nome: nome, codigo: codigo });
     recRenderExames();
     recSearchInput.value = '';
+    recSearchInput.focus();
     recAutocompleteList.classList.remove('show');
   }
 
@@ -5502,7 +5526,10 @@ function agenRemoverPDF() {
     const textoOriginal = btn ? btn.innerHTML : '';
     if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; }
     let recoletas = JSON.parse(localStorage.getItem('cda_recoletas') || '[]');
-    const rec = recoletas[index];
+    // O index dos cards se refere à lista filtrada de pendentes (as finalizadas
+    // não aparecem na tela) — localizar o registro real na lista completa.
+    const pendentes = recoletas.filter(r => (r.status || 'RECOLETA_ABERTA') !== 'FINALIZADA');
+    const rec = pendentes[index];
     if (rec && rec.codigo) {
       try {
         const controller = new AbortController();
@@ -5519,7 +5546,10 @@ function agenRemoverPDF() {
         else { console.warn('[CDA] Servidor retornou erro ao excluir:', json.erro); }
       } catch(err) { console.warn('[CDA] Falha ao excluir do servidor:', err); }
     }
-    recoletas.splice(index, 1);
+    if (rec) {
+      const idxReal = recoletas.findIndex(item => item.id === rec.id || (item.codigo === rec.codigo && item.nome === rec.nome));
+      if (idxReal !== -1) recoletas.splice(idxReal, 1);
+    }
     localStorage.setItem('cda_recoletas', JSON.stringify(recoletas));
     carregarRecoletas();
     showToast('Recoleta excluída.');
@@ -6238,12 +6268,12 @@ async function carregarUsuarios() {
         const retornoTxt = d.diasRetorno !== null ? d.diasRetorno + ' dia(s) até o retorno' : (d.dataComunicacao ? 'Paciente ainda não veio' : '');
         return '<div class="recoleta-card">' +
           '<div class="recoleta-header">' +
-            '<div><div class="recoleta-codigo">CÓDIGO: ' + d.codigo + '</div><div class="recoleta-nome">' + d.nome + '</div></div>' +
+            '<div><div class="recoleta-codigo">CÓDIGO: ' + agendaEscapar(d.codigo) + '</div><div class="recoleta-nome">' + agendaEscapar(d.nome) + '</div></div>' +
             '<span style="padding:4px 10px;border-radius:12px;font-size:11px;font-weight:800;color:' + st.cor + ';background:' + st.bg + ';">' + st.label + '</span>' +
           '</div>' +
-          '<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ' + (d.motivo || '—') + '</div>' +
+          '<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ' + agendaEscapar(d.motivo || '—') + '</div>' +
           '<div style="font-size:11px;color:#64748b;margin-top:8px;display:flex;flex-direction:column;gap:2px;">' +
-            '<span><i class="fa-regular fa-calendar mr-1"></i>Solicitado em: ' + d.data + '</span>' +
+            '<span><i class="fa-regular fa-calendar mr-1"></i>Solicitado em: ' + agendaEscapar(d.data) + '</span>' +
             '<span><i class="fa-solid fa-phone mr-1"></i>' + avisoTxt + (d.dataComunicacao ? ' (' + d.dataComunicacao + ')' : '') + '</span>' +
             (retornoTxt ? '<span><i class="fa-solid fa-person-walking mr-1"></i>' + retornoTxt + (d.dataVeio ? ' (' + d.dataVeio + ')' : '') + '</span>' : '') +
           '</div>' +
@@ -6302,11 +6332,11 @@ async function carregarUsuarios() {
       const st = REC_ETAPAS[d.status] || REC_ETAPAS.RECOLETA_ABERTA;
       return '<div class="recoleta-card">' +
         '<div class="recoleta-header">' +
-          '<div><div class="recoleta-codigo">CÓDIGO: ' + d.codigo + '</div><div class="recoleta-nome">' + d.nome + '</div></div>' +
+          '<div><div class="recoleta-codigo">CÓDIGO: ' + agendaEscapar(d.codigo) + '</div><div class="recoleta-nome">' + agendaEscapar(d.nome) + '</div></div>' +
           '<span style="padding:4px 10px;border-radius:12px;font-size:11px;font-weight:800;color:' + st.cor + ';background:' + st.bg + ';">' + st.label + '</span>' +
         '</div>' +
-        '<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ' + (d.motivo || '—') + '</div>' +
-        '<div style="font-size:11px;color:#64748b;margin-top:8px;"><i class="fa-solid fa-phone mr-1"></i>Contatado em: ' + d.dataComunicacao + '</div>' +
+        '<div class="recoleta-motivo"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ' + agendaEscapar(d.motivo || '—') + '</div>' +
+        '<div style="font-size:11px;color:#64748b;margin-top:8px;"><i class="fa-solid fa-phone mr-1"></i>Contatado em: ' + agendaEscapar(d.dataComunicacao) + '</div>' +
       '</div>';
     }).join('');
   }
@@ -6588,7 +6618,7 @@ async function carregarUsuarios() {
           .map(([usr, v]) => {
             const pct = Math.round((v.total / maxUsr) * 100);
             return '<div class="rel-bar-row">' +
-              '<div class="rel-bar-label" style="min-width:100px;">' + usr + '</div>' +
+              '<div class="rel-bar-label" style="min-width:100px;">' + agendaEscapar(usr) + '</div>' +
               '<div class="rel-bar-track" style="flex:1;">' +
                 '<div class="rel-bar-fill" style="width:' + pct + '%;background:#5dc1b9;">' +
                   '<span class="rel-bar-val">' + v.total + (v.agendamento > 0 ? ' <span style=\'font-size:0.65rem;opacity:0.85;\'>(' + v.agendamento + ' agen.)</span>' : '') + '</span>' +
@@ -6663,7 +6693,7 @@ async function carregarUsuarios() {
               const pct = Math.round((v.total / maxUA) * 100);
               const brutoStr = v.bruto > 0 ? ' <span style=\'font-size:0.65rem;opacity:0.85;\'>R$' + v.bruto.toLocaleString('pt-BR',{minimumFractionDigits:2}) + '</span>' : '';
               return '<div class="rel-bar-row">' +
-                '<div class="rel-bar-label" style="min-width:100px;">' + usr + '</div>' +
+                '<div class="rel-bar-label" style="min-width:100px;">' + agendaEscapar(usr) + '</div>' +
                 '<div class="rel-bar-track" style="flex:1;">' +
                   '<div class="rel-bar-fill" style="width:' + pct + '%;background:#338b85;">' +
                     '<span class="rel-bar-val">' + v.total + brutoStr + '</span>' +
