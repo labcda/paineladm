@@ -2257,6 +2257,10 @@
                         </button>
                     </div>
                 </div>
+                <div id="bol-ia-status" class="hidden mt-3" style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:#005954;background:#f0fbfb;border-radius:10px;padding:8px 12px;">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span id="bol-ia-status-texto">Lendo valor e parcelas com IA...</span>
+                </div>
             </div>
 
             <div class="mb-4">
@@ -2780,6 +2784,9 @@
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyNAnEvW3JJ0-STfXV13kb0H8KWmGAXdWpeqf7fMKM8To7l3h4YMceIjDDYC8V8207llQ/exec';
   const APPS_SCRIPT_AGENDA_URL = 'https://script.google.com/macros/s/AKfycbyaCe1qi8balumQbWeZ6A-_b-eGx0pRH8PEL7MsxvuiPYJq52ztL-f2Ej6ypRLo6ejz/exec';
   const CDA_TOKEN = 'CDA-2025-xK9#mPqL';
+  // Mesmo proxy (Cloudflare Worker) usado pelo App do Paciente para ler PDFs com IA —
+  // a chave da Anthropic fica só no Worker, nunca aqui.
+  const CLAUDE_PROXY_URL = 'https://labcda-claude.laboratoriocda-areatecnica.workers.dev';
 
   // ==================== RASTREIO DE USUÁRIO ====================
   let USUARIO_LOGADO = null;
@@ -8231,6 +8238,75 @@ async function carregarUsuarios() {
     document.getElementById('bol-pdf-anexado-nome').textContent = file.name;
     document.getElementById('bol-pdf-anexado-status').textContent = 'Pronto para enviar';
     showToast('PDF selecionado: ' + file.name);
+    bolLerValorComIA(file);
+  }
+
+  // ==================== LEITURA AUTOMÁTICA DO VALOR/PARCELAS COM IA ====================
+  // Lê o PDF do espelho assim que é anexado e tenta preencher sozinho o valor
+  // total e a quantidade de parcelas — o usuário sempre pode conferir/corrigir
+  // antes de salvar, a IA nunca grava nada direto.
+  async function bolLerValorComIA(file) {
+    const statusEl = document.getElementById('bol-ia-status');
+    const statusTexto = document.getElementById('bol-ia-status-texto');
+    statusEl.classList.remove('hidden');
+    statusTexto.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Lendo valor e parcelas com IA...';
+    try {
+      const base64 = await new Promise((res, rej) => {
+        const reader = new FileReader();
+        reader.onload = () => res(reader.result.split(',')[1]);
+        reader.onerror = rej;
+        reader.readAsDataURL(file);
+      });
+
+      const prompt = 'Analise este pedido de compra / nota fiscal / orçamento de fornecedor de um laboratório. ' +
+        'Identifique o VALOR TOTAL do pedido e, se o pagamento for parcelado, em QUANTAS PARCELAS. ' +
+        'Responda SOMENTE com JSON válido, sem texto fora do JSON, sem markdown:\n' +
+        '{"valorTotal": <numero, ex: 1234.56>, "parcelas": <numero inteiro, 1 se for à vista ou não houver menção>, "encontrouValor": true ou false}\n' +
+        'Se não tiver certeza do valor total, responda "encontrouValor": false.';
+
+      const resp = await fetch(CLAUDE_PROXY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-5', max_tokens: 300,
+          messages: [{ role: 'user', content: [
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
+            { type: 'text', text: prompt }
+          ] }]
+        })
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      const texto = (data.content || []).map(b => b.text || '').join('');
+      const resultado = JSON.parse(texto.replace(/```json|```/g, '').trim());
+
+      if (!resultado.encontrouValor || !resultado.valorTotal) {
+        statusTexto.innerHTML = '<i class="fa-solid fa-circle-info"></i> Não consegui identificar o valor automaticamente — preencha manualmente.';
+        setTimeout(() => statusEl.classList.add('hidden'), 5000);
+        return;
+      }
+
+      const valorInput = document.getElementById('bol-valor');
+      valorInput.value = 'R$ ' + Number(resultado.valorTotal).toFixed(2).replace('.', ',');
+
+      const parcelas = parseInt(resultado.parcelas) || 1;
+      if (parcelas <= 1) {
+        bolSelecionarDividido('nao');
+      } else if (parcelas >= 2 && parcelas <= 6) {
+        bolSelecionarDividido(String(parcelas));
+      } else {
+        bolSelecionarDividido('outro');
+        document.getElementById('bol-div-outro-valor').value = parcelas;
+        bolAtualizarParcelas();
+      }
+
+      statusTexto.innerHTML = '<i class="fa-solid fa-circle-check"></i> Valor e parcelas preenchidos — confira antes de salvar.';
+      setTimeout(() => statusEl.classList.add('hidden'), 6000);
+    } catch (err) {
+      console.warn('[CDA] Leitura do PDF com IA indisponível:', err);
+      statusTexto.innerHTML = '<i class="fa-solid fa-circle-info"></i> Leitura automática indisponível agora — preencha manualmente.';
+      setTimeout(() => statusEl.classList.add('hidden'), 5000);
+    }
   }
 
   function bolRemoverPDF() {
@@ -8241,6 +8317,7 @@ async function carregarUsuarios() {
     document.getElementById('bol-pdf-anexado-info').classList.add('hidden');
     document.getElementById('bol-upload-progress').classList.add('hidden');
     document.getElementById('bol-upload-status').classList.add('hidden');
+    document.getElementById('bol-ia-status').classList.add('hidden');
   }
 
   // Drag and drop
