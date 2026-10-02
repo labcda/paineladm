@@ -4306,6 +4306,123 @@
   const GQ_CATS = ['Temperatura e ambiente', 'Limpeza e conservação', 'Resultados e qualidade', 'Recebimento e fornecedores', 'Segurança do paciente e ocorrências', 'Reuniões e treinamento'];
   GQ.form = null;
 
+
+  // ---------- FORMULÁRIOS DIGITAIS - lote 2 ----------
+  function gqTexto(c, v) {
+    if (v === '' || v == null) return '';
+    if (c.tipo === 'check') return v ? 'Sim' : 'Não';
+    if (Array.isArray(v)) return v.join(', ');
+    if (c.tipo === 'grade') return Object.keys(v).map(l => l + ': ' + Object.keys(v[l]).map(k => k + ' = ' + v[l][k]).join(' | ')).join('\n');
+    if (c.tipo === 'checklist') {
+      const itens = Object.keys(v), nc = itens.filter(i => v[i].s === 'NC').length, cc = itens.filter(i => v[i].s === 'C').length;
+      return 'Conformes: ' + cc + ' | Não conformes: ' + nc + ' | NA: ' + (itens.length - cc - nc) + '\n' + itens.map(i => '[' + v[i].s + '] ' + i + (v[i].o ? ' — ' + v[i].o : '')).join('\n');
+    }
+    return String(v);
+  }
+  const SN = ['Sim', 'Não'];
+  const AN_HEMO = ['Hemácias', 'Hemoglobina', 'Hematócrito', 'VCM', 'HCM', 'CHCM', 'RDW', 'Leucócitos totais', 'Plaquetas'];
+  GQ_CATS.push('Controle interno e laboratório de apoio', 'Documentos administrativos e RH', 'Relatórios gerenciais');
+  GQ_FORMS.push(
+    { c: 'FR 011', t: 'Água Reagente - Temperatura, pH e Condutividade', cat: 'Temperatura e ambiente', modo: 'mensal', item_label: 'Setor / estação', itens: ['Estação de água'],
+      aviso: 'Temperatura máx. 30 °C; pH 5,0 a 7,5; condutividade (água tipo II) máx. 1,0 µS/cm. Fonte: USP.', desvio: 'obs',
+      cols: [{ id: 'temp', label: 'Temperatura (°C)', tipo: 'numero', max: 30 }, { id: 'ph', label: 'pH', tipo: 'numero', min: 5, max: 7.5 }, { id: 'cond', label: 'Condutividade (µS/cm)', tipo: 'numero', max: 1 }, { id: 'obs', label: 'Observações / manutenção', tipo: 'texto' }] },
+
+    { c: 'FR 003', t: 'Dupla Observação - Hematologia Digital', cat: 'Controle interno e laboratório de apoio', modo: 'evento',
+      campos: [{ id: 'barcode', label: 'Nº do código de barras', tipo: 'texto', obrig: 1 }, { id: 'data', label: 'Data', tipo: 'data', obrig: 1 }, { id: 'idade', label: 'Idade', tipo: 'texto' },
+        { id: 'valores', label: 'Valores observados', tipo: 'grade', obrig: 1, colunas: ['Observador 1', 'Observador 2'], linhas: ['Hemácias', 'Hemoglobina', 'Hematócrito', 'Leucócitos totais', 'Bastonetes', 'Neutrófilos', 'Linfócitos', 'Eosinófilos', 'Monócitos', 'Basófilos', 'Plaquetas'] },
+        { id: 'obs', label: 'Observação', tipo: 'textarea' }] },
+    { c: 'FR 029', t: 'Controle Interno de Hemograma Digital', cat: 'Controle interno e laboratório de apoio', modo: 'evento',
+      campos: [{ id: 'data', label: 'Data', tipo: 'data', obrig: 1 }, { id: 'amostra', label: 'Amostra número', tipo: 'texto', obrig: 1 }, { id: 'data2', label: 'Data da segunda leitura', tipo: 'data' },
+        { id: 'valores', label: 'Valores', tipo: 'grade', obrig: 1, colunas: ['Leitura 1 (Data 1)', 'Leitura 2 (Data 2)'], linhas: AN_HEMO }, { id: 'obs', label: 'Observações', tipo: 'textarea' }] },
+    { c: 'FR 042', t: 'Controle Interno de Hematologia - Confrontação com Laboratórios de Apoio', cat: 'Controle interno e laboratório de apoio', modo: 'evento',
+      campos: [{ id: 'data', label: 'Data', tipo: 'data', obrig: 1 }, { id: 'barcode', label: 'Código de barras', tipo: 'texto', obrig: 1 },
+        { id: 'valores', label: 'Valores', tipo: 'grade', obrig: 1, colunas: ['CDA', 'Álvaro Apoio', 'Diagnósticos do Brasil'], linhas: AN_HEMO }, { id: 'obs', label: 'Análise crítica / observações', tipo: 'textarea' }] },
+    { c: 'FR 028', t: 'Controle Interno de Urinálise - Tiras Reagentes', cat: 'Controle interno e laboratório de apoio', modo: 'evento',
+      campos: [{ id: 'data', label: 'Data do controle', tipo: 'data', obrig: 1 }, { id: 'lote', label: 'Lote das tiras / controle', tipo: 'texto' },
+        { id: 'valores', label: 'Resultado do laboratório x valor-alvo PNCQ', tipo: 'grade', obrig: 1, colunas: ['Análise do laboratório', 'Valor-alvo PNCQ'], linhas: ['pH', 'Densidade', 'Proteínas', 'Glicose', 'Cetonas', 'Bilirrubina total', 'Sangue', 'Urobilinogênio', 'Nitrito'] }, { id: 'obs', label: 'Observações / ação', tipo: 'textarea' }] },
+    { c: 'FR 039', t: 'Controle Interno de Fator Reumatoide e ASLO', cat: 'Controle interno e laboratório de apoio', modo: 'evento',
+      campos: [{ id: 'data', label: 'Data', tipo: 'data', obrig: 1 }, { id: 'fr_neg', label: 'Fator reumatoide - controle negativo', tipo: 'texto' }, { id: 'fr_pos', label: 'Fator reumatoide - controle positivo', tipo: 'texto' }, { id: 'aslo_neg', label: 'ASLO - controle negativo', tipo: 'texto' }, { id: 'aslo_pos', label: 'ASLO - controle positivo', tipo: 'texto' }, { id: 'obs', label: 'Observações / ação se fora do esperado', tipo: 'textarea' }] },
+    { c: 'FR 033', t: 'Ata de Investigação de Resultado Inaceitável do CEQ', cat: 'Controle interno e laboratório de apoio', modo: 'evento',
+      campos: [{ id: 'data', label: 'Data', tipo: 'data', obrig: 1 }, { id: 'inicio', label: 'Início', tipo: 'hora' }, { id: 'termino', label: 'Término', tipo: 'hora' }, { id: 'conceito', label: 'Conceito inaceitável (analito / rodada)', tipo: 'texto', obrig: 1 }, { id: 'descricao', label: 'Descrição', tipo: 'textarea', obrig: 1 }, { id: 'revisao', label: 'Revisão de dados', tipo: 'textarea' },
+        { id: 'classificacao', label: 'Classificação do problema', tipo: 'select', opcoes: ['Erro administrativo', 'Problemas metodológicos', 'Problemas técnicos', 'Problemas com a amostra-controle', 'Problemas com a avaliação de resultados', 'Nenhuma explicação após a investigação'], obrig: 1 },
+        { id: 'correlacao', label: 'Correlação com resultados de pacientes', tipo: 'textarea' }, { id: 'acoes_sn', label: 'Ações corretivas?', tipo: 'select', opcoes: SN }, { id: 'acoes', label: 'Quais?', tipo: 'textarea' }, { id: 'participantes', label: 'Participantes (um por linha: nome - setor)', tipo: 'textarea', obrig: 1 }, { id: 'obs', label: 'Observações', tipo: 'textarea' }] },
+    { c: 'FR 027', t: 'Qualificação de Laboratório de Apoio', cat: 'Controle interno e laboratório de apoio', modo: 'evento',
+      campos: [{ id: 'razao', label: 'Razão social', tipo: 'texto', obrig: 1 }, { id: 'fantasia', label: 'Nome fantasia', tipo: 'texto' }, { id: 'contato', label: 'Contato', tipo: 'texto' }, { id: 'tel', label: 'Telefone', tipo: 'texto' }, { id: 'email', label: 'E-mail', tipo: 'texto' }, { id: 'site', label: 'Website', tipo: 'texto' }, { id: 'data', label: 'Data da qualificação', tipo: 'data', obrig: 1 },
+        { id: 'contrato', label: 'Cópia do contrato?', tipo: 'select', opcoes: SN }, { id: 'certificacao', label: 'Possui alguma certificação? (anexar cópia)', tipo: 'select', opcoes: SN }, { id: 'proficiencia', label: 'Os exames contratados estão no programa de proficiência?', tipo: 'select', opcoes: SN },
+        { id: 'preparo', label: 'Disponibiliza informações de preparo do paciente e coleta?', tipo: 'select', opcoes: SN }, { id: 'cert_prof', label: 'Cópia do certificado do programa de proficiência atualizado?', tipo: 'select', opcoes: SN },
+        { id: 'laudos', label: 'Fornecimento dos laudos', tipo: 'multi', opcoes: ['Internet (site)', 'E-mail', 'Fax', 'Outro'] }, { id: 'laudos_outro', label: 'Se outro, qual', tipo: 'texto' }, { id: 'material', label: 'Fornece material descartável e etiquetas para coleta/envio?', tipo: 'select', opcoes: SN }, { id: 'interface', label: 'Interfaceamento?', tipo: 'select', opcoes: SN },
+        { id: 'parecer', label: 'Parecer (qualificado / qualificado com restrição / não qualificado)', tipo: 'select', opcoes: ['Qualificado', 'Qualificado com restrição', 'Não qualificado'], obrig: 1 }, { id: 'obs', label: 'Observações', tipo: 'textarea' }] },
+    { c: 'FR 012', t: 'Qualificação de Fornecedores', cat: 'Recebimento e fornecedores', modo: 'evento',
+      campos: [{ id: 'razao', label: 'Razão social', tipo: 'texto', obrig: 1 }, { id: 'fantasia', label: 'Nome fantasia', tipo: 'texto' }, { id: 'cnpj', label: 'CNPJ', tipo: 'texto' }, { id: 'ie', label: 'Inscrição estadual', tipo: 'texto' }, { id: 'endereco', label: 'Endereço', tipo: 'texto' }, { id: 'cidade', label: 'Cidade', tipo: 'texto' }, { id: 'uf', label: 'UF', tipo: 'texto' }, { id: 'cep', label: 'CEP', tipo: 'texto' },
+        { id: 'contato', label: 'Contato da empresa', tipo: 'texto' }, { id: 'email', label: 'E-mail da empresa', tipo: 'texto' }, { id: 'fornecedor_de', label: 'Fornecedor de', tipo: 'texto', obrig: 1 }, { id: 'rep_nome', label: 'Nome do representante', tipo: 'texto' }, { id: 'rep_contato', label: 'Contato do representante', tipo: 'texto' }, { id: 'rep_email', label: 'E-mail do representante', tipo: 'texto' },
+        { id: 'exclusivo', label: 'Representante exclusivo de alguma linha?', tipo: 'select', opcoes: SN }, { id: 'exclusivo_desc', label: 'Descrição', tipo: 'texto' }, { id: 'certificada', label: 'Empresa certificada?', tipo: 'select', opcoes: SN }, { id: 'cert_desc', label: 'Descrição da certificação', tipo: 'texto' },
+        { id: 'historico', label: 'Histórico acima de 2 anos com o laboratório?', tipo: 'select', opcoes: SN }, { id: 'ref_com', label: 'Referências comerciais', tipo: 'textarea' },
+        { id: 'docs', label: 'Documentos obrigatórios recebidos', tipo: 'multi', opcoes: ['Alvará sanitário', 'Responsabilidade técnica', 'Certificado de boas práticas'] },
+        { id: 'data', label: 'Data da avaliação', tipo: 'data', obrig: 1 }, { id: 'parecer', label: 'Parecer', tipo: 'select', opcoes: ['Qualificado', 'Qualificado com restrição', 'Não qualificado'], obrig: 1 }] },
+    { c: 'FR 040', t: 'Verificação de Auditoria Interna', cat: 'Resultados e qualidade', modo: 'evento',
+      aviso: 'Itens atualizados para a legislação vigente (PGR/NR-1 no lugar do PPRA; RDC 978/2025 no lugar da RDC 302).',
+      campos: [{ id: 'data', label: 'Data', tipo: 'data', obrig: 1 }, { id: 'local', label: 'Local auditado', tipo: 'texto', obrig: 1 }, { id: 'auditor', label: 'Auditor', tipo: 'texto', obrig: 1 },
+        { id: 'checklist', label: 'Requisitos a verificar (C = conforme, NC = não conforme, NA = não se aplica)', tipo: 'checklist', obrig: 1, grupos: [
+          { t: 'ORGANIZAÇÃO › Funcionamento', itens: ['Licença de funcionamento', 'Alvará de localização', 'Registro no Conselho Profissional Regional', 'Habilitação legal do responsável técnico junto ao Conselho Profissional', 'Inscrição do responsável técnico no Conselho Regional profissional', 'Responsável Técnico Substituto', 'Inscrição no CNES', 'Alvará ambiental', 'Certificado do serviço de desinsetização', 'Alvará do Corpo de Bombeiros', 'Licença sanitária'] },
+          { t: 'ORGANIZAÇÃO › Pessoal', itens: ['Arquivo dos funcionários', 'Documento de descrição de cargos', 'PQ de treinamento', 'Cartão de vacina atualizado'] },
+          { t: 'ORGANIZAÇÃO › Exames', itens: ['Lista dos exames realizados nas dependências do laboratório', 'Lista dos exames enviados para laboratórios de apoio', 'Lista dos exames realizados em caráter de urgência'] },
+          { t: 'ESTRUTURA FÍSICA › Instalações', itens: ['A área de atendimento e coleta proporciona segurança e conforto para o número de clientes atendidos', 'PQ de limpeza', 'A distribuição das áreas e dos equipamentos permite uma boa realização das tarefas', 'A ventilação das áreas é suficiente', 'A temperatura das áreas é controlada', 'As bancadas são distribuídas racionalmente e suficientes para equipamentos, reagentes, insumos e amostras', 'A iluminação é suficiente e bem distribuída', 'Pisos, paredes e bancadas são de material impermeável', 'A rede elétrica é segura, com pontos/tomadas suficientes', 'Local da lavagem é adequado', 'Preparação, armazenamento e uso de solventes/fixadores e colorações conforme normas de segurança', 'Formulário de manutenções prediais'] },
+          { t: 'EQUIPAMENTOS › Relação e identificação', itens: ['Equipamentos com etiquetas com as informações exigidas', 'Equipamentos fora de uso identificados', 'Relação dos equipamentos próprios e de terceiros'] },
+          { t: 'EQUIPAMENTOS › Realização de exames', itens: ['Registros das calibrações/verificações dos equipamentos', 'Registros das manutenções efetuadas', 'Registros da limpeza e conservação', 'PQ de qualificação de fornecedores', 'Lista de fornecedores qualificados', 'Contrato de manutenção com serviços de terceiros'] },
+          { t: 'EQUIPAMENTOS › Instrumentos de medição', itens: ['Termômetro calibrado para utilização', 'Registros dos procedimentos de calibração', 'Registros da temperatura dos equipamentos e das providências tomadas'] },
+          { t: 'SISTEMA DE INFORMÁTICA - LIS', itens: ['PQ do LIS', 'Cópias de segurança'] },
+          { t: 'REAGENTES', itens: ['PQ de reagentes', 'Registros dos lotes de insumos', 'PQ da água reagente', 'Registros de controle da qualidade da água reagente'] },
+          { t: 'PROCESSOS › Controle da qualidade', itens: ['PQ do CIQ', 'Registros dos controles internos', 'PQ do CEQ', 'Contrato com provedor', 'Lista dos analitos cobertos pelo CEQ', 'Registros do CEQ'] },
+          { t: 'PROCESSOS › Pré-analítico e atendimento', itens: ['Instruções de coleta para clientes', 'Instruções de coleta para coletadores', 'Critérios para aceitação/rejeição de amostras biológicas', 'Manual de coleta', 'Instruções para o atendimento de clientes', 'Comprovante do atendimento aos clientes', 'Cadastro dos clientes', 'Identificação das amostras biológicas', 'Instruções para transporte, armazenamento e guarda de materiais e amostras', 'Transporte de resíduos biológicos'] },
+          { t: 'PROCESSOS › Realização dos exames e laudo', itens: ['Notificação compulsória', 'Valores críticos', 'Contrato com laboratórios de apoio', 'Qualificação de laboratórios de apoio', 'Registros para a rastreabilidade', 'PQ do laudo laboratorial', 'Atendimento da RDC 978/2025 para o laudo', 'Arquivamento dos laudos'] },
+          { t: 'DOCUMENTAÇÃO', itens: ['Manual da qualidade', 'Formulários de registro', 'Lista mestra', 'Controle de registros', 'Arquivamento'] },
+          { t: 'SEGURANÇA DO TRABALHO E DESCARTE', itens: ['PQ de biossegurança', 'Recebimento de EPIs', 'Procedimentos para acidentes no trabalho', 'Manuseio e transporte de material biológico', 'Plano de prevenção de acidentes', 'PGR (NR-1) - substitui o PPRA', 'PCMSO', 'Vacinação', 'Extintores de incêndio', 'PQ de limpeza e esterilização', 'PGRSS'] },
+          { t: 'MEDIÇÃO, ANÁLISE E MELHORIAS DO SGQ', itens: ['PQ de auditoria interna', 'Registros das auditorias internas', 'Registros de não conformidades e ações corretivas implantadas', 'PQ de satisfação do cliente', 'Registros de medição e monitoramento da satisfação', 'Registros dos indicadores de desempenho'] }] },
+        { id: 'conclusao', label: 'Conclusão / observações gerais', tipo: 'textarea' }] },
+    { c: 'FR 036', t: 'Controle da Manutenção Predial', cat: 'Limpeza e conservação', modo: 'evento',
+      campos: [{ id: 'data', label: 'Data', tipo: 'data', obrig: 1 }, { id: 'item', label: 'Item', tipo: 'texto', obrig: 1 }, { id: 'reparo', label: 'Houve reparo?', tipo: 'select', opcoes: SN, obrig: 1 }, { id: 'proximo', label: 'Próximo reparo (data ou "quando necessário")', tipo: 'texto' }, { id: 'descricao', label: 'Descrição do reparo', tipo: 'textarea', obrig: 1 }] },
+    { c: 'FR 044', t: 'Análise do Perfil de Atendimento', cat: 'Relatórios gerenciais', modo: 'evento',
+      campos: [{ id: 'data_ini', label: 'Data início', tipo: 'data', obrig: 1 }, { id: 'data', label: 'Data final', tipo: 'data', obrig: 1 }, { id: 'top10', label: 'Top 10 exames realizados', tipo: 'textarea' }, { id: 'unidade', label: 'Atendimento por unidade', tipo: 'textarea' }, { id: 'convenio', label: 'Atendimento por convênio', tipo: 'textarea' }, { id: 'sexo', label: 'Atendimento por sexo e faixa etária', tipo: 'textarea' }, { id: 'secao', label: 'Seção por atendimento', tipo: 'textarea' }, { id: 'final', label: 'Relatório final (análise crítica)', tipo: 'textarea', obrig: 1 }] },
+    { c: 'FR 045', t: 'Relatório de Investigação de Evento Adverso Grave ou Óbito', cat: 'Segurança do paciente e ocorrências', modo: 'evento',
+      aviso: 'Estrutura padronizada pelo sistema (o modelo original não tinha campos descritos). Referencie o FR 038 do evento.',
+      campos: [{ id: 'data_ini', label: 'Data início da investigação', tipo: 'data', obrig: 1 }, { id: 'data', label: 'Data término', tipo: 'data', obrig: 1 }, { id: 'responsavel', label: 'Responsável pelo relatório', tipo: 'texto', obrig: 1 }, { id: 'ref', label: 'Registro do evento (FR 038, data/paciente)', tipo: 'texto' },
+        { id: 'descricao', label: 'Descrição do evento', tipo: 'textarea', obrig: 1 }, { id: 'cronologia', label: 'Cronologia dos fatos', tipo: 'textarea' }, { id: 'causa', label: 'Análise de causa raiz', tipo: 'textarea', obrig: 1 }, { id: 'fatores', label: 'Fatores contribuintes', tipo: 'textarea' }, { id: 'acoes', label: 'Ações corretivas e preventivas (responsável e prazo)', tipo: 'textarea', obrig: 1 },
+        { id: 'nsp', label: 'NSP comunicado?', tipo: 'select', opcoes: SN }, { id: 'notivisa', label: 'Notificação ao NOTIVISA (data / protocolo)', tipo: 'texto' }, { id: 'paciente_info', label: 'Paciente/familiar informado?', tipo: 'select', opcoes: SN }, { id: 'conclusao', label: 'Conclusão', tipo: 'textarea' }] },
+
+    // ----- Termos (geram PDF para imprimir e assinar) -----
+    { c: 'FR 013', t: 'Termo de Sigilo e Confidencialidade', cat: 'Documentos administrativos e RH', modo: 'evento', aviso: 'Gera o termo em PDF para imprimir e assinar; o PDF assinado deve ser arquivado na pasta do colaborador.',
+      campos: [{ id: 'nome', label: 'Nome do declarante', tipo: 'texto', obrig: 1 }, { id: 'cpf', label: 'CPF', tipo: 'texto', obrig: 1 }, { id: 'data', label: 'Data', tipo: 'data', obrig: 1 }],
+      assinaturas: ['Declarante', 'Márcio Rosa Santos - Diretor', 'Testemunha 1', 'Testemunha 2'],
+      texto: ['TERMO DE SIGILO E CONFIDENCIALIDADE',
+        'Pelo presente instrumento, {nome}, portador do CPF sob o nº {cpf}, funcionário/estagiário do CDA Laboratório de Análises Clínicas Ltda, denominado DECLARANTE, declara para os devidos fins de direito e judicial estar ciente das disposições abaixo relacionadas:',
+        'CLÁUSULA PRIMEIRA – DO OBJETO. O objeto deste termo é prover a necessária e adequada proteção às informações confidenciais que os funcionários e estagiários do CDA Laboratório de Análises Clínicas Ltda podem tomar conhecimento no exercício de sua atividade laboral.',
+        'CLÁUSULA SEGUNDA – DAS INFORMAÇÕES CONFIDENCIAIS. O DECLARANTE obriga-se a manter o mais absoluto sigilo com relação a toda e qualquer informação assimilada em decorrência do seu exercício funcional, devendo ser tratada como informação sigilosa. Deverá ser considerada como informação confidencial toda e qualquer informação escrita ou oral revelada ao DECLARANTE, por clientes ou terceiros, contendo-a ou não a expressão "CONFIDENCIAL". O termo "informação" abrangerá toda informação escrita, verbal ou de qualquer outro modo apresentada, tangível ou intangível, podendo incluir informações técnicas, intelectuais, financeiras, dentre outros, doravante denominados "INFORMAÇÕES CONFIDENCIAIS", a que, diretamente ou através de seus contatos com os clientes, teve acesso ou conhecimento o DECLARANTE em decorrência do seu exercício funcional. O DECLARANTE compromete-se a não revelar, produzir, utilizar ou dar conhecimento, em hipótese alguma, a terceiros, dessas INFORMAÇÕES CONFIDENCIAIS. O DECLARANTE obriga-se no sentido de que as INFORMAÇÕES CONFIDENCIAIS fiquem restritas ao conhecimento daqueles que estiverem diretamente envolvidos nas informações pessoais, documentos, análises, discussões, processos, resultados, laudos, diagnósticos e reuniões no exercício de sua atividade laboral.',
+        'CLÁUSULA TERCEIRA – DOS DIREITOS E OBRIGAÇÕES. O DECLARANTE compromete-se e se obriga a não utilizar a INFORMAÇÃO CONFIDENCIAL revelada em decorrência do seu exercício funcional, em tempo algum, mantendo sempre estrito sigilo acerca de tais informações. Compromete-se a não efetuar qualquer cópia da informação confidencial sem o consentimento prévio e expresso do seu superior imediato; a cientificar seus diretores, ou superiores imediatos, qualquer quebra de sigilo destas informações de natureza confidencial; e a tomar todas as medidas necessárias à proteção da informação confidencial, bem como para evitar e prevenir revelação a terceiros, exceto se devidamente autorizado por escrito pelo superior imediato. O DECLARANTE está ciente que a senha, decorrente de seu USER, por ele utilizada para acesso ao SIL (Sistema de Informação Laboratorial) é pessoal e intransferível, sendo EXPRESSAMENTE VEDADO, sob qualquer pretexto ou circunstância, revelá-la a quem quer que seja.',
+        'CLÁUSULA QUARTA – DA VIGÊNCIA. O presente termo de confidencialidade tem natureza irrevogável e irretratável, perdurando o dever de sigilo dele decorrente por tempo indeterminado.',
+        'CLÁUSULA QUINTA – DAS PENALIDADES. A quebra do sigilo, sem autorização expressa, sujeitará o DECLARANTE, por ação ou omissão, ao pagamento ou recomposição de todas as perdas e danos sofridos pela fornecedora de informações, inclusive as de ordem moral ou concorrencial, bem como as de responsabilidade civil, criminal e ética respectivas, as quais serão apuradas em regular processo judicial ou administrativo.',
+        'E, por assim estarem justas e contratadas, as partes assinam o presente instrumento em 1 (uma) via, na presença de duas testemunhas.',
+        'Afonso Cláudio, ES, {data}.'] },
+    { c: 'FR 018', t: 'Termo de Recusa de Atendimento após Acidente de Trabalho', cat: 'Documentos administrativos e RH', modo: 'evento', aviso: 'Gera o termo em PDF para imprimir e assinar (1ª via empresa, 2ª via empregado).',
+      campos: [{ id: 'nome', label: 'Nome do empregado', tipo: 'texto', obrig: 1 }, { id: 'cpf', label: 'CPF', tipo: 'texto', obrig: 1 }, { id: 'data', label: 'Data', tipo: 'data', obrig: 1 }],
+      assinaturas: ['Empregado acidentado', 'Responsável pela empresa'],
+      texto: ['TERMO DE RESPONSABILIDADE – RECUSA DE ATENDIMENTO',
+        'Eu {nome}, inscrito(a) no CPF nº {cpf}, pelo presente termo e em sã consciência declaro recusar, por motivos particulares, submeter-me aos procedimentos de atendimento médico de emergência nos Prontos Socorro dos estabelecimentos hospitalares conveniados pela empresa em função do recente acidente do trabalho ora ocorrido comigo envolvendo exposição a riscos biológicos.',
+        'Afonso Cláudio, ES, {data}.', '1ª via da empresa  |  2ª via do empregado'] },
+    { c: 'FR 021', t: 'Termo de Responsabilidade de Recebimento e Uso de EPIs', cat: 'Documentos administrativos e RH', modo: 'evento', aviso: 'Gera o termo em PDF para imprimir e assinar.', tabela_no_pdf: true,
+      campos: [{ id: 'nome', label: 'Nome do empregado', tipo: 'texto', obrig: 1 }, { id: 'cpf', label: 'CPF', tipo: 'texto', obrig: 1 }, { id: 'data', label: 'Data', tipo: 'data', obrig: 1 }, { id: 'epis', label: 'EPIs entregues (descrição e CA, se houver)', tipo: 'textarea' }],
+      assinaturas: ['Empregado', 'Responsável pela empresa'],
+      texto: ['TERMO DE RESPONSABILIDADE DE RECEBIMENTO DE EPIs',
+        'Eu {nome}, inscrito(a) no CPF nº {cpf}, pelo presente termo e em sã consciência declaro que recebi Equipamentos de Proteção Individual fornecidos por esta empresa, onde os mesmos são de acesso livre e fácil, assim como sou instruído a fazer uso dos mesmos para assegurar a integridade de minha saúde ocupacional.',
+        'Afonso Cláudio, ES, {data}.'] },
+    { c: 'FR 016', t: 'Termo de Nomeação', cat: 'Documentos administrativos e RH', modo: 'evento', aviso: 'Gera o termo em PDF para imprimir e colher as assinaturas.', tabela_no_pdf: true,
+      campos: [{ id: 'data', label: 'Data', tipo: 'data', obrig: 1 }, { id: 'nomeacoes', label: 'Funcionários nomeados', tipo: 'grade', obrig: 1, colunas: ['Funcionário'], linhas: ['Diretor', 'Chefe de Recepção', 'Chefe da Área Técnica', 'Coletor 1', 'Coletor 2', 'Recepcionista 1', 'Recepcionista 2', 'Supervisor de Qualidade', 'Responsável Técnico Ativo', 'Responsável Técnico Substituto', 'Relacionamento com Laboratórios de Apoio', 'Responsável Financeiro'] }],
+      assinaturas: ['Márcio Rosa Santos - Diretor Geral'],
+      texto: ['TERMO DE NOMEAÇÃO',
+        'Por este ato, a Direção do Laboratório CDA, estabelecido na Rua José Giestas, nº 46, Bairro Centro, Afonso Cláudio - ES, CEP: 29600-000, inscrita no CNPJ sob o número 12.525.717/0001-36, nomeia os funcionários abaixo como responsáveis específicos (cada nomeado assina ao lado do seu nome no documento impresso):',
+        'Afonso Cláudio, ES, {data}.'] }
+  );
+  GQ_FORMS.forEach(f => { if (f.texto && !f.tabela_no_pdf) f.somente_texto = true; });
+
   function gqFormLista() {
     const el = document.getElementById('gq-f-corpo');
     document.getElementById('gq-f-voltar').style.display = 'none';
@@ -4319,7 +4436,7 @@
       });
       h += '</div>';
     });
-    h += '<p class="text-xs text-slate-400 mt-4">Os demais formulários (FR 003, 011-013, 016, 018, 021, 024, 027-029, 033, 036, 039-045) entram nas próximas etapas.</p>';
+    h += '<p class="text-xs text-slate-400 mt-4">FR 001 (geladeira) est' + String.fromCharCode(225) + ' na aba Temperatura; FR 006 (n' + String.fromCharCode(227) + 'o conformidade) no sistema de NC; FR 024 (satisfa' + String.fromCharCode(231) + String.fromCharCode(227) + 'o) no NPS do app.</p>';
     el.innerHTML = h;
     GQ.form = null;
   }
@@ -4329,6 +4446,22 @@
   function gqCampoHtml(c, id, valor) {
     const v = valor == null ? '' : valor;
     const base = 'class="w-full border rounded-lg p-2 text-sm" id="' + id + '"';
+    if (c.tipo === 'multi') return '<div id="' + id + '" class="grid gap-1">' + c.opcoes.map((o, k) => '<label class="text-sm flex gap-2 items-center"><input type="checkbox" value="' + gqEsc(o) + '" id="' + id + '__' + k + '"> ' + gqEsc(o) + '</label>').join('') + '</div>';
+    if (c.tipo === 'grade') return '<div id="' + id + '" style="overflow:auto"><table class="text-sm w-full"><thead><tr><th></th>' + c.colunas.map(x => '<th class="text-left p-1">' + gqEsc(x) + '</th>').join('') + '</tr></thead><tbody>' +
+      c.linhas.map((l, i) => '<tr><td class="p-1 font-bold whitespace-nowrap">' + gqEsc(l) + '</td>' + c.colunas.map((x, j) => '<td class="p-1"><input type="text" data-sem-upper inputmode="decimal" class="border rounded p-1 text-sm" style="width:80px" id="' + id + '__' + i + '__' + j + '"></td>').join('') + '</tr>').join('') + '</tbody></table></div>';
+    if (c.tipo === 'checklist') {
+      let k = 0, h = '<div id="' + id + '">';
+      c.grupos.forEach(g => {
+        h += '<p class="text-xs font-extrabold mt-3 mb-1" style="color:#0F4C5C">' + gqEsc(g.t) + '</p>';
+        g.itens.forEach(it => {
+          h += '<div class="border-b py-1"><p class="text-sm">' + gqEsc(it) + '</p><div class="flex gap-3 items-center text-sm">' +
+            ['C', 'NC', 'NA'].map(s => '<label><input type="radio" name="' + id + '__r' + k + '" value="' + s + '"> ' + s + '</label>').join('') +
+            '<input type="text" placeholder="Obs. (obrigatória se NC)" class="border rounded p-1 text-xs flex-1" id="' + id + '__o' + k + '"></div></div>';
+          k++;
+        });
+      });
+      return h + '</div>';
+    }
     if (c.tipo === 'textarea') return '<textarea ' + base + ' rows="3">' + gqEsc(v) + '</textarea>';
     if (c.tipo === 'select') return '<select ' + base + '><option value="">—</option>' + c.opcoes.map(o => '<option' + (o === v ? ' selected' : '') + '>' + gqEsc(o) + '</option>').join('') + '</select>';
     if (c.tipo === 'data') return '<input type="date" ' + base + ' value="' + gqEsc(v) + '">';
@@ -4339,6 +4472,13 @@
   function gqLer(c, id) {
     const el = document.getElementById(id); if (!el) return '';
     if (c.tipo === 'check') return el.checked;
+    if (c.tipo === 'multi') return c.opcoes.filter((o, k) => document.getElementById(id + '__' + k).checked);
+    if (c.tipo === 'grade') { const o = {}; c.linhas.forEach((l, i) => { c.colunas.forEach((x, j) => { const v = (document.getElementById(id + '__' + i + '__' + j).value || '').trim(); if (v) { (o[l] = o[l] || {})[x] = v; } }); }); return Object.keys(o).length ? o : ''; }
+    if (c.tipo === 'checklist') {
+      const o = {}; let k = 0;
+      c.grupos.forEach(g => g.itens.forEach(it => { const r = document.querySelector('input[name="' + id + '__r' + k + '"]:checked'); const ob = (document.getElementById(id + '__o' + k).value || '').trim(); if (r) o[it] = { s: r.value, o: ob }; k++; }));
+      return Object.keys(o).length ? o : '';
+    }
     return (el.value || '').trim();
   }
   function gqForaFaixa(c, v) {
@@ -4453,7 +4593,10 @@
     const f = GQ.form, el = document.getElementById('gq-f-corpo');
     let h = '<div class="gq-card mb-3"><p class="font-extrabold">' + gqEsc(f.c) + ' · ' + gqEsc(f.t) + '</p>' + (f.aviso ? '<p class="text-xs text-amber-700 mt-1">' + gqEsc(f.aviso) + '</p>' : '') +
       '<div class="mt-3 grid gap-2"><label class="text-xs font-bold text-slate-500">Unidade</label><select id="gq-e-un" class="border rounded-lg p-2 text-sm">' + GQ_UNIDADES.map(u => '<option>' + u + '</option>').join('') + '</select>';
-    f.campos.forEach(c => { h += '<label class="text-xs font-bold text-slate-500 mt-1">' + gqEsc(c.label) + (c.obrig ? ' *' : '') + '</label>' + gqCampoHtml(c, 'gq-e-' + c.id, c.tipo === 'data' && c.id === 'data' ? new Date().toISOString().slice(0, 10) : ''); });
+    f.campos.forEach(c => {
+      if (c.tipo === 'titulo') { h += '<p class="text-xs font-extrabold uppercase mt-3" style="color:#0F4C5C">' + gqEsc(c.label) + '</p>'; return; }
+      h += '<label class="text-xs font-bold text-slate-500 mt-1">' + gqEsc(c.label) + (c.obrig ? ' *' : '') + '</label>' + gqCampoHtml(c, 'gq-e-' + c.id, c.tipo === 'data' && c.id === 'data' ? new Date().toISOString().slice(0, 10) : '');
+    });
     h += '<div id="gq-e-alerta" class="text-sm font-bold" style="color:#dc2626"></div>' + (f.pontuacao ? '<div id="gq-e-media" class="text-sm font-bold" style="color:#0F4C5C"></div>' : '') +
       '<button class="gq-btn mt-2" style="background:#0F4C5C" onclick="gqEventoSalvar()"><i class="fa-solid fa-floppy-disk"></i> Registrar (gera PDF no Drive)</button></div></div>' +
       '<div class="gq-card"><p class="gq-t">Registros anteriores</p><div id="gq-e-lista" class="text-sm"></div></div>';
@@ -4473,7 +4616,7 @@
     try {
       const regs = (await gqApi('listarRegistros', { form: f.c, limite: 30 })).reverse();
       box.innerHTML = regs.map(r => { let d = {}; try { d = JSON.parse(r.dados); } catch (e) {}
-        const resumo = f.campos.filter(c => d[c.id] && c.id !== 'data').slice(0, 2).map(c => gqEsc(String(d[c.id]).slice(0, 40))).join(' · ');
+        const resumo = f.campos.filter(c => typeof d[c.id] === 'string' && d[c.id] && c.id !== 'data').slice(0, 2).map(c => gqEsc(String(d[c.id]).slice(0, 40))).join(' · ');
         return '<div class="flex justify-between gap-2 border-b py-2"><span><b>' + gqEsc(r.periodo) + '</b> · ' + gqEsc(r.unidade) + ' · ' + resumo + '<br><span class="text-xs text-slate-400">' + gqEsc(r.usuario) + ' · ' + gqEsc(String(r.criado_em).slice(0, 16).replace('T', ' ')) + '</span></span>' +
           (r.pdf_url ? '<a target="_blank" rel="noopener" style="color:#0F4C5C;font-weight:700" href="' + gqEsc(r.pdf_url) + '">PDF</a>' : '') + '</div>'; }).join('') || '<p class="text-slate-400">Nenhum registro ainda.</p>';
     } catch (e) { box.innerHTML = '<span class="text-red-600">' + gqEsc(e.message) + '</span>'; }
@@ -4482,16 +4625,29 @@
   async function gqEventoSalvar() {
     const f = GQ.form, u = gqUsuarioForm();
     if (!u) { showToast('Informe seu nome em "Registrado por".', 'error'); return; }
-    const dados = {}; let falta = '', foraSemObs = false;
-    f.campos.forEach(c => { dados[c.id] = gqLer(c, 'gq-e-' + c.id); if (c.obrig && !dados[c.id]) falta = falta || c.label; });
+    const dados = {}; let falta = '', foraSemObs = false, ncSemObs = '';
+    f.campos.forEach(c => {
+      if (c.tipo === 'titulo') return;
+      dados[c.id] = gqLer(c, 'gq-e-' + c.id);
+      if (c.obrig && !(dados[c.id] && (!Array.isArray(dados[c.id]) || dados[c.id].length))) falta = falta || c.label;
+      if (c.tipo === 'checklist' && dados[c.id]) Object.keys(dados[c.id]).forEach(it => { const r = dados[c.id][it]; if (r.s === 'NC' && !r.o && !ncSemObs) ncSemObs = it; });
+    });
     if (falta) { showToast('Preencha: ' + falta, 'error'); return; }
+    if (ncSemObs) { showToast('Item NC sem observação: ' + ncSemObs.slice(0, 60), 'error'); return; }
     f.campos.forEach(c => { if (gqForaFaixa(c, dados[c.id]) && f.desvio && !dados[f.desvio]) foraSemObs = true; });
     if (foraSemObs) { showToast('Valor fora da faixa: descreva a ação nas observações.', 'error'); return; }
     if (f.pontuacao) { let s = 0; f.campos.forEach(c => { if (c.pts && dados[c.id]) s += c.pts[dados[c.id]]; }); dados.media_pct = s; }
-    const rotulos = f.campos.map(c => ({ id: c.id, label: c.label })); if (f.pontuacao) rotulos.push({ id: 'media_pct', label: 'Média da avaliação (%)' });
+    const rotulos = f.campos.filter(c => c.tipo !== 'titulo').map(c => ({ id: c.id, label: c.label, texto: gqTexto(c, dados[c.id]) })); if (f.pontuacao) rotulos.push({ id: 'media_pct', label: 'Média da avaliação (%)', texto: String(dados.media_pct) });
+    const pdf = { titulo: f.t, rotulos: rotulos };
+    if (f.texto) {
+      const ph = { nome: dados.nome || '', cpf: dados.cpf || '', data: dados.data ? dados.data.split('-').reverse().join('/') : '' };
+      pdf.paragrafos = f.texto.map(t => t.replace(/\{(\w+)\}/g, (m, k) => ph[k] != null ? ph[k] : m)); pdf.assinaturas = f.assinaturas || []; pdf.somente_texto = !f.tabela_no_pdf;
+    }
     try {
-      await gqApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: document.getElementById('gq-e-un').value, periodo: dados.data || new Date().toISOString().slice(0, 10), chave: String(Date.now()), dados: dados, usuario: u, pdf: { titulo: f.t, rotulos: rotulos } });
-      showToast('Registro salvo e arquivado no Drive.', 'success'); gqEventoMontar();
+      const rr = await gqApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: document.getElementById('gq-e-un').value, periodo: dados.data || new Date().toISOString().slice(0, 10), chave: String(Date.now()), dados: dados, usuario: u, pdf: pdf });
+      showToast('Registro salvo e arquivado no Drive.', 'success');
+      if (f.texto && rr.pdf_url) window.open(rr.pdf_url, '_blank', 'noopener');
+      gqEventoMontar();
     } catch (e) { showToast(e.message, 'error'); }
   }
 
