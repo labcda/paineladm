@@ -2495,7 +2495,7 @@
         <div id="gq-conexao" style="display:none;background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:18px;">
           <p class="font-bold text-slate-700 mb-2"><i class="fa-solid fa-plug"></i> Conectar ao sistema da Qualidade</p>
           <p class="text-xs text-slate-500 mb-3">Cole a URL do Apps Script (termina em /exec) e a chave gerada pelo setup(). Ficam salvas só neste navegador.</p>
-          <input id="gq-cfg-url" type="text" placeholder="URL /exec" class="w-full border rounded-lg p-2 text-sm mb-2">
+          <input id="gq-cfg-url" type="text" data-sem-upper autocapitalize="off" spellcheck="false" placeholder="URL /exec" class="w-full border rounded-lg p-2 text-sm mb-2">
           <input id="gq-cfg-chave" type="password" placeholder="Chave da Qualidade" class="w-full border rounded-lg p-2 text-sm mb-2">
           <button onclick="gqSalvarConexao()" class="px-4 py-2 rounded-lg text-white font-bold text-sm" style="background:#0F4C5C">Conectar</button>
         </div>
@@ -3028,7 +3028,7 @@
   // ==================== UPPERCASE GLOBAL EM CAMPOS DE TEXTO ====================
   document.addEventListener('input', function(e) {
     const el = e.target;
-    if (el.tagName === 'INPUT' && el.type === 'text') {
+    if (el.tagName === 'INPUT' && el.type === 'text' && !el.hasAttribute('data-sem-upper')) {
       const start = el.selectionStart;
       const end = el.selectionEnd;
       const upper = el.value.toUpperCase();
