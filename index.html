@@ -344,6 +344,12 @@
     .atividade-titulo { font-weight: 600; color: #101620; font-size: 0.85rem; }
     .atividade-tempo { font-size: 0.75rem; color: #8c939e; }
 
+    .gq-aba{padding:8px 16px;border-radius:100px;border:1px solid #cbd5e1;background:#fff;font-weight:700;font-size:.85rem;cursor:pointer}
+    .gq-aba.on{background:#0F4C5C;color:#fff;border-color:#0F4C5C}
+    .gq-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:18px}
+    .gq-t{font-weight:800;color:#334155;margin-bottom:8px}
+    .gq-pill{color:#fff;font-size:.7rem;font-weight:800;padding:3px 10px;border-radius:100px;white-space:nowrap}
+    .gq-btn{background:#d97706;color:#fff;font-weight:700;font-size:.8rem;padding:8px 12px;border-radius:10px;border:none;cursor:pointer}
     .page { display: none; }
     .page.active { display: block; animation: fadeIn 0.4s ease-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -1078,6 +1084,7 @@
         <li data-page="recoletas" title="Recoletas"><a href="#"><i class="fa-solid fa-vial"></i><span>Recoletas</span></a></li>
         <li data-page="relatorios" title="Relatórios"><a href="#"><i class="fa-solid fa-chart-line"></i><span>Relatórios</span></a></li>
         <li data-page="boletos" title="Boletos"><a href="#"><i class="fa-solid fa-file-invoice-dollar"></i><span>Boletos</span></a></li>
+        <li data-page="gq" title="Gestão da Qualidade"><a href="#"><i class="fa-solid fa-shield-halved"></i><span>Gestão da Qualidade</span></a></li>
         <li data-page="qualidade" title="Controle de Qualidade"><a href="#"><i class="fa-solid fa-award"></i><span>Controle de Qualidade</span></a></li>
         <li data-page="configuracoes" id="nav-configuracoes" title="Configurações"><a href="#"><i class="fa-solid fa-gear"></i><span>Configurações</span></a></li>
       </ul>
@@ -2477,6 +2484,82 @@
           </div>
         </div>
       </section>
+      <!-- GESTÃO DA QUALIDADE (documentos + temperatura) -->
+      <section id="page-gq" class="page space-y-5">
+        <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 100%);border-radius:26px;padding:22px;color:white;box-shadow:0 14px 34px rgba(15,76,92,0.2);">
+          <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-3"><i class="fa-solid fa-shield-halved"></i> Gestão da Qualidade</span>
+          <h2 class="text-2xl font-extrabold leading-tight mb-1">Qualidade (DICQ / ONA)</h2>
+          <p class="text-sm text-white/80">Documentos controlados, temperatura e pendências do dia. Todo arquivo fica guardado no Drive; nada é apagado.</p>
+        </div>
+
+        <div id="gq-conexao" style="display:none;background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:18px;">
+          <p class="font-bold text-slate-700 mb-2"><i class="fa-solid fa-plug"></i> Conectar ao sistema da Qualidade</p>
+          <p class="text-xs text-slate-500 mb-3">Cole a URL do Apps Script (termina em /exec) e a chave gerada pelo setup(). Ficam salvas só neste navegador.</p>
+          <input id="gq-cfg-url" type="text" placeholder="URL /exec" class="w-full border rounded-lg p-2 text-sm mb-2">
+          <input id="gq-cfg-chave" type="password" placeholder="Chave da Qualidade" class="w-full border rounded-lg p-2 text-sm mb-2">
+          <button onclick="gqSalvarConexao()" class="px-4 py-2 rounded-lg text-white font-bold text-sm" style="background:#0F4C5C">Conectar</button>
+        </div>
+
+        <div id="gq-corpo">
+          <div class="flex flex-wrap gap-2 mb-4" id="gq-abas">
+            <button class="gq-aba" data-aba="hoje" onclick="gqAba('hoje')">Hoje</button>
+            <button class="gq-aba" data-aba="temp" onclick="gqAba('temp')">Temperatura</button>
+            <button class="gq-aba" data-aba="docs" onclick="gqAba('docs')">Documentos</button>
+            <button class="gq-aba" data-aba="conf" onclick="gqAba('conf')"><i class="fa-solid fa-gear"></i></button>
+          </div>
+
+          <div id="gq-p-hoje" class="gq-painel"></div>
+
+          <div id="gq-p-temp" class="gq-painel" style="display:none">
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:18px;margin-bottom:14px;">
+              <p class="font-bold text-slate-700 mb-3">Registrar leitura</p>
+              <div class="grid grid-cols-2 gap-2 mb-2">
+                <select id="gq-t-equip" class="border rounded-lg p-2 text-sm"></select>
+                <select id="gq-t-turno" class="border rounded-lg p-2 text-sm"><option>ABERTURA</option><option>FECHAMENTO</option></select>
+              </div>
+              <div class="grid grid-cols-3 gap-2 mb-2">
+                <input id="gq-t-atual" type="text" inputmode="decimal" placeholder="Atual °C" class="border rounded-lg p-2 text-sm">
+                <input id="gq-t-min" type="text" inputmode="decimal" placeholder="Mínima °C" class="border rounded-lg p-2 text-sm">
+                <input id="gq-t-max" type="text" inputmode="decimal" placeholder="Máxima °C" class="border rounded-lg p-2 text-sm">
+              </div>
+              <input id="gq-t-usuario" type="text" placeholder="Seu nome (responsável pela leitura)" class="w-full border rounded-lg p-2 text-sm mb-2">
+              <textarea id="gq-t-acao" rows="2" placeholder="Ação corretiva (obrigatória se fora da faixa)" class="w-full border rounded-lg p-2 text-sm mb-2"></textarea>
+              <input id="gq-t-obs" type="text" placeholder="Observações (opcional)" class="w-full border rounded-lg p-2 text-sm mb-3">
+              <button onclick="gqRegistrarTemp()" class="px-4 py-2 rounded-lg text-white font-bold text-sm" style="background:#0F4C5C"><i class="fa-solid fa-floppy-disk"></i> Registrar</button>
+              <p class="text-[11px] text-slate-400 mt-2">Faixa padrão 2–8 °C. Registre temperatura atual, mínima e máxima desde a leitura anterior (termômetro calibrado).</p>
+            </div>
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:18px;">
+              <div class="flex items-center justify-between mb-3"><p class="font-bold text-slate-700">Histórico do mês</p><input id="gq-t-mes" type="month" class="border rounded-lg p-1 text-sm" onchange="gqCarregarTemps()"></div>
+              <canvas id="gq-t-chart" height="110"></canvas>
+              <div id="gq-t-lista" class="mt-3 text-sm"></div>
+            </div>
+          </div>
+
+          <div id="gq-p-docs" class="gq-painel" style="display:none">
+            <div class="flex flex-wrap gap-2 mb-3">
+              <input id="gq-d-busca" type="text" placeholder="Buscar código ou título" oninput="gqRenderDocs()" class="border rounded-lg p-2 text-sm flex-1 min-w-[180px]">
+              <select id="gq-d-tipo" class="border rounded-lg p-2 text-sm" onchange="gqRenderDocs()"><option value="">Todos os tipos</option><option>MQ</option><option>PQ</option><option>ITA</option><option>FR</option><option>L</option><option>DC</option><option>SP</option></select>
+              <select id="gq-d-status" class="border rounded-lg p-2 text-sm" onchange="gqRenderDocs()"><option value="">Todos os status</option><option value="importado">Importado (a validar)</option><option value="rascunho">Rascunho</option><option value="em_aprovacao">Em aprovação</option><option value="vigente">Vigente</option><option value="obsoleto">Obsoleto</option></select>
+              <select id="gq-d-unid" class="border rounded-lg p-2 text-sm" onchange="gqRenderDocs()"><option value="">Todas as unidades</option><option>Matriz</option><option>Mata Fria</option></select>
+              <select id="gq-d-rev" class="border rounded-lg p-2 text-sm" onchange="gqRenderDocs()"><option value="">Revisão: todas</option><option value="vencida">Vencida</option><option value="30">Vence em 30 dias</option></select>
+            </div>
+            <div id="gq-d-resumo" class="text-xs text-slate-500 mb-2"></div>
+            <div id="gq-d-lista" style="background:#fff;border:1px solid #e2e8f0;border-radius:18px;overflow:hidden;"></div>
+          </div>
+
+          <div id="gq-p-conf" class="gq-painel" style="display:none">
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:18px;">
+              <p class="font-bold text-slate-700 mb-2">Conexão</p>
+              <button onclick="gqDesconectar()" class="px-3 py-2 rounded-lg border text-sm font-bold text-red-600">Desconectar deste navegador</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div id="gq-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;padding:16px;">
+        <div style="background:#fff;border-radius:18px;max-width:520px;width:100%;max-height:90vh;overflow:auto;padding:20px;" id="gq-modal-corpo"></div>
+      </div>
+
 
       <!-- CONTROLE DE QUALIDADE -->
       <section id="page-qualidade" class="page space-y-5">
@@ -3909,6 +3992,7 @@
       if (pageId === 'agenda') {
         agendaAtualizarAtual();
       }
+      if (pageId === 'gq') { gqIniciar(); }
       if (pageId === 'qualidade') {
         carregarNaoConformidades();
       }
@@ -3921,6 +4005,212 @@
       }
     });
   });
+
+
+  // ==================== GESTÃO DA QUALIDADE (documentos + temperatura) ====================
+  // Backend: projeto Apps Script "CDA Qualidade" (APPS-SCRIPT-QUALIDADE.gs). URL e chave ficam só no navegador.
+  const GQ = { docs: [], equips: [], chart: null };
+
+  function gqCfg() {
+    try { return { url: localStorage.getItem('gq_url') || '', chave: localStorage.getItem('gq_chave') || '' }; }
+    catch (e) { return { url: '', chave: '' }; }
+  }
+  function gqEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  async function gqApi(acao, dados) {
+    const c = gqCfg();
+    if (!c.url || !c.chave) throw new Error('Qualidade não conectada.');
+    const r = await fetch(c.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(Object.assign({ chave: c.chave, acao: acao }, dados || {})) });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.erro || 'Erro');
+    return j.dados;
+  }
+
+  function gqSalvarConexao() {
+    const u = document.getElementById('gq-cfg-url').value.trim();
+    const k = document.getElementById('gq-cfg-chave').value.trim();
+    if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(u) || !k) { showToast('Informe a URL /exec e a chave.', 'error'); return; }
+    try { localStorage.setItem('gq_url', u); localStorage.setItem('gq_chave', k); } catch (e) {}
+    document.getElementById('gq-cfg-chave').value = '';
+    gqIniciar();
+  }
+  function gqDesconectar() {
+    try { localStorage.removeItem('gq_url'); localStorage.removeItem('gq_chave'); } catch (e) {}
+    gqIniciar();
+  }
+
+  function gqAba(a) {
+    document.querySelectorAll('.gq-painel').forEach(p => p.style.display = 'none');
+    document.getElementById('gq-p-' + a).style.display = 'block';
+    document.querySelectorAll('.gq-aba').forEach(b => b.classList.toggle('on', b.dataset.aba === a));
+    if (a === 'hoje') gqCarregarHoje();
+    if (a === 'temp') gqPrepararTemp();
+    if (a === 'docs') gqCarregarDocs();
+  }
+
+  function gqIniciar() {
+    const c = gqCfg(), ok = !!(c.url && c.chave);
+    document.getElementById('gq-conexao').style.display = ok ? 'none' : 'block';
+    document.getElementById('gq-corpo').style.display = ok ? 'block' : 'none';
+    if (ok) gqAba('hoje');
+  }
+
+  async function gqCarregarHoje() {
+    const el = document.getElementById('gq-p-hoje');
+    el.innerHTML = '<p class="text-sm text-slate-400">Carregando…</p>';
+    try {
+      const r = await gqApi('hoje');
+      let h = '<div class="grid gap-3 md:grid-cols-2">';
+      h += '<div class="gq-card"><p class="gq-t">Leituras de temperatura de hoje</p>';
+      r.leituras.forEach(l => {
+        h += '<div class="mb-2"><b>' + gqEsc(l.nome) + '</b> <span class="text-xs text-slate-400">(' + l.faixa_min + '–' + l.faixa_max + ' °C)</span><div class="flex gap-2 mt-1">';
+        r.turnos.forEach(t => {
+          const s = l.feitas[t];
+          const cor = s === 'OK' ? '#16a34a' : s === 'DESVIO' ? '#dc2626' : (r.funciona ? '#d97706' : '#94a3b8');
+          h += '<span class="gq-pill" style="background:' + cor + '">' + t + ': ' + (s || (r.funciona ? 'pendente' : '—')) + '</span>';
+        });
+        h += '</div></div>';
+      });
+      h += '</div>';
+      h += '<div class="gq-card"><p class="gq-t">Documentos</p><p class="text-sm">Total: <b>' + r.docs_total + '</b> · ' +
+        Object.keys(r.docs_por_status).map(s => gqEsc(s) + ': ' + r.docs_por_status[s]).join(' · ') + '</p>' +
+        '<p class="text-sm mt-2" style="color:#dc2626"><b>' + r.docs_vencidos.length + '</b> com revisão vencida</p>' +
+        '<p class="text-sm" style="color:#d97706"><b>' + r.docs_vencendo.length + '</b> vencem em 30 dias</p></div>';
+      h += '</div>';
+      if (r.desvios.length) {
+        h += '<div class="gq-card mt-3"><p class="gq-t" style="color:#dc2626">Últimos desvios de temperatura</p>';
+        r.desvios.forEach(d => { h += '<p class="text-sm">' + gqEsc(d.data) + ' ' + gqEsc(d.turno) + ' — ' + gqEsc(d.equip_nome) + ': ' + gqEsc(d.atual) + ' (mín ' + gqEsc(d.min) + ' / máx ' + gqEsc(d.max) + ') — ' + gqEsc(d.acao_corretiva) + '</p>'; });
+        h += '</div>';
+      }
+      el.innerHTML = h;
+    } catch (e) { el.innerHTML = '<p class="text-sm text-red-600">' + gqEsc(e.message) + '</p>'; }
+  }
+
+  // ---------- temperatura ----------
+  async function gqPrepararTemp() {
+    try {
+      GQ.equips = (await gqApi('listarEquipamentos')).filter(e => e.ativo !== 'nao');
+      document.getElementById('gq-t-equip').innerHTML = GQ.equips.map(e => '<option value="' + gqEsc(e.id) + '">' + gqEsc(e.nome) + ' (' + gqEsc(e.faixa_min) + '–' + gqEsc(e.faixa_max) + ' °C)</option>').join('');
+      const m = document.getElementById('gq-t-mes');
+      if (!m.value) { const d = new Date(); m.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
+      const u = document.getElementById('gq-t-usuario');
+      try { if (!u.value) u.value = localStorage.getItem('gq_usuario') || ''; } catch (e) {}
+      gqCarregarTemps();
+    } catch (e) { showToast(e.message, 'error'); }
+  }
+
+  async function gqRegistrarTemp(corrigir) {
+    const v = id => document.getElementById(id).value.trim();
+    const dados = { equip_id: v('gq-t-equip'), turno: v('gq-t-turno'), atual: v('gq-t-atual'), min: v('gq-t-min'), max: v('gq-t-max'),
+      usuario: v('gq-t-usuario'), acao_corretiva: v('gq-t-acao'), obs: v('gq-t-obs'), corrigir: !!corrigir };
+    try { localStorage.setItem('gq_usuario', dados.usuario); } catch (e) {}
+    try {
+      const r = await gqApi('registrarTemperatura', dados);
+      showToast(r.situacao === 'OK' ? 'Leitura registrada.' : 'Leitura registrada com DESVIO — alerta enviado.', r.situacao === 'OK' ? 'success' : 'error');
+      ['gq-t-atual', 'gq-t-min', 'gq-t-max', 'gq-t-acao', 'gq-t-obs'].forEach(i => document.getElementById(i).value = '');
+      gqCarregarTemps();
+    } catch (e) {
+      if (/Já existe leitura/.test(e.message) && confirm(e.message + '\n\nRegistrar como RETIFICAÇÃO (a leitura anterior é mantida no histórico)?')) return gqRegistrarTemp(true);
+      showToast(e.message, 'error');
+    }
+  }
+
+  async function gqCarregarTemps() {
+    const mes = document.getElementById('gq-t-mes').value;
+    try {
+      const lista = await gqApi('listarTemperaturas', { mes: mes });
+      lista.sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
+      const porEq = {};
+      lista.forEach(t => { (porEq[t.equip_nome] = porEq[t.equip_nome] || []).push(t); });
+      const dias = Array.from(new Set(lista.map(t => t.data))).sort();
+      const cores = ['#0F4C5C', '#d97706', '#7c3aed', '#16a34a'];
+      const ds = Object.keys(porEq).map((n, i) => ({ label: n + ' (atual)', borderColor: cores[i % 4], backgroundColor: cores[i % 4], tension: .25,
+        data: dias.map(d => { const x = porEq[n].filter(t => t.data === d); return x.length ? parseFloat(x[x.length - 1].atual) : null; }), spanGaps: true }));
+      if (GQ.chart) GQ.chart.destroy();
+      GQ.chart = new Chart(document.getElementById('gq-t-chart'), { type: 'line', data: { labels: dias.map(d => d.slice(8)), datasets: ds },
+        options: { plugins: { legend: { position: 'bottom' } }, scales: { y: { suggestedMin: 0, suggestedMax: 10 } } } });
+      document.getElementById('gq-t-lista').innerHTML = lista.slice().reverse().slice(0, 40).map(t =>
+        '<div class="flex justify-between border-b py-1"><span>' + gqEsc(t.data) + ' ' + gqEsc(t.hora) + ' · ' + gqEsc(t.equip_nome) + ' · ' + gqEsc(t.turno) + '</span><span style="color:' + (t.situacao === 'OK' ? '#16a34a' : '#dc2626') + ';font-weight:700">' +
+        gqEsc(t.atual) + ' (' + gqEsc(t.min) + '/' + gqEsc(t.max) + ') ' + gqEsc(t.situacao) + '</span></div>').join('') || '<p class="text-slate-400">Sem leituras neste mês.</p>';
+    } catch (e) { showToast(e.message, 'error'); }
+  }
+
+  // ---------- documentos ----------
+  async function gqCarregarDocs() {
+    document.getElementById('gq-d-lista').innerHTML = '<p class="p-4 text-sm text-slate-400">Carregando…</p>';
+    try { GQ.docs = await gqApi('listarDocumentos'); gqRenderDocs(); }
+    catch (e) { document.getElementById('gq-d-lista').innerHTML = '<p class="p-4 text-sm text-red-600">' + gqEsc(e.message) + '</p>'; }
+  }
+
+  function gqDias(iso) {
+    if (!iso) return null;
+    const p = iso.split('-'), h = new Date();
+    return Math.round((Date.UTC(+p[0], +p[1] - 1, +p[2]) - Date.UTC(h.getFullYear(), h.getMonth(), h.getDate())) / 86400000);
+  }
+
+  function gqRenderDocs() {
+    const q = document.getElementById('gq-d-busca').value.toLowerCase();
+    const tp = document.getElementById('gq-d-tipo').value, st = document.getElementById('gq-d-status').value;
+    const un = document.getElementById('gq-d-unid').value, rv = document.getElementById('gq-d-rev').value;
+    const rows = GQ.docs.filter(d => {
+      if (q && (d.codigo + ' ' + d.titulo).toLowerCase().indexOf(q) < 0) return false;
+      if (tp && d.tipo !== tp) return false;
+      if (st && d.status !== st) return false;
+      if (un && d.unidade !== un) return false;
+      const dias = gqDias(d.proxima_revisao);
+      if (rv === 'vencida' && !(dias !== null && dias < 0 && d.status !== 'obsoleto')) return false;
+      if (rv === '30' && !(dias !== null && dias >= 0 && dias <= 30)) return false;
+      return true;
+    });
+    document.getElementById('gq-d-resumo').textContent = rows.length + ' documento(s)';
+    const cor = { importado: '#94a3b8', rascunho: '#d97706', em_aprovacao: '#7c3aed', vigente: '#16a34a', obsoleto: '#64748b' };
+    document.getElementById('gq-d-lista').innerHTML = rows.slice(0, 300).map(d => {
+      const dias = gqDias(d.proxima_revisao);
+      const rev = dias === null ? '' : dias < 0 ? '<span style="color:#dc2626">revisão vencida há ' + (-dias) + 'd</span>' : '<span class="text-slate-400">revisão em ' + dias + 'd</span>';
+      return '<div class="flex items-center justify-between gap-2 px-4 py-3 border-b cursor-pointer hover:bg-slate-50" onclick="gqAbrirDoc(\'' + gqEsc(d.id) + '\')">' +
+        '<div class="min-w-0"><p class="text-sm font-bold truncate">' + gqEsc(d.titulo) + '</p><p class="text-xs text-slate-500">' + gqEsc(d.unidade) + ' · v' + gqEsc(d.versao) + ' · ' + rev + '</p></div>' +
+        '<span class="gq-pill" style="background:' + (cor[d.status] || '#94a3b8') + '">' + gqEsc(d.status) + '</span></div>';
+    }).join('') || '<p class="p-4 text-sm text-slate-400">Nenhum documento.</p>';
+  }
+
+  async function gqAbrirDoc(id) {
+    const d = GQ.docs.find(x => x.id === id); if (!d) return;
+    let hist = [];
+    try { hist = await gqApi('historicoDocumento', { id: id }); } catch (e) {}
+    const m = document.getElementById('gq-modal');
+    document.getElementById('gq-modal-corpo').innerHTML =
+      '<div class="flex justify-between items-start mb-3"><div><p class="text-xs text-slate-500">' + gqEsc(d.codigo) + ' · ' + gqEsc(d.unidade) + ' · v' + gqEsc(d.versao) + '</p><p class="font-extrabold">' + gqEsc(d.titulo) + '</p></div><button onclick="gqFecharModal()" class="text-xl">&times;</button></div>' +
+      '<p class="text-sm mb-1">Status: <b>' + gqEsc(d.status) + '</b></p>' +
+      '<p class="text-sm mb-1">Vigência: ' + gqEsc(d.data_vigencia || '—') + ' · Próxima revisão: ' + gqEsc(d.proxima_revisao || '—') + '</p>' +
+      '<p class="text-sm mb-3">Aprovador: ' + gqEsc(d.aprovador || '—') + '</p>' +
+      (d.arquivo_url ? '<a href="' + gqEsc(d.arquivo_url) + '" target="_blank" rel="noopener" class="inline-block mb-3 text-sm font-bold" style="color:#0F4C5C"><i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir arquivo no Drive</a>' : '<p class="text-xs text-amber-600 mb-3">Sem arquivo vinculado.</p>') +
+      '<input id="gq-m-usuario" type="text" placeholder="Seu nome (obrigatório para aprovar)" class="w-full border rounded-lg p-2 text-sm mb-2" value="' + gqEsc((function () { try { return localStorage.getItem('gq_usuario') || ''; } catch (e) { return ''; } })()) + '">' +
+      '<input id="gq-m-motivo" type="text" placeholder="Motivo / observação (obrigatório para obsoleto)" class="w-full border rounded-lg p-2 text-sm mb-3">' +
+      '<div class="flex flex-wrap gap-2 mb-4">' +
+      '<button class="gq-btn" onclick="gqStatus(\'' + d.id + '\',\'em_aprovacao\')">Enviar p/ aprovação</button>' +
+      '<button class="gq-btn" style="background:#16a34a" onclick="gqStatus(\'' + d.id + '\',\'vigente\')">Aprovar (vigente)</button>' +
+      '<button class="gq-btn" style="background:#0F4C5C" onclick="gqStatus(\'' + d.id + '\',\'vigente\',true)">Aprovar como nova versão</button>' +
+      '<button class="gq-btn" style="background:#64748b" onclick="gqStatus(\'' + d.id + '\',\'obsoleto\')">Tornar obsoleto</button></div>' +
+      '<p class="text-xs font-bold text-slate-500 mb-1">Histórico</p>' +
+      (hist.map(h => '<p class="text-xs text-slate-600">' + gqEsc(String(h.data).slice(0, 16).replace('T', ' ')) + ' · ' + gqEsc(h.status) + ' · v' + gqEsc(h.versao_nova) + ' · ' + gqEsc(h.usuario) + (h.motivo ? ' — ' + gqEsc(h.motivo) : '') + '</p>').join('') || '<p class="text-xs text-slate-400">Sem alterações registradas.</p>');
+    m.style.display = 'flex';
+  }
+  function gqFecharModal() { document.getElementById('gq-modal').style.display = 'none'; }
+
+  async function gqStatus(id, status, novaVersao) {
+    const usuario = document.getElementById('gq-m-usuario').value.trim(), motivo = document.getElementById('gq-m-motivo').value.trim();
+    if (!usuario) { showToast('Informe seu nome.', 'error'); return; }
+    if (status === 'vigente' && !confirm('Confirma a aprovação deste documento? Fica registrada com seu nome, data e hora.')) return;
+    try {
+      localStorage.setItem('gq_usuario', usuario);
+    } catch (e) {}
+    try {
+      await gqApi('mudarStatus', { id: id, status: status, usuario: usuario, motivo: motivo, nova_versao: !!novaVersao });
+      showToast('Documento atualizado.', 'success');
+      gqFecharModal(); gqCarregarDocs();
+    } catch (e) { showToast(e.message, 'error'); }
+  }
 
   let cdaToastTimer = null;
   function showToast(msg, tipo, duracao) {
@@ -7195,6 +7485,7 @@ async function carregarUsuarios() {
     { id: 'recoletas',     label: 'Recoletas',     icon: 'fa-solid fa-vial' },
     { id: 'relatorios',    label: 'Relatórios',    icon: 'fa-solid fa-chart-line' },
     { id: 'boletos',       label: 'Boletos',       icon: 'fa-solid fa-file-invoice-dollar' },
+    { id: 'gq',            label: 'Gestão da Qualidade (documentos/temperatura)', icon: 'fa-solid fa-shield-halved' },
     { id: 'qualidade',     label: 'Controle de Qualidade', icon: 'fa-solid fa-award' },
     { id: 'configuracoes', label: 'Configurações', icon: 'fa-solid fa-gear' }
   ];
