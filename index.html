@@ -2589,7 +2589,11 @@
                         <input type="password" id="config-senha-confirm" placeholder="Confirme a senha..." class="cfg-input"></div>
                 </div>
                 <div>
-                    <label class="cfg-label" style="margin-bottom:8px;"><i class="fa-solid fa-shield-halved mr-1"></i> Permissões de acesso — o que este usuário poderá ver e usar</label>
+                    <label class="cfg-label" style="margin-bottom:8px;"><i class="fa-solid fa-shield-halved mr-1"></i> Permissões de acesso — o usuário só verá o que estiver marcado</label>
+                    <div style="display:flex;gap:14px;margin-bottom:8px;font-size:0.75rem;font-weight:700;">
+                        <a href="#" onclick="cfgMarcarTodasPermissoes('cfg-permissoes-grid', true); return false;" style="color:#338b85;">Marcar todas</a>
+                        <a href="#" onclick="cfgMarcarTodasPermissoes('cfg-permissoes-grid', false); return false;" style="color:#94a3b8;">Limpar</a>
+                    </div>
                     <div class="cfg-permissoes-grid" id="cfg-permissoes-grid"></div>
                 </div>
                 <div id="config-error" class="login-error-msg" style="display: none; margin-top: 6px;">Preencha todos os campos</div>
@@ -2619,6 +2623,10 @@
         <p id="modal-permissoes-login" style="font-size:1.05rem; font-weight:800; color:#0B302D;"></p>
       </div>
       <button onclick="fecharModalPermissoes()" style="width:30px;height:30px;border-radius:50%;border:none;background:#f1f5f9;color:#64748b;cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div style="display:flex;gap:14px;margin-bottom:8px;font-size:0.75rem;font-weight:700;">
+      <a href="#" onclick="cfgMarcarTodasPermissoes('modal-permissoes-grid', true); return false;" style="color:#338b85;">Marcar todas</a>
+      <a href="#" onclick="cfgMarcarTodasPermissoes('modal-permissoes-grid', false); return false;" style="color:#94a3b8;">Limpar</a>
     </div>
     <div class="cfg-permissoes-grid" id="modal-permissoes-grid" style="margin-bottom:18px;"></div>
     <button id="btn-salvar-permissoes" class="fin-btn-primary" onclick="salvarPermissoesModal()" style="width:100%; justify-content:center; padding:12px;"><i class="fa-solid fa-check"></i> Salvar permissões</button>
@@ -2885,6 +2893,7 @@
 
   function quickAbrir(pagina, callback) {
     fecharQuickAdd();
+    if (!podeAcessar(pagina)) { showToast('Você não tem permissão para acessar esta área.', 'error'); return; }
     navigateToPage(pagina);
     if (callback) setTimeout(callback, 150);
   }
@@ -2941,14 +2950,14 @@
         splash.style.display = 'none';
         document.getElementById('appContainer').style.display = 'flex';
         document.body.classList.add('app-loaded');
+        // Permissões primeiro: assim nada é buscado nem exibido além do que foi liberado
+        aplicarPermissoes(permissoes);
         carregarExames();
         agenInicializar();
-        carregarEstatisticas();
-        renderAtividades();
-        carregarRecoletas();
+        if (podeAcessar('home')) { carregarEstatisticas(); renderAtividades(); }
+        if (podeAcessar('recoletas')) carregarRecoletas();
         atualizarBadgeUsuario();
         iniciarTemaDashboard();
-        aplicarPermissoes(permissoes);
       }, 600);
     }, 2500);
   }
@@ -2956,7 +2965,7 @@
   document.addEventListener('DOMContentLoaded', function() {
     const loginLogo = document.getElementById('login-logo-img');
     if (loginLogo) loginLogo.src = LOGO_CDA_B64;
-    cfgRenderPermissoesGrid('cfg-permissoes-grid', null);
+    cfgRenderPermissoesGrid('cfg-permissoes-grid', null, false);
     const senhaInput = document.getElementById('login-senha');
     const usuarioInput = document.getElementById('login-usuario');
     if (senhaInput) {
@@ -3850,6 +3859,11 @@
       const pageId = li.getAttribute('data-page');
       if (!pageId) return;
       e.preventDefault();
+      // Barreira central: qualquer caminho até uma página (menu, atalho, "Novo", link) passa por aqui
+      if (pageId !== 'home' && !podeAcessar(pageId)) {
+        showToast('Você não tem permissão para acessar esta área.', 'error');
+        return;
+      }
       if (pageId === 'configuracoes' && !configAutorizado) {
         document.getElementById('modal-senha-config').style.display = 'flex';
         document.getElementById('senha-config-input').value = '';
@@ -7133,7 +7147,7 @@ async function carregarUsuarios() {
         document.getElementById('config-login').value = '';
         document.getElementById('config-senha').value = '';
         document.getElementById('config-senha-confirm').value = '';
-        cfgRenderPermissoesGrid('cfg-permissoes-grid', null);
+        cfgRenderPermissoesGrid('cfg-permissoes-grid', null, false);
         carregarUsuarios();
         setTimeout(() => successEl.style.display = 'none', 4000);
       } else if (json.existe) {
@@ -7152,6 +7166,7 @@ async function carregarUsuarios() {
 
   // ==================== PERMISSÕES DE ACESSO POR USUÁRIO ====================
   const CFG_PAGINAS = [
+    { id: 'home',          label: 'Dashboard (indicadores)', icon: 'fa-solid fa-house' },
     { id: 'orcamento',     label: 'Orçamentos',    icon: 'fa-solid fa-calculator' },
     { id: 'agendamento',   label: 'Agendamento',   icon: 'fa-regular fa-calendar-check' },
     { id: 'agenda',        label: 'Agenda',        icon: 'fa-regular fa-calendar-days' },
@@ -7162,14 +7177,21 @@ async function carregarUsuarios() {
     { id: 'configuracoes', label: 'Configurações', icon: 'fa-solid fa-gear' }
   ];
 
-  function cfgRenderPermissoesGrid(containerId, permissoesAtuais) {
+  // padraoMarcado: usado só quando não há permissões salvas. Novo usuário nasce
+  // SEM nenhum acesso marcado (o admin libera só o que quiser); usuários antigos
+  // sem permissões salvas continuam com acesso total até serem editados.
+  function cfgRenderPermissoesGrid(containerId, permissoesAtuais, padraoMarcado) {
     const container = document.getElementById(containerId);
     if (!container) return;
-    const perms = permissoesAtuais || {};
+    const temSalvas = !!permissoesAtuais;
     container.innerHTML = CFG_PAGINAS.map(p => {
-      const marcado = perms[p.id] !== false; // sem dado prévio = acesso liberado por padrão
+      const marcado = temSalvas ? permissoesAtuais[p.id] !== false : !!padraoMarcado;
       return '<label class="cfg-perm-item"><input type="checkbox" data-perm="' + p.id + '" ' + (marcado ? 'checked' : '') + '><i class="' + p.icon + '"></i><span>' + p.label + '</span></label>';
     }).join('');
+  }
+
+  function cfgMarcarTodasPermissoes(containerId, marcar) {
+    document.querySelectorAll('#' + containerId + ' input[data-perm]').forEach(cb => { cb.checked = marcar; });
   }
 
   function cfgColetarPermissoes(containerId) {
@@ -7180,14 +7202,44 @@ async function carregarUsuarios() {
     return perms;
   }
 
+  // Permissões do usuário logado (null = acesso total: admin local ou usuário antigo sem permissões salvas)
+  let PERMISSOES_USUARIO = null;
+
+  function podeAcessar(pageId) {
+    if (!PERMISSOES_USUARIO) return true;
+    return PERMISSOES_USUARIO[pageId] !== false;
+  }
+
+  // Aplica as permissões em TODOS os pontos de entrada: menu lateral, atalhos da Home,
+  // menu "Novo", sino de notificações e os próprios indicadores do dashboard.
   function aplicarPermissoes(permissoes) {
-    // Se o backend ainda não devolve permissões no login, libera tudo (comportamento atual, sem quebrar nada)
-    if (!permissoes) return;
+    PERMISSOES_USUARIO = permissoes || null;
+    if (!PERMISSOES_USUARIO) return;
+
     CFG_PAGINAS.forEach(p => {
-      const permitido = permissoes[p.id] !== false;
       const item = document.querySelector('#main-nav li[data-page="' + p.id + '"]');
-      if (item) item.style.display = permitido ? '' : 'none';
+      if (item && p.id !== 'home') item.style.display = podeAcessar(p.id) ? '' : 'none';
     });
+
+    // Atalhos da Home e menu "Novo": o destino vem do próprio onclick (navigateToPage('x') / quickAbrir('x'))
+    document.querySelectorAll('.home-shortcut-tile, #fin-quickadd-menu button').forEach(btn => {
+      const m = (btn.getAttribute('onclick') || '').match(/(?:navigateToPage|quickAbrir)\('(\w+)'/);
+      if (m && !podeAcessar(m[1])) btn.style.display = 'none';
+    });
+    const menuNovo = document.getElementById('fin-quickadd-wrap');
+    if (menuNovo && ![...document.querySelectorAll('#fin-quickadd-menu button')].some(b => b.style.display !== 'none')) menuNovo.style.display = 'none';
+
+    // Sem permissão para o Dashboard: esconde indicadores, gráficos, notificações e o botão Atualizar
+    if (!podeAcessar('home')) {
+      document.querySelectorAll('#page-home > *:not(.home-shortcuts)').forEach(el => { el.style.display = 'none'; });
+      ['fin-notif-wrap'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+      const btnAtualizar = document.querySelector('#fin-topbar-right .fin-btn-ghost');
+      if (btnAtualizar) btnAtualizar.style.display = 'none';
+      const aviso = document.createElement('p');
+      aviso.style.cssText = 'text-align:center;color:var(--fin-text-muted);font-size:0.9rem;margin-top:30px;';
+      aviso.textContent = 'Use o menu lateral ou os atalhos acima para acessar as áreas liberadas para o seu usuário.';
+      document.getElementById('page-home').appendChild(aviso);
+    }
   }
 
   let cfgEditandoIndex = null;
@@ -7197,7 +7249,7 @@ async function carregarUsuarios() {
     if (!usuario) return;
     cfgEditandoIndex = index;
     document.getElementById('modal-permissoes-login').textContent = usuario.login || '';
-    cfgRenderPermissoesGrid('modal-permissoes-grid', usuario.permissoes || null);
+    cfgRenderPermissoesGrid('modal-permissoes-grid', usuario.permissoes || null, true);
     document.getElementById('modal-permissoes').style.display = 'flex';
   }
 
