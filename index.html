@@ -2505,6 +2505,7 @@
             <button class="gq-aba" data-aba="hoje" onclick="gqAba('hoje')">Hoje</button>
             <button class="gq-aba" data-aba="temp" onclick="gqAba('temp')">Temperatura</button>
             <button class="gq-aba" data-aba="docs" onclick="gqAba('docs')">Documentos</button>
+            <button class="gq-aba" data-aba="form" onclick="gqAba('form')">Formulários</button>
             <button class="gq-aba" data-aba="conf" onclick="gqAba('conf')"><i class="fa-solid fa-gear"></i></button>
           </div>
 
@@ -2545,6 +2546,15 @@
             </div>
             <div id="gq-d-resumo" class="text-xs text-slate-500 mb-2"></div>
             <div id="gq-d-lista" style="background:#fff;border:1px solid #e2e8f0;border-radius:18px;overflow:hidden;"></div>
+          </div>
+
+          <div id="gq-p-form" class="gq-painel" style="display:none">
+            <div class="gq-card mb-3" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <label class="text-xs font-bold text-slate-500">Registrado por</label>
+              <input id="gq-f-usuario" type="text" placeholder="Seu nome" class="border rounded-lg p-2 text-sm" style="min-width:200px">
+              <button id="gq-f-voltar" class="gq-aba" style="display:none" onclick="gqFormLista()">&larr; Formulários</button>
+            </div>
+            <div id="gq-f-corpo"></div>
           </div>
 
           <div id="gq-p-conf" class="gq-painel" style="display:none">
@@ -4047,6 +4057,7 @@
     if (a === 'hoje') gqCarregarHoje();
     if (a === 'temp') gqPrepararTemp();
     if (a === 'docs') gqCarregarDocs();
+    if (a === 'form') { try { const un = document.getElementById('gq-f-usuario'); if (un && !un.value) un.value = localStorage.getItem('gq_usuario') || ''; } catch (e) {} gqFormLista(); }
   }
 
   function gqIniciar() {
@@ -4209,6 +4220,278 @@
       await gqApi('mudarStatus', { id: id, status: status, usuario: usuario, motivo: motivo, nova_versao: !!novaVersao });
       showToast('Documento atualizado.', 'success');
       gqFecharModal(); gqCarregarDocs();
+    } catch (e) { showToast(e.message, 'error'); }
+  }
+
+
+  // ---------- FORMULÁRIOS DIGITAIS ----------
+  // Definições (campos de cada formulário). Alterar um formulário = editar aqui; os registros ficam no Drive/planilha.
+  // modo 'mensal': uma linha por dia do mês (cols). modo 'evento': um registro por ocorrência (campos).
+  const GQ_UNIDADES = ['Matriz', 'Mata Fria'];
+  const GQ_FORMS = [
+    // ----- Temperatura e ambiente -----
+    { c: 'FR 009', t: 'Controle de Temperatura do Banho-Maria', cat: 'Temperatura e ambiente', modo: 'mensal', item_label: 'Equipamento', itens: ['Banho-maria'],
+      aviso: 'Ideal 37 °C (aceitável 36 a 38 °C). Fora da faixa: transferir reagentes/amostras e descrever a ação.', desvio: 'obs',
+      cols: [{ id: 't8', label: '8:00 h (°C)', tipo: 'numero', min: 36, max: 38 }, { id: 't15', label: '15:00 h (°C)', tipo: 'numero', min: 36, max: 38 }, { id: 'obs', label: 'Observações / ação', tipo: 'texto' }] },
+    { c: 'FR 010', t: 'Controle de Temperatura e Umidade - Área Técnica', cat: 'Temperatura e ambiente', modo: 'mensal', item_label: 'Setor', itens: ['Área Técnica'],
+      aviso: 'Temperatura 18 a 24 °C; umidade relativa 40 a 80 %.', desvio: 'obs',
+      cols: [{ id: 'tmin', label: 'Temp. mín (°C)', tipo: 'numero', min: 18, max: 24 }, { id: 'tmax', label: 'Temp. máx (°C)', tipo: 'numero', min: 18, max: 24 }, { id: 'umin', label: 'Umid. mín (%)', tipo: 'numero', min: 40, max: 80 }, { id: 'umax', label: 'Umid. máx (%)', tipo: 'numero', min: 40, max: 80 }, { id: 'obs', label: 'Observações / ação', tipo: 'texto' }] },
+    { c: 'FR 030', t: 'Controle de Temperatura - Maleta de Coleta Domiciliar', cat: 'Temperatura e ambiente', modo: 'mensal', chave_label: 'Dia', item_label: 'Maleta', itens: ['Maleta 1'],
+      aviso: 'Temperatura ideal: 4 a 25 °C.', desvio: 'obs',
+      cols: [{ id: 'antes', label: 'Antes (°C)', tipo: 'numero', min: 4, max: 25 }, { id: 'apos', label: 'Após (°C)', tipo: 'numero', min: 4, max: 25 }, { id: 'obs', label: 'Observações / ação', tipo: 'texto' }] },
+    { c: 'FR 047', t: 'Controle de Temperatura - Maleta de Transporte de Amostras', cat: 'Temperatura e ambiente', modo: 'mensal', item_label: 'Maleta', itens: ['Maleta 1'],
+      aviso: 'Temperatura ideal: 4 a 25 °C.', desvio: 'obs',
+      cols: [{ id: 'antes', label: 'Antes (°C)', tipo: 'numero', min: 4, max: 25 }, { id: 'apos', label: 'Após (°C)', tipo: 'numero', min: 4, max: 25 }, { id: 'obs', label: 'Observações / ação', tipo: 'texto' }] },
+    { c: 'FR 020', t: 'Controle de Temperatura no Recebimento de Insumos', cat: 'Recebimento e fornecedores', modo: 'evento', desvio: 'obs',
+      aviso: 'Temperatura adequada no recebimento: 2 a 16 °C.',
+      campos: [{ id: 'data', label: 'Data', tipo: 'data', obrig: 1 }, { id: 'material', label: 'Material recebido', tipo: 'texto', obrig: 1 }, { id: 'qtd', label: 'Quantidade', tipo: 'texto' }, { id: 'temp', label: 'Temperatura no recebimento (°C)', tipo: 'numero', min: 2, max: 16, obrig: 1 }, { id: 'lote', label: 'Lote / validade', tipo: 'texto' }, { id: 'obs', label: 'Observações / ação (obrigatória se fora da faixa)', tipo: 'textarea' }] },
+
+    // ----- Limpeza e conservação -----
+    { c: 'FR 004', t: 'Limpeza das Centrífugas', cat: 'Limpeza e conservação', modo: 'mensal', item_label: 'Setor', itens: ['Área Técnica'],
+      cols: [{ id: 'alcool', label: 'Álcool 70% (diária)', tipo: 'check' }, { id: 'cacapas', label: 'Caçapas c/ álcool 70% (semanal)', tipo: 'check' }, { id: 'obs', label: 'Obs.', tipo: 'texto' }] },
+    { c: 'FR 005', t: 'Limpeza de Pias e Bancadas', cat: 'Limpeza e conservação', modo: 'mensal', item_label: 'Setor', itens: ['Área Técnica'],
+      cols: [{ id: 'alcool', label: 'Álcool 70%', tipo: 'check' }, { id: 'organizar', label: 'Organizar', tipo: 'check' }, { id: 'arear', label: 'Arear pia', tipo: 'check' }, { id: 'hipoclorito', label: 'Hipoclorito 1% bancadas (semanal)', tipo: 'check' }, { id: 'obs', label: 'Obs.', tipo: 'texto' }] },
+    { c: 'FR 034', t: 'Limpeza de Equipamentos e Conservação - A15', cat: 'Limpeza e conservação', modo: 'mensal', item_label: 'Equipamento', itens: ['A15'],
+      cols: [{ id: 'externa', label: 'Limpeza externa', tipo: 'check' }, { id: 'final', label: 'Limpeza - final de expediente', tipo: 'check' }, { id: 'concentrada', label: 'Limpeza concentrada quinzenal', tipo: 'check' }, { id: 'obs', label: 'Obs.', tipo: 'texto' }] },
+    { c: 'FR 035', t: 'Limpeza de Equipamentos e Conservação - KX', cat: 'Limpeza e conservação', modo: 'mensal', item_label: 'Equipamento', itens: ['KX'],
+      cols: [{ id: 'externa', label: 'Limpeza externa', tipo: 'check' }, { id: 'final', label: 'Limpeza - final de expediente', tipo: 'check' }, { id: 'concentrada', label: 'Limpeza concentrada quinzenal', tipo: 'check' }, { id: 'obs', label: 'Obs.', tipo: 'texto' }] },
+    { c: 'FR 049', t: 'Limpeza e Degelo da Geladeira', cat: 'Limpeza e conservação', modo: 'mensal', item_label: 'Geladeira', itens: ['Geladeira Matriz', 'Geladeira Mata Fria'],
+      cols: [{ id: 'alcool', label: 'Álcool 70% (diária)', tipo: 'check' }, { id: 'degelo', label: 'Degelo e limpeza (mensal)', tipo: 'check' }, { id: 'obs', label: 'Obs.', tipo: 'texto' }] },
+
+    // ----- Resultados e qualidade -----
+    { c: 'FR 025', t: 'Comunicação de Resultados com Valores Críticos', cat: 'Resultados e qualidade', modo: 'evento',
+      campos: [{ id: 'data', label: 'Data', tipo: 'data', obrig: 1 }, { id: 'os', label: 'OS', tipo: 'texto', obrig: 1 }, { id: 'paciente', label: 'Paciente', tipo: 'texto', obrig: 1 }, { id: 'exame', label: 'Exame', tipo: 'texto', obrig: 1 },
+        { id: 'liberacao', label: 'Horário de liberação do equipamento', tipo: 'hora', obrig: 1 }, { id: 'contato', label: 'Horário do contato', tipo: 'hora', obrig: 1 }, { id: 'quem_fez', label: 'Quem FEZ o contato', tipo: 'texto', obrig: 1 }, { id: 'quem_recebeu', label: 'Quem RECEBEU o contato (nome e vínculo)', tipo: 'texto', obrig: 1 }, { id: 'obs', label: 'Observações', tipo: 'textarea' }] },
+    { c: 'FR 008', t: 'Relatório de Auditoria Interna', cat: 'Resultados e qualidade', modo: 'evento',
+      campos: [{ id: 'data', label: 'Data da auditoria', tipo: 'data', obrig: 1 }, { id: 'local', label: 'Local auditado', tipo: 'texto', obrig: 1 }, { id: 'auditor', label: 'Auditor', tipo: 'texto', obrig: 1 }, { id: 'fortes', label: 'Pontos fortes (um por linha)', tipo: 'textarea' }, { id: 'nc', label: 'Não conformidades (uma por linha)', tipo: 'textarea' }, { id: 'evid', label: 'Evidências das não conformidades', tipo: 'textarea' }, { id: 'oportunidades', label: 'Oportunidades de melhoria (uma por linha)', tipo: 'textarea' }, { id: 'resp_setor', label: 'Responsável pelo setor auditado', tipo: 'texto' }] },
+
+    // ----- Fornecedores -----
+    { c: 'FR 007', t: 'Registro de Avaliação de Fornecedores', cat: 'Recebimento e fornecedores', modo: 'evento', pontuacao: true,
+      aviso: 'A média é calculada automaticamente (cada item vale até 20%).',
+      campos: [{ id: 'razao', label: 'Razão social', tipo: 'texto', obrig: 1 }, { id: 'fantasia', label: 'Nome fantasia', tipo: 'texto' }, { id: 'cnpj', label: 'CNPJ', tipo: 'texto' }, { id: 'area', label: 'Área', tipo: 'select', opcoes: ['Técnica', 'Administrativa'] }, { id: 'data', label: 'Avaliação realizada em', tipo: 'data', obrig: 1 }, { id: 'prox', label: 'Próxima avaliação', tipo: 'data' },
+        { id: 'assist', label: 'Serviços de assistência técnica', tipo: 'select', opcoes: ['Atende', 'Atende com restrição', 'Não atende', 'NA'], pts: { 'Atende': 20, 'Atende com restrição': 13, 'Não atende': 6, 'NA': 20 } },
+        { id: 'assess', label: 'Serviço de assessoria científica', tipo: 'select', opcoes: ['Atende', 'Atende com restrição', 'Não atende', 'NA'], pts: { 'Atende': 20, 'Atende com restrição': 13, 'Não atende': 6, 'NA': 20 } },
+        { id: 'prazo', label: 'Cumpre o prazo de entrega', tipo: 'select', opcoes: ['Sim', 'Sim com restrição', 'Não', 'NA'], pts: { 'Sim': 20, 'Sim com restrição': 13, 'Não': 6, 'NA': 20 } },
+        { id: 'embal', label: 'Condição das embalagens / qualidade do serviço', tipo: 'select', opcoes: ['Sim', 'Sim com restrição', 'Não', 'NA'], pts: { 'Sim': 20, 'Sim com restrição': 13, 'Não': 6, 'NA': 20 } },
+        { id: 'comunic', label: 'Facilidade de comunicação e resolução de problemas', tipo: 'select', opcoes: ['Sim', 'Sim com restrição', 'Não', 'NA'], pts: { 'Sim': 20, 'Sim com restrição': 13, 'Não': 6, 'NA': 20 } },
+        { id: 'obs', label: 'Observações', tipo: 'textarea' }] },
+
+    // ----- Segurança do paciente e ocorrências -----
+    { c: 'FR 038', t: 'Incidentes e Eventos Adversos', cat: 'Segurança do paciente e ocorrências', modo: 'evento',
+      alerta: { campo: 'grau', valores: ['Grave', 'Óbito'], msg: 'Dano grave ou óbito: comunicar o NSP imediatamente; a notificação ao NOTIVISA deve ser feita em até 72 h.' },
+      campos: [{ id: 'data', label: 'Data da ocorrência', tipo: 'data', obrig: 1 }, { id: 'relacionado', label: 'Ocorrência relacionada a', tipo: 'select', opcoes: ['Paciente', 'Acompanhante', 'Profissional'], obrig: 1 }, { id: 'notificador', label: 'Notificador', tipo: 'texto' }, { id: 'relator', label: 'Relator', tipo: 'texto' }, { id: 'paciente', label: 'Paciente', tipo: 'texto' },
+        { id: 'classificacao', label: 'Classificação', tipo: 'select', opcoes: ['Near miss', 'Incidente sem dano', 'Incidente com dano (evento adverso)'], obrig: 1 }, { id: 'grau', label: 'Grau do dano', tipo: 'select', opcoes: ['Nenhum', 'Leve', 'Moderado', 'Grave', 'Óbito'], obrig: 1 },
+        { id: 'descricao', label: 'Descrição da ocorrência', tipo: 'textarea', obrig: 1 }, { id: 'consequencia', label: 'Consequência para o paciente', tipo: 'textarea' }, { id: 'fatores', label: 'Fatores contribuintes', tipo: 'textarea' }, { id: 'deteccao', label: 'Detecção', tipo: 'textarea' }, { id: 'atenuantes', label: 'Fatores atenuantes', tipo: 'textarea' }, { id: 'imediatas', label: 'Ações imediatas', tipo: 'textarea' }, { id: 'reducao', label: 'Ações para redução de risco', tipo: 'textarea' }] },
+    { c: 'FR 037', t: 'Manifestação do Paciente', cat: 'Segurança do paciente e ocorrências', modo: 'evento',
+      campos: [{ id: 'data', label: 'Data de abertura', tipo: 'data', obrig: 1 }, { id: 'recebido_por', label: 'Quem recebeu a manifestação', tipo: 'texto', obrig: 1 }, { id: 'forma', label: 'Forma de recebimento', tipo: 'select', opcoes: ['E-mail', 'WhatsApp', 'Telefonema', 'Pessoal', 'Pesquisa de satisfação', 'Outros'], obrig: 1 }, { id: 'forma_outros', label: 'Se outros, descreva', tipo: 'texto' },
+        { id: 'manifestacao', label: 'Manifestação / reclamação', tipo: 'textarea', obrig: 1 }, { id: 'feedback', label: 'Feedback ao paciente', tipo: 'textarea' }, { id: 'resp_feedback', label: 'Responsável pelo feedback', tipo: 'texto' }, { id: 'plano', label: 'Plano de ação (se necessário)', tipo: 'textarea' }, { id: 'resp_plano', label: 'Responsável pelo plano', tipo: 'texto' }, { id: 'data_plano', label: 'Prazo do plano', tipo: 'data' }] },
+    { c: 'FR 022', t: 'CIAT - Comunicação de Acidente de Trabalho', cat: 'Segurança do paciente e ocorrências', modo: 'evento',
+      aviso: 'Dado de saúde ocupacional: acesso restrito (LGPD).',
+      campos: [{ id: 'nome', label: 'Nome do acidentado', tipo: 'texto', obrig: 1 }, { id: 'unidade_trab', label: 'Unidade de trabalho', tipo: 'texto' }, { id: 'nasc', label: 'Data de nascimento', tipo: 'data' }, { id: 'tel', label: 'Telefone', tipo: 'texto' },
+        { id: 'data', label: 'Data do acidente', tipo: 'data', obrig: 1 }, { id: 'hora', label: 'Hora do acidente', tipo: 'hora' }, { id: 'local', label: 'Local do acidente', tipo: 'texto' }, { id: 'horario_trab', label: 'Horário de trabalho', tipo: 'texto' }, { id: 'parte_corpo', label: 'Parte do corpo atingida', tipo: 'texto' }, { id: 'agente', label: 'Agente/objeto causador', tipo: 'texto' },
+        { id: 'epi', label: 'Utilizava EPI?', tipo: 'select', opcoes: ['Sim', 'Não'] }, { id: 'epi_detalhe', label: 'Quais EPIs / por que não', tipo: 'texto' }, { id: 'categoria', label: 'Categoria', tipo: 'select', opcoes: ['Material biológico', 'Trajeto', 'Outro'] }, { id: 'bo', label: 'Registro policial (nº do B.O., se houver)', tipo: 'texto' },
+        { id: 'descricao', label: 'Descrição (ao executar o quê / aconteceu o quê / devido a quê)', tipo: 'textarea', obrig: 1 },
+        { id: 'atend_unidade', label: 'Unidade de atendimento médico', tipo: 'texto' }, { id: 'atend_data', label: 'Data do atendimento', tipo: 'data' }, { id: 'atend_hora', label: 'Horário do atendimento médico', tipo: 'hora' }, { id: 'cid', label: 'CID-10', tipo: 'texto' }, { id: 'crm', label: 'CRM do médico', tipo: 'texto' }, { id: 'internacao', label: 'Internação?', tipo: 'select', opcoes: ['Sim', 'Não'] }] },
+    { c: 'FR 046', t: 'Termo de Conhecimento de Ocorrências', cat: 'Segurança do paciente e ocorrências', modo: 'evento',
+      campos: [{ id: 'data', label: 'Data da ocorrência', tipo: 'data', obrig: 1 }, { id: 'periodo', label: 'Período (horas/dias)', tipo: 'texto' }, { id: 'colaborador', label: 'Colaborador(a)', tipo: 'texto', obrig: 1 }, { id: 'descricao', label: 'Descrição da ocorrência / justificativa', tipo: 'textarea', obrig: 1 }] },
+
+    // ----- Reuniões e treinamento -----
+    { c: 'FR 023', t: 'Ata de Reunião', cat: 'Reuniões e treinamento', modo: 'evento',
+      campos: [{ id: 'data', label: 'Data', tipo: 'data', obrig: 1 }, { id: 'inicio', label: 'Início', tipo: 'hora' }, { id: 'termino', label: 'Término', tipo: 'hora' }, { id: 'local', label: 'Local', tipo: 'texto' }, { id: 'carater', label: 'Caráter da reunião', tipo: 'select', opcoes: ['Ordinária', 'Extraordinária'] },
+        { id: 'pauta', label: 'Pauta', tipo: 'textarea', obrig: 1 }, { id: 'relato', label: 'Relato', tipo: 'textarea', obrig: 1 }, { id: 'participantes', label: 'Participantes (um por linha: nome - setor)', tipo: 'textarea', obrig: 1 }] },
+    { c: 'FR 002', t: 'Lista de Treinamento', cat: 'Reuniões e treinamento', modo: 'evento',
+      campos: [{ id: 'data', label: 'Data', tipo: 'data', obrig: 1 }, { id: 'tipo', label: 'Tipo de treinamento', tipo: 'select', opcoes: ['Interno', 'Externo'], obrig: 1 }, { id: 'instrutor', label: 'Instrutor / agente multiplicador', tipo: 'texto', obrig: 1 }, { id: 'tema', label: 'Tema', tipo: 'texto', obrig: 1 }, { id: 'carga', label: 'Carga horária', tipo: 'texto' },
+        { id: 'conteudo', label: 'Conteúdo abordado', tipo: 'textarea' }, { id: 'participantes', label: 'Participantes (um por linha: nome - setor)', tipo: 'textarea', obrig: 1 }, { id: 'avaliacao', label: 'Avaliação da eficácia (como foi verificado o aprendizado)', tipo: 'textarea' }] }
+  ];
+  const GQ_CATS = ['Temperatura e ambiente', 'Limpeza e conservação', 'Resultados e qualidade', 'Recebimento e fornecedores', 'Segurança do paciente e ocorrências', 'Reuniões e treinamento'];
+  GQ.form = null;
+
+  function gqFormLista() {
+    const el = document.getElementById('gq-f-corpo');
+    document.getElementById('gq-f-voltar').style.display = 'none';
+    let h = '';
+    GQ_CATS.forEach(cat => {
+      const fs = GQ_FORMS.filter(f => f.cat === cat);
+      if (!fs.length) return;
+      h += '<p class="text-xs font-extrabold uppercase text-slate-500 mt-4 mb-2">' + gqEsc(cat) + '</p><div class="grid gap-2 md:grid-cols-2">';
+      fs.forEach(f => {
+        h += '<button class="gq-card text-left" style="cursor:pointer" onclick="gqFormAbrir(\'' + f.c + '\')"><span class="text-xs text-slate-400">' + gqEsc(f.c) + ' · ' + (f.modo === 'mensal' ? 'controle mensal' : 'registro') + '</span><br><b class="text-sm">' + gqEsc(f.t) + '</b></button>';
+      });
+      h += '</div>';
+    });
+    h += '<p class="text-xs text-slate-400 mt-4">Os demais formulários (FR 003, 011-013, 016, 018, 021, 024, 027-029, 033, 036, 039-045) entram nas próximas etapas.</p>';
+    el.innerHTML = h;
+    GQ.form = null;
+  }
+
+  function gqUsuarioForm() { const u = (document.getElementById('gq-f-usuario').value || '').trim(); try { localStorage.setItem('gq_usuario', u); } catch (e) {} return u; }
+
+  function gqCampoHtml(c, id, valor) {
+    const v = valor == null ? '' : valor;
+    const base = 'class="w-full border rounded-lg p-2 text-sm" id="' + id + '"';
+    if (c.tipo === 'textarea') return '<textarea ' + base + ' rows="3">' + gqEsc(v) + '</textarea>';
+    if (c.tipo === 'select') return '<select ' + base + '><option value="">—</option>' + c.opcoes.map(o => '<option' + (o === v ? ' selected' : '') + '>' + gqEsc(o) + '</option>').join('') + '</select>';
+    if (c.tipo === 'data') return '<input type="date" ' + base + ' value="' + gqEsc(v) + '">';
+    if (c.tipo === 'hora') return '<input type="time" ' + base + ' value="' + gqEsc(v) + '">';
+    if (c.tipo === 'numero') return '<input type="text" inputmode="decimal" data-sem-upper ' + base + ' value="' + gqEsc(v) + '">';
+    return '<input type="text" ' + base + ' value="' + gqEsc(v) + '">';
+  }
+  function gqLer(c, id) {
+    const el = document.getElementById(id); if (!el) return '';
+    if (c.tipo === 'check') return el.checked;
+    return (el.value || '').trim();
+  }
+  function gqForaFaixa(c, v) {
+    if (c.tipo !== 'numero' || v === '' || v == null) return false;
+    const n = parseFloat(String(v).replace(',', '.'));
+    if (isNaN(n)) return false;
+    return (c.min != null && n < c.min) || (c.max != null && n > c.max);
+  }
+
+  async function gqFormAbrir(cod) {
+    const f = GQ_FORMS.find(x => x.c === cod); if (!f) return;
+    GQ.form = f;
+    document.getElementById('gq-f-voltar').style.display = 'inline-block';
+    if (f.modo === 'mensal') gqMensalMontar(); else gqEventoMontar();
+  }
+
+  // ----- mensal -----
+  function gqMensalMontar() {
+    const f = GQ.form, el = document.getElementById('gq-f-corpo'), d = new Date();
+    const mes = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    el.innerHTML = '<div class="gq-card mb-3"><p class="font-extrabold">' + gqEsc(f.c) + ' · ' + gqEsc(f.t) + '</p>' + (f.aviso ? '<p class="text-xs text-amber-700 mt-1">' + gqEsc(f.aviso) + '</p>' : '') +
+      '<div class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3">' +
+      '<select id="gq-m-un" class="border rounded-lg p-2 text-sm" onchange="gqMensalCarregar()">' + GQ_UNIDADES.map(u => '<option>' + u + '</option>').join('') + '</select>' +
+      '<input id="gq-m-mes" type="month" value="' + mes + '" class="border rounded-lg p-2 text-sm" onchange="gqMensalCarregar()">' +
+      '<input id="gq-m-item" list="gq-m-itens" data-sem-upper placeholder="' + gqEsc(f.item_label || 'Item') + '" value="' + gqEsc(f.itens[0]) + '" class="border rounded-lg p-2 text-sm col-span-2" onchange="gqMensalCarregar()"><datalist id="gq-m-itens">' + f.itens.map(i => '<option value="' + gqEsc(i) + '">').join('') + '</datalist></div></div>' +
+      '<div id="gq-m-tab"></div>';
+    gqMensalCarregar();
+  }
+
+  async function gqMensalCarregar() {
+    const f = GQ.form, un = document.getElementById('gq-m-un').value, mes = document.getElementById('gq-m-mes').value, item = document.getElementById('gq-m-item').value.trim();
+    const box = document.getElementById('gq-m-tab'); box.innerHTML = '<p class="text-sm text-slate-400">Carregando…</p>';
+    let regs = [], fech = [];
+    try {
+      regs = await gqApi('listarRegistros', { form: f.c, unidade: un, periodo: mes, item: item });
+      fech = (await gqApi('listarFechamentos', { form: f.c })).filter(x => x.unidade === un && x.periodo === mes && x.item === item);
+    } catch (e) { box.innerHTML = '<p class="text-red-600 text-sm">' + gqEsc(e.message) + '</p>'; return; }
+    const ult = {}; regs.forEach(r => { ult[r.chave] = r; });
+    const p = mes.split('-'), dias = new Date(+p[0], +p[1], 0).getDate(), hoje = new Date(), hojeIso = hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0') + '-' + String(hoje.getDate()).padStart(2, '0');
+    GQ._mensal = { un, mes, item, ult };
+    let h = '<div class="gq-card" style="overflow:auto"><table class="w-full text-sm" style="min-width:560px"><thead><tr><th class="text-left p-1">Dia</th>' + f.cols.map(c => '<th class="text-left p-1">' + gqEsc(c.label) + '</th>').join('') + '<th class="p-1"></th></tr></thead><tbody>';
+    for (let dia = 1; dia <= dias; dia++) {
+      const iso = mes + '-' + String(dia).padStart(2, '0'), futuro = iso > hojeIso, r = ult[String(dia)];
+      let dados = {}; if (r) { try { dados = JSON.parse(r.dados); } catch (e) {} }
+      h += '<tr style="border-top:1px solid #e2e8f0;' + (r ? 'background:#f0fdf4' : '') + '"><td class="p-1 font-bold">' + dia + '</td>';
+      f.cols.forEach(c => {
+        if (r) {
+          const val = c.tipo === 'check' ? (dados[c.id] ? '✓' : '—') : gqEsc(dados[c.id] || '');
+          const bad = gqForaFaixa(c, dados[c.id]);
+          h += '<td class="p-1" style="' + (bad ? 'color:#dc2626;font-weight:700' : '') + '">' + val + '</td>';
+        } else if (futuro) { h += '<td class="p-1 text-slate-300">·</td>'; }
+        else if (c.tipo === 'check') h += '<td class="p-1"><input type="checkbox" id="gq-c-' + dia + '-' + c.id + '"></td>';
+        else h += '<td class="p-1"><input type="text" ' + (c.tipo === 'numero' ? 'inputmode="decimal" data-sem-upper style="width:70px"' : 'style="width:100%;min-width:90px"') + ' class="border rounded p-1 text-sm" id="gq-c-' + dia + '-' + c.id + '"></td>';
+      });
+      if (r) h += '<td class="p-1 text-[11px] text-slate-500 whitespace-nowrap">' + gqEsc(r.usuario) + (r.retifica_de ? ' (retif.)' : '') + ' <a href="#" onclick="gqMensalRetificar(' + dia + ');return false" style="color:#0F4C5C">retificar</a></td>';
+      else if (futuro) h += '<td></td>';
+      else h += '<td class="p-1"><button class="gq-btn" onclick="gqMensalSalvar(' + dia + ')">✓</button></td>';
+      h += '</tr>';
+    }
+    h += '</tbody></table></div>';
+    h += '<div class="gq-card mt-3"><p class="text-sm mb-2"><b>' + Object.keys(ult).length + '</b> dia(s) registrado(s) em ' + gqEsc(mes) + '.</p>' +
+      '<button class="gq-btn" style="background:#0F4C5C" onclick="gqMensalFechar()"><i class="fa-solid fa-file-pdf"></i> Fechar o mês e gerar PDF (arquivado no Drive)</button>' +
+      (fech.length ? '<div class="mt-3 text-sm"><b>Fechamentos:</b> ' + fech.map(x => '<a target="_blank" rel="noopener" style="color:#0F4C5C" href="' + gqEsc(x.pdf_url) + '">' + gqEsc(String(x.fechado_em).slice(0, 10)) + ' (' + gqEsc(x.usuario) + ')</a>').join(' · ') + '</div>' : '') + '</div>';
+    box.innerHTML = h;
+  }
+
+  function gqMensalDados(dia) {
+    const f = GQ.form, dados = {}; let foraSemObs = false;
+    f.cols.forEach(c => { dados[c.id] = gqLer(c, 'gq-c-' + dia + '-' + c.id); });
+    f.cols.forEach(c => { if (gqForaFaixa(c, dados[c.id]) && f.desvio && !dados[f.desvio]) foraSemObs = true; });
+    return { dados, foraSemObs };
+  }
+
+  async function gqMensalSalvar(dia, retificar, motivo) {
+    const f = GQ.form, u = gqUsuarioForm(), m = GQ._mensal;
+    if (!u) { showToast('Informe seu nome em "Registrado por".', 'error'); return; }
+    const r = gqMensalDados(dia);
+    if (!Object.values(r.dados).some(v => v === true || (v !== false && v !== ''))) { showToast('Preencha o lançamento do dia.', 'error'); return; }
+    if (r.foraSemObs) { showToast('Valor fora da faixa: descreva a ação nas observações.', 'error'); return; }
+    try {
+      await gqApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: m.un, periodo: m.mes, item: m.item, chave: dia, dados: r.dados, usuario: u, retificar: !!retificar, motivo: motivo || '' });
+      showToast('Dia ' + dia + ' registrado.', 'success'); gqMensalCarregar();
+    } catch (e) { showToast(e.message, 'error'); }
+  }
+
+  function gqMensalRetificar(dia) {
+    const f = GQ.form, m = GQ._mensal, r = m.ult[String(dia)]; if (!r) return;
+    let dados = {}; try { dados = JSON.parse(r.dados); } catch (e) {}
+    const motivo = prompt('Motivo da retificação do dia ' + dia + ' (o registro original será mantido no histórico):'); if (!motivo) return;
+    const novos = {};
+    f.cols.forEach(c => {
+      if (c.tipo === 'check') { novos[c.id] = confirm(c.label + '\nMarcar como FEITO? (OK = sim, Cancelar = não)\nAtual: ' + (dados[c.id] ? 'feito' : 'não feito')); }
+      else { const v = prompt(c.label + ' (atual: ' + (dados[c.id] || '—') + ')', dados[c.id] || ''); novos[c.id] = v === null ? (dados[c.id] || '') : v.trim(); }
+    });
+    const u = gqUsuarioForm(); if (!u) { showToast('Informe seu nome em "Registrado por".', 'error'); return; }
+    gqApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: m.un, periodo: m.mes, item: m.item, chave: dia, dados: novos, usuario: u, retificar: true, motivo: motivo })
+      .then(() => { showToast('Retificação registrada.', 'success'); gqMensalCarregar(); }).catch(e => showToast(e.message, 'error'));
+  }
+
+  async function gqMensalFechar() {
+    const f = GQ.form, u = gqUsuarioForm(), m = GQ._mensal;
+    if (!u) { showToast('Informe seu nome em "Registrado por".', 'error'); return; }
+    if (!confirm('Fechar ' + f.c + ' de ' + m.mes + ' (' + m.un + ', ' + m.item + ')? Será gerado o PDF e arquivado no Drive. Depois do fechamento, só é possível retificar com motivo.')) return;
+    try {
+      const r = await gqApi('fecharPeriodo', { form: f.c, versao: '1.0-digital', titulo: f.t, unidade: m.un, periodo: m.mes, item: m.item, usuario: u, rotulos: f.cols.map(c => ({ id: c.id, label: c.label })) });
+      showToast('Mês fechado e arquivado.', 'success'); window.open(r.pdf_url, '_blank', 'noopener'); gqMensalCarregar();
+    } catch (e) { showToast(e.message, 'error'); }
+  }
+
+  // ----- evento -----
+  function gqEventoMontar() {
+    const f = GQ.form, el = document.getElementById('gq-f-corpo');
+    let h = '<div class="gq-card mb-3"><p class="font-extrabold">' + gqEsc(f.c) + ' · ' + gqEsc(f.t) + '</p>' + (f.aviso ? '<p class="text-xs text-amber-700 mt-1">' + gqEsc(f.aviso) + '</p>' : '') +
+      '<div class="mt-3 grid gap-2"><label class="text-xs font-bold text-slate-500">Unidade</label><select id="gq-e-un" class="border rounded-lg p-2 text-sm">' + GQ_UNIDADES.map(u => '<option>' + u + '</option>').join('') + '</select>';
+    f.campos.forEach(c => { h += '<label class="text-xs font-bold text-slate-500 mt-1">' + gqEsc(c.label) + (c.obrig ? ' *' : '') + '</label>' + gqCampoHtml(c, 'gq-e-' + c.id, c.tipo === 'data' && c.id === 'data' ? new Date().toISOString().slice(0, 10) : ''); });
+    h += '<div id="gq-e-alerta" class="text-sm font-bold" style="color:#dc2626"></div>' + (f.pontuacao ? '<div id="gq-e-media" class="text-sm font-bold" style="color:#0F4C5C"></div>' : '') +
+      '<button class="gq-btn mt-2" style="background:#0F4C5C" onclick="gqEventoSalvar()"><i class="fa-solid fa-floppy-disk"></i> Registrar (gera PDF no Drive)</button></div></div>' +
+      '<div class="gq-card"><p class="gq-t">Registros anteriores</p><div id="gq-e-lista" class="text-sm"></div></div>';
+    el.innerHTML = h;
+    el.querySelectorAll('select,input,textarea').forEach(i => i.addEventListener('change', gqEventoAtualizar));
+    gqEventoLista();
+  }
+
+  function gqEventoAtualizar() {
+    const f = GQ.form;
+    if (f.alerta) { const v = gqLer({}, 'gq-e-' + f.alerta.campo); document.getElementById('gq-e-alerta').textContent = f.alerta.valores.indexOf(v) >= 0 ? '⚠ ' + f.alerta.msg : ''; }
+    if (f.pontuacao) { let s = 0, n = 0; f.campos.forEach(c => { if (c.pts) { const v = gqLer(c, 'gq-e-' + c.id); if (v) { s += c.pts[v]; n++; } } }); document.getElementById('gq-e-media').textContent = n ? 'Média da avaliação: ' + s + '%' : ''; }
+  }
+
+  async function gqEventoLista() {
+    const f = GQ.form, box = document.getElementById('gq-e-lista');
+    try {
+      const regs = (await gqApi('listarRegistros', { form: f.c, limite: 30 })).reverse();
+      box.innerHTML = regs.map(r => { let d = {}; try { d = JSON.parse(r.dados); } catch (e) {}
+        const resumo = f.campos.filter(c => d[c.id] && c.id !== 'data').slice(0, 2).map(c => gqEsc(String(d[c.id]).slice(0, 40))).join(' · ');
+        return '<div class="flex justify-between gap-2 border-b py-2"><span><b>' + gqEsc(r.periodo) + '</b> · ' + gqEsc(r.unidade) + ' · ' + resumo + '<br><span class="text-xs text-slate-400">' + gqEsc(r.usuario) + ' · ' + gqEsc(String(r.criado_em).slice(0, 16).replace('T', ' ')) + '</span></span>' +
+          (r.pdf_url ? '<a target="_blank" rel="noopener" style="color:#0F4C5C;font-weight:700" href="' + gqEsc(r.pdf_url) + '">PDF</a>' : '') + '</div>'; }).join('') || '<p class="text-slate-400">Nenhum registro ainda.</p>';
+    } catch (e) { box.innerHTML = '<span class="text-red-600">' + gqEsc(e.message) + '</span>'; }
+  }
+
+  async function gqEventoSalvar() {
+    const f = GQ.form, u = gqUsuarioForm();
+    if (!u) { showToast('Informe seu nome em "Registrado por".', 'error'); return; }
+    const dados = {}; let falta = '', foraSemObs = false;
+    f.campos.forEach(c => { dados[c.id] = gqLer(c, 'gq-e-' + c.id); if (c.obrig && !dados[c.id]) falta = falta || c.label; });
+    if (falta) { showToast('Preencha: ' + falta, 'error'); return; }
+    f.campos.forEach(c => { if (gqForaFaixa(c, dados[c.id]) && f.desvio && !dados[f.desvio]) foraSemObs = true; });
+    if (foraSemObs) { showToast('Valor fora da faixa: descreva a ação nas observações.', 'error'); return; }
+    if (f.pontuacao) { let s = 0; f.campos.forEach(c => { if (c.pts && dados[c.id]) s += c.pts[dados[c.id]]; }); dados.media_pct = s; }
+    const rotulos = f.campos.map(c => ({ id: c.id, label: c.label })); if (f.pontuacao) rotulos.push({ id: 'media_pct', label: 'Média da avaliação (%)' });
+    try {
+      await gqApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: document.getElementById('gq-e-un').value, periodo: dados.data || new Date().toISOString().slice(0, 10), chave: String(Date.now()), dados: dados, usuario: u, pdf: { titulo: f.t, rotulos: rotulos } });
+      showToast('Registro salvo e arquivado no Drive.', 'success'); gqEventoMontar();
     } catch (e) { showToast(e.message, 'error'); }
   }
 
