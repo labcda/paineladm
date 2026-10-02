@@ -2050,23 +2050,29 @@
                     <i class="fa-solid fa-file-invoice-dollar"></i> Boletos
                 </span>
                 <h2 class="text-2xl font-extrabold leading-tight mb-1">Controle de Boletos</h2>
-                <p class="text-sm text-white/80 leading-relaxed">Gerencie pedidos, recebimentos e conferência de boletos de fornecedores.</p>
+                <p class="text-sm text-white/80 leading-relaxed">Veja o que vence, acompanhe os pedidos dos fornecedores e dê baixa nos pagamentos.</p>
+                <button onclick="bolMostrarAba('novo')" style="margin-top:14px;display:inline-flex;align-items:center;gap:8px;background:#fff;color:#005954;font-weight:800;font-size:0.82rem;padding:10px 18px;border-radius:100px;border:none;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,0.15);">
+                    <i class="fa-solid fa-plus"></i> Novo Pedido
+                </button>
             </div>
         </div>
 
-        <!-- Abas -->
-        <div style="display:flex;gap:8px;background:#EBECF0;border-radius:16px;padding:6px;">
-            <button id="bol-aba-dashboard" onclick="bolMostrarAba('dashboard')" class="bol-aba-btn">
-                <i class="fa-solid fa-chart-line mr-2"></i>Dashboard
+        <!-- Aviso de urgência (aparece em todas as abas quando há boleto vencendo/atrasado) -->
+        <div id="bol-alerta" style="display:none;"></div>
+
+        <!-- Abas — na ordem em que são usadas no dia a dia -->
+        <div style="display:flex;gap:8px;background:#EBECF0;border-radius:16px;padding:6px;flex-wrap:wrap;">
+            <button id="bol-aba-vencimentos" onclick="bolMostrarAba('vencimentos')" class="bol-aba-btn ativo" title="Boletos que você precisa pagar">
+                <i class="fa-regular fa-calendar-days mr-2"></i>A Pagar
             </button>
-            <button id="bol-aba-novo" onclick="bolMostrarAba('novo')" class="bol-aba-btn ativo">
+            <button id="bol-aba-lista" onclick="bolMostrarAba('lista')" class="bol-aba-btn" title="Pedidos feitos aos fornecedores e em que etapa estão">
+                <i class="fa-solid fa-list mr-2"></i>Pedidos
+            </button>
+            <button id="bol-aba-novo" onclick="bolMostrarAba('novo')" class="bol-aba-btn" title="Cadastrar um novo pedido de compra">
                 <i class="fa-solid fa-plus mr-2"></i>Novo Pedido
             </button>
-            <button id="bol-aba-lista" onclick="bolMostrarAba('lista')" class="bol-aba-btn">
-                <i class="fa-solid fa-list mr-2"></i>Lista de Pedidos
-            </button>
-            <button id="bol-aba-vencimentos" onclick="bolMostrarAba('vencimentos')" class="bol-aba-btn">
-                <i class="fa-regular fa-calendar-days mr-2"></i>Vencimentos
+            <button id="bol-aba-dashboard" onclick="bolMostrarAba('dashboard')" class="bol-aba-btn">
+                <i class="fa-solid fa-chart-line mr-2"></i>Dashboard
             </button>
             <button id="bol-aba-relatorio" onclick="bolMostrarAba('relatorio')" class="bol-aba-btn">
                 <i class="fa-solid fa-chart-pie mr-2"></i>Relatório
@@ -2169,7 +2175,7 @@
         </div>
 
         <!-- PAINEL: NOVO PEDIDO (Parte 1) -->
-        <div id="bol-painel-novo">
+        <div id="bol-painel-novo" style="display:none;">
           <div class="neumorphic-card">
             <div class="bol-etapa-indicator">
                 <div class="bol-etapa-step completo">
@@ -2197,7 +2203,8 @@
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                         <i class="fa-solid fa-building mr-1"></i> Nome do Fornecedor <span style="color:#ef4444">*</span>
                     </label>
-                    <input type="text" id="bol-fornecedor" placeholder="Nome do fornecedor..." class="bol-form-field">
+                    <input type="text" id="bol-fornecedor" list="bol-fornecedores-lista" autocomplete="off" placeholder="Digite ou escolha um fornecedor já usado..." class="bol-form-field">
+                    <datalist id="bol-fornecedores-lista"></datalist>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
@@ -2352,7 +2359,7 @@
         </div>
 
         <!-- PAINEL: VENCIMENTOS (contas a pagar) -->
-        <div id="bol-painel-vencimentos" style="display:none;">
+        <div id="bol-painel-vencimentos">
           <div class="fin-card">
             <div class="fin-card-head">
               <div class="fin-card-title"><i class="fa-regular fa-calendar-days mr-1" style="color:#338b85;"></i> Boletos a Pagar</div>
@@ -2380,22 +2387,22 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                        <i class="fa-solid fa-building mr-1"></i> Fornecedor
+                        <i class="fa-solid fa-magnifying-glass mr-1"></i> Fornecedor
                     </label>
-                    <input type="text" id="bol-venc-filtro-fornecedor" placeholder="Filtrar por fornecedor..." class="bol-form-field" oninput="bolRenderVencimentos()">
+                    <input type="text" id="bol-venc-filtro-fornecedor" placeholder="Digite o nome do fornecedor..." class="bol-form-field" oninput="bolRenderVencimentos()">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                         <i class="fa-solid fa-barcode mr-1"></i> Nº do Boleto
                     </label>
-                    <input type="text" id="bol-venc-filtro-numero" placeholder="Buscar pelo número do boleto..." class="bol-form-field" oninput="bolRenderVencimentos()">
+                    <input type="text" id="bol-venc-filtro-numero" placeholder="Buscar pelo número..." class="bol-form-field" oninput="bolRenderVencimentos()">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                        <i class="fa-solid fa-filter mr-1"></i> Status
+                        <i class="fa-solid fa-filter mr-1"></i> Mostrar
                     </label>
                     <div style="display:flex;gap:6px;flex-wrap:wrap;">
                         <button type="button" class="bol-filtro-chip ativo" id="bol-venc-filtro-aberto" onclick="bolVencFiltroStatus('ABERTO')">Em Aberto</button>
@@ -2403,11 +2410,25 @@
                         <button type="button" class="bol-filtro-chip" id="bol-venc-filtro-todos" onclick="bolVencFiltroStatus('TODOS')">Todos</button>
                     </div>
                 </div>
-                <div style="display:flex;align-items:end;">
-                    <button id="bol-venc-btn-baixa-lote" class="bol-modal-btn success" style="width:100%;" onclick="bolDarBaixaSelecionados()">
-                        <i class="fa-solid fa-check-double mr-1"></i> Dar Baixa nos Selecionados
-                    </button>
-                </div>
+            </div>
+
+            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px;">
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider" style="margin-right:4px;"><i class="fa-regular fa-clock mr-1"></i> Vencimento:</span>
+                <button type="button" class="bol-filtro-chip ativo" id="bol-venc-periodo-todos" onclick="bolVencFiltroPeriodo('todos')">Qualquer data</button>
+                <button type="button" class="bol-filtro-chip" id="bol-venc-periodo-hoje" onclick="bolVencFiltroPeriodo('hoje')">Hoje</button>
+                <button type="button" class="bol-filtro-chip" id="bol-venc-periodo-7dias" onclick="bolVencFiltroPeriodo('7dias')">Próximos 7 dias</button>
+                <button type="button" class="bol-filtro-chip" id="bol-venc-periodo-mes" onclick="bolVencFiltroPeriodo('mes')">Este mês</button>
+            </div>
+
+            <!-- Barra de ações em lote -->
+            <div id="bol-venc-barra-lote" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#f8fafc;border-radius:12px;padding:10px 14px;margin-bottom:14px;">
+                <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;font-weight:700;color:#475569;cursor:pointer;">
+                    <input type="checkbox" id="bol-venc-selecionar-todos" onchange="bolVencSelecionarTodos(this.checked)" style="width:17px;height:17px;"> Selecionar todos
+                </label>
+                <span id="bol-venc-sel-resumo" style="flex:1;font-size:0.8rem;color:#64748b;">Marque os boletos que já foram pagos para dar baixa de uma vez.</span>
+                <button id="bol-venc-btn-baixa-lote" class="bol-modal-btn success" style="opacity:0.5;pointer-events:none;" onclick="bolDarBaixaSelecionados()">
+                    <i class="fa-solid fa-check-double mr-1"></i> Dar Baixa nos Selecionados
+                </button>
             </div>
 
             <div id="bol-venc-lista"><p class="text-sm text-slate-500 text-center py-4">Carregando...</p></div>
@@ -3881,7 +3902,8 @@
       breadcrumbActive.innerText = label;
       if (pageId !== 'configuracoes') configAutorizado = false;
       if (pageId === 'boletos') {
-        bolInicializarForm();
+        // Abre direto em "A Pagar" (o que importa no dia a dia); os pedidos carregam em segundo plano
+        bolMostrarAba('vencimentos');
         bolCarregarPedidos();
       }
       if (pageId === 'agenda') {
@@ -8158,7 +8180,18 @@ async function carregarUsuarios() {
   let bolParcelas = 1;
 
   // Inicializar campos automáticos ao abrir a aba
+  // Sugere fornecedores já cadastrados (pedidos + boletos) para não precisar redigitar o nome
+  function bolPreencherFornecedores() {
+    const lista = document.getElementById('bol-fornecedores-lista');
+    if (!lista) return;
+    const nomes = new Set();
+    bolDadosAtuais.forEach(p => { if (p.fornecedor) nomes.add(p.fornecedor); });
+    bolParcelasCache.forEach(p => { if (p.fornecedor) nomes.add(p.fornecedor); });
+    lista.innerHTML = [...nomes].sort().map(n => '<option value="' + agendaEscapar(n).replace(/"/g, '&quot;') + '"></option>').join('');
+  }
+
   function bolInicializarForm() {
+    bolPreencherFornecedores();
     const hoje = new Date();
     document.getElementById('bol-data-pedido').value = hoje.toLocaleDateString('pt-BR');
     const user = getUsuarioLogado();
@@ -8877,6 +8910,17 @@ async function carregarUsuarios() {
       acoes = `<button onclick="bolAbrirModalFinanceiro('${p.id}')" class="bol-modal-btn success" style="padding:8px 14px;font-size:0.75rem;"><i class="fa-solid fa-money-check-dollar mr-1"></i> Conferir Boletos</button>`;
     }
 
+    // Linha do tempo: Pedido feito → Mercadoria recebida → Boletos conferidos
+    const concluidas = p.status === 'finalizado' ? 3 : ((p.status === 'recebido' || p.status === 'conferido') ? 2 : 1);
+    const nomesEtapas = ['Pedido feito', 'Mercadoria recebida', 'Boletos conferidos'];
+    const linhaTempo = '<div style="display:flex;align-items:center;gap:6px;margin:4px 0 12px;">' + nomesEtapas.map((nome, i) => {
+      const feito = i < concluidas, atual = i === concluidas;
+      const cor = feito ? '#005954' : (atual ? '#F59E0B' : '#cbd5e1');
+      const bolinha = '<span style="width:18px;height:18px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:0.55rem;color:#fff;background:' + (feito ? cor : '#fff') + ';border:2px solid ' + cor + ';">' + (feito ? '<i class="fa-solid fa-check"></i>' : '') + '</span>';
+      const rotulo = '<span style="font-size:0.68rem;font-weight:' + (atual ? '800' : '600') + ';color:' + (feito || atual ? '#334155' : '#94a3b8') + ';">' + nome + '</span>';
+      return '<span style="display:inline-flex;align-items:center;gap:5px;">' + bolinha + rotulo + '</span>' + (i < 2 ? '<span style="flex:1;height:2px;min-width:12px;background:' + (i < concluidas - 1 ? '#005954' : '#e2e8f0') + ';"></span>' : '');
+    }).join('') + '</div>';
+
     return `
       <div class="bol-card">
         <div class="bol-card-header">
@@ -8895,6 +8939,7 @@ async function carregarUsuarios() {
           ${p.dataRecebimento ? `<br><i class="fa-solid fa-truck-fast mr-1"></i> Recebido: ${new Date(p.dataRecebimento).toLocaleDateString('pt-BR')} por <span class="bol-responsavel-badge">${agendaEscapar(p.quemRecebeu || '')}</span>` : ''}
           ${p.dataConferencia ? `<br><i class="fa-solid fa-money-check mr-1"></i> Conferido: ${new Date(p.dataConferencia).toLocaleDateString('pt-BR')} por <span class="bol-responsavel-badge">${agendaEscapar(p.quemConferiu || '')}</span>` : ''}
         </div>
+        ${linhaTempo}
         <div class="bol-card-actions">
           <a href="${agendaEscapar(p.espelhoUrl || '#')}" target="_blank" class="bol-espelho-link"><i class="fa-solid fa-eye"></i> Ver Espelho</a>
           ${acoes}
@@ -8964,6 +9009,7 @@ async function carregarUsuarios() {
     document.getElementById('bol-venc-kpi-aberto').textContent = abertos.length;
     document.getElementById('bol-venc-kpi-aberto-sub').textContent = 'R$ ' + somaAbertos.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
     document.getElementById('bol-venc-kpi-atrasado').textContent = atrasados.length + (somaAtrasados > 0 ? ' · R$ ' + somaAtrasados.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '');
+    bolAtualizarAlerta();
   }
 
   function bolVencFiltroStatus(status) {
@@ -8974,18 +9020,97 @@ async function carregarUsuarios() {
     bolRenderVencimentos();
   }
 
+  let bolVencPeriodoAtual = 'todos';
+
+  function bolVencFiltroPeriodo(periodo) {
+    bolVencPeriodoAtual = periodo;
+    ['todos', 'hoje', '7dias', 'mes'].forEach(p => {
+      document.getElementById('bol-venc-periodo-' + p).classList.toggle('ativo', p === periodo);
+    });
+    bolRenderVencimentos();
+  }
+
+  function bolFormatarReais(v) {
+    return 'R$ ' + (parseFloat(v) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function bolDiasAteVenc(p, hoje) {
+    const d = bolParseDataBR(p.dataVencimento);
+    return d ? Math.round((d - hoje) / 86400000) : null;
+  }
+
+  // Classifica pelo prazo: atrasado / hoje / semana (até 7 dias) / adiante / pago
+  function bolClassificarVenc(p, hoje) {
+    if (p.status === 'PAGO') return 'pago';
+    const dias = bolDiasAteVenc(p, hoje);
+    if (dias === null) return 'adiante';
+    if (dias < 0) return 'atrasado';
+    if (dias === 0) return 'hoje';
+    if (dias <= 7) return 'semana';
+    return 'adiante';
+  }
+
+  const BOL_GRUPOS_VENC = {
+    atrasado: { titulo: 'Atrasados',       icone: 'fa-circle-exclamation',  cor: '#DC2626', fundo: 'rgba(220,38,38,0.08)' },
+    hoje:     { titulo: 'Vencem hoje',     icone: 'fa-triangle-exclamation', cor: '#EA580C', fundo: 'rgba(234,88,12,0.08)' },
+    semana:   { titulo: 'Próximos 7 dias', icone: 'fa-clock',                cor: '#D97706', fundo: 'rgba(217,119,6,0.08)' },
+    adiante:  { titulo: 'Mais adiante',    icone: 'fa-calendar',             cor: '#338b85', fundo: 'rgba(51,139,133,0.08)' },
+    pago:     { titulo: 'Pagos',           icone: 'fa-circle-check',         cor: '#16A34A', fundo: 'rgba(22,163,74,0.08)' }
+  };
+
+  function bolCardVencimento(p, tipo, hoje) {
+    const g = BOL_GRUPOS_VENC[tipo];
+    const dias = bolDiasAteVenc(p, hoje);
+    let prazo;
+    if (tipo === 'pago') prazo = 'Pago em ' + agendaEscapar(p.dataPagamento || '-') + (p.quemPagou ? ' por ' + agendaEscapar(p.quemPagou) : '') + (p.pagoAntecipado === 'SIM' ? ' (antecipado)' : '');
+    else if (tipo === 'atrasado') prazo = 'Venceu há ' + Math.abs(dias) + (Math.abs(dias) === 1 ? ' dia' : ' dias');
+    else if (tipo === 'hoje') prazo = 'Vence hoje';
+    else prazo = dias === 1 ? 'Vence amanhã' : (dias !== null ? 'Vence em ' + dias + ' dias' : '');
+
+    const aberto = p.status === 'ABERTO';
+    const checkbox = aberto
+      ? '<input type="checkbox" class="bol-venc-checkbox" value="' + p.linha + '" onchange="bolAtualizarSelecaoVenc()" style="width:18px;height:18px;flex-shrink:0;">'
+      : '<span style="width:18px;flex-shrink:0;"></span>';
+    const botoes =
+      (aberto ? '<button onclick="bolDarBaixaUnica(' + p.linha + ', this)" class="bol-modal-btn success" style="padding:7px 12px;font-size:0.74rem;"><i class="fa-solid fa-check mr-1"></i> Dar baixa</button>' : '') +
+      (aberto ? '<button onclick="bolAbrirReagendar(' + p.linha + ')" class="bol-modal-btn neutral" style="padding:7px 12px;font-size:0.74rem;"><i class="fa-regular fa-calendar-plus mr-1"></i> Reagendar</button>' : '') +
+      '<button onclick="bolAbrirEditarVencimento(' + p.linha + ')" class="bol-modal-btn neutral" style="padding:7px 12px;font-size:0.74rem;" title="Corrigir valor, vencimento ou número do boleto"><i class="fa-solid fa-pen mr-1"></i> Editar</button>';
+
+    return '<div class="bol-card" style="border-left:4px solid ' + g.cor + ';display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;">' +
+      checkbox +
+      '<div style="flex:1;min-width:210px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">' +
+          '<div>' +
+            '<div class="bol-card-fornecedor">' + agendaEscapar(p.fornecedor) + '</div>' +
+            '<div class="text-xs text-slate-400" style="margin-top:2px;">Parcela ' + agendaEscapar(String(p.numeroParcela)) + (p.numeroBoleto ? ' · <i class="fa-solid fa-barcode"></i> ' + agendaEscapar(p.numeroBoleto) : '') + '</div>' +
+          '</div>' +
+          '<span class="bol-card-valor">' + bolFormatarReais(p.valor) + '</span>' +
+        '</div>' +
+        '<div style="margin-top:6px;font-size:0.78rem;font-weight:700;color:' + g.cor + ';"><i class="fa-regular fa-calendar mr-1"></i>' + agendaEscapar(p.dataVencimento || '-') + (prazo ? ' · ' + prazo : '') + '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;">' + botoes + '</div>' +
+    '</div>';
+  }
+
   function bolRenderVencimentos() {
     const container = document.getElementById('bol-venc-lista');
     if (!container) return;
     const filtroFornecedor = (document.getElementById('bol-venc-filtro-fornecedor').value || '').toUpperCase().trim();
     const filtroNumero = (document.getElementById('bol-venc-filtro-numero').value || '').toUpperCase().trim();
     const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
-    const hojeStr = bolHojeDDMMYYYY();
 
-    let itens = bolParcelasCache.filter(p => {
+    const itens = bolParcelasCache.filter(p => {
       if (bolVencFiltroStatusAtual !== 'TODOS' && p.status !== bolVencFiltroStatusAtual) return false;
       if (filtroFornecedor && p.fornecedor.toUpperCase().indexOf(filtroFornecedor) < 0) return false;
       if (filtroNumero && (p.numeroBoleto || '').toUpperCase().indexOf(filtroNumero) < 0) return false;
+      if (bolVencPeriodoAtual !== 'todos') {
+        const d = bolParseDataBR(p.dataVencimento);
+        if (!d) return false;
+        const dias = Math.round((d - hoje) / 86400000);
+        if (bolVencPeriodoAtual === 'hoje' && dias !== 0) return false;
+        if (bolVencPeriodoAtual === '7dias' && (dias < 0 || dias > 7)) return false;
+        if (bolVencPeriodoAtual === 'mes' && (d.getMonth() !== hoje.getMonth() || d.getFullYear() !== hoje.getFullYear())) return false;
+      }
       return true;
     });
     itens.sort((a, b) => {
@@ -8994,53 +9119,159 @@ async function carregarUsuarios() {
     });
 
     if (itens.length === 0) {
-      container.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-regular fa-calendar-check text-slate-300 text-3xl mb-3"></i><p class="text-sm text-slate-400">Nenhum boleto encontrado.</p></div>';
+      const msg = bolParcelasCache.length === 0
+        ? 'Nenhum boleto cadastrado ainda. Os boletos aparecem aqui depois que você confere um pedido na aba "Pedidos".'
+        : 'Nenhum boleto encontrado com esses filtros.';
+      container.innerHTML = '<div class="flex flex-col items-center py-8 text-center"><i class="fa-regular fa-calendar-check text-slate-300 text-3xl mb-3"></i><p class="text-sm text-slate-400" style="max-width:380px;">' + msg + '</p></div>';
+      bolAtualizarSelecaoVenc();
       return;
     }
 
-    container.innerHTML = itens.map(p => {
-      const dataVenc = bolParseDataBR(p.dataVencimento);
-      const atrasado = p.status === 'ABERTO' && dataVenc && dataVenc < hoje;
-      const venceHoje = p.status === 'ABERTO' && p.dataVencimento === hojeStr;
-      let badgeClasse = 'bol-status-recebido', badgeTexto = 'Em Aberto';
-      if (p.status === 'PAGO') { badgeClasse = 'bol-status-finalizado'; badgeTexto = 'Pago'; }
-      else if (atrasado) { badgeClasse = 'bol-status-atrasado'; badgeTexto = 'Atrasado'; }
-      else if (venceHoje) { badgeClasse = 'bol-status-pendente'; badgeTexto = 'Vence Hoje'; }
+    const grupos = { atrasado: [], hoje: [], semana: [], adiante: [], pago: [] };
+    itens.forEach(p => grupos[bolClassificarVenc(p, hoje)].push(p));
 
-      const checkbox = p.status === 'ABERTO'
-        ? '<input type="checkbox" class="bol-venc-checkbox" value="' + p.linha + '" style="width:18px;height:18px;margin-right:10px;">'
-        : '<span style="width:18px;display:inline-block;margin-right:10px;"></span>';
-
-      const acaoPagar = p.status === 'ABERTO'
-        ? '<button onclick="bolDarBaixaUnica(' + p.linha + ', this)" class="bol-modal-btn success" style="padding:6px 12px;font-size:0.72rem;"><i class="fa-solid fa-check mr-1"></i> Dar Baixa</button>'
-        : '';
-      const infoPagamento = p.status === 'PAGO'
-        ? '<div class="bol-card-info" style="margin-top:4px;"><i class="fa-solid fa-money-check mr-1"></i> Pago em ' + agendaEscapar(p.dataPagamento) + ' por <span class="bol-responsavel-badge">' + agendaEscapar(p.quemPagou) + '</span>' + (p.pagoAntecipado === 'SIM' ? ' <span style="color:#338b85;font-weight:700;">(antecipado)</span>' : '') + '</div>'
-        : '';
-
-      return '<div class="bol-card" style="display:flex;align-items:center;gap:10px;">' +
-        checkbox +
-        '<div style="flex:1;">' +
-          '<div class="bol-card-header" style="margin-bottom:4px;">' +
-            '<div>' +
-              '<div class="bol-card-codigo">PARCELA ' + agendaEscapar(String(p.numeroParcela)) + '</div>' +
-              '<div class="bol-card-fornecedor">' + agendaEscapar(p.fornecedor) + '</div>' +
-            '</div>' +
-            '<span class="bol-status-badge ' + badgeClasse + '">' + badgeTexto + '</span>' +
-          '</div>' +
-          '<div style="display:flex;justify-content:space-between;align-items:center;">' +
-            '<span class="bol-card-valor">R$ ' + parseFloat(p.valor).toFixed(2).replace('.', ',') + '</span>' +
-            '<span class="text-xs text-slate-400"><i class="fa-regular fa-calendar mr-1"></i>Vence: ' + agendaEscapar(p.dataVencimento || '-') + '</span>' +
-          '</div>' +
-          (p.numeroBoleto ? '<div class="text-xs text-slate-400" style="margin-top:2px;"><i class="fa-solid fa-barcode mr-1"></i>Nº: ' + agendaEscapar(p.numeroBoleto) + '</div>' : '') +
-          infoPagamento +
+    container.innerHTML = ['atrasado', 'hoje', 'semana', 'adiante', 'pago'].filter(k => grupos[k].length).map(k => {
+      const g = BOL_GRUPOS_VENC[k];
+      const soma = grupos[k].reduce((s, p) => s + (parseFloat(p.valor) || 0), 0);
+      return '<div style="margin-bottom:18px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;background:' + g.fundo + ';color:' + g.cor + ';border-radius:10px;padding:8px 12px;margin-bottom:8px;font-size:0.8rem;font-weight:800;">' +
+          '<span><i class="fa-solid ' + g.icone + ' mr-2"></i>' + g.titulo + ' (' + grupos[k].length + ')</span>' +
+          '<span>' + bolFormatarReais(soma) + '</span>' +
         '</div>' +
-        '<div style="display:flex;gap:6px;flex-shrink:0;">' +
-          acaoPagar +
-          '<button onclick="bolAbrirEditarVencimento(' + p.linha + ')" class="bol-modal-btn neutral" style="padding:6px 10px;font-size:0.72rem;" title="Editar vencimento/valor"><i class="fa-solid fa-pen"></i></button>' +
-        '</div>' +
+        grupos[k].map(p => bolCardVencimento(p, k, hoje)).join('') +
       '</div>';
     }).join('');
+    bolAtualizarSelecaoVenc();
+  }
+
+  // ---- Seleção em lote (com total) ----
+  function bolVencSelecionarTodos(marcar) {
+    document.querySelectorAll('.bol-venc-checkbox').forEach(cb => { cb.checked = marcar; });
+    bolAtualizarSelecaoVenc();
+  }
+
+  function bolAtualizarSelecaoVenc() {
+    const caixas = [...document.querySelectorAll('.bol-venc-checkbox')];
+    const marcados = caixas.filter(cb => cb.checked);
+    const total = marcados.reduce((s, cb) => {
+      const p = bolParcelasCache.find(x => x.linha === parseInt(cb.value, 10));
+      return s + (p ? (parseFloat(p.valor) || 0) : 0);
+    }, 0);
+    const resumo = document.getElementById('bol-venc-sel-resumo');
+    const btn = document.getElementById('bol-venc-btn-baixa-lote');
+    const todos = document.getElementById('bol-venc-selecionar-todos');
+    if (resumo) resumo.innerHTML = marcados.length
+      ? '<b style="color:#005954;">' + marcados.length + ' selecionado' + (marcados.length > 1 ? 's' : '') + '</b> · total ' + bolFormatarReais(total)
+      : 'Marque os boletos que já foram pagos para dar baixa de uma vez.';
+    if (btn) { btn.style.opacity = marcados.length ? '1' : '0.5'; btn.style.pointerEvents = marcados.length ? 'auto' : 'none'; }
+    if (todos) { todos.disabled = caixas.length === 0; todos.checked = caixas.length > 0 && marcados.length === caixas.length; }
+  }
+
+  // ---- Reagendar pagamento (mudar só a data de vencimento) ----
+  function bolDataParaISO(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function bolAbrirReagendar(linha) {
+    const p = bolParcelasCache.find(x => x.linha === linha);
+    if (!p) return;
+    const existente = document.getElementById('bol-modal-reagendar');
+    if (existente) existente.remove();
+    const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    const venc = bolParseDataBR(p.dataVencimento);
+    // Os atalhos contam a partir do vencimento atual — ou de hoje, se o boleto já venceu
+    const base = (venc && venc > hoje) ? venc : hoje;
+    const modal = document.createElement('div');
+    modal.id = 'bol-modal-reagendar';
+    modal.className = 'bol-modal-overlay ativo';
+    modal.dataset.base = bolDataParaISO(base);
+    modal.innerHTML = `
+      <div class="bol-modal-box" style="max-width:400px;">
+        <div class="bol-modal-header">
+          <h3><i class="fa-regular fa-calendar-plus mr-2"></i> Reagendar pagamento</h3>
+          <p class="sub">${agendaEscapar(p.fornecedor)} — Parcela ${agendaEscapar(String(p.numeroParcela))} · ${bolFormatarReais(p.valor)}</p>
+        </div>
+        <div class="bol-modal-body">
+          <p style="font-size:0.82rem;color:#64748b;margin-bottom:12px;">Vencimento atual: <b style="color:#101620;">${agendaEscapar(p.dataVencimento || '-')}</b></p>
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Adiar por</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+            <button type="button" class="bol-filtro-chip" onclick="bolReagAtalho(1)">+1 dia</button>
+            <button type="button" class="bol-filtro-chip" onclick="bolReagAtalho(7)">+7 dias</button>
+            <button type="button" class="bol-filtro-chip" onclick="bolReagAtalho(15)">+15 dias</button>
+            <button type="button" class="bol-filtro-chip" onclick="bolReagAtalho(30)">+30 dias</button>
+          </div>
+          <p style="font-size:0.7rem;color:#94a3b8;margin-bottom:14px;">Contado a partir de ${base.toLocaleDateString('pt-BR')}${base === hoje ? ' (hoje, pois o boleto já venceu)' : ''}.</p>
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Ou escolha a nova data</label>
+          <input type="date" id="bol-reag-data" class="bol-form-field" value="${bolDataParaISO(venc && venc > hoje ? venc : hoje)}">
+        </div>
+        <div style="padding:16px 20px;border-top:1px solid #e2e8f0;display:flex;gap:10px;">
+          <button onclick="bolFecharReagendar()" class="bol-modal-btn neutral" style="flex:1;">Cancelar</button>
+          <button id="bol-reag-btn-salvar" onclick="bolConfirmarReagendar(${linha})" class="bol-modal-btn success" style="flex:2;"><i class="fa-solid fa-check"></i> Confirmar nova data</button>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+  }
+
+  function bolReagAtalho(dias) {
+    const modal = document.getElementById('bol-modal-reagendar');
+    if (!modal) return;
+    const [y, m, d] = modal.dataset.base.split('-').map(Number);
+    const nova = new Date(y, m - 1, d + dias);
+    document.getElementById('bol-reag-data').value = bolDataParaISO(nova);
+  }
+
+  function bolFecharReagendar() {
+    const modal = document.getElementById('bol-modal-reagendar');
+    if (modal) modal.remove();
+  }
+
+  async function bolConfirmarReagendar(linha) {
+    const p = bolParcelasCache.find(x => x.linha === linha);
+    const iso = document.getElementById('bol-reag-data').value;
+    if (!p || !iso) { showToast('Escolha a nova data de vencimento.', 'error'); return; }
+    const [y, m, d] = iso.split('-');
+    const novaData = d + '/' + m + '/' + y;
+    if (novaData === p.dataVencimento) { showToast('A nova data é igual à atual.', 'error'); return; }
+    const btn = document.getElementById('bol-reag-btn-salvar');
+    const textoOriginal = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...'; }
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'atualizarVencimentoParcela', token: CDA_TOKEN, linha: linha, dataVencimento: novaData, valor: p.valor, numeroBoleto: p.numeroBoleto || '' })
+      });
+      const json = await resp.json();
+      if (!json.ok) throw new Error(json.erro || 'Erro ao salvar');
+      showToast('Pagamento reagendado para ' + novaData + '.');
+      bolFecharReagendar();
+      bolCarregarVencimentos();
+    } catch (e) {
+      showToast('Erro: ' + (e.message || 'não foi possível reagendar'), 'error');
+      if (btn) { btn.disabled = false; btn.innerHTML = textoOriginal; }
+    }
+  }
+
+  // ---- Aviso de urgência no topo (visível em todas as abas) ----
+  function bolAtualizarAlerta() {
+    const el = document.getElementById('bol-alerta');
+    if (!el) return;
+    const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    const abertos = bolParcelasCache.filter(p => p.status === 'ABERTO');
+    const atrasados = abertos.filter(p => bolClassificarVenc(p, hoje) === 'atrasado');
+    const venceHoje = abertos.filter(p => bolClassificarVenc(p, hoje) === 'hoje');
+    if (!atrasados.length && !venceHoje.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+    const soma = lista => lista.reduce((s, p) => s + (parseFloat(p.valor) || 0), 0);
+    const partes = [];
+    if (atrasados.length) partes.push('<b>' + atrasados.length + ' atrasado' + (atrasados.length > 1 ? 's' : '') + '</b> (' + bolFormatarReais(soma(atrasados)) + ')');
+    if (venceHoje.length) partes.push('<b>' + venceHoje.length + ' vence' + (venceHoje.length > 1 ? 'm' : '') + ' hoje</b> (' + bolFormatarReais(soma(venceHoje)) + ')');
+    const critico = atrasados.length > 0;
+    el.innerHTML = '<div onclick="bolMostrarAba(\'vencimentos\')" style="cursor:pointer;display:flex;align-items:center;gap:12px;border-radius:16px;padding:12px 16px;font-size:0.85rem;' +
+      (critico ? 'background:#fef2f2;border:1px solid #fecaca;color:#991b1b;' : 'background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;') + '">' +
+      '<i class="fa-solid fa-triangle-exclamation" style="font-size:1.1rem;"></i>' +
+      '<span style="flex:1;">Atenção: ' + partes.join(' e ') + '.</span>' +
+      '<span style="font-weight:800;white-space:nowrap;">Ver boletos <i class="fa-solid fa-chevron-right" style="font-size:0.65rem;"></i></span></div>';
+    el.style.display = 'block';
   }
 
   async function bolDarBaixaSelecionados() {
