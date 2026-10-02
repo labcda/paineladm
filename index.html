@@ -4033,7 +4033,10 @@
     const r = await fetch(c.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(Object.assign({ chave: c.chave, acao: acao }, dados || {})) });
     const j = await r.json();
-    if (!j.ok) throw new Error(j.erro || 'Erro');
+    if (!j.ok) {
+      if (/Chave inv/.test(j.erro || '')) { try { localStorage.removeItem('gq_chave'); } catch (e) {} setTimeout(gqIniciar, 0); throw new Error('Chave inválida: conecte novamente.'); }
+      throw new Error(j.erro || 'Erro');
+    }
     return j.dados;
   }
 
@@ -4042,8 +4045,9 @@
     const k = document.getElementById('gq-cfg-chave').value.trim();
     if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(u) || !k) { showToast('Informe a URL /exec e a chave.', 'error'); return; }
     try { localStorage.setItem('gq_url', u); localStorage.setItem('gq_chave', k); } catch (e) {}
-    document.getElementById('gq-cfg-chave').value = '';
-    gqIniciar();
+    // Valida antes de aceitar: chave errada não fica salva
+    gqApi('hoje').then(() => { document.getElementById('gq-cfg-chave').value = ''; showToast('Conectado.', 'success'); gqIniciar(); })
+      .catch(e => { try { localStorage.removeItem('gq_chave'); } catch (x) {} showToast(/Chave/.test(e.message) ? 'Chave incorreta. Confira e cole de novo.' : e.message, 'error'); gqIniciar(); });
   }
   function gqDesconectar() {
     try { localStorage.removeItem('gq_url'); localStorage.removeItem('gq_chave'); } catch (e) {}
