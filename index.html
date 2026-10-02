@@ -4021,6 +4021,14 @@
   // Backend: projeto Apps Script "CDA Qualidade" (APPS-SCRIPT-QUALIDADE.gs). URL e chave ficam só no navegador.
   const GQ = { docs: [], equips: [], chart: null };
 
+  // Conexão por link único (#gq=URL~CHAVE): grava no navegador e remove o trecho da barra de endereço
+  (function () {
+    try {
+      const m = /^#gq=(https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec)~([A-Za-z0-9]{20,80})$/.exec(location.hash);
+      if (m) { localStorage.setItem('gq_url', m[1]); localStorage.setItem('gq_chave', m[2]); history.replaceState(null, '', location.pathname + location.search); }
+    } catch (e) {}
+  })();
+
   function gqCfg() {
     try { return { url: localStorage.getItem('gq_url') || '', chave: localStorage.getItem('gq_chave') || '' }; }
     catch (e) { return { url: '', chave: '' }; }
