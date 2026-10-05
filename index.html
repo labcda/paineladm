@@ -3096,6 +3096,9 @@
 
   function handleLoginClick() { fazerLogin(); }
 
+  // Acorda o Apps Script assim que a página abre (ele pode levar 20-30 s na primeira chamada)
+  try { fetch(APPS_SCRIPT_URL + '?action=ping&token=' + encodeURIComponent(CDA_TOKEN)).catch(() => {}); } catch (e) {}
+
   async function fazerLogin() {
     const usuarioEl = document.getElementById('login-usuario');
     const senhaEl = document.getElementById('login-senha');
@@ -3119,7 +3122,8 @@
     errorEl.style.display = 'block'; errorEl.style.color = '#005954';
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 10000);
+      const timeout = setTimeout(() => controller.abort(), 45000);
+      setTimeout(() => { if (errorEl.innerText.indexOf('VERIFICANDO') === 0) errorEl.innerText = 'SERVIDOR DEMORANDO PARA RESPONDER... AGUARDE (ATÉ 45 s)'; }, 6000);
       // POST (não GET) para a senha não ficar salva na URL/histórico do navegador.
       const resp = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
@@ -5592,7 +5596,7 @@ function agenRemoverPDF() {
     let agendaOk = false;
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 10000);
+      const timeout = setTimeout(() => controller.abort(), 45000);
       const url = APPS_SCRIPT_AGENDA_URL + '?action=listar&data=' + data + '&token=' + encodeURIComponent(CDA_TOKEN);
       const resp = await fetch(url, { method: 'GET', redirect: 'follow', signal: controller.signal });
       clearTimeout(timeout);
@@ -6505,7 +6509,7 @@ function agenRemoverPDF() {
     container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Carregando do servidor...</p>';
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 10000);
+      const timeout = setTimeout(() => controller.abort(), 45000);
       const url = APPS_SCRIPT_URL + '?action=consultarRecoletas&token=' + encodeURIComponent(CDA_TOKEN);
       const resp = await fetch(url, { signal: controller.signal, redirect: 'follow' });
       clearTimeout(timeout);
@@ -6897,7 +6901,7 @@ function agenRemoverPDF() {
 
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 10000);
+      const timeout = setTimeout(() => controller.abort(), 45000);
       let url = APPS_SCRIPT_URL + '?action=consultarRecoletas' + 
         (filtroCodigo ? '&codigo=' + encodeURIComponent(filtroCodigo) : '') +
         (filtroNome ? '&nome=' + encodeURIComponent(filtroNome) : '') +
