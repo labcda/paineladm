@@ -2506,6 +2506,7 @@
             <button class="gq-aba" data-aba="temp" onclick="gqAba('temp')">Temperatura</button>
             <button class="gq-aba" data-aba="docs" onclick="gqAba('docs')">Documentos</button>
             <button class="gq-aba" data-aba="form" onclick="gqAba('form')">Formulários</button>
+            <button class="gq-aba" data-aba="ass" onclick="gqAba('ass')"><i class="fa-solid fa-signature"></i> Assinaturas</button>
             <button class="gq-aba" data-aba="conf" onclick="gqAba('conf')"><i class="fa-solid fa-gear"></i></button>
           </div>
 
@@ -2557,7 +2558,41 @@
             <div id="gq-f-corpo"></div>
           </div>
 
-          <div id="gq-p-conf" class="gq-painel" style="display:none">
+          <div id="gq-p-ass" class="gq-painel" style="display:none">
+            <div class="gq-card mb-3">
+              <p class="gq-t">Assinaturas cadastradas</p>
+              <div id="gq-a-lista"></div>
+            </div>
+            <div class="gq-card mb-3">
+              <p class="gq-t">Cadastrar ou atualizar uma assinatura</p>
+              <div class="grid gap-2 md:grid-cols-2">
+                <input id="gq-a-nome" type="text" placeholder="Nome completo" class="border rounded-lg p-2 text-sm" autocomplete="off">
+                <input id="gq-a-cargo" type="text" placeholder="Cargo / função (ex.: Responsável Técnico)" class="border rounded-lg p-2 text-sm" autocomplete="off">
+                <input id="gq-a-pin" type="text" inputmode="numeric" data-sem-upper autocomplete="off" name="gq-pin-novo" placeholder="PIN pessoal (4 a 8 números)" class="border rounded-lg p-2 text-sm" style="-webkit-text-security:disc">
+                <input id="gq-a-pin2" type="text" inputmode="numeric" data-sem-upper autocomplete="off" name="gq-pin-novo2" placeholder="Repita o PIN" class="border rounded-lg p-2 text-sm" style="-webkit-text-security:disc">
+              </div>
+              <p class="text-xs text-slate-500 mt-3 mb-1">Assine no quadro abaixo, com o dedo (celular/tablet), caneta ou mouse:</p>
+              <canvas id="gq-a-canvas" style="width:100%;height:190px;border:2px dashed #37A7AA;border-radius:12px;background:#fff;touch-action:none;cursor:crosshair"></canvas>
+              <div class="flex gap-2 mt-2">
+                <button class="gq-btn" style="background:#64748b" onclick="GQA.limpar && GQA.limpar()">Limpar</button>
+                <button class="gq-btn" style="background:#0F4C5C" onclick="gqAssSalvar()"><i class="fa-solid fa-signature"></i> Salvar assinatura</button>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-2">O PIN é pessoal: será pedido toda vez que esta pessoa assinar um documento. A assinatura anterior, se houver, fica guardada como inativa.</p>
+            </div>
+            <div class="gq-card">
+              <p class="gq-t">Assinar um documento</p>
+              <div class="grid gap-2 md:grid-cols-2">
+                <select id="gq-a-doc" class="border rounded-lg p-2 text-sm md:col-span-2" onchange="gqAssDocMudou()"></select>
+                <select id="gq-a-papel" class="border rounded-lg p-2 text-sm"><option>Elaboração</option><option>Revisão</option><option>Aprovação</option></select>
+                <select id="gq-a-quem" class="border rounded-lg p-2 text-sm"></select>
+                <input id="gq-a-pinassina" type="text" inputmode="numeric" data-sem-upper autocomplete="off" name="gq-pin-assinar" placeholder="PIN de quem assina" class="border rounded-lg p-2 text-sm" style="-webkit-text-security:disc">
+                <button class="gq-btn" style="background:#16a34a" onclick="gqAssAssinar()"><i class="fa-solid fa-pen-nib"></i> Assinar</button>
+              </div>
+              <div id="gq-a-hist" class="mt-3"></div>
+            </div>
+          </div>
+
+<div id="gq-p-conf" class="gq-painel" style="display:none">
             <div style="background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:18px;">
               <p class="font-bold text-slate-700 mb-2">Conexão</p>
               <button onclick="gqDesconectar()" class="px-3 py-2 rounded-lg border text-sm font-bold text-red-600">Desconectar deste navegador</button>
@@ -2914,7 +2949,7 @@
         if (String(url).indexOf('script.google.com/macros/') < 0) return false;
         const metodo = ((init && init.method) || 'GET').toUpperCase();
         if (metodo === 'GET') { const m = /[?&]action=([A-Za-z]+)/.exec(url); return !!(m && LEITURAS.test(m[1])); }
-        if (metodo === 'POST' && init && typeof init.body === 'string') return /"action":"(verificarLogin|login)"/.test(init.body) || /"acao":"(hoje|listarDocumentos|listarEquipamentos|listarTemperaturas|listarRegistros|listarFechamentos|historicoDocumento|listarLog)"/.test(init.body);
+        if (metodo === 'POST' && init && typeof init.body === 'string') return /"action":"(verificarLogin|login)"/.test(init.body) || /"acao":"(hoje|listarDocumentos|listarEquipamentos|listarTemperaturas|listarRegistros|listarFechamentos|historicoDocumento|listarLog|listarAssinantes|listarAssinaturasDoc)"/.test(init.body);
       } catch (e) {}
       return false;
     }
@@ -4129,6 +4164,7 @@
     if (a === 'hoje') gqCarregarHoje();
     if (a === 'temp') gqPrepararTemp();
     if (a === 'docs') gqCarregarDocs();
+    if (a === 'ass') gqAssIniciar();
     if (a === 'form') { try { const un = document.getElementById('gq-f-usuario'); if (un && !un.value) un.value = localStorage.getItem('gq_usuario') || ''; } catch (e) {} gqFormLista(); }
   }
 
@@ -4496,6 +4532,113 @@
         'Afonso Cláudio, ES, {data}.'] }
   );
   GQ_FORMS.forEach(f => { if (f.texto && !f.tabela_no_pdf) f.somente_texto = true; });
+
+
+  // ---------- ASSINATURAS ----------
+  const GQA = { limpar: null, temTraco: () => false, assinantes: [], pronto: false };
+
+  function gqPadIniciar() {
+    const cv = document.getElementById('gq-a-canvas'); if (!cv) return;
+    const ratio = window.devicePixelRatio || 1, w = cv.clientWidth || 520, h = 190;
+    cv.width = Math.round(w * ratio); cv.height = Math.round(h * ratio); cv.style.height = h + 'px';
+    const ctx = cv.getContext('2d'); ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#0b1f3a';
+    let desenhando = false, ult = null, tem = false;
+    const pos = e => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+    cv.onpointerdown = e => {
+      e.preventDefault(); try { cv.setPointerCapture(e.pointerId); } catch (x) {}
+      desenhando = true; ult = pos(e); tem = true; ctx.lineWidth = 2.2;
+      ctx.beginPath(); ctx.arc(ult.x, ult.y, 1.1, 0, Math.PI * 2); ctx.fillStyle = '#0b1f3a'; ctx.fill(); ctx.beginPath(); ctx.moveTo(ult.x, ult.y);
+    };
+    cv.onpointermove = e => {
+      if (!desenhando) return; e.preventDefault();
+      const p = pos(e), pr = (e.pointerType === 'pen' && e.pressure) ? e.pressure : 0.5; ctx.lineWidth = 1.5 + 2 * pr;
+      const mx = (ult.x + p.x) / 2, my = (ult.y + p.y) / 2;
+      ctx.quadraticCurveTo(ult.x, ult.y, mx, my); ctx.stroke(); ctx.beginPath(); ctx.moveTo(mx, my); ult = p;
+    };
+    cv.onpointerup = cv.onpointercancel = cv.onpointerleave = () => { desenhando = false; };
+    GQA.limpar = () => { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height); ctx.setTransform(ratio, 0, 0, ratio, 0, 0); tem = false; };
+    GQA.temTraco = () => tem;
+  }
+
+  // recorta o desenho (caixa mínima + margem) e devolve PNG transparente
+  function gqPadExportar() {
+    const cv = document.getElementById('gq-a-canvas'), ctx = cv.getContext('2d');
+    const W = cv.width, H = cv.height, dados = ctx.getImageData(0, 0, W, H).data;
+    let x0 = W, y0 = H, x1 = 0, y1 = 0;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (dados[(y * W + x) * 4 + 3] > 8) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    if (x1 <= x0 || y1 <= y0) return '';
+    const m = 8; x0 = Math.max(0, x0 - m); y0 = Math.max(0, y0 - m); x1 = Math.min(W - 1, x1 + m); y1 = Math.min(H - 1, y1 + m);
+    let w = x1 - x0 + 1, h = y1 - y0 + 1, esc = Math.min(1, 480 / w);
+    const out = document.createElement('canvas'); out.width = Math.round(w * esc); out.height = Math.round(h * esc);
+    out.getContext('2d').drawImage(cv, x0, y0, w, h, 0, 0, out.width, out.height);
+    return out.toDataURL('image/png');
+  }
+
+  async function gqAssIniciar() {
+    gqPadIniciar();
+    const lista = document.getElementById('gq-a-lista');
+    lista.innerHTML = '<p class="text-sm text-slate-400">Carregando…</p>';
+    try {
+      GQA.assinantes = await gqApi('listarAssinantes', { miniaturas: true });
+      gqAssRender();
+      if (!GQ.docs || !GQ.docs.length) GQ.docs = await gqApi('listarDocumentos');
+      const sel = document.getElementById('gq-a-doc');
+      sel.innerHTML = '<option value="">Escolha o documento…</option>' + GQ.docs.filter(d => d.status !== 'obsoleto').map(d => '<option value="' + gqEsc(d.id) + '">' + gqEsc(d.titulo) + ' · ' + gqEsc(d.unidade) + ' · v' + gqEsc(d.versao) + '</option>').join('');
+      document.getElementById('gq-a-quem').innerHTML = '<option value="">Quem vai assinar…</option>' + GQA.assinantes.map(a => '<option value="' + gqEsc(a.id) + '">' + gqEsc(a.nome) + ' — ' + gqEsc(a.cargo) + '</option>').join('');
+      GQA.pronto = true;
+    } catch (e) { lista.innerHTML = '<p class="text-sm text-red-600">' + gqEsc(e.message) + '</p>'; }
+  }
+
+  function gqAssRender() {
+    const lista = document.getElementById('gq-a-lista');
+    lista.innerHTML = GQA.assinantes.map(a =>
+      '<div class="flex items-center gap-3 border-b py-2"><div style="width:120px;height:48px;display:flex;align-items:center;justify-content:center;background:#f8fafc;border-radius:8px">' +
+      (a.miniatura ? '<img src="' + a.miniatura + '" style="max-width:112px;max-height:42px">' : '<span class="text-xs text-slate-400">sem imagem</span>') + '</div>' +
+      '<div class="flex-1 min-w-0"><p class="text-sm font-bold truncate">' + gqEsc(a.nome) + '</p><p class="text-xs text-slate-500">' + gqEsc(a.cargo) + ' · cadastrada em ' + gqEsc(String(a.criado_em).slice(0, 10)) + '</p></div></div>').join('') ||
+      '<p class="text-sm text-slate-400">Nenhuma assinatura cadastrada ainda.</p>';
+  }
+
+  async function gqAssSalvar() {
+    const v = id => document.getElementById(id).value.trim();
+    const nome = v('gq-a-nome'), cargo = v('gq-a-cargo'), pin = v('gq-a-pin'), pin2 = v('gq-a-pin2');
+    if (!nome || !cargo) { showToast('Informe nome e cargo.', 'error'); return; }
+    if (!/^\d{4,8}$/.test(pin)) { showToast('O PIN deve ter de 4 a 8 números.', 'error'); return; }
+    if (pin !== pin2) { showToast('Os PINs não conferem.', 'error'); return; }
+    if (!GQA.temTraco()) { showToast('Desenhe a assinatura no quadro.', 'error'); return; }
+    const imagem = gqPadExportar(); if (!imagem) { showToast('Assinatura vazia.', 'error'); return; }
+    if (GQA.assinantes.some(a => a.nome.toUpperCase() === nome.toUpperCase()) && !confirm('Já existe uma assinatura de ' + nome + '. A nova passa a valer e a antiga fica guardada como inativa. Continuar?')) return;
+    try {
+      await gqApi('salvarAssinante', { nome: nome, cargo: cargo, pin: pin, imagem: imagem, usuario: (localStorage.getItem('gq_usuario') || nome) });
+      showToast('Assinatura cadastrada.', 'success');
+      ['gq-a-nome', 'gq-a-cargo', 'gq-a-pin', 'gq-a-pin2'].forEach(i => document.getElementById(i).value = ''); GQA.limpar();
+      gqAssIniciar();
+    } catch (e) { showToast(e.message, 'error'); }
+  }
+
+  async function gqAssDocMudou() {
+    const id = document.getElementById('gq-a-doc').value, box = document.getElementById('gq-a-hist');
+    if (!id) { box.innerHTML = ''; return; }
+    box.innerHTML = '<p class="text-xs text-slate-400">Carregando…</p>';
+    try {
+      const l = await gqApi('listarAssinaturasDoc', { documento_id: id });
+      box.innerHTML = l.length ? '<p class="text-xs font-bold text-slate-500 mb-1">Já assinado:</p>' + l.map(s => '<p class="text-xs text-slate-600">' + gqEsc(s.papel) + ' · ' + gqEsc(s.nome) + ' · v' + gqEsc(s.versao) + ' · ' + gqEsc(String(s.data).slice(0, 16).replace('T', ' ')) + ' · <a target="_blank" rel="noopener" style="color:#0F4C5C" href="' + gqEsc(s.comprovante_url) + '">comprovante</a></p>').join('') : '<p class="text-xs text-slate-400">Este documento ainda não tem assinaturas.</p>';
+    } catch (e) { box.innerHTML = '<p class="text-xs text-red-600">' + gqEsc(e.message) + '</p>'; }
+  }
+
+  async function gqAssAssinar() {
+    const v = id => document.getElementById(id).value.trim();
+    const doc = v('gq-a-doc'), papel = v('gq-a-papel'), quem = v('gq-a-quem'), pin = v('gq-a-pinassina');
+    if (!doc || !quem || !pin) { showToast('Escolha o documento, quem assina e digite o PIN.', 'error'); return; }
+    if (!confirm('Confirmar a assinatura eletrônica deste documento? Fica registrada com data, hora e código de verificação.')) return;
+    try {
+      const r = await gqApi('assinarDocumento', { documento_id: doc, assinante_id: quem, papel: papel, pin: pin, usuario: (localStorage.getItem('gq_usuario') || '') });
+      document.getElementById('gq-a-pinassina').value = '';
+      showToast('Documento assinado. Comprovante gerado.', 'success');
+      if (r.comprovante_url) window.open(r.comprovante_url, '_blank', 'noopener');
+      gqAssDocMudou();
+    } catch (e) { showToast(e.message, 'error'); }
+  }
 
   function gqFormLista() {
     const el = document.getElementById('gq-f-corpo');
