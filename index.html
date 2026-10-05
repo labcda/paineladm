@@ -2946,6 +2946,8 @@
       try {
         localStorage.removeItem('cda_usuario_logado');
         localStorage.removeItem('cda_session_token');
+        localStorage.removeItem('gq_url');
+        localStorage.removeItem('gq_chave');
         localStorage.removeItem('patient_name');
         localStorage.removeItem('patient_phone');
         localStorage.removeItem('cda_recoletas');
@@ -3135,7 +3137,12 @@
       clearTimeout(timeout);
       if (!resp.ok) throw new Error('Erro HTTP: ' + resp.status);
       const json = await resp.json();
-      if (json.ok && json.autorizado) { setSessionToken(json.sessionToken); loginSucesso(usuario, json.permissoes); }
+      if (json.ok && json.autorizado) {
+        setSessionToken(json.sessionToken);
+        // Conexão automática com a Qualidade (entregue pelo servidor só a quem tem permissão)
+        try { const q = json.qualidade; if (q && typeof q.url === 'string' && q.url.indexOf('https://script.google.com/') === 0 && q.chave) { localStorage.setItem('gq_url', q.url); localStorage.setItem('gq_chave', q.chave); } } catch (eq) {}
+        loginSucesso(usuario, json.permissoes);
+      }
       else if (json.ok && !json.autorizado) {
         errorEl.innerText = 'LOGIN OU SENHA INCORRETOS.';
         errorEl.style.color = '#ef4444';
