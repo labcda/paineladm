@@ -2695,12 +2695,12 @@
             </div>
             <div class="space-y-3">
                 <div><label class="cfg-label"><i class="fa-solid fa-user mr-1"></i> Login</label>
-                    <input type="text" id="config-login" placeholder="Digite o login do usuário..." class="cfg-input"></div>
+                    <input type="text" id="config-login" autocomplete="off" placeholder="Digite o login do usuário..." class="cfg-input"></div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div><label class="cfg-label"><i class="fa-solid fa-lock mr-1"></i> Senha</label>
-                        <input type="password" id="config-senha" placeholder="Digite a senha..." class="cfg-input"></div>
+                        <input type="password" id="config-senha" autocomplete="new-password" placeholder="Digite a senha..." class="cfg-input"></div>
                     <div><label class="cfg-label"><i class="fa-solid fa-lock mr-1"></i> Confirmar senha</label>
-                        <input type="password" id="config-senha-confirm" placeholder="Confirme a senha..." class="cfg-input"></div>
+                        <input type="password" id="config-senha-confirm" autocomplete="new-password" placeholder="Confirme a senha..." class="cfg-input"></div>
                 </div>
                 <div>
                     <label class="cfg-label" style="margin-bottom:8px;"><i class="fa-solid fa-shield-halved mr-1"></i> Permissões de acesso — o usuário só verá o que estiver marcado</label>
@@ -7193,12 +7193,17 @@ async function carregarUsuarios() {
     const container = document.getElementById('config-lista-usuarios');
     container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i>CARREGANDO...</p>';
     try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000);
       const url = APPS_SCRIPT_URL + '?action=listarUsuarios&token=' + encodeURIComponent(CDA_TOKEN) + '&sessionToken=' + encodeURIComponent(getSessionToken());
-      const resp = await fetch(url, { signal: controller.signal });
-      clearTimeout(timeout);
-      const json = await resp.json();
+      // O Apps Script às vezes leva 20-30 s para "acordar": espera até 45 s e tenta de novo uma vez
+      let json = null, ultimoErro = null;
+      for (let tentativa = 0; tentativa < 2 && !json; tentativa++) {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 45000);
+        try { const resp = await fetch(url, { signal: controller.signal }); json = await resp.json(); }
+        catch (e) { ultimoErro = e; }
+        finally { clearTimeout(timeout); }
+      }
+      if (!json) throw ultimoErro || new Error('sem resposta');
       if (json.ok && Array.isArray(json.usuarios)) {
         usuariosCadastrados = json.usuarios;
         if (json.usuarios.length === 0) { container.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">NENHUM USUÁRIO CADASTRADO</p>'; return; }
