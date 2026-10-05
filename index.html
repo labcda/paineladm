@@ -8800,8 +8800,17 @@ async function carregarUsuarios() {
   async function agendaBuscarEventosMes(date) {
     const mesISO = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0');
     try {
-      const resp = await fetch(APPS_SCRIPT_URL + '?action=listarEventosCalendario&mes=' + encodeURIComponent(mesISO) + '&token=' + encodeURIComponent(CDA_TOKEN), { redirect: 'follow' });
-      const json = await resp.json();
+      // O Apps Script às vezes responde lento (20-30 s) ou devolve um 404 passageiro: tenta até 3 vezes
+      const url = APPS_SCRIPT_URL + '?action=listarEventosCalendario&mes=' + encodeURIComponent(mesISO) + '&token=' + encodeURIComponent(CDA_TOKEN);
+      let json = null, ultimoErro = null;
+      for (let tentativa = 0; tentativa < 3 && !json; tentativa++) {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 45000);
+        try { const resp = await fetch(url, { redirect: 'follow', signal: controller.signal }); json = await resp.json(); }
+        catch (e) { ultimoErro = e; json = null; if (tentativa < 2) await new Promise(r => setTimeout(r, 1500)); }
+        finally { clearTimeout(timeout); }
+      }
+      if (!json) throw ultimoErro || new Error('sem resposta');
       if (!json.ok) throw new Error(json.erro || 'Falha ao carregar eventos');
       return json.eventos || [];
     } catch (err) {
