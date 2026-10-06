@@ -2965,7 +2965,7 @@
         if (String(url).indexOf('script.google.com/macros/') < 0) return false;
         const metodo = ((init && init.method) || 'GET').toUpperCase();
         if (metodo === 'GET') { const m = /[?&]action=([A-Za-z]+)/.exec(url); return !!(m && LEITURAS.test(m[1])); }
-        if (metodo === 'POST' && init && typeof init.body === 'string') return /"action":"(verificarLogin|login)"/.test(init.body) || /"acao":"(hoje|listarDocumentos|listarEquipamentos|listarTemperaturas|listarRegistros|listarFechamentos|historicoDocumento|listarLog|listarAssinantes|listarAssinaturasDoc|listarArquivosVivos|listarControleAnalitico)"/.test(init.body);
+        if (metodo === 'POST' && init && typeof init.body === 'string') return /"action":"(verificarLogin|login)"/.test(init.body) || /"acao":"(hoje|listarDocumentos|listarEquipamentos|listarTemperaturas|listarRegistros|listarFechamentos|historicoDocumento|listarLog|listarAssinantes|listarAssinaturasDoc|listarArquivosVivos|listarControleAnalitico|listarLinksRecepcao)"/.test(init.body);
       } catch (e) {}
       return false;
     }
@@ -4987,11 +4987,61 @@
   }
   const rcpApi = (acao, dados) => gqApi(acao, dados, rcpCfg());
 
+  const RCP_LINK_URL = 'https://labcda.github.io/paineladm/preencher.html';
+
   function rcpIniciar() {
     const c = rcpCfg(), el = document.getElementById('rcp-corpo');
     if (!c.url || !c.chave) { el.innerHTML = '<div class="gq-card"><p class="text-sm">O acesso da recepção ainda não foi liberado para este usuário. Saia do painel e entre de novo; se continuar, peça ao administrador para marcar a permissão <b>Recepção</b> e configurar o acesso.</p></div>'; return; }
     const forms = GQ_FORMS.filter(f => f.modo === 'paciente');
-    el.innerHTML = '<div class="grid gap-3 md:grid-cols-2">' + forms.map(f => '<button class="gq-card text-left" style="cursor:pointer;padding:22px" onclick="rcpAbrir(\'' + gqEsc(f.c) + '\')"><span class="text-xs text-slate-400"><i class="fa-solid fa-file-signature"></i> o cliente assina na tela</span><br><b class="text-lg">' + gqEsc(f.t) + '</b></button>').join('') + '</div>';
+    el.innerHTML = '<div class="grid gap-3 md:grid-cols-2">' + forms.map(f => '<div class="gq-card" style="padding:20px"><span class="text-xs text-slate-400"><i class="fa-solid fa-file-signature"></i> o cliente assina na tela</span><br><b class="text-lg">' + gqEsc(f.t) + '</b>' +
+      '<div class="flex flex-wrap gap-2 mt-3"><button class="gq-btn" style="background:#0F4C5C" onclick="rcpAbrir(\'' + gqEsc(f.c) + '\')"><i class="fa-solid fa-tablet-screen-button"></i> Preencher aqui (tablet)</button>' +
+      '<button class="gq-btn" style="background:#16a34a" onclick="rcpWhats(\'' + gqEsc(f.c) + '\')"><i class="fa-brands fa-whatsapp"></i> Enviar por WhatsApp</button></div></div>').join('') + '</div>' +
+      '<div class="gq-card mt-3"><div class="flex items-center justify-between mb-2"><p class="gq-t" style="margin:0">Links enviados aos clientes</p><button class="gq-aba" onclick="rcpCarregarLinks()">Atualizar</button></div><div id="rcp-links" class="text-sm"></div></div>';
+    rcpCarregarLinks();
+  }
+
+  async function rcpCarregarLinks() {
+    const box = document.getElementById('rcp-links'); if (!box) return;
+    box.innerHTML = '<p class="text-slate-400">Carregando…</p>';
+    try {
+      const l = await rcpApi('listarLinksRecepcao', {});
+      const cor = { pendente: '#d97706', preenchido: '#16a34a', expirado: '#94a3b8' };
+      box.innerHTML = l.map(x => '<div class="flex items-center justify-between gap-2 border-b py-2"><span><b>' + gqEsc(x.cliente) + '</b> · pedido ' + gqEsc(x.pedido) + '<br><span class="text-xs text-slate-400">' + gqEsc(x.form) + ' · enviado ' + gqEsc(String(x.criado_em).slice(0, 16).replace('T', ' ')) + '</span></span><span class="flex items-center gap-2"><span class="gq-pill" style="background:' + (cor[x.status] || '#94a3b8') + '">' + gqEsc(x.status) + '</span>' + (x.pdf_url ? '<a target="_blank" rel="noopener" style="color:#0F4C5C;font-weight:700" href="' + gqEsc(x.pdf_url) + '">PDF</a>' : '') + '</span></div>').join('') || '<p class="text-slate-400">Nenhum link enviado ainda.</p>';
+    } catch (e) { box.innerHTML = '<span class="text-red-600">' + gqEsc(e.message) + '</span>'; }
+  }
+
+  function rcpWhats(cod) {
+    const f = GQ_FORMS.find(x => x.c === cod); if (!f) return;
+    let u = ''; try { u = localStorage.getItem('gq_usuario') || ''; } catch (e) {}
+    document.getElementById('gq-modal-corpo').innerHTML =
+      '<div class="flex justify-between items-start mb-3"><div><p class="text-xs text-slate-500">Enviar por WhatsApp</p><p class="font-extrabold">' + gqEsc(f.t) + '</p></div><button onclick="gqFecharModal()" class="text-xl">&times;</button></div>' +
+      '<p class="text-xs text-slate-500 mb-3">O cliente recebe um link, preenche no celular e assina com o dedo. Ao enviar, o PDF vai direto para a pasta da recepção no Drive. O link vale para <b>um</b> preenchimento.</p>' +
+      '<div class="grid gap-2"><input id="rw-nome" type="text" placeholder="Nome do cliente" class="border rounded-lg p-3 text-base">' +
+      '<input id="rw-pedido" type="text" inputmode="numeric" data-sem-upper placeholder="Nº do pedido" class="border rounded-lg p-3 text-base">' +
+      '<input id="rw-tel" type="tel" inputmode="tel" data-sem-upper placeholder="WhatsApp do cliente (DDD + número)" class="border rounded-lg p-3 text-base">' +
+      '<select id="rw-horas" class="border rounded-lg p-3 text-base"><option value="24">Link válido por 24 horas</option><option value="48" selected>Link válido por 48 horas</option><option value="72">Link válido por 72 horas</option></select>' +
+      '<input id="rw-user" type="text" placeholder="Atendente (seu nome)" class="border rounded-lg p-3 text-base" value="' + gqEsc(u) + '"></div>' +
+      '<div class="flex flex-wrap gap-2 mt-4"><button class="gq-btn" style="background:#16a34a" onclick="rcpGerarLink(\'' + gqEsc(cod) + '\', true)"><i class="fa-brands fa-whatsapp"></i> Gerar link e abrir o WhatsApp</button>' +
+      '<button class="gq-btn" style="background:#64748b" onclick="rcpGerarLink(\'' + gqEsc(cod) + '\', false)">Só copiar o link</button></div>';
+    document.getElementById('gq-modal').style.display = 'flex';
+  }
+
+  async function rcpGerarLink(cod, whats) {
+    const f = GQ_FORMS.find(x => x.c === cod), v = id => (document.getElementById(id).value || '').trim();
+    const nome = v('rw-nome'), pedido = v('rw-pedido'), tel = v('rw-tel').replace(/\D/g, ''), horas = v('rw-horas'), usuario = v('rw-user');
+    if (!nome || !pedido) { showToast('Informe o nome do cliente e o nº do pedido.', 'error'); return; }
+    if (!usuario) { showToast('Informe quem está enviando.', 'error'); return; }
+    if (whats && (tel.length < 10 || tel.length > 13)) { showToast('Informe o WhatsApp com DDD (ex.: 27 99999-9999).', 'error'); return; }
+    try { localStorage.setItem('gq_usuario', usuario); } catch (e) {}
+    try {
+      const r = await rcpApi('criarLinkRecepcao', { form: cod, cliente: nome, pedido: pedido, telefone: tel, validade_horas: horas, usuario: usuario });
+      const url = RCP_LINK_URL + '?t=' + r.token;
+      const msg = 'Olá, ' + nome + '! Aqui é o Laboratório CDA. Para agilizar seu atendimento, preencha o ' + f.t + ' neste link: ' + url + '\n\nO link vale por ' + r.horas + ' horas e só pode ser usado uma vez. Qualquer dúvida, estamos à disposição.';
+      gqFecharModal();
+      if (whats) { const fone = tel.length <= 11 ? '55' + tel : tel; window.open('https://wa.me/' + fone + '?text=' + encodeURIComponent(msg), '_blank', 'noopener'); showToast('Link gerado. Confirme o envio no WhatsApp.', 'success'); }
+      else { try { await navigator.clipboard.writeText(url); showToast('Link copiado.', 'success'); } catch (e) { prompt('Copie o link:', url); } }
+      rcpCarregarLinks();
+    } catch (e) { showToast(e.message, 'error'); }
   }
   function rcpAbrir(cod) {
     const f = GQ_FORMS.find(x => x.c === cod); if (!f) return;
