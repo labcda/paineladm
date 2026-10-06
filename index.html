@@ -2507,6 +2507,7 @@
             <button class="gq-aba" data-aba="docs" onclick="gqAba('docs')">Documentos</button>
             <button class="gq-aba" data-aba="form" onclick="gqAba('form')">Formulários</button>
             <button class="gq-aba" data-aba="ass" onclick="gqAba('ass')"><i class="fa-solid fa-signature"></i> Assinaturas</button>
+            <button class="gq-aba" data-aba="cq" onclick="gqAba('cq')"><i class="fa-solid fa-chart-line"></i> Controle analítico</button>
             <button class="gq-aba" data-aba="conf" onclick="gqAba('conf')"><i class="fa-solid fa-gear"></i></button>
           </div>
 
@@ -2590,6 +2591,11 @@
               </div>
               <div id="gq-a-hist" class="mt-3"></div>
             </div>
+          </div>
+
+<div id="gq-p-cq" class="gq-painel" style="display:none">
+            <div id="gq-cq-nav" class="flex flex-wrap gap-2 mb-3"></div>
+            <div id="gq-cq-corpo"></div>
           </div>
 
 <div id="gq-p-conf" class="gq-painel" style="display:none">
@@ -2949,7 +2955,7 @@
         if (String(url).indexOf('script.google.com/macros/') < 0) return false;
         const metodo = ((init && init.method) || 'GET').toUpperCase();
         if (metodo === 'GET') { const m = /[?&]action=([A-Za-z]+)/.exec(url); return !!(m && LEITURAS.test(m[1])); }
-        if (metodo === 'POST' && init && typeof init.body === 'string') return /"action":"(verificarLogin|login)"/.test(init.body) || /"acao":"(hoje|listarDocumentos|listarEquipamentos|listarTemperaturas|listarRegistros|listarFechamentos|historicoDocumento|listarLog|listarAssinantes|listarAssinaturasDoc|listarArquivosVivos)"/.test(init.body);
+        if (metodo === 'POST' && init && typeof init.body === 'string') return /"action":"(verificarLogin|login)"/.test(init.body) || /"acao":"(hoje|listarDocumentos|listarEquipamentos|listarTemperaturas|listarRegistros|listarFechamentos|historicoDocumento|listarLog|listarAssinantes|listarAssinaturasDoc|listarArquivosVivos|listarControleAnalitico)"/.test(init.body);
       } catch (e) {}
       return false;
     }
@@ -4165,6 +4171,7 @@
     if (a === 'temp') gqPrepararTemp();
     if (a === 'docs') gqCarregarDocs();
     if (a === 'ass') gqAssIniciar();
+    if (a === 'cq') gqCqIniciar();
     if (a === 'form') { try { const un = document.getElementById('gq-f-usuario'); if (un && !un.value) un.value = localStorage.getItem('gq_usuario') || ''; } catch (e) {} gqFormLista(); }
   }
 
@@ -4639,6 +4646,206 @@
       if (r.comprovante_url) window.open(r.comprovante_url, '_blank', 'noopener');
       gqAssDocMudou();
     } catch (e) { showToast(e.message, 'error'); }
+  }
+
+
+  // ---------- CONTROLE DE QUALIDADE ANALÍTICO (hematologia e bioquímica) ----------
+  const AN_BIOQ = ['Glicose', 'Colesterol', 'Triglicerídeos', 'Ácido úrico', 'CPK', 'Creatinina', 'Ureia', 'TGO', 'TGP', 'Bilirrubina total', 'Bilirrubina direta', 'Bilirrubina indireta', 'Gama GT'];
+  const GQC = {
+    tipos: {
+      HEMA_REPET: { nome: 'Hematologia - amostra do dia anterior', tol: 10, modo: 'repet', equips: ['Sysmex KX', 'Zybio Z3'], analitos: AN_HEMO },
+      HEMA_APOIO: { nome: 'Hematologia - laboratório de apoio', tol: 10, modo: 'apoio', equips: ['Sysmex KX', 'Zybio Z3'], analitos: AN_HEMO },
+      BIOQ_APOIO: { nome: 'Bioquímica - laboratório de apoio', tol: 10, modo: 'apoio', equips: ['Biosystems A15'], analitos: AN_BIOQ }
+    },
+    apoios: ['DB Diagnósticos do Brasil', 'Hermes Pardini', 'Alvaro Apoio'],
+    tipo: 'HEMA_REPET', vals: {}, chart: null
+  };
+  const gqcK = s => String(s).replace(/[^A-Za-z0-9]/g, '_');
+  const gqcNum = s => { s = String(s == null ? '' : s).trim(); if (!s) return NaN; if (s.indexOf(',') >= 0) s = s.replace(/\./g, '').replace(',', '.'); return parseFloat(s); };
+
+  function gqCqIniciar() {
+    const nav = [['HEMA_REPET', 'Hemato: dia anterior'], ['HEMA_APOIO', 'Hemato: lab. de apoio'], ['BIOQ_APOIO', 'Bioquímica: lab. de apoio'], ['tend', 'Tendência e histórico']];
+    document.getElementById('gq-cq-nav').innerHTML = nav.map(n => '<button class="gq-aba" data-cq="' + n[0] + '" onclick="gqCqMostrar(\'' + n[0] + '\')">' + n[1] + '</button>').join('');
+    gqCqMostrar(GQC.tipo || 'HEMA_REPET');
+  }
+
+  function gqCqMostrar(modo) {
+    document.querySelectorAll('#gq-cq-nav .gq-aba').forEach(b => b.classList.toggle('on', b.dataset.cq === modo));
+    if (modo === 'tend') { gqCqTendencia(); return; }
+    GQC.tipo = modo; GQC.vals = {};
+    const t = GQC.tipos[modo];
+    let u = ''; try { u = localStorage.getItem('gq_usuario') || ''; } catch (e) {}
+    let h = '<div class="gq-card mb-3"><p class="font-extrabold">' + gqEsc(t.nome) + '</p>' +
+      '<p class="text-xs text-slate-500 mt-1">Tolerância: ±' + t.tol + '%. A variação é calculada na hora: (valor medido − valor de referência) ÷ valor de referência × 100.</p>' +
+      '<div class="grid gap-2 md:grid-cols-3 mt-3">' +
+      '<input id="gqc-data" type="date" class="border rounded-lg p-2 text-sm" value="' + new Date().toISOString().slice(0, 10) + '">' +
+      '<input id="gqc-amostra" type="text" placeholder="Identificação da amostra (OS / código de barras)" class="border rounded-lg p-2 text-sm md:col-span-2" data-sem-upper>' +
+      '<input id="gqc-usuario" type="text" placeholder="Registrado por (seu nome)" class="border rounded-lg p-2 text-sm md:col-span-3" value="' + gqEsc(u) + '"></div>';
+    if (t.modo === 'repet') {
+      h += '<div class="mt-3"><label class="text-xs font-bold text-slate-500">Equipamento</label><select id="gqc-equip" class="border rounded-lg p-2 text-sm w-full" onchange="gqcMontarTabela()">' + t.equips.map(e => '<option>' + gqEsc(e) + '</option>').join('') + '</select></div>';
+    } else {
+      if (t.equips.length > 1) h += '<div class="mt-3"><p class="text-xs font-bold text-slate-500 mb-1">Equipamentos comparados</p><div class="flex flex-wrap gap-3">' + t.equips.map((e, i) => '<label class="text-sm flex items-center gap-1"><input type="checkbox" class="gqc-eq" value="' + gqEsc(e) + '" checked onchange="gqcMontarTabela()"> ' + gqEsc(e) + '</label>').join('') + '</div></div>';
+      h += '<div class="mt-3"><p class="text-xs font-bold text-slate-500 mb-1">Laboratório(s) de apoio (escolha 1 ou 2)</p><div class="flex flex-wrap gap-3">' + GQC.apoios.map((a, i) => '<label class="text-sm flex items-center gap-1"><input type="checkbox" class="gqc-ap" value="' + gqEsc(a) + '"' + (i === 0 ? ' checked' : '') + ' onchange="gqcLimitarApoios(this)"> ' + gqEsc(a) + '</label>').join('') + '</div></div>';
+    }
+    h += '</div><div class="gq-card mb-3" style="overflow:auto"><div id="gqc-tab"></div></div>' +
+      '<div class="gq-card"><div id="gqc-resumo" class="text-sm font-bold mb-2"></div>' +
+      '<textarea id="gqc-acao" rows="2" placeholder="Ação corretiva (obrigatória se algum resultado ficar fora da tolerância)" class="w-full border rounded-lg p-2 text-sm mb-2"></textarea>' +
+      '<input id="gqc-obs" type="text" placeholder="Observações (opcional)" class="w-full border rounded-lg p-2 text-sm mb-3">' +
+      '<button class="gq-btn" style="background:#0F4C5C" onclick="gqcSalvar()"><i class="fa-solid fa-floppy-disk"></i> Salvar controle</button><div id="gqc-link" class="mt-2 text-sm"></div></div>';
+    document.getElementById('gq-cq-corpo').innerHTML = h;
+    gqcMontarTabela();
+  }
+
+  function gqcLimitarApoios(el) {
+    const marcados = [...document.querySelectorAll('.gqc-ap')].filter(c => c.checked);
+    if (marcados.length > 2) { el.checked = false; showToast('Escolha no máximo 2 laboratórios de apoio.', 'error'); return; }
+    if (!marcados.length) { el.checked = true; showToast('Deixe ao menos 1 laboratório de apoio.', 'error'); return; }
+    gqcMontarTabela();
+  }
+
+  // monta a configuração atual (colunas e pares referência x medido)
+  function gqcConfig() {
+    const t = GQC.tipos[GQC.tipo];
+    if (t.modo === 'repet') {
+      const eq = document.getElementById('gqc-equip').value;
+      return { cols: [{ k: 'O', rot: 'Dia anterior (original)' }, { k: 'N', rot: 'Reanálise (hoje)' }], pares: [{ ref: 'O', med: 'N', rot: eq, equipamento: eq, lab: '' }] };
+    }
+    const eqs = t.equips.length > 1 ? [...document.querySelectorAll('.gqc-eq')].filter(c => c.checked).map(c => c.value) : t.equips.slice();
+    const aps = [...document.querySelectorAll('.gqc-ap')].filter(c => c.checked).map(c => c.value);
+    const cols = eqs.map(e => ({ k: 'E_' + gqcK(e), rot: e })).concat(aps.map(a => ({ k: 'A_' + gqcK(a), rot: 'Apoio: ' + a })));
+    const pares = []; eqs.forEach(e => aps.forEach(a => pares.push({ ref: 'A_' + gqcK(a), med: 'E_' + gqcK(e), rot: e + ' × ' + a, equipamento: e, lab: a })));
+    return { cols, pares };
+  }
+
+  function gqcMontarTabela() {
+    const t = GQC.tipos[GQC.tipo], cfg = gqcConfig();
+    if (!cfg.cols.length || !cfg.pares.length) { document.getElementById('gqc-tab').innerHTML = '<p class="text-sm text-amber-700">Selecione ao menos 1 equipamento e 1 laboratório de apoio.</p>'; return; }
+    let h = '<table class="text-sm w-full" style="min-width:' + (200 + cfg.cols.length * 120 + cfg.pares.length * 110) + 'px"><thead><tr><th class="text-left p-1">Analito</th>' +
+      cfg.cols.map(c => '<th class="text-left p-1">' + gqEsc(c.rot) + '</th>').join('') + cfg.pares.map(p => '<th class="text-left p-1" style="color:#0F4C5C">Variação ' + gqEsc(t.modo === 'repet' ? '' : p.rot) + '</th>').join('') + '</tr></thead><tbody>';
+    t.analitos.forEach((a, i) => {
+      h += '<tr style="border-top:1px solid #e2e8f0"><td class="p-1 font-bold whitespace-nowrap">' + gqEsc(a) + '</td>';
+      cfg.cols.forEach(c => { const id = 'gqc-' + i + '-' + c.k; h += '<td class="p-1"><input type="text" inputmode="decimal" data-sem-upper class="border rounded p-1 text-sm" style="width:100px" id="' + id + '" value="' + gqEsc(GQC.vals[id] || '') + '" oninput="GQC.vals[this.id]=this.value;gqcRecalc()"></td>'; });
+      cfg.pares.forEach((p, j) => { h += '<td class="p-1 font-bold" id="gqc-r-' + i + '-' + j + '">—</td>'; });
+      h += '</tr>';
+    });
+    document.getElementById('gqc-tab').innerHTML = h + '</tbody></table>';
+    gqcRecalc();
+  }
+
+  function gqcRecalc() {
+    const t = GQC.tipos[GQC.tipo], cfg = gqcConfig(); let fora = 0, ok = 0;
+    t.analitos.forEach((a, i) => cfg.pares.forEach((p, j) => {
+      const ref = gqcNum((document.getElementById('gqc-' + i + '-' + p.ref) || {}).value), med = gqcNum((document.getElementById('gqc-' + i + '-' + p.med) || {}).value);
+      const el = document.getElementById('gqc-r-' + i + '-' + j); if (!el) return;
+      if (isNaN(ref) || isNaN(med) || ref === 0) { el.textContent = '—'; el.style.color = '#94a3b8'; return; }
+      const v = (med - ref) / ref * 100, dentro = Math.abs(v) <= t.tol;
+      el.textContent = (v > 0 ? '+' : '') + v.toFixed(1).replace('.', ',') + '%  ' + (dentro ? '✓' : '✗');
+      el.style.color = dentro ? '#16a34a' : '#dc2626'; if (dentro) ok++; else fora++;
+    }));
+    const r = document.getElementById('gqc-resumo');
+    if (r) r.innerHTML = (ok + fora) ? ('Dentro da tolerância: <span style="color:#16a34a">' + ok + '</span> · Fora: <span style="color:' + (fora ? '#dc2626' : '#64748b') + '">' + fora + '</span>') : '<span class="text-slate-400">Digite os valores para ver a variação.</span>';
+    return { ok, fora };
+  }
+
+  async function gqcSalvar() {
+    const t = GQC.tipos[GQC.tipo], cfg = gqcConfig(), v = id => document.getElementById(id).value.trim();
+    const usuario = v('gqc-usuario'), amostra = v('gqc-amostra'), data = v('gqc-data');
+    if (!usuario) { showToast('Informe quem está registrando.', 'error'); return; }
+    if (!amostra) { showToast('Informe a identificação da amostra.', 'error'); return; }
+    try { localStorage.setItem('gq_usuario', usuario); } catch (e) {}
+    const linhas = []; let fora = 0;
+    t.analitos.forEach((a, i) => cfg.pares.forEach(p => {
+      const rs = (document.getElementById('gqc-' + i + '-' + p.ref) || {}).value, ms = (document.getElementById('gqc-' + i + '-' + p.med) || {}).value;
+      const ref = gqcNum(rs), med = gqcNum(ms);
+      if (isNaN(ref) && isNaN(med)) return;
+      if (isNaN(ref) || isNaN(med)) { linhas.push({ erro: a + ' (' + p.rot + '): preencha os dois valores' }); return; }
+      if (ref === 0) { linhas.push({ erro: a + ': referência zero' }); return; }
+      if (Math.abs((med - ref) / ref * 100) > t.tol) fora++;
+      linhas.push({ analito: a, equipamento: p.equipamento, lab_apoio: p.lab, valor_ref: rs, valor_medido: ms });
+    }));
+    const erro = linhas.find(l => l.erro); if (erro) { showToast(erro.erro, 'error'); return; }
+    if (!linhas.length) { showToast('Preencha ao menos um analito.', 'error'); return; }
+    if (fora && !v('gqc-acao')) { showToast(fora + ' resultado(s) fora de ±' + t.tol + '%: descreva a ação corretiva.', 'error'); return; }
+    try {
+      const r = await gqApi('salvarControleAnalitico', { tipo: GQC.tipo, data: data, amostra: amostra, usuario: usuario, linhas: linhas, acao_corretiva: v('gqc-acao'), observacao: v('gqc-obs') });
+      showToast(r.fora ? 'Controle salvo com ' + r.fora + ' resultado(s) FORA da tolerância — alerta enviado.' : 'Controle salvo: todos dentro da tolerância.', r.fora ? 'error' : 'success');
+      const lk = document.getElementById('gqc-link');
+      if (lk && r.arquivo_url) lk.innerHTML = '<a target="_blank" rel="noopener" style="color:#0F4C5C;font-weight:700" href="' + gqEsc(r.arquivo_url) + '"><i class="fa-solid fa-file-lines"></i> Abrir a planilha do ano (atualizada automaticamente)</a>';
+      GQC.vals = {}; gqcMontarTabela(); ['gqc-amostra', 'gqc-acao', 'gqc-obs'].forEach(i => document.getElementById(i).value = '');
+    } catch (e) { showToast(e.message, 'error'); }
+  }
+
+  // ----- tendência e histórico -----
+  const GQC_CORES = ['#0F4C5C', '#37A7AA', '#d97706', '#7c3aed', '#16a34a', '#dc2626', '#0ea5e9', '#be185d', '#65a30d', '#475569', '#f59e0b', '#14b8a6', '#6366f1'];
+
+  async function gqCqTendencia() {
+    const corpo = document.getElementById('gq-cq-corpo');
+    corpo.innerHTML = '<div class="gq-card mb-3"><div class="grid gap-2 md:grid-cols-4">' +
+      '<select id="gqt-tipo" class="border rounded-lg p-2 text-sm" onchange="gqtAtualizarFiltros()">' + Object.keys(GQC.tipos).map(k => '<option value="' + k + '">' + gqEsc(GQC.tipos[k].nome) + '</option>').join('') + '</select>' +
+      '<select id="gqt-equip" class="border rounded-lg p-2 text-sm" onchange="gqtDesenhar()"></select>' +
+      '<select id="gqt-analito" class="border rounded-lg p-2 text-sm" onchange="gqtDesenhar()"></select>' +
+      '<select id="gqt-dias" class="border rounded-lg p-2 text-sm" onchange="gqtDesenhar()"><option value="90">Últimos 90 dias</option><option value="30">Últimos 30 dias</option><option value="180">Últimos 6 meses</option><option value="365">Último ano</option><option value="0">Tudo</option></select></div></div>' +
+      '<div id="gqt-kpi" class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3"></div>' +
+      '<div class="gq-card mb-3"><canvas id="gqt-chart" height="120"></canvas><p class="text-[11px] text-slate-400 mt-2">Linhas tracejadas = limites de tolerância. Cada ponto é a variação % de uma comparação.</p></div>' +
+      '<div class="gq-card mb-3" style="overflow:auto"><p class="gq-t">Resumo por analito</p><div id="gqt-resumo"></div></div>' +
+      '<div class="gq-card"><p class="gq-t">Últimos lançamentos</p><div id="gqt-hist" class="text-sm"></div></div>';
+    gqtAtualizarFiltros();
+  }
+
+  async function gqtAtualizarFiltros() {
+    const tipo = document.getElementById('gqt-tipo').value, t = GQC.tipos[tipo];
+    document.getElementById('gqt-equip').innerHTML = '<option value="">Todos os equipamentos</option>' + t.equips.map(e => '<option>' + gqEsc(e) + '</option>').join('');
+    document.getElementById('gqt-analito').innerHTML = '<option value="">Todos os analitos</option>' + t.analitos.map(a => '<option>' + gqEsc(a) + '</option>').join('');
+    try { GQC.dados = await gqApi('listarControleAnalitico', { tipo: tipo }); } catch (e) { GQC.dados = []; showToast(e.message, 'error'); }
+    gqtDesenhar();
+  }
+
+  function gqtDesenhar() {
+    const tipo = document.getElementById('gqt-tipo').value, t = GQC.tipos[tipo], eq = document.getElementById('gqt-equip').value, an = document.getElementById('gqt-analito').value, dias = +document.getElementById('gqt-dias').value;
+    let corte = ''; if (dias) { const d = new Date(); d.setDate(d.getDate() - dias); corte = d.toISOString().slice(0, 10); }
+    const base = (GQC.dados || []).filter(r => r.tipo === tipo && (!corte || r.data >= corte));
+    const lista = base.filter(r => (!eq || r.equipamento === eq) && (!an || r.analito === an)).sort((a, b) => a.data.localeCompare(b.data));
+    const num = x => parseFloat(x);
+    // KPIs
+    const n = lista.length, fora = lista.filter(r => r.situacao === 'FORA').length, vies = n ? lista.reduce((s, r) => s + num(r.variacao_pct), 0) / n : 0;
+    const k = (rot, val, cor) => '<div class="gq-card" style="padding:12px"><p class="text-[11px] text-slate-500">' + rot + '</p><p class="text-xl font-extrabold" style="color:' + (cor || '#0F4C5C') + '">' + val + '</p></div>';
+    document.getElementById('gqt-kpi').innerHTML = k('Comparações', n) + k('Dentro da tolerância', n ? Math.round((n - fora) / n * 100) + '%' : '—', '#16a34a') + k('Fora da tolerância', fora, fora ? '#dc2626' : '#64748b') + k('Viés médio', n ? (vies > 0 ? '+' : '') + vies.toFixed(1).replace('.', ',') + '%' : '—');
+    // gráfico
+    const datas = Array.from(new Set(lista.map(r => r.data))).sort();
+    const series = {};
+    lista.forEach(r => {
+      const nome = an ? ((r.equipamento || '') + (r.lab_apoio ? ' × ' + r.lab_apoio : '')) : r.analito;
+      ((series[nome] = series[nome] || {})[r.data] = series[nome][r.data] || []).push(num(r.variacao_pct));
+    });
+    const ds = Object.keys(series).map((nome, i) => ({ label: nome, borderColor: GQC_CORES[i % GQC_CORES.length], backgroundColor: GQC_CORES[i % GQC_CORES.length], tension: .2, spanGaps: true, pointRadius: 4,
+      data: datas.map(d => series[nome][d] ? series[nome][d].reduce((a, b) => a + b, 0) / series[nome][d].length : null) }));
+    const lim = (v, cor) => ({ label: (v > 0 ? '+' : '') + v + '%', data: datas.map(() => v), borderColor: cor, borderDash: [6, 4], pointRadius: 0, borderWidth: 1.5 });
+    ds.push(lim(t.tol, '#dc2626'), lim(-t.tol, '#dc2626'), lim(0, '#94a3b8'));
+    if (GQC.chart) GQC.chart.destroy();
+    GQC.chart = new Chart(document.getElementById('gqt-chart'), { type: 'line', data: { labels: datas.map(d => d.split('-').reverse().slice(0, 2).join('/')), datasets: ds },
+      options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }, scales: { y: { title: { display: true, text: 'Variação (%)' }, suggestedMin: -t.tol * 1.5, suggestedMax: t.tol * 1.5 } } } });
+    // resumo por analito
+    const grupos = {}; base.filter(r => !eq || r.equipamento === eq).forEach(r => { (grupos[r.analito] = grupos[r.analito] || []).push(r); });
+    let h = '<table class="text-sm w-full" style="min-width:560px"><thead><tr><th class="text-left p-1">Analito</th><th class="p-1">n</th><th class="p-1">Viés médio</th><th class="p-1">Maior variação</th><th class="p-1">% dentro</th><th class="p-1">Atenção</th></tr></thead><tbody>';
+    t.analitos.forEach(a => {
+      const g = (grupos[a] || []).slice().sort((x, y) => x.data.localeCompare(y.data)); if (!g.length) return;
+      const v = g.map(r => num(r.variacao_pct)), media = v.reduce((s, x) => s + x, 0) / v.length, maior = v.reduce((m, x) => Math.abs(x) > Math.abs(m) ? x : m, 0), dentro = g.filter(r => r.situacao === 'OK').length;
+      const ult = v.slice(-5), tend = ult.length === 5 && (ult.every(x => x > 0) || ult.every(x => x < 0));
+      h += '<tr style="border-top:1px solid #e2e8f0"><td class="p-1 font-bold">' + gqEsc(a) + '</td><td class="p-1 text-center">' + g.length + '</td><td class="p-1 text-center">' + (media > 0 ? '+' : '') + media.toFixed(1).replace('.', ',') + '%</td><td class="p-1 text-center">' + (maior > 0 ? '+' : '') + maior.toFixed(1).replace('.', ',') + '%</td><td class="p-1 text-center" style="color:' + (dentro === g.length ? '#16a34a' : '#d97706') + '">' + Math.round(dentro / g.length * 100) + '%</td><td class="p-1 text-xs" style="color:#d97706">' + (tend ? '⚠ últimas 5 comparações sempre para o mesmo lado (possível viés sistemático)' : '') + '</td></tr>';
+    });
+    document.getElementById('gqt-resumo').innerHTML = h + '</tbody></table>';
+    // histórico por lançamento
+    const porGrupo = {}; (GQC.dados || []).forEach(r => { (porGrupo[r.grupo] = porGrupo[r.grupo] || []).push(r); });
+    const gl = Object.values(porGrupo).sort((a, b) => (b[0].data + b[0].grupo).localeCompare(a[0].data + a[0].grupo)).slice(0, 15);
+    document.getElementById('gqt-hist').innerHTML = gl.map(g => { const f = g.filter(r => r.situacao === 'FORA').length;
+      return '<div class="flex justify-between gap-2 border-b py-2"><span><b>' + gqEsc(g[0].data) + '</b> · amostra ' + gqEsc(g[0].amostra) + ' · ' + g.length + ' comparações · <span style="color:' + (f ? '#dc2626' : '#16a34a') + '">' + (f ? f + ' fora' : 'todas dentro') + '</span><br><span class="text-xs text-slate-400">' + gqEsc(g[0].usuario) + '</span></span><a href="#" style="color:#dc2626;font-size:.75rem" onclick="gqtAnular(\'' + gqEsc(g[0].grupo) + '\');return false">anular</a></div>'; }).join('') || '<p class="text-slate-400">Nenhum lançamento ainda.</p>';
+  }
+
+  async function gqtAnular(grupo) {
+    const motivo = prompt('Motivo da anulação (o lançamento continua guardado, marcado como anulado):'); if (!motivo) return;
+    let u = ''; try { u = localStorage.getItem('gq_usuario') || ''; } catch (e) {}
+    u = u || prompt('Seu nome:') || ''; if (!u) return;
+    try { await gqApi('anularControleAnalitico', { grupo: grupo, motivo: motivo, usuario: u }); showToast('Lançamento anulado.', 'success'); gqtAtualizarFiltros(); } catch (e) { showToast(e.message, 'error'); }
   }
 
   function gqFormLista() {
