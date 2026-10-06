@@ -3002,12 +3002,47 @@
         }
       });
     };
-  })();
+    // --- sessão: toda chamada ao servidor do painel/agenda leva o token de sessão do usuário logado ---
+    function doPainel(url) { try { return (typeof APPS_SCRIPT_URL !== 'undefined' && String(url).indexOf(APPS_SCRIPT_URL) === 0) || (typeof APPS_SCRIPT_AGENDA_URL !== 'undefined' && String(url).indexOf(APPS_SCRIPT_AGENDA_URL) === 0); } catch (e) { return false; } }
+    function comSessao(input, init) {
+      if (typeof input !== 'string' || !doPainel(input)) return [input, init];
+      let st = ''; try { st = localStorage.getItem('cda_session_token') || ''; } catch (e) {}
+      if (!st) return [input, init];
+      if (((init && init.method) || 'GET').toUpperCase() === 'GET') { if (input.indexOf('sessionToken=') < 0 && input.indexOf('token=') >= 0) input += '&sessionToken=' + encodeURIComponent(st); return [input, init]; }
+      if (init && typeof init.body === 'string' && init.body.charAt(0) === '{') { try { const b = JSON.parse(init.body); if (!b.sessionToken) { b.sessionToken = st; init = Object.assign({}, init, { body: JSON.stringify(b) }); } } catch (e) {} }
+      return [input, init];
+    }
+    const base = window.fetch;
+    window.fetch = function (input, init) {
+      const r = comSessao(input, init);
+      return base(r[0], r[1]).then(resp => { try { if (doPainel(r[0])) resp.clone().json().then(j => { if (j && j.sessaoExpirada) cdaSessaoExpirada(); }).catch(() => {}); } catch (e) {} return resp; });
+    };  })();
+
+  let cdaSessaoAvisada = false;
+  function cdaSessaoExpirada() {
+    if (cdaSessaoAvisada) return; cdaSessaoAvisada = true;
+    try { showToast('Sua sessão expirou. Entre novamente.', 'error'); } catch (e) {}
+    setTimeout(() => { try { limparUsuarioLogado(); } catch (e) {} location.reload(); }, 1500);
+  }
+
+  // Abre um PDF privado do Drive pelo servidor (só quem está logado consegue)
+  async function abrirArquivoPrivado(url) {
+    const m = /\/d\/([A-Za-z0-9_-]{20,})/.exec(String(url || '')) || /[?&]id=([A-Za-z0-9_-]{20,})/.exec(String(url || ''));
+    if (!m) { showToast('Arquivo não encontrado.', 'error'); return; }
+    const w = window.open('', '_blank');
+    try {
+      const r = await fetch(APPS_SCRIPT_URL + '?action=baixarArquivo&fileId=' + m[1] + '&token=' + encodeURIComponent(CDA_TOKEN));
+      const j = await r.json(); if (!j.ok) throw new Error(j.erro || 'Erro ao abrir');
+      const bin = atob(j.base64), bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      const blobUrl = URL.createObjectURL(new Blob([bytes], { type: j.mime || 'application/pdf' }));
+      if (w) w.location = blobUrl; else window.open(blobUrl, '_blank');
+    } catch (e) { if (w) w.close(); showToast(e.message, 'error'); }
+  }
 
   // ==================== CONFIGURAÇÕES GLOBAIS ====================
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyNAnEvW3JJ0-STfXV13kb0H8KWmGAXdWpeqf7fMKM8To7l3h4YMceIjDDYC8V8207llQ/exec';
   const APPS_SCRIPT_AGENDA_URL = 'https://script.google.com/macros/s/AKfycbyaCe1qi8balumQbWeZ6A-_b-eGx0pRH8PEL7MsxvuiPYJq52ztL-f2Ej6ypRLo6ejz/exec';
-  const CDA_TOKEN = 'CDA-2025-xK9#mPqL';
+  const CDA_TOKEN = 'CDA-50qZi8FlCWOndf4jEhLxMQn1';
   // Mesmo proxy (Cloudflare Worker) usado pelo App do Paciente para ler PDFs com IA —
   // a chave da Anthropic fica só no Worker, nunca aqui.
   const CLAUDE_PROXY_URL = 'https://labcda-claude.laboratoriocda-areatecnica.workers.dev';
@@ -3022,7 +3057,7 @@
   }
 
   // Token de sessão emitido pelo backend no login (verificarLogin) — só quem
-  // logou de verdade (não o atalho ADMIN/CDA2024, que é só front-end) tem um,
+  // logou de verdade (o antigo atalho de login do front-end foi removido) tem um,
   // e só com ele o backend libera ações administrativas sensíveis.
   function setSessionToken(token) {
       try { if (token) localStorage.setItem('cda_session_token', token); } catch(e) {}
@@ -3048,6 +3083,7 @@
       try {
         localStorage.removeItem('cda_usuario_logado');
         localStorage.removeItem('cda_session_token');
+        localStorage.removeItem('cda_perfil');
         localStorage.removeItem('patient_name');
         localStorage.removeItem('patient_phone');
         localStorage.removeItem('cda_recoletas');
@@ -3219,7 +3255,6 @@
       errorEl.style.display = 'block'; errorEl.style.color = '#ef4444';
       setTimeout(() => errorEl.style.display = 'none', 3000); return;
     }
-    if (usuario === 'ADMIN' && senha === 'CDA2024') { loginSucesso('ADMIN'); return; }
     errorEl.innerText = 'VERIFICANDO CREDENCIAIS...';
     errorEl.style.display = 'block'; errorEl.style.color = '#005954';
     try {
@@ -3239,6 +3274,7 @@
       const json = await resp.json();
       if (json.ok && json.autorizado) {
         setSessionToken(json.sessionToken);
+        try { localStorage.setItem('cda_perfil', json.perfil || 'EXTERNO'); } catch (ep) {}
         // Conexão automática com a Qualidade (entregue pelo servidor só a quem tem permissão)
         try { const q = json.qualidade; if (q && typeof q.url === 'string' && q.url.indexOf('https://script.google.com/') === 0 && q.chave) { localStorage.setItem('gq_url', q.url); localStorage.setItem('gq_chave', q.chave); } } catch (eq) {}
         try { const rc = json.recepcao; if (rc && typeof rc.url === 'string' && rc.url.indexOf('https://script.google.com/') === 0 && rc.chave) { localStorage.setItem('rcp_url', rc.url); localStorage.setItem('rcp_chave', rc.chave); } else { localStorage.removeItem('rcp_url'); localStorage.removeItem('rcp_chave'); } } catch (er) {}
@@ -4090,11 +4126,8 @@
         showToast('Você não tem permissão para acessar esta área.', 'error');
         return;
       }
-      if (pageId === 'configuracoes' && !configAutorizado) {
-        document.getElementById('modal-senha-config').style.display = 'flex';
-        document.getElementById('senha-config-input').value = '';
-        document.getElementById('senha-config-error').style.display = 'none';
-        setTimeout(() => document.getElementById('senha-config-input').focus(), 100);
+      if (pageId === 'configuracoes' && cdaPerfil() !== 'ADMIN') {
+        showToast('As Configurações são só para administradores.', 'error');
         return;
       }
       navItems.forEach(item => item.classList.remove('active'));
@@ -6760,8 +6793,8 @@ function agenRemoverPDF() {
     navigateToPage('home');
   }
 
-  // ==================== CONFIGURACOES - SENHA 5912 ====================
-  const SENHA_CONFIG = '5912';
+  // ==================== CONFIGURACOES (somente administrador; validado no servidor) ====================
+  function cdaPerfil() { try { return localStorage.getItem('cda_perfil') || ''; } catch (e) { return ''; } }
   let configAutorizado = false;
 
   function fecharModalSenha() {
@@ -6770,21 +6803,7 @@ function agenRemoverPDF() {
     document.getElementById('senha-config-error').style.display = 'none';
   }
 
-  function verificarSenhaConfig() {
-    const input = document.getElementById('senha-config-input');
-    const error = document.getElementById('senha-config-error');
-    if (input.value === SENHA_CONFIG) {
-      configAutorizado = true;
-      fecharModalSenha();
-      navigateToPage('configuracoes');
-      carregarUsuarios();
-    } else {
-      error.style.display = 'block';
-      input.value = '';
-      input.focus();
-      setTimeout(() => error.style.display = 'none', 3000);
-    }
-  }
+  function verificarSenhaConfig() { fecharModalSenha(); }   // (sem senha no código: o acesso é por perfil de administrador)
 
   const senhaConfigInput = document.getElementById('senha-config-input');
   if (senhaConfigInput) {
@@ -6937,13 +6956,13 @@ function agenRemoverPDF() {
     const outroWrap = document.getElementById('rec-motivo-outro-wrap');
     const outroInput = document.getElementById('rec-motivo-outro-texto');
     if (sel.value === '__OUTRO__') {
-      const senha = prompt('Digite a senha de autorização para liberar o campo de motivo personalizado:');
-      if (senha === '5912') {
+      // Motivo personalizado: só administrador (sem senha escrita no código)
+      if (cdaPerfil() === 'ADMIN') {
         outroWrap.style.display = 'block';
         outroInput.disabled = false;
         outroInput.focus();
       } else {
-        showToast('Senha incorreta. Selecione outro motivo da lista.', 'error');
+        showToast('Motivo personalizado: somente administrador. Selecione um motivo da lista.', 'error');
         sel.value = '';
         outroWrap.style.display = 'none';
         outroInput.disabled = true;
@@ -9982,7 +10001,7 @@ async function carregarUsuarios() {
 
           <div class="bol-modal-secao">
             <h4><i class="fa-solid fa-file-pdf mr-1"></i> Espelho do Pedido</h4>
-            <a href="${pedido.espelhoUrl}" target="_blank" class="bol-espelho-link">
+            <a href="#" onclick="abrirArquivoPrivado('${pedido.espelhoUrl}');return false" class="bol-espelho-link">
               <i class="fa-solid fa-eye"></i> Visualizar Espelho no Drive
             </a>
           </div>
@@ -10124,7 +10143,7 @@ async function carregarUsuarios() {
 
           <div class="bol-modal-secao">
             <h4><i class="fa-solid fa-file-pdf mr-1"></i> Espelho do Pedido</h4>
-            <a href="${pedido.espelhoUrl}" target="_blank" class="bol-espelho-link">
+            <a href="#" onclick="abrirArquivoPrivado('${pedido.espelhoUrl}');return false" class="bol-espelho-link">
               <i class="fa-solid fa-eye"></i> Visualizar Espelho no Drive
             </a>
           </div>
@@ -10371,7 +10390,7 @@ async function carregarUsuarios() {
         </div>
         ${linhaTempo}
         <div class="bol-card-actions">
-          <a href="${agendaEscapar(p.espelhoUrl || '#')}" target="_blank" class="bol-espelho-link"><i class="fa-solid fa-eye"></i> Ver Espelho</a>
+          <a href="#" onclick="abrirArquivoPrivado('${agendaEscapar(p.espelhoUrl || '')}');return false" class="bol-espelho-link"><i class="fa-solid fa-eye"></i> Ver Espelho</a>
           ${acoes}
         </div>
       </div>
