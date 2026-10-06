@@ -1084,6 +1084,7 @@
         <li data-page="recoletas" title="Recoletas"><a href="#"><i class="fa-solid fa-vial"></i><span>Recoletas</span></a></li>
         <li data-page="relatorios" title="Relatórios"><a href="#"><i class="fa-solid fa-chart-line"></i><span>Relatórios</span></a></li>
         <li data-page="boletos" title="Boletos"><a href="#"><i class="fa-solid fa-file-invoice-dollar"></i><span>Boletos</span></a></li>
+        <li data-page="recepcao" title="Recepção"><a href="#"><i class="fa-solid fa-clipboard-user"></i><span>Recepção</span></a></li>
         <li data-page="gq" title="Gestão da Qualidade"><a href="#"><i class="fa-solid fa-shield-halved"></i><span>Gestão da Qualidade</span></a></li>
         <li data-page="qualidade" title="Controle de Qualidade"><a href="#"><i class="fa-solid fa-award"></i><span>Controle de Qualidade</span></a></li>
         <li data-page="configuracoes" id="nav-configuracoes" title="Configurações"><a href="#"><i class="fa-solid fa-gear"></i><span>Configurações</span></a></li>
@@ -2485,6 +2486,15 @@
         </div>
       </section>
       <!-- GESTÃO DA QUALIDADE (documentos + temperatura) -->
+      <!-- RECEPÇÃO (formulários de uso da recepção: o cliente responde e assina na tela) -->
+      <section id="page-recepcao" class="page space-y-5">
+        <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 100%);border-radius:26px;padding:22px;color:white;box-shadow:0 14px 34px rgba(15,76,92,0.2);">
+          <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-3"><i class="fa-solid fa-clipboard-user"></i> Recepção</span>
+          <h2 class="text-2xl font-extrabold leading-tight mb-1">Formulários da Recepção</h2>
+          <p class="text-sm text-white/80">Questionários que o cliente responde e assina na tela. O PDF no modelo do laboratório fica arquivado no Drive e pode ser consultado sempre que precisar.</p>
+        </div>
+        <div id="rcp-corpo"></div>
+      </section>
       <section id="page-gq" class="page space-y-5">
         <div style="background:linear-gradient(135deg,#0F4C5C 0%,#37A7AA 100%);border-radius:26px;padding:22px;color:white;box-shadow:0 14px 34px rgba(15,76,92,0.2);">
           <span class="inline-flex items-center gap-2 bg-white/15 border border-white/25 px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider mb-3"><i class="fa-solid fa-shield-halved"></i> Gestão da Qualidade</span>
@@ -3231,6 +3241,7 @@
         setSessionToken(json.sessionToken);
         // Conexão automática com a Qualidade (entregue pelo servidor só a quem tem permissão)
         try { const q = json.qualidade; if (q && typeof q.url === 'string' && q.url.indexOf('https://script.google.com/') === 0 && q.chave) { localStorage.setItem('gq_url', q.url); localStorage.setItem('gq_chave', q.chave); } } catch (eq) {}
+        try { const rc = json.recepcao; if (rc && typeof rc.url === 'string' && rc.url.indexOf('https://script.google.com/') === 0 && rc.chave) { localStorage.setItem('rcp_url', rc.url); localStorage.setItem('rcp_chave', rc.chave); } else { localStorage.removeItem('rcp_url'); localStorage.removeItem('rcp_chave'); } } catch (er) {}
         loginSucesso(usuario, json.permissoes);
       }
       else if (json.ok && !json.autorizado) {
@@ -4104,6 +4115,7 @@
         agendaAtualizarAtual();
       }
       if (pageId === 'gq') { gqIniciar(); }
+      if (pageId === 'recepcao') { rcpIniciar(); }
       if (pageId === 'qualidade') {
         carregarNaoConformidades();
       }
@@ -4136,11 +4148,11 @@
   }
   function gqEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-  async function gqApi(acao, dados) {
-    const c = gqCfg();
+  async function gqApi(acao, dados, cfg) {
+    const c = cfg || gqCfg();
     if (!c.url || !c.chave) throw new Error('Qualidade não conectada.');
     const r = await fetch(c.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(Object.assign({ chave: c.chave, acao: acao }, dados || {})) });
+      body: JSON.stringify(Object.assign({}, dados || {}, { chave: c.chave, acao: acao })) });
     const j = await r.json();
     if (!j.ok) {
       if (/Chave inv/.test(j.erro || '')) { try { localStorage.removeItem('gq_chave'); } catch (e) {} setTimeout(gqIniciar, 0); throw new Error('Chave inválida: conecte novamente.'); }
@@ -4848,6 +4860,146 @@
     try { await gqApi('anularControleAnalitico', { grupo: grupo, motivo: motivo, usuario: u }); showToast('Lançamento anulado.', 'success'); gqtAtualizarFiltros(); } catch (e) { showToast(e.message, 'error'); }
   }
 
+
+  // ---------- QUESTIONÁRIOS DO PACIENTE (o cliente responde e assina na tela) ----------
+  GQ_FORMS.push({
+    c: 'QP ESPERMOGRAMA', t: 'Questionário de Espermograma', cat: 'Pacientes (assinatura do cliente)', modo: 'paciente',
+    perguntas: [
+      { id: 'abstinencia', tipo: 'numero', label: 'Tempo de abstinência:', pos: 'dias', dica: '(Abstinência: Período em que o cliente ficou sem se masturbar e sem relação sexual)' },
+      { id: 'varicocele', tipo: 'radio', label: 'Tem Varicocele?', opcoes: ['NÃO', 'SIM', 'NÃO SEI INFORMAR'], obrig: 1, dica: '(Varicocele: Aumento anormal das veias dos testículos)' },
+      { id: 'vasectomia', tipo: 'radio', label: 'Está fazendo controle de vasectomia?', opcoes: ['NÃO', 'SIM'], obrig: 1, dica: '(Vasectomia: Procedimento cirúrgico que interrompe a circulação dos espermatozoides)' },
+      { id: 'ejaculacoes', tipo: 'numero', label: 'Em caso de vasectomia, qual o número de ejaculações após a cirurgia?', pos: 'ejaculações' },
+      { id: 'tempo_vasectomia', tipo: 'texto', label: 'Há quanto tempo foi realizada a vasectomia?' },
+      { id: 'filhos', tipo: 'radio', label: 'Tem filho(s)?', opcoes: ['NÃO', 'SIM'], obrig: 1 },
+      { id: 'medicamento', tipo: 'radio', label: 'Faz uso de algum medicamento?', opcoes: ['NÃO', 'SIM'], obrig: 1 },
+      { id: 'quais', tipo: 'texto', label: 'Quais?', anexoA: 'medicamento' }
+    ],
+    observacao: 'Observação: A perda de amostra durante a coleta inviabiliza a execução do exame e compromete o resultado, impossibilitando uma avaliação adequada pelo médico solicitante. Caso haja perda, o laboratório não realizará a análise e o cliente deverá retornar em outro dia para realizar nova coleta. Ao assinar esse questionário, afirmo que todas as informações aqui escritas foram lidas e compreendidas por mim e que todas as informações preenchidas por mim são verídicas.',
+    finais: [{ id: 'perda', tipo: 'radio', label: 'Houve perda de amostra durante a coleta?', opcoes: ['NÃO', 'SIM'], obrig: 1 }]
+  });
+
+  // quadro de assinatura reutilizável (dedo, caneta ou mouse); devolve {limpar, temTraco, exportar}
+  function gqPadNovo(canvasId) {
+    const cv = document.getElementById(canvasId); if (!cv) return null;
+    const ratio = window.devicePixelRatio || 1, w = cv.clientWidth || 520, h = cv.clientHeight || 190;
+    cv.width = Math.round(w * ratio); cv.height = Math.round(h * ratio);
+    const ctx = cv.getContext('2d'); ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#0b1f3a';
+    let desenhando = false, ult = null, tem = false;
+    const pos = e => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+    cv.onpointerdown = e => { e.preventDefault(); try { cv.setPointerCapture(e.pointerId); } catch (x) {} desenhando = true; ult = pos(e); tem = true; ctx.lineWidth = 2.2; ctx.beginPath(); ctx.arc(ult.x, ult.y, 1.1, 0, Math.PI * 2); ctx.fillStyle = '#0b1f3a'; ctx.fill(); ctx.beginPath(); ctx.moveTo(ult.x, ult.y); };
+    cv.onpointermove = e => { if (!desenhando) return; e.preventDefault(); const p = pos(e), pr = (e.pointerType === 'pen' && e.pressure) ? e.pressure : 0.5; ctx.lineWidth = 1.5 + 2 * pr; const mx = (ult.x + p.x) / 2, my = (ult.y + p.y) / 2; ctx.quadraticCurveTo(ult.x, ult.y, mx, my); ctx.stroke(); ctx.beginPath(); ctx.moveTo(mx, my); ult = p; };
+    cv.onpointerup = cv.onpointercancel = cv.onpointerleave = () => { desenhando = false; };
+    return {
+      limpar: () => { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height); ctx.setTransform(ratio, 0, 0, ratio, 0, 0); tem = false; },
+      temTraco: () => tem,
+      exportar: () => {
+        const W = cv.width, H = cv.height, dados = ctx.getImageData(0, 0, W, H).data; let x0 = W, y0 = H, x1 = 0, y1 = 0;
+        for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (dados[(y * W + x) * 4 + 3] > 8) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+        if (x1 <= x0 || y1 <= y0) return '';
+        const m = 8; x0 = Math.max(0, x0 - m); y0 = Math.max(0, y0 - m); x1 = Math.min(W - 1, x1 + m); y1 = Math.min(H - 1, y1 + m);
+        const ww = x1 - x0 + 1, hh = y1 - y0 + 1, esc = Math.min(1, 480 / ww), out = document.createElement('canvas'); out.width = Math.round(ww * esc); out.height = Math.round(hh * esc);
+        out.getContext('2d').drawImage(cv, x0, y0, ww, hh, 0, 0, out.width, out.height); return out.toDataURL('image/png');
+      }
+    };
+  }
+
+  function gqPacienteMontar() {
+    const f = GQ.form, el = document.getElementById('rcp-corpo'), agora = new Date(), hh = String(agora.getHours()).padStart(2, '0') + ':' + String(agora.getMinutes()).padStart(2, '0');
+    const campo = p => {
+      let h = '<div class="mt-4"><p class="text-sm font-bold">' + gqEsc(p.label) + (p.obrig ? ' <span style="color:#dc2626">*</span>' : '') + '</p>' + (p.dica ? '<p class="text-xs text-slate-500">' + gqEsc(p.dica) + '</p>' : '');
+      if (p.tipo === 'radio') h += '<div class="flex flex-wrap gap-2 mt-2">' + p.opcoes.map(o => '<label class="gq-pill-opt"><input type="radio" name="gqp-' + p.id + '" value="' + gqEsc(o) + '"> ' + gqEsc(o) + '</label>').join('') + '</div>';
+      else h += '<div class="flex items-center gap-2 mt-2"><input id="gqp-' + p.id + '" type="text" ' + (p.tipo === 'numero' ? 'inputmode="numeric" data-sem-upper' : '') + ' class="border rounded-lg p-3 text-base flex-1" style="max-width:420px">' + (p.pos ? '<span class="text-sm">' + gqEsc(p.pos) + '</span>' : '') + '</div>';
+      return h + '</div>';
+    };
+    let u = ''; try { u = localStorage.getItem('gq_usuario') || ''; } catch (e) {}
+    el.innerHTML = '<style>.gq-pill-opt{display:inline-flex;align-items:center;gap:8px;border:2px solid #cbd5e1;border-radius:100px;padding:10px 18px;font-weight:700;font-size:.95rem;cursor:pointer;background:#fff}.gq-pill-opt:has(input:checked){border-color:#0F4C5C;background:#E5F4F3;color:#0F4C5C}.gq-pill-opt input{width:18px;height:18px}</style>' +
+      '<div class="gq-card mb-3"><p class="font-extrabold text-lg">' + gqEsc(f.t) + '</p><p class="text-xs text-slate-500">O cliente responde e assina aqui. O PDF no modelo do laboratório é gerado e guardado no Drive.</p>' +
+      '<div class="grid gap-3 md:grid-cols-3 mt-3"><div><label class="text-xs font-bold text-slate-500">Cliente *</label><input id="gqp-nome" type="text" class="border rounded-lg p-3 text-base w-full"></div>' +
+      '<div><label class="text-xs font-bold text-slate-500">Nº do pedido *</label><input id="gqp-pedido" type="text" inputmode="numeric" data-sem-upper class="border rounded-lg p-3 text-base w-full"></div>' +
+      '<div><label class="text-xs font-bold text-slate-500">Data</label><input id="gqp-data" type="date" class="border rounded-lg p-3 text-base w-full" value="' + agora.toISOString().slice(0, 10) + '"></div></div>' +
+      f.perguntas.filter(p => !p.anexoA).map(p => {
+        let h = campo(p); const anexo = f.perguntas.find(a => a.anexoA === p.id);
+        if (anexo) h += '<div class="mt-2"><p class="text-xs text-slate-500">' + gqEsc(anexo.label) + '</p><input id="gqp-' + anexo.id + '" type="text" class="border rounded-lg p-3 text-base w-full" style="max-width:520px"></div>';
+        return h;
+      }).join('') +
+      '<div class="mt-5 p-3 rounded-lg text-sm" style="background:#f8fafc;border:1px solid #e2e8f0">' + gqEsc(f.observacao) + '</div>' +
+      f.finais.map(campo).join('') +
+      '<div class="mt-5"><p class="text-sm font-bold">Assinatura do cliente <span style="color:#dc2626">*</span></p><p class="text-xs text-slate-500">Assine no quadro, com o dedo ou a caneta.</p>' +
+      '<canvas id="gqp-canvas" style="width:100%;height:200px;border:2px dashed #37A7AA;border-radius:12px;background:#fff;touch-action:none;cursor:crosshair;margin-top:6px"></canvas>' +
+      '<button class="gq-btn mt-2" style="background:#64748b" onclick="GQP.pad && GQP.pad.limpar()">Limpar assinatura</button></div>' +
+      '<div class="grid gap-3 md:grid-cols-3 mt-4"><div><label class="text-xs font-bold text-slate-500">Unidade</label><select id="gqp-un" class="border rounded-lg p-3 text-base w-full">' + GQ_UNIDADES.map(x => '<option>' + x + '</option>').join('') + '</select></div>' +
+      '<div><label class="text-xs font-bold text-slate-500">Horário de entrega do material</label><input id="gqp-hora" type="time" class="border rounded-lg p-3 text-base w-full" value="' + hh + '"></div>' +
+      '<div><label class="text-xs font-bold text-slate-500">Atendente (quem recebeu)</label><input id="gqp-usuario" type="text" class="border rounded-lg p-3 text-base w-full" value="' + gqEsc(u) + '"></div></div>' +
+      '<button class="gq-btn mt-4" style="background:#0F4C5C;font-size:1rem;padding:12px 22px" onclick="gqPacienteSalvar()"><i class="fa-solid fa-file-signature"></i> Salvar e gerar PDF assinado</button></div>' +
+      '<div class="gq-card"><p class="gq-t">Últimos questionários</p><div id="gqp-lista" class="text-sm"></div></div>';
+    GQP.pad = gqPadNovo('gqp-canvas');
+    gqPacienteLista();
+  }
+
+  const GQP = { pad: null };
+
+  async function gqPacienteLista() {
+    const f = GQ.form, box = document.getElementById('gqp-lista'); if (!box) return;
+    try {
+      const regs = (await rcpApi('listarRegistros', { form: f.c, limite: 15 })).reverse();
+      box.innerHTML = regs.map(r => { let d = {}; try { d = JSON.parse(r.dados); } catch (e) {}
+        return '<div class="flex justify-between gap-2 border-b py-2"><span><b>' + gqEsc(d.cliente || '') + '</b> · pedido ' + gqEsc(d.pedido || '') + ' · ' + gqEsc(r.periodo) + '<br><span class="text-xs text-slate-400">' + gqEsc(r.usuario) + ' · ' + gqEsc(String(r.criado_em).slice(0, 16).replace('T', ' ')) + '</span></span>' +
+          (r.pdf_url ? '<a target="_blank" rel="noopener" style="color:#0F4C5C;font-weight:700" href="' + gqEsc(r.pdf_url) + '">PDF</a>' : '') + '</div>'; }).join('') || '<p class="text-slate-400">Nenhum questionário ainda.</p>';
+    } catch (e) { box.innerHTML = '<span class="text-red-600">' + gqEsc(e.message) + '</span>'; }
+  }
+
+  async function gqPacienteSalvar() {
+    const f = GQ.form, v = id => (document.getElementById(id) || {}).value || '', val = s => String(s).trim();
+    const nome = val(v('gqp-nome')), pedido = val(v('gqp-pedido')), data = v('gqp-data'), hora = v('gqp-hora'), usuario = val(v('gqp-usuario')), un = v('gqp-un');
+    if (!nome) { showToast('Informe o nome do cliente.', 'error'); return; }
+    if (!pedido) { showToast('Informe o número do pedido.', 'error'); return; }
+    if (!usuario) { showToast('Informe quem está atendendo.', 'error'); return; }
+    try { localStorage.setItem('gq_usuario', usuario); } catch (e) {}
+    const resp = {}; let falta = '';
+    f.perguntas.concat(f.finais).forEach(p => {
+      if (p.tipo === 'radio') { const r = document.querySelector('input[name="gqp-' + p.id + '"]:checked'); resp[p.id] = r ? r.value : ''; }
+      else resp[p.id] = val(v('gqp-' + p.id));
+      if (p.obrig && !resp[p.id] && !falta) falta = p.label;
+    });
+    if (falta) { showToast('Responda: ' + falta, 'error'); return; }
+    if (!GQP.pad || !GQP.pad.temTraco()) { showToast('O cliente precisa assinar no quadro.', 'error'); return; }
+    const assinatura_img = GQP.pad.exportar(); if (!assinatura_img) { showToast('Assinatura vazia.', 'error'); return; }
+    const texto = p => { let s = resp[p.id]; if (!s) return ''; if (p.pos) s += ' ' + p.pos; const anexo = f.perguntas.find(a => a.anexoA === p.id); if (anexo && resp[anexo.id]) s += '   ' + anexo.label + ' ' + resp[anexo.id]; return s; };
+    const linhas = f.perguntas.filter(p => !p.anexoA).map(p => ({ label: p.label, valor: texto(p), dica: p.dica || '' }));
+    const linhas_finais = f.finais.map(p => ({ label: p.label, valor: texto(p) }));
+    const dataBr = data.split('-').reverse().join('/');
+    const dados = Object.assign({ cliente: nome, pedido: pedido, data: data, horario: hora }, resp);
+    try {
+      const r = await rcpApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: un, periodo: data, lancamento: String(Date.now()), dados: dados, usuario: usuario,
+        pdf: { layout: 'paciente', titulo: f.t, cliente: nome, pedido: pedido, data_br: dataBr, linhas: linhas, observacao: f.observacao, linhas_finais: linhas_finais, assinatura_img: assinatura_img, horario: hora, nome_arquivo: f.c + ' - Pedido ' + pedido + ' - ' + data },
+        livro: { titulo: f.t, rotulos: [{ id: 'cliente', label: 'Cliente', texto: nome }, { id: 'pedido', label: 'Nº do pedido', texto: pedido }, { id: 'data', label: 'Data', texto: dataBr }, { id: 'horario', label: 'Horário de entrega', texto: hora }] } });
+      showToast('Questionário assinado e arquivado no Drive.', 'success');
+      if (r.pdf_url) window.open(r.pdf_url, '_blank', 'noopener');
+      gqPacienteMontar();
+    } catch (e) { showToast(e.message, 'error'); }
+  }
+
+  // ---------- área RECEPÇÃO: acesso restrito (só os questionários de pacientes) ----------
+  function rcpCfg() {
+    try { const u = localStorage.getItem('rcp_url'), k = localStorage.getItem('rcp_chave'); if (u && k) return { url: u, chave: k }; } catch (e) {}
+    return gqCfg();   // quem tem acesso total à Qualidade também pode usar a recepção
+  }
+  const rcpApi = (acao, dados) => gqApi(acao, dados, rcpCfg());
+
+  function rcpIniciar() {
+    const c = rcpCfg(), el = document.getElementById('rcp-corpo');
+    if (!c.url || !c.chave) { el.innerHTML = '<div class="gq-card"><p class="text-sm">O acesso da recepção ainda não foi liberado para este usuário. Saia do painel e entre de novo; se continuar, peça ao administrador para marcar a permissão <b>Recepção</b> e configurar o acesso.</p></div>'; return; }
+    const forms = GQ_FORMS.filter(f => f.modo === 'paciente');
+    el.innerHTML = '<div class="grid gap-3 md:grid-cols-2">' + forms.map(f => '<button class="gq-card text-left" style="cursor:pointer;padding:22px" onclick="rcpAbrir(\'' + gqEsc(f.c) + '\')"><span class="text-xs text-slate-400"><i class="fa-solid fa-file-signature"></i> o cliente assina na tela</span><br><b class="text-lg">' + gqEsc(f.t) + '</b></button>').join('') + '</div>';
+  }
+  function rcpAbrir(cod) {
+    const f = GQ_FORMS.find(x => x.c === cod); if (!f) return;
+    GQ.form = f; gqPacienteMontar();
+    const el = document.getElementById('rcp-corpo');
+    el.insertAdjacentHTML('afterbegin', '<button class="gq-aba mb-3" onclick="rcpIniciar()">&larr; Formulários da recepção</button>');
+  }
+
   function gqFormLista() {
     const el = document.getElementById('gq-f-corpo');
     document.getElementById('gq-f-voltar').style.display = 'none';
@@ -5029,7 +5181,7 @@
     if (!Object.values(r.dados).some(v => v === true || (v !== false && v !== ''))) { showToast('Preencha o lançamento do dia.', 'error'); return; }
     if (r.foraSemObs) { showToast('Valor fora da faixa: descreva a ação nas observações.', 'error'); return; }
     try {
-      await gqApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: m.un, periodo: m.mes, item: m.item, chave: dia, dados: r.dados, usuario: u, retificar: !!retificar, motivo: motivo || '', mensal: gqMensalInfo() });
+      await gqApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: m.un, periodo: m.mes, item: m.item, lancamento: dia, dados: r.dados, usuario: u, retificar: !!retificar, motivo: motivo || '', mensal: gqMensalInfo() });
       showToast('Dia ' + dia + ' registrado.', 'success'); gqMensalCarregar();
     } catch (e) { showToast(e.message, 'error'); }
   }
@@ -5044,7 +5196,7 @@
       else { const v = prompt(c.label + ' (atual: ' + (dados[c.id] || '—') + ')', dados[c.id] || ''); novos[c.id] = v === null ? (dados[c.id] || '') : v.trim(); }
     });
     const u = gqUsuarioForm(); if (!u) { showToast('Informe seu nome em "Registrado por".', 'error'); return; }
-    gqApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: m.un, periodo: m.mes, item: m.item, chave: dia, dados: novos, usuario: u, retificar: true, motivo: motivo, mensal: gqMensalInfo() })
+    gqApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: m.un, periodo: m.mes, item: m.item, lancamento: dia, dados: novos, usuario: u, retificar: true, motivo: motivo, mensal: gqMensalInfo() })
       .then(() => { showToast('Retificação registrada.', 'success'); gqMensalCarregar(); }).catch(e => showToast(e.message, 'error'));
   }
 
@@ -5127,7 +5279,7 @@
     let assinatura = null;
     try { assinatura = gqSignLer('gqe'); } catch (e) { showToast(e.message, 'error'); return; }
     try {
-      const rr = await gqApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: document.getElementById('gq-e-un').value, periodo: dados.data || new Date().toISOString().slice(0, 10), chave: String(Date.now()), dados: dados, usuario: u, pdf: pdf, livro: { titulo: f.t, rotulos: rotulos }, assinatura: assinatura });
+      const rr = await gqApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: document.getElementById('gq-e-un').value, periodo: dados.data || new Date().toISOString().slice(0, 10), lancamento: String(Date.now()), dados: dados, usuario: u, pdf: pdf, livro: { titulo: f.t, rotulos: rotulos }, assinatura: assinatura });
       showToast('Registro salvo e arquivado no Drive.', 'success');
       if (f.texto && rr.pdf_url) window.open(rr.pdf_url, '_blank', 'noopener');
       gqEventoMontar();
@@ -8412,6 +8564,7 @@ async function carregarUsuarios() {
     { id: 'recoletas',     label: 'Recoletas',     icon: 'fa-solid fa-vial' },
     { id: 'relatorios',    label: 'Relatórios',    icon: 'fa-solid fa-chart-line' },
     { id: 'boletos',       label: 'Boletos',       icon: 'fa-solid fa-file-invoice-dollar' },
+    { id: 'recepcao',      label: 'Recepção (formulários dos pacientes)', icon: 'fa-solid fa-clipboard-user' },
     { id: 'gq',            label: 'Gestão da Qualidade (documentos/temperatura)', icon: 'fa-solid fa-shield-halved' },
     { id: 'qualidade',     label: 'Controle de Qualidade', icon: 'fa-solid fa-award' },
     { id: 'configuracoes', label: 'Configurações', icon: 'fa-solid fa-gear' }
