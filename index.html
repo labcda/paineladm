@@ -2533,7 +2533,7 @@
             <div style="background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:18px;">
               <div class="flex items-center justify-between mb-3"><p class="font-bold text-slate-700">Histórico do mês</p><input id="gq-t-mes" type="month" class="border rounded-lg p-1 text-sm" onchange="gqCarregarTemps()"></div>
               <canvas id="gq-t-chart" height="110"></canvas>
-              <div id="gq-t-lista" class="mt-3 text-sm"></div>
+              <div id="gq-t-lista" class="mt-3 text-sm"></div><div id="gq-t-vivo" class="mt-3 text-sm"></div>
             </div>
           </div>
 
@@ -2949,7 +2949,7 @@
         if (String(url).indexOf('script.google.com/macros/') < 0) return false;
         const metodo = ((init && init.method) || 'GET').toUpperCase();
         if (metodo === 'GET') { const m = /[?&]action=([A-Za-z]+)/.exec(url); return !!(m && LEITURAS.test(m[1])); }
-        if (metodo === 'POST' && init && typeof init.body === 'string') return /"action":"(verificarLogin|login)"/.test(init.body) || /"acao":"(hoje|listarDocumentos|listarEquipamentos|listarTemperaturas|listarRegistros|listarFechamentos|historicoDocumento|listarLog|listarAssinantes|listarAssinaturasDoc)"/.test(init.body);
+        if (metodo === 'POST' && init && typeof init.body === 'string') return /"action":"(verificarLogin|login)"/.test(init.body) || /"acao":"(hoje|listarDocumentos|listarEquipamentos|listarTemperaturas|listarRegistros|listarFechamentos|historicoDocumento|listarLog|listarAssinantes|listarAssinaturasDoc|listarArquivosVivos)"/.test(init.body);
       } catch (e) {}
       return false;
     }
@@ -4241,6 +4241,7 @@
     const mes = document.getElementById('gq-t-mes').value;
     try {
       const lista = await gqApi('listarTemperaturas', { mes: mes });
+      gqVivoLinks('FR 001', x => x.tipo === 'temperatura' && x.periodo === mes, 'gq-t-vivo', 'FR 001 do m' + String.fromCharCode(234) + 's (atualizado automaticamente)');
       lista.sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
       const porEq = {};
       lista.forEach(t => { (porEq[t.equip_nome] = porEq[t.equip_nome] || []).push(t); });
@@ -4759,7 +4760,27 @@
     h += '<div class="gq-card mt-3"><p class="text-sm mb-2"><b>' + Object.keys(ult).length + '</b> dia(s) registrado(s) em ' + gqEsc(mes) + '.</p>' +
       '<button class="gq-btn" style="background:#0F4C5C" onclick="gqMensalFechar()"><i class="fa-solid fa-file-pdf"></i> Fechar o mês e gerar PDF (arquivado no Drive)</button>' +
       (fech.length ? '<div class="mt-3 text-sm"><b>Fechamentos:</b> ' + fech.map(x => '<a target="_blank" rel="noopener" style="color:#0F4C5C" href="' + gqEsc(x.pdf_url) + '">' + gqEsc(String(x.fechado_em).slice(0, 10)) + ' (' + gqEsc(x.usuario) + ')</a>').join(' · ') + '</div>' : '') + '</div>';
+    h += '<div id="gq-m-vivo" class="mt-3 text-sm"></div>';
     box.innerHTML = h;
+    gqVivoLinks(f.c, x => x.tipo === 'mensal' && x.unidade === un && x.periodo === mes && x.item === item, 'gq-m-vivo', 'Abrir o arquivo do m' + String.fromCharCode(234) + 's (atualizado automaticamente)');
+  }
+
+
+  // Informações para o servidor montar o arquivo vivo do mês (planilha no Drive, atualizada a cada gravação)
+  function gqMensalInfo() {
+    const f = GQ.form, m = GQ._mensal, p = m.mes.split('-');
+    return { titulo: f.t, rotulos: f.cols.map(c => ({ id: c.id, label: c.label })), dias: new Date(+p[0], +p[1], 0).getDate(), chave_label: 'Dia' };
+  }
+
+  // Mostra o(s) link(s) do arquivo que o sistema mantém atualizado no Drive
+  async function gqVivoLinks(form, filtro, elId, rotulo) {
+    const el = document.getElementById(elId); if (!el) return;
+    try {
+      const l = (await gqApi('listarArquivosVivos', { form: form })).filter(filtro);
+      el.innerHTML = l.length
+        ? l.map(x => '<a target="_blank" rel="noopener" style="color:#0F4C5C;font-weight:700" href="' + gqEsc(x.arquivo_url) + '"><i class="fa-solid fa-file-lines"></i> ' + gqEsc(rotulo) + (x.item ? ' — ' + gqEsc(x.item) : '') + '</a> <span class="text-xs text-slate-400">atualizado ' + gqEsc(String(x.atualizado_em).slice(0, 16).replace('T', ' ')) + '</span>').join('<br>')
+        : '<span class="text-xs text-slate-400">O arquivo no Drive ser' + String.fromCharCode(225) + ' criado no primeiro registro.</span>';
+    } catch (e) {}
   }
 
   function gqMensalDados(dia) {
@@ -4776,7 +4797,7 @@
     if (!Object.values(r.dados).some(v => v === true || (v !== false && v !== ''))) { showToast('Preencha o lançamento do dia.', 'error'); return; }
     if (r.foraSemObs) { showToast('Valor fora da faixa: descreva a ação nas observações.', 'error'); return; }
     try {
-      await gqApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: m.un, periodo: m.mes, item: m.item, chave: dia, dados: r.dados, usuario: u, retificar: !!retificar, motivo: motivo || '' });
+      await gqApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: m.un, periodo: m.mes, item: m.item, chave: dia, dados: r.dados, usuario: u, retificar: !!retificar, motivo: motivo || '', mensal: gqMensalInfo() });
       showToast('Dia ' + dia + ' registrado.', 'success'); gqMensalCarregar();
     } catch (e) { showToast(e.message, 'error'); }
   }
@@ -4791,7 +4812,7 @@
       else { const v = prompt(c.label + ' (atual: ' + (dados[c.id] || '—') + ')', dados[c.id] || ''); novos[c.id] = v === null ? (dados[c.id] || '') : v.trim(); }
     });
     const u = gqUsuarioForm(); if (!u) { showToast('Informe seu nome em "Registrado por".', 'error'); return; }
-    gqApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: m.un, periodo: m.mes, item: m.item, chave: dia, dados: novos, usuario: u, retificar: true, motivo: motivo })
+    gqApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: m.un, periodo: m.mes, item: m.item, chave: dia, dados: novos, usuario: u, retificar: true, motivo: motivo, mensal: gqMensalInfo() })
       .then(() => { showToast('Retificação registrada.', 'success'); gqMensalCarregar(); }).catch(e => showToast(e.message, 'error'));
   }
 
@@ -4816,10 +4837,11 @@
     });
     h += '<div id="gq-e-alerta" class="text-sm font-bold" style="color:#dc2626"></div>' + (f.pontuacao ? '<div id="gq-e-media" class="text-sm font-bold" style="color:#0F4C5C"></div>' : '') +
       '<button class="gq-btn mt-2" style="background:#0F4C5C" onclick="gqEventoSalvar()"><i class="fa-solid fa-floppy-disk"></i> Registrar (gera PDF no Drive)</button></div></div>' +
-      '<div class="gq-card"><p class="gq-t">Registros anteriores</p><div id="gq-e-lista" class="text-sm"></div></div>';
+      '<div id="gq-e-vivo" class="text-sm mb-3"></div><div class="gq-card"><p class="gq-t">Registros anteriores</p><div id="gq-e-lista" class="text-sm"></div></div>';
     el.innerHTML = h;
     el.querySelectorAll('select,input,textarea').forEach(i => i.addEventListener('change', gqEventoAtualizar));
     gqEventoLista();
+    gqVivoLinks(f.c, x => x.tipo === 'livro' && x.periodo === String(new Date().getFullYear()), 'gq-e-vivo', 'Abrir o livro de registros de ' + new Date().getFullYear() + ' (atualizado automaticamente)');
   }
 
   function gqEventoAtualizar() {
@@ -4861,7 +4883,7 @@
       pdf.paragrafos = f.texto.map(t => t.replace(/\{(\w+)\}/g, (m, k) => ph[k] != null ? ph[k] : m)); pdf.assinaturas = f.assinaturas || []; pdf.somente_texto = !f.tabela_no_pdf;
     }
     try {
-      const rr = await gqApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: document.getElementById('gq-e-un').value, periodo: dados.data || new Date().toISOString().slice(0, 10), chave: String(Date.now()), dados: dados, usuario: u, pdf: pdf });
+      const rr = await gqApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: document.getElementById('gq-e-un').value, periodo: dados.data || new Date().toISOString().slice(0, 10), chave: String(Date.now()), dados: dados, usuario: u, pdf: pdf, livro: { titulo: f.t, rotulos: rotulos } });
       showToast('Registro salvo e arquivado no Drive.', 'success');
       if (f.texto && rr.pdf_url) window.open(rr.pdf_url, '_blank', 'noopener');
       gqEventoMontar();
