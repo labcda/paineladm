@@ -4916,6 +4916,7 @@
   async function gqFormAbrir(cod) {
     const f = GQ_FORMS.find(x => x.c === cod); if (!f) return;
     GQ.form = f;
+    await gqSignCarregar();
     document.getElementById('gq-f-voltar').style.display = 'inline-block';
     if (f.modo === 'mensal') gqMensalMontar(); else gqEventoMontar();
   }
@@ -4990,6 +4991,30 @@
     } catch (e) {}
   }
 
+
+  // ---------- assinatura dentro dos formulários ----------
+  const GQS = { lista: null };
+  async function gqSignCarregar() {
+    if (GQS.lista) return;
+    try { GQS.lista = await gqApi('listarAssinantes', {}); } catch (e) { GQS.lista = []; }
+  }
+  function gqSignHtml(p, papel) {
+    const lista = GQS.lista || [];
+    let ult = ''; try { ult = localStorage.getItem('gq_assinante') || ''; } catch (e) {}
+    if (!lista.length) return '<div class="text-xs text-amber-700 mt-3 mb-1">Nenhuma assinatura cadastrada: cadastre a sua na aba <b>Assinaturas</b> para assinar aqui.</div>';
+    return '<div class="mt-3 p-3 rounded-lg" style="background:#E5F4F3"><p class="text-xs font-extrabold mb-2" style="color:#0F4C5C"><i class="fa-solid fa-signature"></i> Assinatura eletrônica</p>' +
+      '<div class="grid gap-2 md:grid-cols-3"><select id="' + p + '-quem" class="border rounded-lg p-2 text-sm"><option value="">Não assinar agora</option>' + lista.map(a => '<option value="' + gqEsc(a.id) + '"' + (a.id === ult ? ' selected' : '') + '>' + gqEsc(a.nome) + ' — ' + gqEsc(a.cargo) + '</option>').join('') + '</select>' +
+      '<input id="' + p + '-papel" type="text" class="border rounded-lg p-2 text-sm" value="' + gqEsc(papel) + '" data-sem-upper>' +
+      '<input id="' + p + '-pin" type="text" inputmode="numeric" data-sem-upper autocomplete="off" name="gq-pin-' + p + '" placeholder="PIN de quem assina" class="border rounded-lg p-2 text-sm" style="-webkit-text-security:disc"></div></div>';
+  }
+  function gqSignLer(p) {
+    const q = document.getElementById(p + '-quem'); if (!q || !q.value) return null;
+    const pin = (document.getElementById(p + '-pin').value || '').trim();
+    if (!pin) throw new Error('Digite o PIN de quem vai assinar (ou escolha "Não assinar agora").');
+    try { localStorage.setItem('gq_assinante', q.value); } catch (e) {}
+    return { assinante_id: q.value, papel: (document.getElementById(p + '-papel').value || '').trim() || 'Responsável', pin: pin };
+  }
+
   function gqMensalDados(dia) {
     const f = GQ.form, dados = {}; let foraSemObs = false;
     f.cols.forEach(c => { dados[c.id] = gqLer(c, 'gq-c-' + dia + '-' + c.id); });
@@ -5023,16 +5048,26 @@
       .then(() => { showToast('Retificação registrada.', 'success'); gqMensalCarregar(); }).catch(e => showToast(e.message, 'error'));
   }
 
-  async function gqMensalFechar() {
+  function gqMensalFechar() {
     const f = GQ.form, u = gqUsuarioForm(), m = GQ._mensal;
     if (!u) { showToast('Informe seu nome em "Registrado por".', 'error'); return; }
-    if (!confirm('Fechar ' + f.c + ' de ' + m.mes + ' (' + m.un + ', ' + m.item + ')? Será gerado o PDF e arquivado no Drive. Depois do fechamento, só é possível retificar com motivo.')) return;
-    try {
-      const r = await gqApi('fecharPeriodo', { form: f.c, versao: '1.0-digital', titulo: f.t, unidade: m.un, periodo: m.mes, item: m.item, usuario: u, rotulos: f.cols.map(c => ({ id: c.id, label: c.label })) });
-      showToast('Mês fechado e arquivado.', 'success'); window.open(r.pdf_url, '_blank', 'noopener'); gqMensalCarregar();
-    } catch (e) { showToast(e.message, 'error'); }
+    document.getElementById('gq-modal-corpo').innerHTML =
+      '<div class="flex justify-between items-start mb-3"><p class="font-extrabold">Fechar ' + gqEsc(f.c) + ' de ' + gqEsc(m.mes) + '</p><button onclick="gqFecharModal()" class="text-xl">&times;</button></div>' +
+      '<p class="text-sm text-slate-600 mb-3">' + gqEsc(f.t) + ' · ' + gqEsc(m.un) + (m.item ? ' · ' + gqEsc(m.item) : '') + '. Será gerado o PDF oficial, com a sua assinatura, e arquivado no Drive. Depois do fechamento, só é possível retificar, com motivo.</p>' +
+      gqSignHtml('gqm', 'Responsável pela área') +
+      '<div class="flex gap-2 mt-3"><button class="gq-btn" style="background:#0F4C5C" onclick="gqMensalFecharConfirmar()"><i class="fa-solid fa-file-signature"></i> Fechar o mês e assinar</button><button class="gq-btn" style="background:#64748b" onclick="gqFecharModal()">Cancelar</button></div>';
+    document.getElementById('gq-modal').style.display = 'flex';
   }
 
+  async function gqMensalFecharConfirmar() {
+    const f = GQ.form, u = gqUsuarioForm(), m = GQ._mensal;
+    let assinatura = null;
+    try { assinatura = gqSignLer('gqm'); } catch (e) { showToast(e.message, 'error'); return; }
+    try {
+      const r = await gqApi('fecharPeriodo', { form: f.c, versao: '1.0-digital', titulo: f.t, unidade: m.un, periodo: m.mes, item: m.item, usuario: u, rotulos: f.cols.map(c => ({ id: c.id, label: c.label })), assinatura: assinatura });
+      gqFecharModal(); showToast(r.assinado ? 'Mês fechado, assinado e arquivado.' : 'Mês fechado e arquivado.', 'success'); window.open(r.pdf_url, '_blank', 'noopener'); gqMensalCarregar();
+    } catch (e) { showToast(e.message, 'error'); }
+  }
   // ----- evento -----
   function gqEventoMontar() {
     const f = GQ.form, el = document.getElementById('gq-f-corpo');
@@ -5043,7 +5078,7 @@
       h += '<label class="text-xs font-bold text-slate-500 mt-1">' + gqEsc(c.label) + (c.obrig ? ' *' : '') + '</label>' + gqCampoHtml(c, 'gq-e-' + c.id, c.tipo === 'data' && c.id === 'data' ? new Date().toISOString().slice(0, 10) : '');
     });
     h += '<div id="gq-e-alerta" class="text-sm font-bold" style="color:#dc2626"></div>' + (f.pontuacao ? '<div id="gq-e-media" class="text-sm font-bold" style="color:#0F4C5C"></div>' : '') +
-      '<button class="gq-btn mt-2" style="background:#0F4C5C" onclick="gqEventoSalvar()"><i class="fa-solid fa-floppy-disk"></i> Registrar (gera PDF no Drive)</button></div></div>' +
+      gqSignHtml('gqe', 'Responsável pelo registro') + '<button class="gq-btn mt-2" style="background:#0F4C5C" onclick="gqEventoSalvar()"><i class="fa-solid fa-floppy-disk"></i> Registrar (gera PDF no Drive)</button></div></div>' +
       '<div id="gq-e-vivo" class="text-sm mb-3"></div><div class="gq-card"><p class="gq-t">Registros anteriores</p><div id="gq-e-lista" class="text-sm"></div></div>';
     el.innerHTML = h;
     el.querySelectorAll('select,input,textarea').forEach(i => i.addEventListener('change', gqEventoAtualizar));
@@ -5089,8 +5124,10 @@
       const ph = { nome: dados.nome || '', cpf: dados.cpf || '', data: dados.data ? dados.data.split('-').reverse().join('/') : '' };
       pdf.paragrafos = f.texto.map(t => t.replace(/\{(\w+)\}/g, (m, k) => ph[k] != null ? ph[k] : m)); pdf.assinaturas = f.assinaturas || []; pdf.somente_texto = !f.tabela_no_pdf;
     }
+    let assinatura = null;
+    try { assinatura = gqSignLer('gqe'); } catch (e) { showToast(e.message, 'error'); return; }
     try {
-      const rr = await gqApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: document.getElementById('gq-e-un').value, periodo: dados.data || new Date().toISOString().slice(0, 10), chave: String(Date.now()), dados: dados, usuario: u, pdf: pdf, livro: { titulo: f.t, rotulos: rotulos } });
+      const rr = await gqApi('salvarRegistro', { form: f.c, versao: '1.0-digital', unidade: document.getElementById('gq-e-un').value, periodo: dados.data || new Date().toISOString().slice(0, 10), chave: String(Date.now()), dados: dados, usuario: u, pdf: pdf, livro: { titulo: f.t, rotulos: rotulos }, assinatura: assinatura });
       showToast('Registro salvo e arquivado no Drive.', 'success');
       if (f.texto && rr.pdf_url) window.open(rr.pdf_url, '_blank', 'noopener');
       gqEventoMontar();
