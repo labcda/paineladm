@@ -159,31 +159,51 @@
       --viz-serie-painel: #3987e5; --viz-serie-app: #199e70;
     }
 
+    /* ===== Menu lateral: ícone + texto, agrupado por área; recolhível; no celular vira gaveta ===== */
     .site-nav {
-      background: var(--fin-sidebar-bg); color: #fff; display: flex; flex-direction: column; align-items: center;
-      width: 86px; flex-shrink: 0; padding: 24px 0; overflow-y: auto; position: relative; z-index: 5;
-      transition: background 250ms;
+      background: var(--fin-sidebar-bg); color: #fff; display: flex; flex-direction: column; align-items: stretch;
+      width: 252px; flex-shrink: 0; padding: 20px 14px; overflow-y: auto; position: relative; z-index: 5;
+      transition: width .22s ease, background 250ms, transform .25s ease;
     }
-    .brand { display: flex; align-items: center; justify-content: center; padding: 0 0 20px; }
-    .brand-mark { width: 44px; height: 44px; border-radius: 50%; background: #fff; color: #005954; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.18); }
-    .brand-name { display: none; }
-    .site-nav ul { margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; list-style: none; }
-    #main-nav { flex: 1; display: flex; align-items: center; }
+    .nav-topo { display: flex; align-items: center; gap: 10px; padding: 2px 6px 14px; }
+    .brand { display: flex; align-items: center; gap: 11px; padding: 0; min-width: 0; }
+    .brand-mark { width: 44px; height: 44px; border-radius: 50%; background: #fff; color: #005954; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.18); }
+    .brand-name { display: block; font-weight: 800; font-size: 1rem; line-height: 1.1; white-space: nowrap; }
+    .brand-name small { display: block; font-weight: 600; font-size: .68rem; opacity: .65; margin-top: 2px; }
+    #nav-recolher { margin-left: auto; width: 30px; height: 30px; border-radius: 50%; border: 0; background: rgba(255,255,255,.1); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: .75rem; flex-shrink: 0; }
+    #nav-recolher:hover { background: rgba(255,255,255,.22); }
+    #main-nav { flex: 1; display: block; }
+    .site-nav ul { margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; list-style: none; }
+    .site-nav li.nav-titulo { font-size: .64rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; color: rgba(255,255,255,.45); padding: 16px 12px 6px; }
     .site-nav li > a {
-      display: flex; align-items: center; justify-content: center; width: 46px; height: 46px;
-      border-radius: 50%; color: rgba(255,255,255,0.55); font-size: 1.05rem; transition: all 0.2s; position: relative;
+      display: flex; align-items: center; justify-content: flex-start; gap: 12px; width: 100%;
+      padding: 11px 12px; border-radius: 14px; color: rgba(255,255,255,0.74); font-size: .9rem; font-weight: 600; transition: all 0.2s; position: relative;
     }
-    .site-nav li > a span { display: none; }
-    .site-nav li > a:hover { color: #fff; background: rgba(255,255,255,0.12); }
-    .site-nav li.active > a { background: #fff; color: var(--fin-primary); box-shadow: 0 6px 16px rgba(0,0,0,0.18); }
-    .rail-footer { display: flex; flex-direction: column; align-items: center; gap: 10px; padding-top: 16px; }
+    .site-nav li > a i { width: 22px; text-align: center; font-size: 1.05rem; flex-shrink: 0; }
+    .site-nav li > a span { display: inline; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .site-nav li > a:hover { color: #fff; background: rgba(255,255,255,0.11); }
+    .site-nav li.active > a { background: #fff; color: var(--fin-primary-dark); box-shadow: 0 6px 16px rgba(0,0,0,0.18); }
+    #appContainer.theme-dark .site-nav li.active > a { color: #002A27; }
+    .rail-footer { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; margin-top: 10px; border-top: 1px solid rgba(255,255,255,.12); }
     .rail-avatar {
-      width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.15); color: #fff;
-      display: flex; align-items: center; justify-content: center; font-size: 0.95rem; cursor: pointer; transition: background 0.2s;
+      display: flex; align-items: center; justify-content: flex-start; gap: 12px; width: auto; height: auto; padding: 10px 12px; border-radius: 14px;
+      background: rgba(255,255,255,0.09); color: #fff; font-size: .88rem; font-weight: 600; cursor: pointer; transition: background 0.2s;
     }
-    .rail-avatar span { display: none; }
-    .rail-avatar:hover { background: rgba(255,255,255,0.28); }
+    .rail-avatar i { width: 22px; text-align: center; font-size: 1.05rem; }
+    .rail-avatar span { display: inline; white-space: nowrap; }
+    .rail-avatar:hover { background: rgba(255,255,255,0.22); }
     .note { display: none; }
+    /* recolhido: só ícones (o texto aparece na dica ao passar o mouse) */
+    .site-nav.recolhido { width: 86px; padding: 20px 0; align-items: center; }
+    .site-nav.recolhido .nav-topo { flex-direction: column; padding: 2px 0 14px; }
+    .site-nav.recolhido .brand-name, .site-nav.recolhido li > a span, .site-nav.recolhido .rail-avatar span, .site-nav.recolhido li.nav-titulo { display: none; }
+    .site-nav.recolhido #nav-recolher { margin: 8px 0 0; transform: rotate(180deg); }
+    .site-nav.recolhido #main-nav, .site-nav.recolhido .rail-footer { display: flex; flex-direction: column; align-items: center; }
+    .site-nav.recolhido li > a { width: 46px; height: 46px; padding: 0; justify-content: center; border-radius: 50%; }
+    .site-nav.recolhido .rail-footer { border-top: 0; }
+    .site-nav.recolhido .rail-avatar { width: 42px; height: 42px; padding: 0; justify-content: center; border-radius: 50%; }
+    #nav-hamb { display: none; }
+    #nav-overlay { display: none; }
 
     main { background: var(--fin-bg); display: flex; flex: 1; min-width: 0; flex-direction: column; overflow: hidden; position: relative; transition: background 250ms; border-right: 1px solid var(--fin-border); }
     main > header { padding: 2.5rem 3rem 1.5rem; background: var(--fin-bg); border-bottom: 1px solid var(--fin-border); }
@@ -1024,7 +1044,18 @@
 
     .bol-valor-input { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.1rem; font-weight: 700; color: #005954; }
 
-    @media (max-width: 768px) { .site-nav { display: none; } }
+    @media (max-width: 768px) {
+      .site-nav, .site-nav.recolhido { position: fixed; top: 0; left: 0; bottom: 0; width: 280px; padding: 20px 14px; align-items: stretch; z-index: 1000; transform: translateX(-108%); border-radius: 0 24px 24px 0; box-shadow: 20px 0 60px rgba(0,0,0,.35); }
+      .site-nav.aberto { transform: none; }
+      .site-nav.recolhido .nav-topo { flex-direction: row; }
+      .site-nav.recolhido .brand-name, .site-nav.recolhido li > a span, .site-nav.recolhido .rail-avatar span, .site-nav.recolhido li.nav-titulo { display: revert; }
+      .site-nav.recolhido li > a { width: 100%; height: auto; padding: 11px 12px; justify-content: flex-start; border-radius: 14px; }
+      .site-nav.recolhido .rail-avatar { width: auto; height: auto; padding: 10px 12px; justify-content: flex-start; border-radius: 14px; }
+      #nav-recolher { display: none; }
+      #nav-hamb { display: flex; }
+      #nav-overlay.aberto { display: block; position: fixed; inset: 0; background: rgba(0,20,18,.55); z-index: 999; backdrop-filter: blur(2px); }
+      .site-wrap { border-radius: 0; height: 100vh; }
+    }
   </style>
 <base target="_blank">
 <base target="_blank">
@@ -1070,23 +1101,30 @@
 
 <!-- ==================== APP CONTAINER ==================== -->
 <div class="site-wrap" style="display: none;" id="appContainer">
-  <nav class="site-nav">
-    <div class="brand">
-      <div class="brand-mark"><i class="fa-solid fa-flask-vial"></i></div>
-      <span class="brand-name">Lab CDA</span>
+  <nav class="site-nav" id="site-nav">
+    <div class="nav-topo">
+      <div class="brand">
+        <div class="brand-mark"><i class="fa-solid fa-flask-vial"></i></div>
+        <span class="brand-name">Lab CDA<small>Painel administrativo</small></span>
+      </div>
+      <button id="nav-recolher" type="button" onclick="menuRecolher()" title="Recolher / expandir o menu"><i class="fa-solid fa-angles-left"></i></button>
     </div>
     <div id="main-nav">
       <ul>
-        <li class="active" data-page="home" title="Home"><a href="#"><i class="fa-solid fa-house"></i><span>Home</span></a></li>
+        <li class="active" data-page="home" title="Início"><a href="#"><i class="fa-solid fa-house"></i><span>Início</span></a></li>
+        <li class="nav-titulo">Atendimento</li>
         <li data-page="orcamento" title="Orçamentos"><a href="#"><i class="fa-solid fa-calculator"></i><span>Orçamentos</span></a></li>
         <li data-page="agendamento" title="Agendamento"><a href="#"><i class="fa-regular fa-calendar-check"></i><span>Agendamento</span></a></li>
         <li data-page="agenda" title="Agenda"><a href="#"><i class="fa-regular fa-calendar-days"></i><span>Agenda</span></a></li>
         <li data-page="recoletas" title="Recoletas"><a href="#"><i class="fa-solid fa-vial"></i><span>Recoletas</span></a></li>
+        <li data-page="recepcao" title="Recepção"><a href="#"><i class="fa-solid fa-clipboard-user"></i><span>Formulários da recepção</span></a></li>
+        <li class="nav-titulo">Gestão</li>
         <li data-page="relatorios" title="Relatórios"><a href="#"><i class="fa-solid fa-chart-line"></i><span>Relatórios</span></a></li>
         <li data-page="boletos" title="Boletos"><a href="#"><i class="fa-solid fa-file-invoice-dollar"></i><span>Boletos</span></a></li>
-        <li data-page="recepcao" title="Recepção"><a href="#"><i class="fa-solid fa-clipboard-user"></i><span>Recepção</span></a></li>
+        <li class="nav-titulo">Qualidade</li>
         <li data-page="gq" title="Gestão da Qualidade"><a href="#"><i class="fa-solid fa-shield-halved"></i><span>Gestão da Qualidade</span></a></li>
-        <li data-page="qualidade" title="Controle de Qualidade"><a href="#"><i class="fa-solid fa-award"></i><span>Controle de Qualidade</span></a></li>
+        <li data-page="qualidade" title="Não conformidades"><a href="#"><i class="fa-solid fa-award"></i><span>Não conformidades</span></a></li>
+        <li class="nav-titulo">Sistema</li>
         <li data-page="configuracoes" id="nav-configuracoes" title="Configurações"><a href="#"><i class="fa-solid fa-gear"></i><span>Configurações</span></a></li>
       </ul>
     </div>
@@ -1094,13 +1132,17 @@
       <div class="rail-avatar" title="Fale conosco" onclick="window.open('https://wa.me/5527998980658', '_blank')"><i class="fa-brands fa-whatsapp"></i><span>Fale conosco</span></div>
     </div>
   </nav>
+  <div id="nav-overlay" onclick="menuMobile(false)"></div>
 
   <main>
     <header>
       <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+          <button id="nav-hamb" type="button" class="fin-icon-btn" onclick="menuMobile(true)" title="Menu" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
         <div>
           <div class="breadcrumbs"><a href="#">Home</a> / <span id="breadcrumb-active">Dashboard</span></div>
           <h1 class="title" id="page-title">Painel de Controle</h1>
+        </div>
         </div>
         <div id="fin-topbar-right">
           <div class="fin-theme-switch" id="fin-theme-toggle">
@@ -3267,7 +3309,7 @@
         headers: { 'Content-Type': 'text/plain' },
         signal: controller.signal,
         redirect: 'follow',
-        body: JSON.stringify({ action: 'verificarLogin', login: usuario, senha: senha, token: CDA_TOKEN })
+        body: JSON.stringify({ action: 'verificarLogin', login: usuario, senha: senha, token: CDA_TOKEN, reqId: (self.crypto && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2)) })
       });
       clearTimeout(timeout);
       if (!resp.ok) throw new Error('Erro HTTP: ' + resp.status);
@@ -5368,6 +5410,32 @@
       gqEventoMontar();
     } catch (e) { showToast(e.message, 'error'); }
   }
+
+  // ==================== MENU LATERAL ====================
+  function menuRecolher() {
+    const n = document.getElementById('site-nav'); if (!n) return;
+    n.classList.toggle('recolhido');
+    try { localStorage.setItem('cda_menu_recolhido', n.classList.contains('recolhido') ? '1' : '0'); } catch (e) {}
+  }
+  function menuMobile(abrir) {
+    const n = document.getElementById('site-nav'), o = document.getElementById('nav-overlay'); if (!n) return;
+    n.classList.toggle('aberto', !!abrir); if (o) o.classList.toggle('aberto', !!abrir);
+  }
+  // esconde o título de um grupo quando todos os itens dele estão ocultos (por permissão)
+  function atualizarTitulosMenu() {
+    document.querySelectorAll('#main-nav li.nav-titulo').forEach(t => {
+      let prox = t.nextElementSibling, algum = false;
+      while (prox && !prox.classList.contains('nav-titulo')) { if (prox.style.display !== 'none') algum = true; prox = prox.nextElementSibling; }
+      t.style.display = algum ? '' : 'none';
+    });
+  }
+  (function menuInicial() {
+    const n = document.getElementById('site-nav'); if (!n) return;
+    let pref = null; try { pref = localStorage.getItem('cda_menu_recolhido'); } catch (e) {}
+    if (pref === '1' || (pref === null && window.innerWidth < 1180 && window.innerWidth > 768)) n.classList.add('recolhido');
+    document.getElementById('main-nav').addEventListener('click', e => { if (window.innerWidth <= 768 && e.target.closest('li[data-page]')) menuMobile(false); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') menuMobile(false); });
+  })();
 
   let cdaToastTimer = null;
   function showToast(msg, tipo, duracao) {
@@ -8682,6 +8750,7 @@ async function carregarUsuarios() {
       const item = document.querySelector('#main-nav li[data-page="' + p.id + '"]');
       if (item && p.id !== 'home') item.style.display = podeAcessar(p.id) ? '' : 'none';
     });
+    atualizarTitulosMenu();
 
     // Atalhos da Home e menu "Novo": o destino vem do próprio onclick (navigateToPage('x') / quickAbrir('x'))
     document.querySelectorAll('.home-shortcut-tile, #fin-quickadd-menu button').forEach(btn => {
