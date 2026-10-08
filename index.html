@@ -374,6 +374,14 @@
     .gq-grupo.on{background:#0F4C5C;border-color:#0F4C5C;color:#fff}
     .gq-grupo.on i,.gq-grupo.on small{color:#cdeff0}
     .gq-chip{padding:5px 12px;border-radius:100px;border:1px solid #cbd5e1;background:#fff;font-size:.75rem;font-weight:700;cursor:pointer}
+    .gq-kpi{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+    .gq-kpi small{font-size:.7rem;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.03em}
+    .gq-kpi b{font-size:1.7rem;line-height:1.1}
+    .gq-kpi span{font-size:.72rem;color:#64748b}
+    .gq-alerta{display:flex;flex-direction:column;border-left:4px solid;padding:6px 10px;margin-bottom:6px;background:#f8fafc;border-radius:8px;cursor:pointer;font-size:.82rem}
+    .gq-alerta small{font-weight:800;font-size:.65rem;text-transform:uppercase}
+    .gq-li{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #f1f5f9;padding:6px 0;font-size:.8rem;cursor:pointer}
+    .gq-li span{font-weight:800;white-space:nowrap}
     .gq-chip.on{background:#37A7AA;border-color:#37A7AA;color:#fff}
     .gq-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:18px}
     .gq-t{font-weight:800;color:#334155;margin-bottom:8px}
@@ -4259,7 +4267,7 @@
   }
 
   const GQ_GRUPOS = [
-    { id: 'inicio', ic: 'fa-house', nome: 'Início', desc: 'Resumo do dia', abas: [['hoje', 'Hoje']] },
+    { id: 'inicio', ic: 'fa-gauge-high', nome: 'Dashboard', desc: 'Visão geral da qualidade', abas: [['hoje', 'Dashboard']] },
     { id: 'rotina', ic: 'fa-clipboard-check', nome: 'Rotina diária', desc: 'Temperatura e formulários', abas: [['temp', 'Temperatura das geladeiras'], ['form', 'Formulários e registros']] },
     { id: 'analitico', ic: 'fa-chart-line', nome: 'Controle analítico', desc: 'Hemato, bioquímica, apoio', abas: [['cq', 'Controle de qualidade analítico']] },
     { id: 'docs', ic: 'fa-folder-open', nome: 'Documentos', desc: 'POPs, versões e assinaturas', abas: [['docs', 'Biblioteca de documentos'], ['ass', 'Assinaturas']] },
@@ -4293,35 +4301,116 @@
     if (ok) gqAba('hoje');
   }
 
+  // ---------- DASHBOARD ----------
+  GQ.dashCharts = GQ.dashCharts || [];
+  GQ.dashDias = GQ.dashDias || 30;
+  function gqDashPeriodo(n) { GQ.dashDias = n; gqCarregarHoje(); }
   async function gqCarregarHoje() {
     const el = document.getElementById('gq-p-hoje');
-    el.innerHTML = '<p class="text-sm text-slate-400">Carregando…</p>';
-    try {
-      const r = await gqApi('hoje');
-      let h = '<div class="grid gap-3 md:grid-cols-2">';
-      h += '<div class="gq-card"><p class="gq-t">Leituras de temperatura de hoje</p>';
-      r.leituras.forEach(l => {
-        h += '<div class="mb-2"><b>' + gqEsc(l.nome) + '</b> <span class="text-xs text-slate-400">(' + l.faixa_min + '–' + l.faixa_max + ' °C)</span><div class="flex gap-2 mt-1">';
-        r.turnos.forEach(t => {
-          const s = l.feitas[t];
-          const cor = s === 'OK' ? '#16a34a' : s === 'DESVIO' ? '#dc2626' : (r.funciona ? '#d97706' : '#94a3b8');
-          h += '<span class="gq-pill" style="background:' + cor + '">' + t + ': ' + (s || (r.funciona ? 'pendente' : '—')) + '</span>';
-        });
-        h += '</div></div>';
-      });
-      h += '</div>';
-      h += '<div class="gq-card"><p class="gq-t">Documentos</p><p class="text-sm">Total: <b>' + r.docs_total + '</b> · ' +
-        Object.keys(r.docs_por_status).map(s => gqEsc(s) + ': ' + r.docs_por_status[s]).join(' · ') + '</p>' +
-        '<p class="text-sm mt-2" style="color:#dc2626"><b>' + r.docs_vencidos.length + '</b> com revisão vencida</p>' +
-        '<p class="text-sm" style="color:#d97706"><b>' + r.docs_vencendo.length + '</b> vencem em 30 dias</p></div>';
-      h += '</div>';
-      if (r.desvios.length) {
-        h += '<div class="gq-card mt-3"><p class="gq-t" style="color:#dc2626">Últimos desvios de temperatura</p>';
-        r.desvios.forEach(d => { h += '<p class="text-sm">' + gqEsc(d.data) + ' ' + gqEsc(d.turno) + ' — ' + gqEsc(d.equip_nome) + ': ' + gqEsc(d.atual) + ' (mín ' + gqEsc(d.min) + ' / máx ' + gqEsc(d.max) + ') — ' + gqEsc(d.acao_corretiva) + '</p>'; });
-        h += '</div>';
-      }
-      el.innerHTML = h;
-    } catch (e) { el.innerHTML = '<p class="text-sm text-red-600">' + gqEsc(e.message) + '</p>'; }
+    el.innerHTML = '<p class="text-sm text-slate-400">Montando o dashboard…</p>';
+    GQ.dashCharts.forEach(c => { try { c.destroy(); } catch (e) {} }); GQ.dashCharts = [];
+    const N = GQ.dashDias, iso = d => d.toISOString().slice(0, 10);
+    const hoje = new Date(), ini = new Date(hoje.getTime() - N * 86400000), iniIso = iso(ini);
+    const meses = [hoje.toISOString().slice(0, 7)]; { const m = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1); meses.unshift(m.getFullYear() + '-' + ('0' + (m.getMonth() + 1)).slice(-2)); }
+    const seguro = p => p.catch(() => null);
+    const [rh, docs, t1, t2, cq, fech] = await Promise.all([
+      seguro(gqApi('hoje')), seguro(gqApi('listarDocumentos')),
+      seguro(gqApi('listarTemperaturas', { mes: meses[1] })), seguro(gqApi('listarTemperaturas', { mes: meses[0] })),
+      seguro(gqApi('listarControleAnalitico', { de: iniIso })), seguro(gqApi('listarFechamentos', {}))
+    ]);
+    if (!rh && !docs) { el.innerHTML = '<p class="text-sm text-red-600">Não foi possível carregar os dados da Qualidade. Verifique a conexão.</p>'; return; }
+    const D = (docs || []).filter(d => d.status !== 'obsoleto');
+    const temps = (t1 || []).concat(t2 || []).filter(t => t.data >= iniIso);
+    const cqs = cq || [];
+    // ---- indicadores ----
+    const vigentes = D.filter(d => d.status === 'vigente').length;
+    const vencidos = D.filter(d => { const x = gqDias(d.proxima_revisao); return x !== null && x < 0; });
+    const vencendo = D.filter(d => { const x = gqDias(d.proxima_revisao); return x !== null && x >= 0 && x <= 30; });
+    const importados = D.filter(d => d.status === 'importado').length;
+    const semRev = D.filter(d => !d.proxima_revisao).length;
+    const desvT = temps.filter(t => t.situacao === 'DESVIO');
+    const desvSemAcao = desvT.filter(t => !String(t.acao_corretiva || '').trim());
+    const confT = temps.length ? Math.round(100 * (temps.length - desvT.length) / temps.length) : null;
+    const cqFora = cqs.filter(r => r.situacao === 'FORA'), cqSemAcao = cqFora.filter(r => !String(r.acao_corretiva || '').trim());
+    const confCq = cqs.length ? Math.round(100 * (cqs.length - cqFora.length) / cqs.length) : null;
+    const pctVig = D.length ? Math.round(100 * vigentes / D.length) : null;
+    let lidasHoje = 0, esperadas = 0;
+    if (rh) rh.leituras.forEach(l => rh.turnos.forEach(t => { esperadas++; if (l.feitas[t]) lidasHoje++; }));
+    const rhOk = rh && rh.funciona;
+    const hojeIso = iso(hoje), pendHoje = rhOk ? esperadas - lidasHoje : 0;
+    const mesAtual = hojeIso.slice(0, 7);
+    const fechMes = (fech || []).filter(f => f.periodo === mesAtual).length;
+    // ---- pontos de atencao ----
+    const alertas = [];
+    const A = (nivel, txt, aba) => alertas.push({ nivel, txt, aba });
+    if (vencidos.length) A(3, '<b>' + vencidos.length + '</b> documento(s) com revisão vencida', 'docs');
+    if (desvSemAcao.length) A(3, '<b>' + desvSemAcao.length + '</b> desvio(s) de temperatura sem ação corretiva registrada', 'temp');
+    if (cqSemAcao.length) A(3, '<b>' + cqSemAcao.length + '</b> resultado(s) de controle analítico fora da tolerância sem ação corretiva', 'cq');
+    if (pendHoje > 0) A(2, '<b>' + pendHoje + '</b> leitura(s) de temperatura pendente(s) hoje', 'temp');
+    if (vencendo.length) A(2, '<b>' + vencendo.length + '</b> documento(s) com revisão nos próximos 30 dias', 'docs');
+    if (importados) A(1, '<b>' + importados + '</b> documento(s) importado(s) aguardando validação do RT', 'docs');
+    if (semRev) A(1, '<b>' + semRev + '</b> documento(s) sem data de próxima revisão', 'docs');
+    if (!cqs.length) A(1, 'Nenhum controle analítico lançado nos últimos ' + N + ' dias', 'cq');
+    alertas.sort((a, b) => b.nivel - a.nivel);
+    const cor = { 3: '#dc2626', 2: '#d97706', 1: '#0ea5e9' }, nomeN = { 3: 'Urgente', 2: 'Atenção', 1: 'Pendência' };
+    const situ = alertas.some(a => a.nivel === 3) ? ['#dc2626', 'Requer ação', 'fa-triangle-exclamation'] : alertas.some(a => a.nivel === 2) ? ['#d97706', 'Atenção', 'fa-circle-exclamation'] : ['#16a34a', 'Em dia', 'fa-circle-check'];
+    const kpi = (titulo, valor, sub, c, aba) => '<div class="gq-kpi" ' + (aba ? 'style="cursor:pointer" onclick="gqAba(\'' + aba + '\')"' : '') + '><small>' + titulo + '</small><b style="color:' + c + '">' + valor + '</b><span>' + sub + '</span></div>';
+    const verde = '#16a34a', verm = '#dc2626', amar = '#d97706', azul = '#0F4C5C';
+    const cpct = (v, bom, ok) => v === null ? '#94a3b8' : v >= bom ? verde : v >= ok ? amar : verm;
+    // ---- HTML ----
+    let h = '<div class="flex flex-wrap items-center gap-2 mb-3"><div class="gq-card flex items-center gap-3" style="padding:10px 16px;border-color:' + situ[0] + '"><i class="fa-solid ' + situ[2] + '" style="color:' + situ[0] + ';font-size:1.4rem"></i><div><b style="color:' + situ[0] + '">' + situ[1] + '</b><br><small class="text-slate-500">' + alertas.filter(a => a.nivel >= 2).length + ' ponto(s) de atenção · ' + hojeIso.split('-').reverse().join('/') + '</small></div></div>' +
+      '<div class="ml-auto flex items-center gap-2"><small class="text-slate-500 font-bold">Período:</small>' + [7, 30, 90].map(n => '<button class="gq-chip' + (N === n ? ' on' : '') + '" onclick="gqDashPeriodo(' + n + ')">' + n + ' dias</button>').join('') +
+      '<button class="gq-chip" onclick="gqCarregarHoje()"><i class="fa-solid fa-rotate"></i></button></div></div>';
+    h += '<div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">' +
+      kpi('Documentos vigentes', pctVig === null ? '—' : pctVig + '%', vigentes + ' de ' + D.length + ' documentos', cpct(pctVig, 90, 60), 'docs') +
+      kpi('Revisões vencidas', vencidos.length, vencendo.length + ' vencem em 30 dias', vencidos.length ? verm : verde, 'docs') +
+      kpi('Temperatura em conformidade', confT === null ? '—' : confT + '%', temps.length + ' leituras · ' + desvT.length + ' desvio(s)', cpct(confT, 98, 90), 'temp') +
+      kpi('Leituras de hoje', rhOk ? lidasHoje + '/' + esperadas : '—', rhOk ? (pendHoje ? pendHoje + ' pendente(s)' : 'tudo registrado') : 'sem expediente hoje', rhOk ? (pendHoje ? amar : verde) : '#94a3b8', 'temp') +
+      kpi('Controle analítico', confCq === null ? '—' : confCq + '%', cqs.length + ' comparações · ' + cqFora.length + ' fora', cpct(confCq, 95, 85), 'cq') +
+      kpi('Ações corretivas pendentes', desvSemAcao.length + cqSemAcao.length, 'desvios sem ação registrada', (desvSemAcao.length + cqSemAcao.length) ? verm : verde) +
+      kpi('Fechamentos do mês', fechMes, 'formulários mensais fechados', azul, 'form') +
+      kpi('Aguardando validação', importados, 'documentos importados', importados ? amar : verde, 'docs') + '</div>';
+    h += '<div class="grid gap-3 md:grid-cols-3 mb-3"><div class="gq-card md:col-span-1"><p class="gq-t"><i class="fa-solid fa-bell"></i> O que precisa de atenção</p>' +
+      (alertas.length ? alertas.map(a => '<div class="gq-alerta" onclick="gqAba(\'' + a.aba + '\')" style="border-left-color:' + cor[a.nivel] + '"><small style="color:' + cor[a.nivel] + '">' + nomeN[a.nivel] + '</small><span>' + a.txt + '</span></div>').join('') : '<p class="text-sm" style="color:#16a34a"><i class="fa-solid fa-circle-check"></i> Nada pendente. Tudo em dia.</p>') + '</div>' +
+      '<div class="gq-card md:col-span-2"><p class="gq-t">Temperatura das geladeiras — últimos ' + N + ' dias</p><div style="height:230px"><canvas id="gqd-temp"></canvas></div></div></div>';
+    h += '<div class="grid gap-3 md:grid-cols-3 mb-3">' +
+      '<div class="gq-card"><p class="gq-t">Documentos por situação</p><div style="height:210px"><canvas id="gqd-status"></canvas></div></div>' +
+      '<div class="gq-card"><p class="gq-t">Documentos por tipo</p><div style="height:210px"><canvas id="gqd-tipo"></canvas></div></div>' +
+      '<div class="gq-card"><p class="gq-t">Controle analítico por tipo</p><div style="height:210px"><canvas id="gqd-cq"></canvas></div></div></div>';
+    h += '<div class="grid gap-3 md:grid-cols-2 mb-3">' +
+      '<div class="gq-card"><p class="gq-t">Desvios de temperatura por semana</p><div style="height:200px"><canvas id="gqd-desv"></canvas></div></div>' +
+      '<div class="gq-card"><p class="gq-t">Calendário de revisões (próximos 6 meses)</p><div style="height:200px"><canvas id="gqd-rev"></canvas></div></div></div>';
+    const linhaDoc = d => '<div class="gq-li" onclick="gqAbrirDoc(\'' + d.id + '\')"><span style="font-weight:600;white-space:normal"><b>' + gqEsc(d.codigo || d.id) + '</b> ' + gqEsc(d.titulo) + '</span><span style="color:' + (gqDias(d.proxima_revisao) < 0 ? verm : amar) + '">' + (gqDias(d.proxima_revisao) < 0 ? Math.abs(gqDias(d.proxima_revisao)) + ' d atraso' : 'em ' + gqDias(d.proxima_revisao) + ' d') + '</span></div>';
+    const prox = vencidos.concat(vencendo).sort((a, b) => gqDias(a.proxima_revisao) - gqDias(b.proxima_revisao));
+    h += '<div class="grid gap-3 md:grid-cols-3 mb-3">' +
+      '<div class="gq-card"><p class="gq-t">Revisões mais urgentes</p>' + (prox.slice(0, 8).map(linhaDoc).join('') || '<p class="text-sm text-slate-400">Nenhuma revisão vencida ou próxima.</p>') + (prox.length > 8 ? '<p class="text-xs text-slate-400 mt-1">+ ' + (prox.length - 8) + ' na aba Documentos</p>' : '') + '</div>' +
+      '<div class="gq-card"><p class="gq-t">Últimos desvios de temperatura</p>' + (desvT.slice(-6).reverse().map(d => '<div class="gq-li" style="cursor:default"><span style="font-weight:600"><b>' + gqEsc(d.data.slice(5).split('-').reverse().join('/')) + '</b> ' + gqEsc(d.equip_nome) + ' ' + gqEsc(d.turno) + '</span><span style="color:' + verm + '">' + gqEsc(d.atual) + ' °C</span></div>').join('') || '<p class="text-sm text-slate-400">Nenhum desvio no período.</p>') + '</div>' +
+      '<div class="gq-card"><p class="gq-t">Controle analítico fora da tolerância</p>' + (cqFora.slice(-6).reverse().map(r => '<div class="gq-li" style="cursor:default"><span style="font-weight:600"><b>' + gqEsc(r.analito) + '</b> ' + gqEsc(r.equipamento) + '</span><span style="color:' + verm + '">' + gqEsc(r.variacao_pct) + '%</span></div>').join('') || '<p class="text-sm text-slate-400">Nenhum resultado fora no período.</p>') + '</div></div>';
+    h += '<div class="gq-card"><p class="gq-t">Atalhos</p><div class="flex flex-wrap gap-2">' +
+      [['temp', 'fa-temperature-half', 'Registrar temperatura'], ['form', 'fa-clipboard-list', 'Abrir formulário'], ['cq', 'fa-chart-line', 'Lançar controle analítico'], ['docs', 'fa-folder-open', 'Documentos'], ['ass', 'fa-signature', 'Assinaturas']].map(a => '<button class="gq-aba" onclick="gqAba(\'' + a[0] + '\')"><i class="fa-solid ' + a[1] + '"></i> ' + a[2] + '</button>').join('') + '</div></div>';
+    el.innerHTML = h;
+    // ---- graficos ----
+    const mk = (id, cfg) => { const c = document.getElementById(id); if (c && window.Chart) GQ.dashCharts.push(new Chart(c, cfg)); };
+    const dias = []; for (let i = N; i >= 0; i--) dias.push(iso(new Date(hoje.getTime() - i * 86400000)));
+    const porEq = {}; temps.forEach(t => { (porEq[t.equip_nome] = porEq[t.equip_nome] || []).push(t); });
+    const cores = ['#0F4C5C', '#d97706', '#7c3aed', '#16a34a', '#0ea5e9'];
+    const dsT = Object.keys(porEq).map((n, i) => ({ label: n, borderColor: cores[i % 5], backgroundColor: cores[i % 5], tension: .25, pointRadius: 2, spanGaps: true,
+      data: dias.map(d => { const x = porEq[n].filter(t => t.data === d).map(t => parseFloat(String(t.atual).replace(',', '.'))).filter(v => !isNaN(v)); return x.length ? +(x.reduce((a, b) => a + b, 0) / x.length).toFixed(1) : null; }) }));
+    if (rh && rh.leituras[0]) { const l = rh.leituras[0]; dsT.push({ label: 'Faixa mín.', data: dias.map(() => parseFloat(l.faixa_min)), borderColor: '#94a3b8', borderDash: [5, 4], pointRadius: 0, fill: false }, { label: 'Faixa máx.', data: dias.map(() => parseFloat(l.faixa_max)), borderColor: '#94a3b8', borderDash: [5, 4], pointRadius: 0, fill: false }); }
+    mk('gqd-temp', { type: 'line', data: { labels: dias.map(d => d.slice(8) + '/' + d.slice(5, 7)), datasets: dsT }, options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }, scales: { x: { ticks: { maxTicksLimit: 10 } } } } });
+    const st = {}; D.forEach(d => { st[d.status] = (st[d.status] || 0) + 1; });
+    const stNome = { vigente: 'Vigente', importado: 'Importado', rascunho: 'Rascunho', em_aprovacao: 'Em aprovação' }, stCor = { vigente: '#16a34a', importado: '#0ea5e9', rascunho: '#94a3b8', em_aprovacao: '#d97706' };
+    mk('gqd-status', { type: 'doughnut', data: { labels: Object.keys(st).map(k => stNome[k] || k), datasets: [{ data: Object.values(st), backgroundColor: Object.keys(st).map(k => stCor[k] || '#475569') }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 12 } } } } });
+    const tp = {}; D.forEach(d => { tp[d.tipo || '?'] = (tp[d.tipo || '?'] || 0) + 1; });
+    mk('gqd-tipo', { type: 'bar', data: { labels: Object.keys(tp), datasets: [{ label: 'Documentos', data: Object.values(tp), backgroundColor: '#37A7AA' }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } } });
+    const cqT = {}; cqs.forEach(r => { const k = (GQC.tipos[r.tipo] || { nome: r.tipo }).nome; const o = cqT[k] = cqT[k] || { ok: 0, fora: 0 }; if (r.situacao === 'FORA') o.fora++; else o.ok++; });
+    mk('gqd-cq', { type: 'bar', data: { labels: Object.keys(cqT).map(k => k.replace(' - ', ': ')), datasets: [{ label: 'Conforme', data: Object.values(cqT).map(o => o.ok), backgroundColor: '#16a34a' }, { label: 'Fora', data: Object.values(cqT).map(o => o.fora), backgroundColor: '#dc2626' }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } } } } });
+    const sem = {}; for (let i = N; i >= 0; i -= 7) { sem[iso(new Date(hoje.getTime() - i * 86400000))] = 0; }
+    const chavesSem = Object.keys(sem); desvT.forEach(t => { let k = chavesSem[0]; chavesSem.forEach(c => { if (t.data >= c) k = c; }); sem[k]++; });
+    mk('gqd-desv', { type: 'bar', data: { labels: chavesSem.map(d => d.slice(8) + '/' + d.slice(5, 7)), datasets: [{ label: 'Desvios', data: chavesSem.map(k => sem[k]), backgroundColor: '#dc2626' }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } } });
+    const mm = []; for (let i = 0; i < 6; i++) { const m = new Date(hoje.getFullYear(), hoje.getMonth() + i, 1); mm.push(m.getFullYear() + '-' + ('0' + (m.getMonth() + 1)).slice(-2)); }
+    const rev = mm.map((m, i) => D.filter(d => d.proxima_revisao && (i === 0 ? d.proxima_revisao.slice(0, 7) <= m : d.proxima_revisao.slice(0, 7) === m)).length);
+    mk('gqd-rev', { type: 'bar', data: { labels: mm.map((m, i) => (i === 0 ? 'Até ' : '') + m.slice(5) + '/' + m.slice(2, 4)), datasets: [{ label: 'Documentos a revisar', data: rev, backgroundColor: mm.map((m, i) => i === 0 ? '#dc2626' : '#0F4C5C') }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } } });
   }
 
   // ---------- temperatura ----------
