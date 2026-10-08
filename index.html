@@ -366,6 +366,15 @@
 
     .gq-aba{padding:8px 16px;border-radius:100px;border:1px solid #cbd5e1;background:#fff;font-weight:700;font-size:.85rem;cursor:pointer}
     .gq-aba.on{background:#0F4C5C;color:#fff;border-color:#0F4C5C}
+    .gq-grupo{display:flex;align-items:center;gap:10px;text-align:left;padding:10px 12px;border-radius:14px;border:1px solid #cbd5e1;background:#fff;cursor:pointer;color:#334155}
+    .gq-grupo i{font-size:1.1rem;color:#0F4C5C;width:22px;text-align:center}
+    .gq-grupo span{display:flex;flex-direction:column;line-height:1.15}
+    .gq-grupo b{font-size:.85rem}
+    .gq-grupo small{font-size:.68rem;color:#64748b}
+    .gq-grupo.on{background:#0F4C5C;border-color:#0F4C5C;color:#fff}
+    .gq-grupo.on i,.gq-grupo.on small{color:#cdeff0}
+    .gq-chip{padding:5px 12px;border-radius:100px;border:1px solid #cbd5e1;background:#fff;font-size:.75rem;font-weight:700;cursor:pointer}
+    .gq-chip.on{background:#37A7AA;border-color:#37A7AA;color:#fff}
     .gq-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:18px}
     .gq-t{font-weight:800;color:#334155;margin-bottom:8px}
     .gq-pill{color:#fff;font-size:.7rem;font-weight:800;padding:3px 10px;border-radius:100px;white-space:nowrap}
@@ -2553,14 +2562,9 @@
         </div>
 
         <div id="gq-corpo">
-          <div class="flex flex-wrap gap-2 mb-4" id="gq-abas">
-            <button class="gq-aba" data-aba="hoje" onclick="gqAba('hoje')">Hoje</button>
-            <button class="gq-aba" data-aba="temp" onclick="gqAba('temp')">Temperatura</button>
-            <button class="gq-aba" data-aba="docs" onclick="gqAba('docs')">Documentos</button>
-            <button class="gq-aba" data-aba="form" onclick="gqAba('form')">Formulários</button>
-            <button class="gq-aba" data-aba="ass" onclick="gqAba('ass')"><i class="fa-solid fa-signature"></i> Assinaturas</button>
-            <button class="gq-aba" data-aba="cq" onclick="gqAba('cq')"><i class="fa-solid fa-chart-line"></i> Controle analítico</button>
-            <button class="gq-aba" data-aba="conf" onclick="gqAba('conf')"><i class="fa-solid fa-gear"></i></button>
+          <div id="gq-abas" class="mb-4">
+            <div id="gq-grupos" class="grid grid-cols-2 md:grid-cols-5 gap-2"></div>
+            <div id="gq-sub" class="flex flex-wrap gap-2 mt-3"></div>
           </div>
 
           <div id="gq-p-hoje" class="gq-painel"></div>
@@ -4254,10 +4258,24 @@
     gqIniciar();
   }
 
+  const GQ_GRUPOS = [
+    { id: 'inicio', ic: 'fa-house', nome: 'Início', desc: 'Resumo do dia', abas: [['hoje', 'Hoje']] },
+    { id: 'rotina', ic: 'fa-clipboard-check', nome: 'Rotina diária', desc: 'Temperatura e formulários', abas: [['temp', 'Temperatura das geladeiras'], ['form', 'Formulários e registros']] },
+    { id: 'analitico', ic: 'fa-chart-line', nome: 'Controle analítico', desc: 'Hemato, bioquímica, apoio', abas: [['cq', 'Controle de qualidade analítico']] },
+    { id: 'docs', ic: 'fa-folder-open', nome: 'Documentos', desc: 'POPs, versões e assinaturas', abas: [['docs', 'Biblioteca de documentos'], ['ass', 'Assinaturas']] },
+    { id: 'config', ic: 'fa-gear', nome: 'Configurações', desc: 'Conexão', abas: [['conf', 'Conexão']] }
+  ];
+  function gqMenuDesenhar(a) {
+    const g = GQ_GRUPOS.find(x => x.abas.some(b => b[0] === a)) || GQ_GRUPOS[0];
+    document.getElementById('gq-grupos').innerHTML = GQ_GRUPOS.map(x =>
+      '<button class="gq-grupo' + (x.id === g.id ? ' on' : '') + '" onclick="gqAba(\'' + x.abas[0][0] + '\')"><i class="fa-solid ' + x.ic + '"></i><span><b>' + x.nome + '</b><small>' + x.desc + '</small></span></button>').join('');
+    document.getElementById('gq-sub').innerHTML = g.abas.length < 2 ? '' : g.abas.map(b =>
+      '<button class="gq-aba' + (b[0] === a ? ' on' : '') + '" data-aba="' + b[0] + '" onclick="gqAba(\'' + b[0] + '\')">' + b[1] + '</button>').join('');
+  }
   function gqAba(a) {
     document.querySelectorAll('.gq-painel').forEach(p => p.style.display = 'none');
     document.getElementById('gq-p-' + a).style.display = 'block';
-    document.querySelectorAll('.gq-aba').forEach(b => b.classList.toggle('on', b.dataset.aba === a));
+    gqMenuDesenhar(a);
     if (a === 'hoje') gqCarregarHoje();
     if (a === 'temp') gqPrepararTemp();
     if (a === 'docs') gqCarregarDocs();
@@ -5132,21 +5150,27 @@
   function gqFormLista() {
     const el = document.getElementById('gq-f-corpo');
     document.getElementById('gq-f-voltar').style.display = 'none';
-    let h = '';
-    GQ_CATS.forEach(cat => {
-      const fs = GQ_FORMS.filter(f => f.cat === cat);
+    GQ.form = null;
+    const cat = GQ.catFiltro || '', busca = (GQ.buscaForm || '').toLowerCase();
+    const contagem = c => GQ_FORMS.filter(f => f.cat === c).length;
+    let h = '<div class="flex flex-wrap gap-2 mb-2"><button class="gq-chip' + (!cat ? ' on' : '') + '" onclick="gqFormCat(\'\')">Todos (' + GQ_FORMS.length + ')</button>' +
+      GQ_CATS.filter(contagem).map((c, i) => '<button class="gq-chip' + (cat === c ? ' on' : '') + '" onclick="gqFormCat(' + GQ_CATS.indexOf(c) + ')">' + gqEsc(c) + ' (' + contagem(c) + ')</button>').join('') + '</div>' +
+      '<input id="gq-f-busca" type="text" data-sem-upper placeholder="Buscar formulário (código ou nome)" value="' + gqEsc(GQ.buscaForm || '') + '" oninput="gqFormBusca(this.value)" class="border rounded-lg p-2 text-sm w-full mb-2">';
+    GQ_CATS.forEach(c => {
+      if (cat && c !== cat) return;
+      const fs = GQ_FORMS.filter(f => f.cat === c && (!busca || (f.c + ' ' + f.t).toLowerCase().indexOf(busca) >= 0));
       if (!fs.length) return;
-      h += '<p class="text-xs font-extrabold uppercase text-slate-500 mt-4 mb-2">' + gqEsc(cat) + '</p><div class="grid gap-2 md:grid-cols-2">';
+      h += '<p class="text-xs font-extrabold uppercase text-slate-500 mt-4 mb-2">' + gqEsc(c) + '</p><div class="grid gap-2 md:grid-cols-2">';
       fs.forEach(f => {
         h += '<button class="gq-card text-left" style="cursor:pointer" onclick="gqFormAbrir(\'' + f.c + '\')"><span class="text-xs text-slate-400">' + gqEsc(f.c) + ' · ' + (f.modo === 'mensal' ? 'controle mensal' : 'registro') + '</span><br><b class="text-sm">' + gqEsc(f.t) + '</b></button>';
       });
       h += '</div>';
     });
-    h += '<p class="text-xs text-slate-400 mt-4">FR 001 (geladeira) est' + String.fromCharCode(225) + ' na aba Temperatura; FR 006 (n' + String.fromCharCode(227) + 'o conformidade) no sistema de NC; FR 024 (satisfa' + String.fromCharCode(231) + String.fromCharCode(227) + 'o) no NPS do app.</p>';
+    h += '<p class="text-xs text-slate-400 mt-4">FR 001 (geladeira) est' + String.fromCharCode(225) + ' em Rotina di' + String.fromCharCode(225) + 'ria &rsaquo; Temperatura; FR 006 (n' + String.fromCharCode(227) + 'o conformidade) no sistema de NC; FR 024 (satisfa' + String.fromCharCode(231) + String.fromCharCode(227) + 'o) no NPS do app.</p>';
     el.innerHTML = h;
-    GQ.form = null;
   }
-
+  function gqFormCat(i) { GQ.catFiltro = i === '' ? '' : GQ_CATS[i]; gqFormLista(); }
+  function gqFormBusca(v) { GQ.buscaForm = v; const pos = v.length; gqFormLista(); const e = document.getElementById('gq-f-busca'); if (e) { e.focus(); e.setSelectionRange(pos, pos); } }
   function gqUsuarioForm() { const u = (document.getElementById('gq-f-usuario').value || '').trim(); try { localStorage.setItem('gq_usuario', u); } catch (e) {} return u; }
 
   function gqCampoHtml(c, id, valor) {
