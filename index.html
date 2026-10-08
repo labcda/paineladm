@@ -3062,6 +3062,10 @@
 
   let cdaSessaoAvisada = false;
   function cdaSessaoExpirada() {
+    // Só vale para quem ESTAVA logado: sem sessão guardada não há o que expirar
+    // (a chamada de "aquecimento" feita ao abrir a página não pode derrubar nem recarregar nada).
+    let tinha = ''; try { tinha = localStorage.getItem('cda_session_token') || ''; } catch (e) {}
+    if (!tinha) return;
     if (cdaSessaoAvisada) return; cdaSessaoAvisada = true;
     try { showToast('Sua sessão expirou. Entre novamente.', 'error'); } catch (e) {}
     setTimeout(() => { try { limparUsuarioLogado(); } catch (e) {} location.reload(); }, 1500);
